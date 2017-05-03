@@ -39,6 +39,29 @@ keywords = "Liquid distribution ",
 abstract = "Abstract In the recent few years, continuous processing has been considered as a promising process alternative to batch processing in pharmaceutical manufacturing. Via a novel population balance model framework, a multi-dimensional multi-component model for a continuous granulation process was developed, describing time evolutions of distributions with respect to granule size, liquid distribution and granule composition. A parametric study was performed to analyze the effects of various process and design parameters, including granulator size and configuration, liquid spray rate and particle velocity, on evolutions and distributions of key granule properties. Simulation results capture experimentally observed sensitivities and trends thus demonstrating the use of a model-based framework for granulation process design, control and optimization to enable QbD in drug product development. "
 }
 
+@article{Barrasso2015cerd,
+title = "Multi-scale modeling of granulation processes: Bi-directional coupling of \{PBM\} with \{DEM\} via collision frequencies ",
+journal = "Chemical Engineering Research and Design ",
+volume = "93",
+number = "",
+pages = "304 - 317",
+year = "2015",
+note = "",
+issn = "0263-8762",
+doi = "https://doi.org/10.1016/j.cherd.2014.04.016",
+url = "http://www.sciencedirect.com/science/article/pii/S0263876214001920",
+author = "Dana Barrasso and Rohit Ramachandran",
+keywords = "Granulation",
+keywords = "Population balance modeling",
+keywords = "Discrete element modeling",
+keywords = "Multi-scale model",
+keywords = "Aggregation",
+keywords = "Collision rate ",
+abstract = "Abstract Wet granulation is a complex particle design process often operated inefficiently in industrial applications. Enhanced process understanding is required to facilitate design, control, and optimization. In this study, a hybrid multi-scale model is presented using a bi-directional coupling approach between \{DEM\} and PBM. The hybrid model takes into account particle collision frequencies and liquid distribution, providing a framework suitable for the complex sub-processes in wet granulation. The effect of particle size distribution on the collision frequency function was demonstrated, indicating the need for a multi-scale model. Results of the hybrid model show an increase in particle size over time from an average diameter of 0.98 mm to 2.5 mm, which qualitatively agrees with experimental trends observed during the liquid addition and wet massing stages. Two-dimensional distributions in particle size and liquid fraction are also presented incorporating the key effect of liquid distribution on the evolution of granule PSD. "
+}
+
+
+
 @article{Bettencourt2017,
 title = "Parallelization methods for efficient simulation of high dimensional population balance models of granulation ",
 journal = "Computers & Chemical Engineering ",
@@ -59,6 +82,20 @@ keywords = "Granulation",
 keywords = "Pharmaceutical process design ",
 abstract = "Abstract In order to solve high resolution \{PBMs\} to simulate real systems, with high accuracy and speed, a comprehensive and robust parallelization framework is needed. In this work, parallelization using just Message Passing Interface (MPI) and a more advanced method using a hybrid \{MPI\} + OpenMP (Open Multi-Processing) technique, have been applied to simulate high resolution \{PBMs\} on the computing clusters, \{SOEHPC\} and Stampede. We study the speed up and the scale up of these parallelization techniques for different system sizes and different computer architectures to come up with one of the fastest ways to solve a \{PBM\} to date. Parallel \{PBMs\} ran approximately 50–60 times faster, when using 128 cores, than the serial \{PBMs\} ran. In this work it is found that hybrid \{MPI\} + \{OMP\} methods which account for socket affinities led to the fastest \{PBM\} compute times and about 80% less memory than a purely \{MPI\} approach. "
 }
+
+@article{Cundall1979,
+author = {P. A. Cundall and O. D. L. Strack},
+title = {A discrete numerical model for granular assemblies},
+journal = {Géotechnique},
+volume = {29},
+number = {1},
+pages = {47-65},
+year = {1979},
+doi = {10.1680/geot.1979.29.1.47},
+URL = { http://dx.doi.org/10.1680/geot.1979.29.1.47},
+eprint = {http://dx.doi.org/10.1680/geot.1979.29.1.47},
+abstract = { The distinct element method is a numerical model capable of describing the mechanical behaviour of assemblies of discs and spheres. The method is based on the use of an explicit numerical scheme in which the interaction of the particles is monitored contact by contact and the motion of the particles modelled particle by particle. The main features of the distinct element method are described. The method is validated by comparing force vector plots obtained from the computer program BALL with the corresponding plots obtained from a photoelastic analysis. The photoelastic analysis used for the comparison is the one applied to an assembly of discs by De Josselin de Jong and Verruijt (1969). The force vector diagrams obtained numerically closely resemble those obtained photoelastically. It is concluded from this comparison that the distinct element method and the program BALL are valid tools for research into the behaviour of granular assemblies. La méthode des éléments distincts est un modèle numérique capable de décrire le comportement mécanique de l'assemblage de disques et de sphères. La méthode est basée sur l'utilisation d'un système numérique explicite dans lequel l'interaction des particules est contrôlée contact par contact et le mouvement des particules simulé particule par particule. Les caracteristiques principales de la méthode des eléments distints sont décrites. La méthode est validée en comparant les tracés de vecteur de force obtenus par le programme sur ordicateur BALL avec les tracés correspondants obtanus a l'aide d'une analyse photo-élastique. L'analyse photo-élastique utilisée pour la comparaison est celle appliquée sur un assemblage de disques par De Josselin de Jong et Verruijt (1969). Les diagrammes de vecteur de force obtenus numériquement sont très voisins de ceux obtenus photo-élastiquement. Cette comparaison permet de conclure que la methode des éléments distincts et le programme BALL sont des instruments valables pour la recherche du comportement des assemblages granulaires. }
+
 
 @article{Jin2011,
 title = "High performance computing using \{MPI\} and OpenMP on multi-core parallel systems ",

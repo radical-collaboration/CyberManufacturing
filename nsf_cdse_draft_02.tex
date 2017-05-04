@@ -150,9 +150,10 @@
 	    \par The meshes were then imported into LIGGGHTS using the write command (\textcolor{cyan}{more specific command that we actually used?}). This resulted in 50 elements of the impeller file having "highly skewed elements angles < 0.5 deg?" that according to LIGGGHTS would degrade parallel performance. The shell did not have any skewed elements \textcolor{cyan}{(FUTURE SOLUTION? - perhaps we can use the output from liggghts exclusion list to find exact elements of issue. then we can use meshlab to exclude those peices or remesh thos individual pieces into better shapes with less skewed elements. might be better for a letter paper though}
 	    
 	    \subsubsection{DEM input file settings}
-	    \par For the DEM simulations, a input script has to be prepared for LIGGGHTS. The input file consists of various physical parameters of the particles being simulated, command lines for the desired outputs from LIGGGHTS and various dump command which is used for post - processing of the data. 
+	    \par For the DEM simulations, a input script has to be prepared for LIGGGHTS. The input file consists of various physical parameters of the particles being simulated, command lines for the desired outputs from LIGGGHTS and various dump command which is used for post - processing of the data.
+	    \par Talk about mono and advantages and then psd. All the physical data is represented in the Table \ref{table:mthds_dem_input}
 	    \par Need to add contact models, movement commands, all the start options, 
-	    	\begin{table}[!htb]
+	    	\begin{table}[!htb][H]
 	\caption{Physical Properties of the particle for the LIGGGHTS input script (Currently a placeholder)} \label{table:mthds_dem_input}
 	\begin{center}
 	\begin{tabular}{c|c|c|c}
@@ -186,10 +187,9 @@
 	\end{center}
 	\end{table}
 
-	    \subsubsection{DEM Post data analysis}
-	    \par matlab script to check for constant flow/ steady state talk about the methods it uses etc? 
-	    
-	    \par matlab script to check for particles leaving etc make sure all good 
+	    \subsubsection{DEM data post processing}
+	    \par The post processing of the data obtained from the DEM simulations was done using MATLAB\textsuperscript{\textregistered}. The first test run on the output data was to determine if the simulation had reached steady-state. The mass inside the granulator was found out by averaging it over 5 time steps and then compared to mass inside the granulator after every 10000 time steps (about $5$x$10^{-4}$ seconds) with a tolerance of about 10%. If the mass was found to be constant for most of the iterations, it was considered to be at steady state. Another test to determine steady state was to monitor the nuber of collision inside the granulator. It can be seen that the number of collision start to oscillate around a mean value. The number of collisions were then plotted and steady state time was determined. 
+	    \par A precautionary script was also run so as to determine that no particles were lost due to overlap of the geometry with the particles as well as from particle particle overlap.
 	     
 	    
 	  \subsection{PBM}

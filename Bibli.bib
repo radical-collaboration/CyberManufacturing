@@ -15,8 +15,7 @@ keywords = "Performance modeling",
 keywords = "MPI",
 keywords = "OpenMP",
 keywords = "Cluster",
-keywords = "SMP ",
-abstract = "Performance evaluation and modeling are crucial steps to enabling the optimization of parallel programs. Programs written using two programming models, such as \{MPI\} and OpenMP, require analysis to determine both performance efficiency and the most suitable numbers of processes and threads for their execution on a given platform. To study both of these problems, we propose the construction of a model that is based upon a small number of parameters, but is able to capture the complexity of the runtime system. We incorporate measurements of overheads introduced by each of the programming models, and thus need to model both the network and computational aspects of the system. We have combined two different techniques that includes static analysis, driven by the OpenUH compiler, to retrieve application signatures and a parallelization overhead measurement benchmark, realized by Sphinx and Perfsuite, to collect system profiles. Finally, we propose a performance evaluation measurement to identify communication and computation efficiency. In this paper, we describe our underlying framework, the performance model, and show how our tool can be applied to a sample code. "
+keywords = "SMP "
 }
 
 @article{Barrasso2013,
@@ -56,15 +55,14 @@ keywords = "Population balance modeling",
 keywords = "Discrete element modeling",
 keywords = "Multi-scale model",
 keywords = "Aggregation",
-keywords = "Collision rate ",
-abstract = "Abstract Wet granulation is a complex particle design process often operated inefficiently in industrial applications. Enhanced process understanding is required to facilitate design, control, and optimization. In this study, a hybrid multi-scale model is presented using a bi-directional coupling approach between \{DEM\} and PBM. The hybrid model takes into account particle collision frequencies and liquid distribution, providing a framework suitable for the complex sub-processes in wet granulation. The effect of particle size distribution on the collision frequency function was demonstrated, indicating the need for a multi-scale model. Results of the hybrid model show an increase in particle size over time from an average diameter of 0.98 mm to 2.5 mm, which qualitatively agrees with experimental trends observed during the liquid addition and wet massing stages. Two-dimensional distributions in particle size and liquid fraction are also presented incorporating the key effect of liquid distribution on the evolution of granule PSD. "
+keywords = "Collision rate "
 }
 
 
 
 @article{Bettencourt2017,
 title = "Parallelization methods for efficient simulation of high dimensional population balance models of granulation ",
-journal = "Computers & Chemical Engineering ",
+journal = "Computers \& Chemical Engineering ",
 volume = "",
 number = "",
 pages = " - ",
@@ -79,8 +77,7 @@ keywords = "OpenMP",
 keywords = "Parallel computing",
 keywords = "Population balance model",
 keywords = "Granulation",
-keywords = "Pharmaceutical process design ",
-abstract = "Abstract In order to solve high resolution \{PBMs\} to simulate real systems, with high accuracy and speed, a comprehensive and robust parallelization framework is needed. In this work, parallelization using just Message Passing Interface (MPI) and a more advanced method using a hybrid \{MPI\} + OpenMP (Open Multi-Processing) technique, have been applied to simulate high resolution \{PBMs\} on the computing clusters, \{SOEHPC\} and Stampede. We study the speed up and the scale up of these parallelization techniques for different system sizes and different computer architectures to come up with one of the fastest ways to solve a \{PBM\} to date. Parallel \{PBMs\} ran approximately 50–60 times faster, when using 128 cores, than the serial \{PBMs\} ran. In this work it is found that hybrid \{MPI\} + \{OMP\} methods which account for socket affinities led to the fastest \{PBM\} compute times and about 80% less memory than a purely \{MPI\} approach. "
+keywords = "Pharmaceutical process design "
 }
 
 @article{Cundall1979,
@@ -93,8 +90,8 @@ pages = {47-65},
 year = {1979},
 doi = {10.1680/geot.1979.29.1.47},
 URL = { http://dx.doi.org/10.1680/geot.1979.29.1.47},
-eprint = {http://dx.doi.org/10.1680/geot.1979.29.1.47},
-abstract = { The distinct element method is a numerical model capable of describing the mechanical behaviour of assemblies of discs and spheres. The method is based on the use of an explicit numerical scheme in which the interaction of the particles is monitored contact by contact and the motion of the particles modelled particle by particle. The main features of the distinct element method are described. The method is validated by comparing force vector plots obtained from the computer program BALL with the corresponding plots obtained from a photoelastic analysis. The photoelastic analysis used for the comparison is the one applied to an assembly of discs by De Josselin de Jong and Verruijt (1969). The force vector diagrams obtained numerically closely resemble those obtained photoelastically. It is concluded from this comparison that the distinct element method and the program BALL are valid tools for research into the behaviour of granular assemblies. La méthode des éléments distincts est un modèle numérique capable de décrire le comportement mécanique de l'assemblage de disques et de sphères. La méthode est basée sur l'utilisation d'un système numérique explicite dans lequel l'interaction des particules est contrôlée contact par contact et le mouvement des particules simulé particule par particule. Les caracteristiques principales de la méthode des eléments distints sont décrites. La méthode est validée en comparant les tracés de vecteur de force obtenus par le programme sur ordicateur BALL avec les tracés correspondants obtanus a l'aide d'une analyse photo-élastique. L'analyse photo-élastique utilisée pour la comparaison est celle appliquée sur un assemblage de disques par De Josselin de Jong et Verruijt (1969). Les diagrammes de vecteur de force obtenus numériquement sont très voisins de ceux obtenus photo-élastiquement. Cette comparaison permet de conclure que la methode des éléments distincts et le programme BALL sont des instruments valables pour la recherche du comportement des assemblages granulaires. }
+eprint = {http://dx.doi.org/10.1680/geot.1979.29.1.47}
+}
 
 
 @article{Jin2011,
@@ -112,20 +109,30 @@ author = "Haoqiang Jin and Dennis Jespersen and Piyush Mehrotra and Rupak Biswas
 keywords = "Hybrid \{MPI\} + OpenMP programming",
 keywords = "Multi-core Systems",
 keywords = "OpenMP Extensions",
-keywords = "Data Locality ",
-abstract = "The rapidly increasing number of cores in modern microprocessors is pushing the current high performance computing (HPC) systems into the petascale and exascale era. The hybrid nature of these systems – distributed memory across nodes and shared memory with non-uniform memory access within each node – poses a challenge to application developers. In this paper, we study a hybrid approach to programming such systems – a combination of two traditional programming models, \{MPI\} and OpenMP. We present the performance of standard benchmarks from the multi-zone \{NAS\} Parallel Benchmarks and two full applications using this approach on several multi-core based systems including an \{SGI\} Altix 4700, an \{IBM\} p575+ and an \{SGI\} Altix \{ICE\} 8200EX. We also present new data locality extensions to OpenMP to better match the hierarchical memory structure of multi-core architectures. "
+keywords = "Data Locality "
 }
 
-@article{Kloss2012,
-  title={Models, algorithms and validation for opensource DEM and CFD--DEM},
-  author={Kloss, Christoph and Goniva, Christoph and Hager, Alice and Amberger, Stefan and Pirker, Stefan},
-  journal={Progress in Computational Fluid Dynamics, an International Journal},
-  volume={12},
-  number={2-3},
-  pages={140--152},
-  year={2012},
-  publisher={Inderscience Publishers}
+@article{Ramachandran2009,
+title = "A mechanistic model for breakage in population balances of granulation: Theoretical kernel development and experimental validation ",
+journal = "Chemical Engineering Research and Design ",
+volume = "87",
+number = "4",
+pages = "598 - 614",
+year = "2009",
+note = "13th European Conference on Mixing: New developments towards more efficient and sustainable operations ",
+issn = "0263-8762",
+doi = "https://doi.org/10.1016/j.cherd.2008.11.007",
+url = "http://www.sciencedirect.com/science/article/pii/S0263876208003225",
+author = "Rohit Ramachandran and Charles D. Immanuel and Frantisek Stepanek and James D. Litster and Francis J. Doyle III",
+keywords = "Granulation",
+keywords = "High-shear mixing",
+keywords = "Multi-dimensional population balance",
+keywords = "Breakage",
+keywords = "Mechanistic kernels",
+keywords = "Experimental validation "
 }
+
+
 
 @article{ramkrishna2014,
 	title = {Population {Balance} {Modeling}: {Current} {Status} and {Future} {Prospects}},
@@ -133,7 +140,6 @@ abstract = "The rapidly increasing number of cores in modern microprocessors is 
 	shorttitle = {Population {Balance} {Modeling}},
 	url = {http://dx.doi.org/10.1146/annurev-chembioeng-060713-040241},
 	doi = {10.1146/annurev-chembioeng-060713-040241},
-	abstract = {Population balance modeling is undergoing phenomenal growth in its applications, and this growth is accompanied by multifarious reviews. This review aims to fortify the model's fundamental base, as well as point to a variety of new applications, including modeling of crystal morphology, cell growth and differentiation, gene regulatory processes, and transfer of drug resistance. This is accomplished by presenting the many faces of population balance equations that arise in the foregoing applications.},
 	number = {1},
 	urldate = {2017-04-27},
 	journal = {Annual Review of Chemical and Biomolecular Engineering},

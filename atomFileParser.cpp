@@ -1,57 +1,50 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <cstring>
 #include <string>
+
 #include "atomFileParser.h"
+
 using namespace std;
 
 
-double getTimeValueFromAtomFileName (string fileName)
+mapCollisionData collisionFileParser (string filePath, string collisionFileName, double& time)
 {
-    const char * str = fileName.c_str();
-    char digits[] = "1234567890";
-    size_t firstDigitPos = strcspn (str,digits);
-    if (firstDigitPos == fileName.length())
+    //Reading Dump files
+    mapCollisionData mapData;
+    ifstream collisionFile;
+    collisionFile.open ((filePath + collisionFileName).c_str(), ifstream::in);
+    if(!collisionFile.is_open())
     {
-        cout << fileName << " file name doesn't contain any time value" << endl;
-        return 0.0;
-    }
-    size_t dotPos = fileName.find(".");
-    if(dotPos == static_cast<size_t>(string::npos))
-    {
-        cout << fileName << " doesn't have any '.' for file extension" << endl;
-        return 0.0;
-    }
-    string timeStr = fileName.substr (firstDigitPos, dotPos - firstDigitPos);
-    return stod(timeStr);
-}
-
-mapParticleIdData atomFileParser (string fileName)
-{
-    mapParticleIdData mapIdData;
-    ifstream atomFile;
-    atomFile.open (fileName.c_str(), ifstream::in);
-    if(!atomFile.is_open())
-    {
-        std::cout << "Unable to open " << fileName << " file" << endl;
-        return mapIdData;
+        std::cout << "Unable to open " << collisionFileName << " file" << endl;
+        return mapData;
     }
     string line;
     string tmpStr;
     stringstream lineData;
-    while (tmpStr.compare("ATOMS") && !atomFile.eof())
+
+    //get time value
+    getline(collisionFile, line); //Read first line as ITEM: TIMESTEP
+    lineData = move(stringstream(line));
+    lineData >> tmpStr;
+    lineData >> tmpStr;
+
+    getline(collisionFile, line); //Read time value
+    lineData = move(stringstream(line));
+    lineData >> time;
+
+    while (tmpStr.compare("ATOMS") && !collisionFile.eof())
     {
-        getline(atomFile, line);
+        getline(collisionFile, line);
         lineData = move(stringstream(line));
         lineData >> tmpStr;
         lineData >> tmpStr;
     }
 
-    if(tmpStr.compare("ATOMS") || atomFile.eof())
+    if(tmpStr.compare("ATOMS") || collisionFile.eof())
     {
-        //cout << fileName << " doesn't contain require info" << endl;
-        return mapIdData;
+        //cout << collisionFileName << " doesn't contain require info" << endl;
+        return mapData;
     }
 
     while(tmpStr.compare("fz"))
@@ -59,8 +52,8 @@ mapParticleIdData atomFileParser (string fileName)
 
     if(tmpStr.compare("fz"))// || atomFile.eof())
     {
-        //cout << fileName << " doesn't contain require info" << endl;
-        return mapIdData;
+        //cout << collisionFileName << " doesn't contain require info" << endl;
+        return mapData;
     }
 
     int c_ccCount = 0;
@@ -74,10 +67,10 @@ mapParticleIdData atomFileParser (string fileName)
     if(tmpStr.compare("f_fppacc"))// || atomFile.eof())
     {
         //cout << fileName << " doesn't contain require info" << endl;
-        return mapIdData;
+        return mapData;
     }
 
-    while (getline(atomFile, line))
+    while (getline(collisionFile, line))
     {
         lineData = move(stringstream(line));
         lineData >> tmpStr; //read and ignore particle id
@@ -85,35 +78,88 @@ mapParticleIdData atomFileParser (string fileName)
         int particleType = stoi(tmpStr);
         lineData >> tmpStr >> tmpStr >> tmpStr; //read and ignore x, y & z value;
         lineData >> tmpStr >> tmpStr >> tmpStr; //read and ignore ix, iy & iz value;
-        particleData pData;
-        lineData >> pData.velocity[0] >> pData.velocity[1] >> pData.velocity[2]; //read vx, vy & vz value;
+        collisionData cData;
+        lineData >> cData.velocity[0] >> cData.velocity[1] >> cData.velocity[2]; //read vx, vy & vz value;
         lineData >> tmpStr >> tmpStr >> tmpStr; //read and ignore fx, fy & fz value;
         //read collision data
-        pData.c_ccVec.resize(c_ccCount);
+        cData.c_ccVec.resize(c_ccCount);
         for(int i = 0; i < c_ccCount; i++)
-            lineData >> pData.c_ccVec[i];
+            lineData >> cData.c_ccVec[i];
 
-        lineData >> pData.f_fpacc;
+        lineData >> cData.f_fpacc;
 
-        auto mapIt = mapIdData.find(particleType);
-        if( mapIt == mapIdData.end())
+        auto mapIt = mapData.find(particleType);
+        if( mapIt == mapData.end())
         {
-            vector<particleData> tmpVec;
-            tmpVec.push_back(pData);
-            pair<int, vector<particleData>> mapEntry(particleType, tmpVec);
-            mapIdData.insert(mapEntry);
+            vector<collisionData> tmpVec;
+            tmpVec.push_back(cData);
+            pair<int, vector<collisionData>> mapEntry(particleType, tmpVec);
+            mapData.insert(mapEntry);
         }
         else
-            (mapIt->second).push_back(pData);
+            (mapIt->second).push_back(cData);
 
     }
 
-//    cout << fileName << endl;
-//    cout << mapIdData.size() << endl;
-//    for(auto it = mapIdData.begin(); it != mapIdData.end(); it++)
+//    cout << collisionFile << endl;
+//    cout << mapData.size() << endl;
+//    for(auto it = mapData.begin(); it != mapData.end(); it++)
 //        cout << (it->second).size() << endl;
 //    cout << endl;
 
-    atomFile.close();
-    return mapIdData;
+    collisionFile.close();
+
+    return mapData;
+}
+
+pairImpactData impactFileParser (string filePath, string impactFileName)
+{
+    //Read Collision file
+    pairImpactData pairData;
+    pairData.first = 0;
+    pairData.second = 0;
+    ifstream impactFile;
+    impactFile.open ((filePath + impactFileName).c_str(), ifstream::in);
+    if(!impactFile.is_open())
+    {
+        std::cout << "Unable to open " << impactFileName << " file" << endl;
+        return pairData;
+    }
+
+    string line;
+    string tmpStr;
+    stringstream lineData;
+
+    getline(impactFile, line); //Read first line as ITEM: TIMESTEP
+    lineData = move(stringstream(line));
+    lineData >> tmpStr;
+    lineData >> tmpStr;
+
+    while (tmpStr.compare("ENTRIES") && !impactFile.eof())
+    {
+        getline(impactFile, line);
+        lineData = move(stringstream(line));
+        lineData >> tmpStr;
+        lineData >> tmpStr;
+    }
+
+    if(tmpStr.compare("ENTRIES") || impactFile.eof())
+    {
+        //cout << impactFileName << " doesn't contain require info" << endl;
+        return pairData;
+    }
+
+    int impactType = 0;
+
+    while (getline(impactFile, line))
+    {
+        lineData = move(stringstream(line));
+        lineData >> impactType; //read impact type
+        if(impactType == 0)
+            pairData.first += 1;
+        if(impactType == 1)
+            pairData.second += 1;
+    }
+
+    return pairData;
 }

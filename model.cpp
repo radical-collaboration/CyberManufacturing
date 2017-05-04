@@ -36,7 +36,7 @@ int main()
 
     //Read Dump Atom Files
     liggghtsData *lData = liggghtsData::getInstance();
-    lData->readDumpAtomFiles();
+    lData->readLiggghtsDataFiles();
 
     //return 0;//to stop execution after reading liggghts data
 

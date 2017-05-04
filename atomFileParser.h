@@ -5,20 +5,24 @@
 #include <vector>
 #include <array>
 #include <map>
+//#include <pair>
 #include <string>
 
 typedef struct
 {
     std::array <double, 3> velocity;
-    //double c_cc;
     std::vector <unsigned int> c_ccVec;
     double f_fpacc;
-} particleData;
+} collisionData;
 
-typedef std::map<int, std::vector<particleData>> mapParticleIdData;
+//for collision files
+typedef std::map<unsigned int, std::vector<collisionData>> mapCollisionData;
+//for impact files
+//first value for impact with wall
+//second value for impact with impeller
+typedef std::pair<unsigned int, unsigned int> pairImpactData;
 
-double getTimeValueFromAtomFileName (std::string fileName);
+mapCollisionData collisionFileParser (std::string filePath, std::string collisionFileName, double& time);
 
-mapParticleIdData atomFileParser (std::string fileName);
-
+pairImpactData impactFileParser (std::string filePath, std::string impactFileName);
 #endif // ATOMFILEDATA_H

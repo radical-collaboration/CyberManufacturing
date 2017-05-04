@@ -107,13 +107,13 @@
 	
 	  \subsection{DEM}
 	    \subsubsection{LIGGGHTS}
-	    \par version, compilation settings, compilers used, etc
-	    \par compiled with intel blak mvapich balh bec on stmapede blah blah blah run using hybrid blah with socket affinities etc this resulted in highest performance etc 
+	    	\par LIGGGHTSv3.60 (\cite{Kloss2012}) developed by DCS computing was used for all the simulation performed in this study. Edits were made to the compute\_contact\_atom source file to obtain particle $-$ particle collisions. The aforementioned version of LIGGGHTS was compiled using the mvapich (mvapich2 v2.1) and intel (intel v15.0.2) compilers with the -o3 optimisation option as well as an option to use OpenMP threads was implemented. This hybrid parallel technique helped achieve significant speed improvements over MPI only compilations. The speed improvements are illustrated in Table (refer to the speed table). The studies were performed on STAMPEDE supercomputer located at Univeristy of Texas, Austin. The hardware configuration of each node consists of 2 8-core Intel Xeon E5-2680 processors based on the Sandy Bridge architecture, 32 gb of memory with QPI interconnects at 8.0 GT/s PCI-e lanes.
+
 	        
 	    \subsubsection{Geometry}    
 	    \par \textcolor{red}{check other file Charles uploaded to see if that one was more "journal ready"}
 	    
-	    \par The first step in creating a DEM model is the construction of geometry (i.e. a 3D computer aided drawing of an equipment). Here, the geometry of L\"{o}dige CoriMix CM5 continuous high shear granulator has been developed using the SolidWorks$^{TM}$ (Dassault Syst\`{e}mes). This granulator consists of a high speed rotating element enclosed within a horizontal cylindrical casing. The casing (shown in Figure \ref{fig:mthdsDemCharlesGranShell}) consists of a cylinder with diameter of 120 mm at the inlet and 130 mm at the outlet and having a total length of 440 mm. A vertical inlet port is provided at one end of the casing and an angled outlet port is provided at the larger end of the case. 
+	    \par In this study, the L\"{o}dige CoriMix CM5 continuous high shear granulator has been studied. Its geometry was developed using the SolidWorks$^{TM}$ (Dassault Syst\`{e}mes). This granulator consisted of a high speed rotating element enclosed within a horizontal cylindrical casing. The casing (shown in Figure \ref{fig:mthdsDemCharlesGranShell}) consists of a cylinder with diameter of 120 mm at the inlet and 130 mm at the outlet and having a total length of 440 mm. A vertical inlet port is provided at one end of the casing and an angled outlet port is provided at the larger end of the case. 
 	
 	      \begin{figure}[H]
 	      \centering
@@ -149,8 +149,43 @@
 	    \par Meshlab was used to align the STL files for importing into LIGGGHTS. No mesh treatments were used on the STLs. 
 	    \par The meshes were then imported into LIGGGHTS using the write command (\textcolor{cyan}{more specific command that we actually used?}). This resulted in 50 elements of the impeller file having "highly skewed elements angles < 0.5 deg?" that according to LIGGGHTS would degrade parallel performance. The shell did not have any skewed elements \textcolor{cyan}{(FUTURE SOLUTION? - perhaps we can use the output from liggghts exclusion list to find exact elements of issue. then we can use meshlab to exclude those peices or remesh thos individual pieces into better shapes with less skewed elements. might be better for a letter paper though}
 	    
-	    \subsubsection{DEM settings (input script, eqn param and relations used etc}
-	    
+	    \subsubsection{DEM input file settings}
+	    \par For the DEM simulations, a input script has to be prepared for LIGGGHTS. The input file consists of various physical parameters of the particles being simulated, command lines for the desired outputs from LIGGGHTS and various dump command which is used for post - processing of the data. 
+	    \par Need to add contact models, movement commands, all the start options, 
+	    	\begin{table}[!htb]
+	\caption{Physical Properties of the particle for the LIGGGHTS input script (Currently a placeholder)} \label{table:mthds_dem_input}
+	\begin{center}
+	\begin{tabular}{c|c|c|c}
+	\hline
+	\bf{Parameter} &\bf{Symbol} &\bf{Value} &\bf{Units}\\
+	\hline
+	Boltzmann constant & $k$ & $1.3806488 \times 10^{-23}$ & $m^2~kg~s^{-2}~K^{-1}$\\
+	Charge of electron & $e$ & $1.60217657 \times 10^{-19}$ & $Coulombs$\\
+	Avogadro Number & $N_A$ & $6.0221413 \times 10^{23}$ & $-$\\
+	Hamaker constant & $A_H$ & $3 \times 10^{-21}$ & $J$\\
+	Hydration force constant & $F_0$ & $10^{-2}$ & $N~m^{-1}$\\
+	Temperature of the medium & $T$ & $298$ & $K$\\
+	Viscosity of the medium & $\mu$ & $0.8999 \times 10^{-3}$ & $Pa.s$\\
+	Permittivity of the medium & $\epsilon_0 \epsilon_r$ & $6.93\times 10^{-10}$ & $C^2~N^{-1}~m^{-2}$ \\
+	Valence of ions in medium & $z$ & $1$ & $-$\\
+	Bulk concentration of ions in medium & $C^b$ & $1 \times 10^{-2}$ & $kg~m^{-3}$\\
+	Debye length & $\frac{1}{\kappa} $ & $1.3581 \times 10^{-7}$ & $m$\\
+	Decay length & $\delta_0$ & $6 \times 10^{-10}$ & $m$\\
+	Density of alginate & $\rho_{Alginate}$ & $1050$ & $kg~m^{-3}$ \\
+	Density of chitosan & $\rho_{Chitosan}$ & $1000$ & $kg~m^{-3}$ \\
+	Surface potential of alginate & $\Psi_{Alginate}$ & $-46 \times 10^{-3}$ & $Volts$\\
+	Surface potential of chitosan & $\Psi_{Chitosan}$ & $56 \times 10^{-3}$ & $Volts$\\
+	Volume of the system & $V$ & $10\times10^{-6}$ & $m^3$\\
+	Volume of the smallest alginate bin & $a_1$ & $1.5 \times 10^{-17}$ & $m^{3}$\\
+	Volume of the smallest chitosan bin & $c_1$ & $0.3 \times 10^{-17}$ & $m^{3}$ \\
+	Aggregation kernel constant & $K_0$ & $5 \times 10^{9}$ & $-$\\
+	Simulated Process Time & $t$ & $10$ & $s$\\
+	Simulation Time-Step & $dt$ & $0.01$ & $s$\\
+	\hline
+	\end{tabular}
+	\end{center}
+	\end{table}
+
 	    \subsubsection{DEM Post data analysis}
 	    \par matlab script to check for constant flow/ steady state talk about the methods it uses etc? 
 	    

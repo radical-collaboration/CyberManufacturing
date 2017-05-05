@@ -15,7 +15,7 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
     arrayOfDouble4D aggregationKernel = getArrayOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
 
     //Initialization
-    arrayOfDouble4D collisionFrequency = getArrayOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS, 1.0);
+    arrayOfDouble4D collisionFrequency = getArrayOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
     arrayOfDouble4D collisionEfficiency = getArrayOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
 
     //Collision Frequency (from 2D Number of Collisions)
@@ -30,21 +30,20 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
     for (int i = 0; i < NUMBEROFDEMBINS; i++)
         scaledDEMDiameter[i] = DEMdiameter[i] * (maxDiameter/maxDEMDiameter);
 
-//    for (int s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
-//        for (int ss1  = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
-//            for (int s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
-//                for (int ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
-//                    for (int i = 0; i < NUMBEROFDEMBINS-1; i++)
-//                        for (int j  = 0; j < NUMBEROFDEMBINS-1; j++)
-//                        {
-//                            bool flag1 = fAll[s1][ss1] >= 1.0 && fAll[s2][ss2] >= 1.0;
-//                            bool flag2 = diameter[s1][ss1] <= scaledDEMDiameter[i+1] && diameter[s1][ss1] > scaledDEMDiameter[i];
-//                            bool flag3 = diameter[s2][ss2] <= scaledDEMDiameter[j+1] && diameter[s2][ss2] > scaledDEMDiameter[j];
-//
-//                            if(flag1 && flag2 && flag3)
-//                                collisionFrequency[s1][ss1][s2][ss2] = (numberOfCollisions[i][j]*timeStep)/(fAll[s1][ss1]*fAll[s2][ss2]*TIMESTEPDEM);
-//                        }
+    for (int s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
+        for (int ss1  = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
+            for (int s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
+                for (int ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
+                    for (int i = 0; i < NUMBEROFDEMBINS-1; i++)
+                        for (int j  = 0; j < NUMBEROFDEMBINS-1; j++)
+                        {
+                            bool flag1 = fAll[s1][ss1] >= 1.0 && fAll[s2][ss2] >= 1.0;
+                            bool flag2 = diameter[s1][ss1] <= scaledDEMDiameter[i+1] && diameter[s1][ss1] > scaledDEMDiameter[i];
+                            bool flag3 = diameter[s2][ss2] <= scaledDEMDiameter[j+1] && diameter[s2][ss2] > scaledDEMDiameter[j];
 
+                            if(flag1 && flag2 && flag3)
+                                collisionFrequency[s1][ss1][s2][ss2] = (numberOfCollisions[i][j]*timeStep)/(fAll[s1][ss1]*fAll[s2][ss2]*TIMESTEPDEM);
+                        }
 
     //Constant Collision Efficiency
     //FROM Barrasso, Tamrakar, Ramachandran. Procedia Engineering 102 (2015) 1295�1304. (p. 1298)
@@ -67,7 +66,6 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
                     if(externalLiquidContent[s1][ss1] >= criticialExternalLiquid && externalLiquidContent[s2][ss1] >= criticialExternalLiquid)
                         collisionEfficiency[s1][ss1][s2][ss2] = COLLISIONEFFICIENCYCONSTANT;
                 }
-
 
     //Aggregation Kernel Calculation
     for (int s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)

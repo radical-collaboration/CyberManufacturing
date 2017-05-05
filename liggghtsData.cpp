@@ -17,6 +17,12 @@ liggghtsData::liggghtsData()
     cout << "LIGGGHTS data pointer created" << endl;
 }
 
+liggghtsData::~liggghtsData()
+{
+    cout << "LIGGGHTS data pointer destroyed" << endl;
+    delete lData;
+}
+
 liggghtsData* liggghtsData::getInstance()
 {
     if(!instanceFlag)
@@ -147,7 +153,8 @@ void liggghtsData::readLiggghtsDataFiles()
 //        for(auto it2 = (it->second).begin(); it2 != (it->second).end(); it2++)
 //        {
 //            cout << "particle type = " << it2->first << endl;
-//            vector<collisionData> pDataVec = it2->second;
+//            cout << "particle diameter = " << get<0>(it2->second) << endl;
+//            vector<collisionData> pDataVec = get<1>(it2->second);
 //            cout << "no. of rows = " << pDataVec.size() << endl;
 //            for (auto vec : pDataVec)
 //            {
@@ -189,6 +196,42 @@ mapCollisionData liggghtsData::getMapCollisionData (double time)
     return mapData;
 }
 
+pairImpactData liggghtsData::getPairImpactData (double time)
+{
+    pairImpactData pairData;
+    pairData.first = 0;
+    pairData.second = 0;
+
+    if (mapImpactDataOverTime.empty())
+        return pairData;
+
+    auto it = mapImpactDataOverTime.find(time);
+    if (it != mapImpactDataOverTime.end())
+        pairData = it->second;
+
+    return pairData;
+}
+
+vector<double> liggghtsData::getFinalNumberOfImpacts()
+{
+    vector<double> nImpacts;
+
+    if(!instanceFlag)
+        return nImpacts;
+
+    if (mapImpactDataOverTime.empty())
+        return nImpacts;
+
+    auto mapIt = mapImpactDataOverTime.end();
+
+    pairImpactData pairData = getPairImpactData((--mapIt)->first);
+
+    nImpacts = vector<double>(NUMBEROFDEMBINS, static_cast<double>(pairData.first + pairData.second));
+
+    return nImpacts;
+}
+
+
 arrayOfDouble2D liggghtsData::getFinalNumberOfCollisions()
 {
     arrayOfDouble2D nCollisions;
@@ -212,16 +255,39 @@ arrayOfDouble2D liggghtsData::getFinalNumberOfCollisions()
     {
         int row = itMapData->first;
 
-        vector<collisionData> vecCollisionData = itMapData->second;
+        vector<collisionData> vecCollisionData = get<1>(itMapData->second);
 
         for (auto data : vecCollisionData)
         {
-            vector <unsigned int> c_ccVec = data.c_ccVec;
+            vector <int> c_ccVec = data.c_ccVec;
             int c_ccCount = 0;
             for(auto c_cc : c_ccVec)
                 nCollisions[row-1][c_ccCount++] += c_cc;
         }
     }
     return nCollisions;
+}
+
+vector<double> liggghtsData::getParticleDiameters()
+{
+    vector<double> particleDiameters;
+
+    if(!instanceFlag)
+        return particleDiameters;
+
+    if (mapCollisionDataOverTime.empty())
+        return particleDiameters;
+
+    auto mapIt = mapCollisionDataOverTime.end();
+
+    mapCollisionData mapData = getMapCollisionData((--mapIt)->first);
+
+    if (mapData.empty())
+        return particleDiameters;
+
+    for(auto itMapData = mapData.begin(); itMapData != mapData.end(); itMapData++)
+        particleDiameters.push_back(get<0>(itMapData->second));
+
+    return particleDiameters;
 }
 

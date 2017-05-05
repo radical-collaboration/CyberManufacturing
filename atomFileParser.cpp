@@ -86,18 +86,22 @@ mapCollisionData collisionFileParser (string filePath, string collisionFileName,
         for(int i = 0; i < c_ccCount; i++)
             lineData >> cData.c_ccVec[i];
 
-        lineData >> cData.f_fpacc;
+        lineData >> cData.f_fpacc; //read f_fpacc value
+
+        double radius = 0.0;
+        lineData >> radius;
 
         auto mapIt = mapData.find(particleType);
         if( mapIt == mapData.end())
         {
             vector<collisionData> tmpVec;
             tmpVec.push_back(cData);
-            pair<int, vector<collisionData>> mapEntry(particleType, tmpVec);
+            auto tupleEntry = make_tuple(radius*2, tmpVec);
+            auto mapEntry = make_pair(particleType, tupleEntry);
             mapData.insert(mapEntry);
         }
         else
-            (mapIt->second).push_back(cData);
+            get<1>(mapIt->second).push_back(cData);
 
     }
 

@@ -316,22 +316,31 @@ int main()
     arrayOfDouble2D externalVolumeBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
 
 
-    compartmentDEMIn.DEMDiameter = vector <double>(NUMBEROFDEMBINS, 0.0);
-    compartmentDEMIn.numberOfCollisions = getArrayOfDouble2D(NUMBEROFDEMBINS, NUMBEROFDEMBINS);
-    compartmentDEMIn.numberOfImpacts = vector <double> (NUMBEROFDEMBINS, 0.0);
+    //compartmentDEMIn.DEMDiameter = vector <double>(NUMBEROFDEMBINS, 0.0);
+    //compartmentDEMIn.numberOfCollisions = getArrayOfDouble2D(NUMBEROFDEMBINS, NUMBEROFDEMBINS);
+    //compartmentDEMIn.numberOfImpacts = vector <double> (NUMBEROFDEMBINS, 0.0);
 
-    default_random_engine generator;
-    uniform_real_distribution<double> distribution(0.0,1.0);
+    //default_random_engine generator;
+    //uniform_real_distribution<double> distribution(0.0,1.0);
 
-    for (int i = 0; i < NUMBEROFDEMBINS; i++)
-    {
-        compartmentDEMIn.DEMDiameter[i] = distribution(generator)*1.0e3;
-        compartmentDEMIn.numberOfImpacts[i] = 1.0; //distribution(generator);
-        for(int j = 0; j < NUMBEROFDEMBINS; j++)
-            compartmentDEMIn.numberOfCollisions[i][j] = 1.0; //distribution(generator);
-    }
-    //compartmentDEMIn.numberOfCollisions = lData->getFinalNumberOfCollisions();
+    //for (int i = 0; i < NUMBEROFDEMBINS; i++)
+    //{
+        //compartmentDEMIn.DEMDiameter[i] = 1.0e3;//distribution(generator)*1.0e3;
+        //compartmentDEMIn.numberOfImpacts[i] = 1.0; //distribution(generator);
+        //for(int j = 0; j < NUMBEROFDEMBINS; j++)
+            //compartmentDEMIn.numberOfCollisions[i][j] = 1.0; //distribution(generator);
+    //}
+    compartmentDEMIn.DEMDiameter = lData->getParticleDiameters();
+    if((compartmentDEMIn.DEMDiameter).size() == 0)
+        cout << "Diameter data is missing in LIGGGHTS output file" << endl;
 
+    compartmentDEMIn.numberOfImpacts = lData->getFinalNumberOfImpacts();
+    if((compartmentDEMIn.numberOfImpacts).size() == 0)
+        cout << "Impact data is missing in LIGGGHTS output file" << endl;
+
+    compartmentDEMIn.numberOfCollisions = lData->getFinalNumberOfCollisions();
+    if((compartmentDEMIn.numberOfCollisions)[0].size() == 0)
+        cout << "Collision data is missing in LIGGGHTS output file" << endl;
 
     vector <double> liquidAdditionRateAllCompartments(NUMBEROFCOMPARTMENTS, 0.0);
     liquidAdditionRateAllCompartments[0] = LIQUIDADDITIONRATE;

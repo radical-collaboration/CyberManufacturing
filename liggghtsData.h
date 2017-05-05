@@ -17,6 +17,7 @@ class liggghtsData
 
     std::map <double, mapCollisionData> mapCollisionDataOverTime;
     std::map <double, pairImpactData> mapImpactDataOverTime;
+    //std::map <double, mapParticleDiameter> mapParticleDiameterOverTime;
 
 public:
     //liggghtsData() = delete;
@@ -28,6 +29,8 @@ public:
     pairImpactData getPairImpactData (double time);
 
     arrayOfDouble2D getFinalNumberOfCollisions();
+    std::vector<double> getFinalNumberOfImpacts();
+    std::vector<double> getParticleDiameters();
     ~liggghtsData();
 };
 

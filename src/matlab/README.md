@@ -1,3 +1,3 @@
 # pbm-dem-multiscale-manufacturing
 
-This branch contains MATLAB files related to this project
+This folder contains MATLAB files related to this project

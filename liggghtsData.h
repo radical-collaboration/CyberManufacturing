@@ -3,27 +3,34 @@
 
 #include <map>
 #include <vector>
+//#include <pair>
 #include "atomFileParser.h"
 #include "utility.h"
 
-typedef std::map <int, std::vector<particleData>> mapParticleIdData;
+
 class liggghtsData
 {
     static bool instanceFlag;
     static liggghtsData *lData;// = nullptr;
     liggghtsData();
-    //void readDumpAtomFiles();
+    bool checkFileConsistency(std::string collisionFile, std::string impactFile);
 
-    std::map <double, mapParticleIdData> mapParticleIdDataOverTime;
+    std::map <double, mapCollisionData> mapCollisionDataOverTime;
+    std::map <double, pairImpactData> mapImpactDataOverTime;
+    //std::map <double, mapParticleDiameter> mapParticleDiameterOverTime;
 
 public:
     //liggghtsData() = delete;
     static liggghtsData* getInstance();
 
-    void readDumpAtomFiles();
+    void readLiggghtsDataFiles();
 
-    mapParticleIdData getMapParticledata (double time);
+    mapCollisionData getMapCollisionData (double time);
+    pairImpactData getPairImpactData (double time);
+
     arrayOfDouble2D getFinalNumberOfCollisions();
+    std::vector<double> getFinalNumberOfImpacts();
+    std::vector<double> getParticleDiameters();
     ~liggghtsData();
 };
 

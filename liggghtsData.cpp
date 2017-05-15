@@ -1,4 +1,6 @@
 #include <iostream>
+#include <algorithm>
+#include <cstring>
 
 #include "liggghtsData.h"
 #include "parameters.h"
@@ -12,7 +14,13 @@ liggghtsData* liggghtsData::lData = nullptr;
 
 liggghtsData::liggghtsData()
 {
+    cout << "LIGGGHTS data pointer created" << endl;
+}
 
+liggghtsData::~liggghtsData()
+{
+    cout << "LIGGGHTS data pointer destroyed" << endl;
+    delete lData;
 }
 
 liggghtsData* liggghtsData::getInstance()
@@ -28,39 +36,125 @@ liggghtsData* liggghtsData::getInstance()
         return lData;
 }
 
-void liggghtsData::readDumpAtomFiles()
+bool liggghtsData::checkFileConsistency(std::string collisionFile, std::string impactFile)
 {
-    if (!mapParticleIdDataOverTime.empty())
+    const char * collisionFileStr = collisionFile.c_str();
+    char digits[] = "1234567890";
+    size_t firstDigitPos = strcspn (collisionFileStr,digits);
+    if (firstDigitPos == collisionFile.length())
+    {
+        cout << collisionFile << " file name doesn't contain any time value" << endl;
+        return false;
+    }
+    size_t dotPos = collisionFile.find(".");
+    if(dotPos == static_cast<size_t>(string::npos))
+    {
+        cout << collisionFile << " doesn't have any '.' for file extension" << endl;
+        return false;
+    }
+    string timeStr = collisionFile.substr (firstDigitPos, dotPos - firstDigitPos);
+    double timeInCollisionFile = stod(timeStr);
+
+    const char * impactFileStr = impactFile.c_str();
+    firstDigitPos = strcspn (impactFileStr,digits);
+    if (firstDigitPos == impactFile.length())
+    {
+        cout << impactFile << " file name doesn't contain any time value" << endl;
+        return false;
+    }
+    dotPos = impactFile.find(".");
+    if(dotPos == static_cast<size_t>(string::npos))
+    {
+        cout << impactFile << " doesn't have any '.' for file extension" << endl;
+        return false;
+    }
+    timeStr = impactFile.substr (firstDigitPos, dotPos - firstDigitPos);
+    double timeInImpactFile = stod(timeStr);
+
+    return(timeInCollisionFile == timeInImpactFile);
+}
+
+
+void liggghtsData::readLiggghtsDataFiles()
+{
+    if (!mapCollisionDataOverTime.empty() && !mapImpactDataOverTime.empty())
         return;
 
     vector <string> fileList = listFiles(ATOMFILEPATH, "atom");
 
+    string subStrCollision = "collision";
+    string subStrImpact = "impact";
+
+    size_t lengthSubStrCollision = subStrCollision.size();
+    size_t lengthSubStrImpact = subStrImpact.size();
+
+    vector <string> collisionFileList;
+    vector <string> impactFileList;
+
     for(auto fileName : fileList)
     {
-        //cout << fileName << endl;
-        double time = getTimeValueFromAtomFileName(fileName);
-        if (time == 0.0)
+        if(!(fileName.substr(0,lengthSubStrCollision)).compare(subStrCollision))
+            collisionFileList.push_back(fileName);
+
+        if(!(fileName.substr(0,lengthSubStrImpact)).compare(subStrImpact))
+            impactFileList.push_back(fileName);
+    }
+
+    size_t nCountCollisionFiles = collisionFileList.size();
+    size_t nCountImpactFiles = impactFileList.size();
+
+    if(nCountCollisionFiles != nCountImpactFiles)
+    {
+        cout << "Collision & Impact files are not in sync" << endl;
+        return;
+    }
+
+
+    sort(collisionFileList.begin(), collisionFileList.end());
+    sort(impactFileList.begin(), impactFileList.end());
+
+    fileList.clear();
+
+    for (size_t c = 0; c < nCountCollisionFiles; c++)
+    {
+        auto collisionFile = collisionFileList[c];
+        auto impactFile = impactFileList[c];
+
+        bool check = checkFileConsistency(collisionFile, impactFile);
+        if (!check)
             continue;
-        mapParticleIdData mapData = atomFileParser(ATOMFILEPATH + fileName);
+
+        double time = 0.0;
+        mapCollisionData mapData = collisionFileParser(ATOMFILEPATH, collisionFile, time);
         if (mapData.empty())
         {
-            cout << fileName << " file is invalid" << endl;
+            cout << collisionFile << " file is invalid" << endl;
             continue;
         }
-        pair<double, mapParticleIdData> mapEntry(time, mapData);
-        mapParticleIdDataOverTime.insert(mapEntry);
+
+        pairImpactData pairData = impactFileParser (ATOMFILEPATH, impactFile);
+        if (pairData.first == 0 && pairData.second == 0)
+        {
+            cout << impactFile << " file is invalid" << endl;
+            continue;
+        }
+
+        pair<double, mapCollisionData> mapCollisionEntry(time, mapData);
+        mapCollisionDataOverTime.insert(mapCollisionEntry);
+
+        pair<double, pairImpactData> mapImpactEntry(time, pairData);
+        mapImpactDataOverTime.insert(mapImpactEntry);
     }
 
 //    cout << endl;
-//    for(auto it = mapParticleIdDataOverTime.begin(); it != mapParticleIdDataOverTime.end(); it++)
+//    for(auto it = mapCollisionDataOverTime.begin(); it != mapCollisionDataOverTime.end(); it++)
 //    {
-//        //auto it = mapParticleIdDataOverTime.end();
-//        //it--;
-//        cout << it->first << endl;
+//        cout <<"timestep = " <<  it->first << endl;
 //        for(auto it2 = (it->second).begin(); it2 != (it->second).end(); it2++)
 //        {
 //            cout << "particle type = " << it2->first << endl;
-//            vector<particleData> pDataVec = it2->second;
+//            cout << "particle diameter = " << get<0>(it2->second) << endl;
+//            vector<collisionData> pDataVec = get<1>(it2->second);
 //            cout << "no. of rows = " << pDataVec.size() << endl;
 //            for (auto vec : pDataVec)
 //            {
@@ -78,22 +172,65 @@ void liggghtsData::readDumpAtomFiles()
 //        }
 //
 //    }
-
+//
+//    cout << endl;
+//    for(auto it = mapImpactDataOverTime.begin(); it != mapImpactDataOverTime.end(); it++)
+//    {
+//        cout <<"timestep = " <<  it->first << endl;
+//        cout << "Number of impact with wall = " << (it->second).first << endl;
+//        cout << "Number of impact with impeller = " << (it->second).second << endl << endl;
+//    }
 }
 
-mapParticleIdData liggghtsData::getMapParticledata (double time)
+mapCollisionData liggghtsData::getMapCollisionData (double time)
 {
-    mapParticleIdData mapPData;
+    mapCollisionData mapData;
 
-    if (mapParticleIdDataOverTime.empty())
-        return mapPData;
+    if (mapCollisionDataOverTime.empty())
+        return mapData;
 
-    auto it = mapParticleIdDataOverTime.find(time);
-    if (it != mapParticleIdDataOverTime.end())
-        mapPData = it->second;
+    auto it = mapCollisionDataOverTime.find(time);
+    if (it != mapCollisionDataOverTime.end())
+        mapData = it->second;
 
-    return mapPData;
+    return mapData;
 }
+
+pairImpactData liggghtsData::getPairImpactData (double time)
+{
+    pairImpactData pairData;
+    pairData.first = 0;
+    pairData.second = 0;
+
+    if (mapImpactDataOverTime.empty())
+        return pairData;
+
+    auto it = mapImpactDataOverTime.find(time);
+    if (it != mapImpactDataOverTime.end())
+        pairData = it->second;
+
+    return pairData;
+}
+
+vector<double> liggghtsData::getFinalNumberOfImpacts()
+{
+    vector<double> nImpacts;
+
+    if(!instanceFlag)
+        return nImpacts;
+
+    if (mapImpactDataOverTime.empty())
+        return nImpacts;
+
+    auto mapIt = mapImpactDataOverTime.end();
+
+    pairImpactData pairData = getPairImpactData((--mapIt)->first);
+
+    nImpacts = vector<double>(NUMBEROFDEMBINS, static_cast<double>(pairData.first + pairData.second));
+
+    return nImpacts;
+}
+
 
 arrayOfDouble2D liggghtsData::getFinalNumberOfCollisions()
 {
@@ -102,32 +239,55 @@ arrayOfDouble2D liggghtsData::getFinalNumberOfCollisions()
     if(!instanceFlag)
         return nCollisions;
 
-    if (mapParticleIdDataOverTime.empty())
+    if (mapCollisionDataOverTime.empty())
         return nCollisions;
 
-    auto mapIt = mapParticleIdDataOverTime.end();
+    auto mapIt = mapCollisionDataOverTime.end();
 
-    mapParticleIdData mapPData = getMapParticledata((--mapIt)->first);
+    mapCollisionData mapData = getMapCollisionData((--mapIt)->first);
 
-    if (mapPData.empty())
+    if (mapData.empty())
         return nCollisions;
 
     nCollisions = getArrayOfDouble2D(NUMBEROFDEMBINS, NUMBEROFDEMBINS);
 
-    for(auto itMapPData = mapPData.begin(); itMapPData != mapPData.end(); itMapPData++)
+    for(auto itMapData = mapData.begin(); itMapData != mapData.end(); itMapData++)
     {
-        int row = itMapPData->first;
+        int row = itMapData->first;
 
-        vector<particleData> vecPData = itMapPData->second;
+        vector<collisionData> vecCollisionData = get<1>(itMapData->second);
 
-        for (auto pData : vecPData)
+        for (auto data : vecCollisionData)
         {
-            vector <unsigned int> c_ccVec = pData.c_ccVec;
+            vector <int> c_ccVec = data.c_ccVec;
             int c_ccCount = 0;
             for(auto c_cc : c_ccVec)
                 nCollisions[row-1][c_ccCount++] += c_cc;
         }
     }
     return nCollisions;
+}
+
+vector<double> liggghtsData::getParticleDiameters()
+{
+    vector<double> particleDiameters;
+
+    if(!instanceFlag)
+        return particleDiameters;
+
+    if (mapCollisionDataOverTime.empty())
+        return particleDiameters;
+
+    auto mapIt = mapCollisionDataOverTime.end();
+
+    mapCollisionData mapData = getMapCollisionData((--mapIt)->first);
+
+    if (mapData.empty())
+        return particleDiameters;
+
+    for(auto itMapData = mapData.begin(); itMapData != mapData.end(); itMapData++)
+        particleDiameters.push_back(get<0>(itMapData->second));
+
+    return particleDiameters;
 }
 

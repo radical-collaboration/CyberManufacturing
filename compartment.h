@@ -5,7 +5,6 @@
 #include "utility.h"
 #include "parameters.h"
 
-#include <omp.h>
 typedef struct
 {
     arrayOfDouble2D fAll;

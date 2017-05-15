@@ -33,6 +33,14 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+    //cout << "CodeBegins" << endl << endl;
+
+    //Read Dump Atom Files
+    liggghtsData *lData = liggghtsData::getInstance();
+    lData->readLiggghtsDataFiles();
+
+    //return 0;//to stop execution after reading liggghts data
+//**************************************************************************************************
    int ierr, num_mpi, mpi_id = 0;
    // spawn MPI processes 
    ierr = MPI_Init (&argc, &argv);
@@ -77,7 +85,6 @@ int main(int argc, char *argv[])
    if(print==1) {printf("now we memcopy load_rev into load\n");}
    //memcpy(load,load_rev, sizeof(load));
    load=load_rev;
-
    ierr = MPI_Barrier(MPI_COMM_WORLD);
    for(int i=0; i<num_mpi+1; i++) {
     if(i>0) {  load[i]=load[i]+load[i-1]; }
@@ -113,14 +120,7 @@ int main(int argc, char *argv[])
 //*************** MPI load Array End   ********************
 
 
-    //cout << "CodeBegins" << endl << endl;
-
-    //Read Dump Atom Files
-    liggghtsData *lData = liggghtsData::getInstance();
-    lData->readDumpAtomFiles();
-
-    //return 0;//to stop execution after reading liggghts data
-
+//**************************************************************************************************
     CompartmentIn compartmentIn; //Input for compartment call
     PreviousCompartmentIn prevCompInData; //Input data from previous compartment; 2nd compartment onwards
     CompartmentDEMIn compartmentDEMIn;
@@ -396,24 +396,54 @@ int main(int argc, char *argv[])
     arrayOfDouble2D internalVolumeBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
     arrayOfDouble2D externalVolumeBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
 
+// **************** snythetic liggghts data ******************************
+  //**** uncommetn this section to use make snythetic dem data 
+  // in place of next section which actually will read available ligghts files
 
-    compartmentDEMIn.DEMDiameter = vector <double>(NUMBEROFDEMBINS, 0.0);
-    compartmentDEMIn.numberOfCollisions = getArrayOfDouble2D(NUMBEROFDEMBINS, NUMBEROFDEMBINS);
-    compartmentDEMIn.numberOfImpacts = vector <double> (NUMBEROFDEMBINS, 0.0);
+    //compartmentDEMIn.DEMDiameter = vector <double>(NUMBEROFDEMBINS, 0.0);
+    //compartmentDEMIn.numberOfCollisions = getArrayOfDouble2D(NUMBEROFDEMBINS, NUMBEROFDEMBINS,0.0);
+    //compartmentDEMIn.numberOfImpacts = vector <double> (NUMBEROFDEMBINS, 0.0);
 
-    default_random_engine generator;
-    uniform_real_distribution<double> distribution(0.0,1.0);
+    //default_random_engine generator;
+   // uniform_real_distribution<double> distribution(0.0,1.0);
 
-    for (int i = 0; i < NUMBEROFDEMBINS; i++)
-    {
-        compartmentDEMIn.DEMDiameter[i] = distribution(generator)*1.0e3;
-        compartmentDEMIn.numberOfImpacts[i] = 1.0; //distribution(generator);
-        for(int j = 0; j < NUMBEROFDEMBINS; j++)
-            compartmentDEMIn.numberOfCollisions[i][j] = 1.0; //distribution(generator);
-    }
-    //compartmentDEMIn.numberOfCollisions = lData->getFinalNumberOfCollisions();
+    //for (int i = 0; i < NUMBEROFDEMBINS; i++)
+   // {
+     //   compartmentDEMIn.DEMDiameter[i] = (i+1)*1.0e-3; //distribution(generator)*1.0e3;
+        // // used (i+1)*1.0e-3 bec distrib fxn give rand values in non size order which not work with DEM based scaled data kernel
+	//// also note that we may have to do dem data converison in liggghts side then send over to PBM -subhodh 
+       // compartmentDEMIn.numberOfImpacts[i] = 1.0; //distribution(generator);
+       // for(int j = 0; j < NUMBEROFDEMBINS; j++)
+         //   compartmentDEMIn.numberOfCollisions[i][j] = 1.0; //distribution(generator);
+   // }
+// ***************** synthetic ligghts data  end ****************
 
+// ***************** read liggghts files START ******************
+   // uncomment this section if you want to read acgtualy ligggghts files 
+  // use dem data ... make sure to comment section before this one which makes syn data
 
+    compartmentDEMIn.DEMDiameter = lData->getParticleDiameters();
+    if((compartmentDEMIn.DEMDiameter).size() == 0)
+        cout << "Diameter data is missing in LIGGGHTS output file" << endl;
+
+    compartmentDEMIn.numberOfImpacts = lData->getFinalNumberOfImpacts();
+    if((compartmentDEMIn.numberOfImpacts).size() == 0)
+        cout << "Impact data is missing in LIGGGHTS output file" << endl;
+
+    compartmentDEMIn.numberOfCollisions = lData->getFinalNumberOfCollisions();
+    if((compartmentDEMIn.numberOfCollisions)[0].size() == 0)
+        cout << "Collision data is missing in LIGGGHTS output file" << endl;
+// ************ read liggghts files end ******************
+
+//compartmentDEMIn.numberOfCollisions = getArrayOfDouble2D(NUMBEROFDEMBINS, NUMBEROFDEMBINS,1.0);
+
+if(mpi_id == 0)
+{
+DUMP2D(compartmentDEMIn.numberOfCollisions);
+DUMP(compartmentDEMIn.DEMDiameter);
+DUMP(compartmentDEMIn.numberOfImpacts);
+}
+ierr = MPI_Barrier(MPI_COMM_WORLD);
     vector <double> liquidAdditionRateAllCompartments(NUMBEROFCOMPARTMENTS, 0.0);
     liquidAdditionRateAllCompartments[0] = LIQUIDADDITIONRATE;
     double time = 0.0;
@@ -471,6 +501,7 @@ int main(int argc, char *argv[])
             gasBinsAllCompartments[c] = compartmentOut.gasBins;
 
         }
+
 // *************************************************************
 //************** START MPI Send Recv ***************************
 // *************************************************************
@@ -643,8 +674,7 @@ ierr = MPI_Barrier(MPI_COMM_WORLD);
 // *************************************************************
 
 
-
-// ************************** start time step calculations ***********************************************
+//***************************************** START time step calcs **************************************************
         double maxofthree = -DBL_MAX;
         double maxAll = -DBL_MAX;
         double maxLiquid = -DBL_MAX;
@@ -703,7 +733,7 @@ ierr = MPI_Barrier(MPI_COMM_WORLD);
             cout << endl << "******fAllCompartments has negative values********" << endl << endl;
         }
 
-// ******************************* END time step Calcs/checks ***************************************************
+//******************************** END time step calcs ****************************************************
 
         //BIN RECALCULATION
         //cout << "********Begin bin recalculation***********" << endl;

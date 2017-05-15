@@ -1,2 +1,2 @@
 # pbm-dem-multiscale-manufacturing
-This branch contains parallel C++ files related to this project
+This folder contains parallel C++ files related to this project

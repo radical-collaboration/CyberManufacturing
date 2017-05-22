@@ -35,8 +35,9 @@
 	\linenumbers
 	
 	\section{Introduction \& Objectives} 
-       \par Half of all industrial chemical production is carried out using particulate processes (\cite{seville1997}). Important products that are produced using particulate processes include detergents, aerosols, fertilizers, and pharmaceuticals. Particulate processes have complex phenomena due to the chaotic microscale behaviour of individual particles in the system that determine the bulk behaviour of the system. Due to the complex nature of these processes there is a lack of governing equations which can accurately describe them (\cite{sen2013}). As a result industries such as pharmaceuticals use expensive heuristic studies and inefficient operational protocols with high recycle ratios to meet strict regulatory standards (\cite{Ramachandran2009}). In an effort to cut costs and improve efficiencies there is a high demand for accurate models that can be used for process design and control systems.   
-       \par Discrete element methods (DEM) have proven to be an accurate way to model a bulk material using microscale particle level interactions. The downside to these models is that they take large amounts of time to solve. Another more computationally efficient, but less accurate, technique used for these systems are population balance models (PBM). To achieve high levels of accuracy with out the long simulation times of DEM there have been numerous works on hybrid PBM-DEM methods.
+
+	\par Half of all industrial chemical production is carried out using particulate processes (\cite{seville1997}). Important products that are produced using particulate processes include detergents, aerosols, fertilizers, and pharmaceuticals. Particulate processes have complex phenomena due to the chaotic microscale behaviour of individual particles in the system that determine the bulk behaviour of the system. Due to the complex nature of these processes there is a lack of governing equations which can accurately describe them (\cite{sen2013}). As a result industries such as pharmaceuticals use expensive heuristic studies and inefficient operational protocols with high recycle ratios to meet strict regulatory standards (\cite{Ramachandran2009}). In an effort to cut costs and improve efficiencies there is a high demand for accurate models that can be used for process design and control systems.   
+	\par Discrete element methods (DEM) have proven to be an accurate way to model a bulk material using microscale particle level interactions. The downside to these models is that they take large amounts of time to solve. Another more computationally efficient, but less accurate, technique used for these systems are population balance models (PBM). To achieve high levels of accuracy with out the long simulation times of DEM there have been numerous works on hybrid PBM-DEM methods.
 	\par \textcolor{cyan}{in the past when faced with comp heavy tasks scientists have used parallel computing. divide big prob into small pieces that are simultaneously solved. time to solve is time to solve small piece.} 
 	\par potential benefits this could have 1. unprecedented accuracy 2.wide adoption of using these models since they are so fast 3. cheaper drugs 4. MPC accurate but in real time 5. parameter estimation for QbD 6. etc. 
 	
@@ -45,11 +46,11 @@
 	    \par 2. use liggghts to accurately model micromechanics for processing in Lodgitech granulator. 
 	    \par 3.LINK PBM-DEM for best of both worlds and optimal performance.  1-way or if possible 2-way coupling
 	
-		
+
 	\section{Background \& Motivation}
 	
 	  \subsection{Particulate Processes}
-	\par Particulate processes are ones in which a system of discrete species exist, such as granules or catalyst pellets, that undergo changes in average composition, size, or other pertinent properties.
+	  \par Particulate processes are ones in which a system of discrete species exist, such as granules or catalyst pellets, that undergo changes in average composition, size, or other pertinent properties.
   \par pharma / particulate processes information prevalence etc
   \par difficult physics bec micro phenomena etc 
   \par as result use time consuming and expensive heuristics or inefficient operation protocol  dotdotdot also reason most blah done in batch mode still bec continuous mode compounds complexity of these systems \par will need to switch to continuous etc  
@@ -57,7 +58,7 @@
 	  
 	  \subsection{Modeling}
 	    \subsubsection{Discrete Element Modeling (DEM)}
-	     \par Discrete Element Method is a simulation technique used to monitor the behaviour of each particle as a separate entity compared to other bulk continuum models. This method tracks the movement of each of the particles with in the space, records the collisions of each particle with the geometry as well as with each other and it is also subject to other force fields like gravity (\cite{Barrasso2015cerd})  This model is based on the Newton's laws of the motion and is expressed as in Equations \ref{eqn:bkgd_dem_n2law} and  \ref{eqn:bkgd_dem_forcebal} : \\
+	    \par Discrete Element Method is a simulation technique used to monitor the behaviour of each particle as a separate entity compared to other bulk continuum models. This method tracks the movement of each of the particles with in the space, records the collisions of each particle with the geometry as well as with each other and it is also subject to other force fields like gravity (\cite{Barrasso2015cerd})  This model is based on the Newton's laws of the motion and is expressed as in Equations \ref{eqn:bkgd_dem_n2law} and  \ref{eqn:bkgd_dem_forcebal} : \\
 	\begin{align}
 	m_i\frac{dv_i}{dt} &= F_{i,net} \label{eqn:bkgd_dem_n2law} \\
 	F_{i,net} &=  F_{i,coll} +  F_{i,ext} \label{eqn:bkgd_dem_forcebal}
@@ -80,11 +81,9 @@
 	    \par \textcolor{cyan}{talk about kernels - empirical, semi mech, and DEM informed? talking about kernels then mentioning there is DEM informed could be GREAT SEGWAY to multi-physics models dotdotdot combined PBM DEM etc.}
 	    
 	
-	    \subsubsection{multi-physics models}
-		\par general goal of mutli physics is best of two (or more worlds) accuracy of one but the time savings of another etc. 
-		
-		
-		\par finish with PBM DEM goals and past works? then mention it still can take a long time dotdotdot SEGWAY into parallel computing?
+	    \subsubsection{Multi-physics models}
+		\par The use of multi-physics models has recently been adapted to understand the behaviour of particle systems. These models help understand the physics of the system at various scales \textit{i\.e\.} micro, meso and macro scale(\cite{sen2014}). Particle process dynamics have been inferred from coupling of various physics models \textit{viz.} Computational Fluid Dynamics (CFD), DEM and PBM. Earlier works from \cite{sen2014} and \cite{Barrasso2015cerd} have successfully predicted process dynamics of the granulation process.
+		\par In this work, a coupling of DEM and PBM was implemented. The PBM gives meso scale information and the DEM gives particle scale information. Combination of these two methods help comprehend the process dynamics with more accuracy. The calculations involved due to the number of particles involved in the DEM process as well as PBM become very computationally heavy. The recent development in the design of CPUs and increasing number of cores in the CPU, it makes sense to utilize them to make the simulations faster. Thus, implementation of various parallel computing techniques was employed in this work to help improve the simulation times.  
 	
 	
 	  \subsection{Parallel Computing and Computer Architectures}
@@ -109,13 +108,13 @@
 
 	        
 	    \subsubsection{Geometry}    
-	    \par \textcolor{red}{check other file Charles uploaded to see if that one was more "journal ready"}
+	    %\par \textcolor{red}{check other file Charles uploaded to see if that one was more "journal ready"}
 	    
 	    \par In this study, the L\"{o}dige CoriMix CM5 continuous high shear granulator has been studied. Its geometry was developed using the SolidWorks$^{TM}$ (Dassault Syst\`{e}mes). This granulator consisted of a high speed rotating element enclosed within a horizontal cylindrical casing. The casing (shown in Figure \ref{fig:mthdsDemCharlesGranShell}) consists of a cylinder with diameter of 120 mm at the inlet and 130 mm at the outlet and having a total length of 440 mm. A vertical inlet port is provided at one end of the casing and an angled outlet port is provided at the larger end of the case. 
 	
 	      \begin{figure}[H]
 	      \centering
-	      \includegraphics[scale=0.1]{mthds_dem_charles_fig5pt01_gran_shell}
+	      \includegraphics[scale=0.2]{shell_final_pic.pdf}
 	      \caption{ a) Shows an isometric view of the granulator casing. b) and c) show the front and back views of the granulator casing corresponding to the inlet and outlet ends respectively.}
 	      %\caption{hello yuktesh}
 	      \label{fig:mthdsDemCharlesGranShell}
@@ -125,7 +124,7 @@
 	
 	      \begin{figure}[H]
 	      \centering
-	      \includegraphics[scale=0.1]{mthds_dem_charles_fig5pt2_impeller}
+	      \includegraphics[scale=0.2]{impeller_final_pic.pdf}
 	      \caption{a) Shows the side view of the impeller. b) and c) show the front and back views of the impeller which correspond to the inlet and outlet ends respectively.}
 	      %\caption{hello yuk}
 	      \label{fig:mthds_dem_charles_impeller}
@@ -133,7 +132,9 @@
 	    
 	      \begin{figure}[H]
 	      \centering
-	      \includegraphics[scale=0.1]{mthds_dem_charles_fig5pt3and4_blades_n_isometric}
+	      \includegraphics[scale=0.075]{feed_element.pdf}
+	      \includegraphics[scale=0.075]{shear_element.pdf}
+	      \includegraphics[scale=0.075]{exit_element.pdf}
 	      \caption{a) Inlet feed element. b) Middle shearing element.  c) Exit blade. blah blah Isometric view of the granulator case with the rotating element }
 	      %\caption{hello tesh}
 	      \label{fig:mthds_dem_charles_fig5pt3and4_blades_n_isometric}

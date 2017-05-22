@@ -35,12 +35,8 @@
 	\linenumbers
 	
 	\section{Introduction \& Objectives} 
-	description of particulate processes and challenges... leads up to our "solution" or start of solution which is what this paper is about 
-	\par \textcolor{cyan}{particulate process and how they are half all chem industry}
-	\par Particulate processes are ones in which a system of discrete species exist, such as a granules or catalysts, that undergo changes in average composition, size, or other pertinent property. Important products that are produced using particulate processes include detergents, aerosols, fertilizers, and pharmaceuticals \textcolor{cyan}{need cite? if so cite prakash}. Despite the prevalence of these particulate systems in industry there is a lack of modelling capabilities, to aid in process design, which is due to the complex phenomena of these systems.  
-	\par \textcolor{cyan}{despite being important they are VERY hard to model and study bec of microphenomena. strain difficulty and added costs to industry bec of this}
-	\par The lack of modelling capabilities for these systems has led to industry depending on inefficient production methods which lead to higher costs (\cite{Ramachandran2009}).
-	\par \textcolor{cyan}{PBM DEM have been helpful for this however but they take long time to solve}
+       \par Half of all industrial chemical production is carried out using particulate processes (\cite{seville1997}). Important products that are produced using particulate processes include detergents, aerosols, fertilizers, and pharmaceuticals. Particulate processes have complex phenomena due to the chaotic microscale behaviour of individual particles in the system that determine the bulk behaviour of the system. Due to the complex nature of these processes there is a lack of governing equations which can accurately describe them (\cite{sen2013}). As a result industries such as pharmaceuticals use expensive heuristic studies and inefficient operational protocols with high recycle ratios to meet strict regulatory standards (\cite{Ramachandran2009}). In an effort to cut costs and improve efficiencies there is a high demand for accurate models that can be used for process design and control systems.   
+       \par Discrete element methods (DEM) have proven to be an accurate way to model a bulk material using microscale particle level interactions. The downside to these models is that they take large amounts of time to solve. Another more computationally efficient, but less accurate, technique used for these systems are population balance models (PBM). To achieve high levels of accuracy with out the long simulation times of DEM there have been numerous works on hybrid PBM-DEM methods.
 	\par \textcolor{cyan}{in the past when faced with comp heavy tasks scientists have used parallel computing. divide big prob into small pieces that are simultaneously solved. time to solve is time to solve small piece.} 
 	\par potential benefits this could have 1. unprecedented accuracy 2.wide adoption of using these models since they are so fast 3. cheaper drugs 4. MPC accurate but in real time 5. parameter estimation for QbD 6. etc. 
 	
@@ -53,6 +49,7 @@
 	\section{Background \& Motivation}
 	
 	  \subsection{Particulate Processes}
+	\par Particulate processes are ones in which a system of discrete species exist, such as granules or catalyst pellets, that undergo changes in average composition, size, or other pertinent properties.
   \par pharma / particulate processes information prevalence etc
   \par difficult physics bec micro phenomena etc 
   \par as result use time consuming and expensive heuristics or inefficient operation protocol  dotdotdot also reason most blah done in batch mode still bec continuous mode compounds complexity of these systems \par will need to switch to continuous etc  
@@ -60,7 +57,7 @@
 	  
 	  \subsection{Modeling}
 	    \subsubsection{Discrete Element Modeling (DEM)}
-	    \par Discrete Element Method is a simulation technique used to monitor the behaviour of each particle as a separate entity compared to other bulk continuum models. This method tracks the movment of each of the particles with in the space, records the collisions of each particle with the geometry as well as with each other and it is also subject to other force fields like gravity (\cite{Barrasso2015cerd})  This model is based on the Newton's laws of the motion and is expressed as in Equations \ref{eqn:bkgd_dem_n2law} and  \ref{eqn:bkgd_dem_forcebal} : \\
+	     \par Discrete Element Method is a simulation technique used to monitor the behaviour of each particle as a separate entity compared to other bulk continuum models. This method tracks the movement of each of the particles with in the space, records the collisions of each particle with the geometry as well as with each other and it is also subject to other force fields like gravity (\cite{Barrasso2015cerd})  This model is based on the Newton's laws of the motion and is expressed as in Equations \ref{eqn:bkgd_dem_n2law} and  \ref{eqn:bkgd_dem_forcebal} : \\
 	\begin{align}
 	m_i\frac{dv_i}{dt} &= F_{i,net} \label{eqn:bkgd_dem_n2law} \\
 	F_{i,net} &=  F_{i,coll} +  F_{i,ext} \label{eqn:bkgd_dem_forcebal}

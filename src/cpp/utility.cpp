@@ -94,6 +94,20 @@ double getMaximumOf2DArray(arrayOfDouble2D array2D)
     return maxValue;
 }
 
+
+int getCountOfNegativeIn3DArray(arrayOfDouble3D array3D)
+{
+    int count = 0;
+    for(size_t d1 = 0; d1 < array3D.size(); d1++)
+        for(size_t d2 = 0; d2 < array3D[d1].size(); d2++)
+            for(size_t d3 = 0; d3 < array3D[d1][d2].size(); d3++)
+            {
+                if(array3D[d1][d2][d3] < 0.0)
+                   count++;
+            }
+    return count;
+}
+
 vector<double> linearize3DVector(arrayOfDouble3D array3D)
 {
     // vector<double> data;

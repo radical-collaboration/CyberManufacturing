@@ -457,19 +457,15 @@
 	   
 	  
 	  \subsection{DEM}
-	    \subsubsection{DEM Validation and Parameter Space Studies}
-	    \par show that DEM is somewhat behaving like a real system
-	    \par fig constant flow reached by end of DEM simulation
+	    \subsubsection{DEM Spacial Decomposition Studies}
+	    \par The effect of spacial decomposition on the simulation time
+	    \par Speed improvements and issues using only MPI and hybrid (MPI + OpenMP)
 	      \begin{figure}[H]
 	      \centering
-	      \includegraphics[scale=0.8]{rslts_DEM_time_traj}
-	      \caption{  }
-	      %\caption{hello tesh}
-	      \label{fig:rslts_DEM_time_traj}
+	      \includegraphics[scale=0.8]{slicing_studies.png}
+	      \caption{The effect of spacial decomposition on the performance of the simulation}
+	      \label{fig:rslts_DEM_slicing_studies}
 	      \end{figure} 
-	    \par fig RTD
-	    \par show affects of certain parameters on DEM and which ones are most critical to outcomes - will help decide on PBM+DEM parameters to study in later section
-	    \par fig vary impeller RPM see how RTD or hold up changes
 	    \par fig vary PSD ( range and/or particle sizes) to see how $C_{coll}$ etc will be affected - important for PBM Kernel
 	      \begin{figure}[H]
 	      \centering
@@ -479,7 +475,7 @@
 	      \label{fig:rslts_psd_velocity}
 	      \end{figure} 
 	        
-	    \par fig vary impeller RPM see $C_{coll}$ changes
+	    \par Talk about over-slicing or excess decomposition(confirm with profs)
 	      \begin{figure}[H]
 	      \centering
 	      \includegraphics[scale=0.5]{rslts_dem_psd_velocity}
@@ -490,12 +486,12 @@
 	      
 	      
 	    \subsubsection{DEM Performance}
-	    \par show that performance is mostly unaffected by RP 
+	    \par Talk about how the time for simulation varies with \# of cores
 	    \par 1. fig scaling 
 	      \begin{figure}[H]
 	      \centering
-	      \includegraphics[scale=0.5]{rslts_strong_scale_slurm}
-	      \caption{ DEM scale just slurm }
+	      \includegraphics[scale=0.7]{timing_plot.pdf}
+	      \caption{The variation in the amount of time taken for the simulation as a function of \# of cores}
 	      %\caption{hello tesh}
 	      \label{fig:rslts_DEM_strong_scale}
 	      \end{figure}
@@ -513,7 +509,8 @@
 	    
 	  \subsection{PBM+DEM - RP} 
 	    \subsubsection{PBM+DEM Validation/Accuracy?}
-	   
+	   	\par Talk about how the physics remain the same whether mono-sized particles are used or a size distribution is used.
+	   \par Figs comparing the one-way coupling from both these sources.
 	    
 	    \subsubsection{PBM+DEM Performance}
 	    \par strong scaling
@@ -540,7 +537,6 @@
 	      %\caption{hello tesh}
 	      \label{fig:rslts_psd_evo_time}
 	      \end{figure}
-	   \par PSD over time for different impeller RPM
 	    
 	\section{Conclusions}
 	

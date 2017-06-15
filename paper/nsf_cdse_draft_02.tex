@@ -10,6 +10,7 @@
 	\usepackage{color}
 	\usepackage{algorithm}
 	\usepackage{algpseudocode}
+	\usepackage{textcomp}
 	%\usepackage[section]{placeins} %prevents floats from appearing before their sections. web address  https://tex.stackexchange.com/questions/32598/force-latex-image-to-appear-in-the-section-in-which-its-declared
 	\usepackage{float}
 	
@@ -42,17 +43,21 @@
 	\par potential benefits this could have 1. unprecedented accuracy 2.wide adoption of using these models since they are so fast 3. cheaper drugs 4. MPC accurate but in real time 5. parameter estimation for QbD 6. etc. 
 	
 	    \subsection{Objectives}
-	    \par 1. develop 4D PBM that is parallelized spatially and internally for optimal utilization of modern HPC equipment.
-	    \par 2. use liggghts to accurately model micromechanics for processing in Lodgitech granulator. 
-	    \par 3.LINK PBM-DEM for best of both worlds and optimal performance.  1-way or if possible 2-way coupling
+	    \par The main objective of this study was to develop new techniques to parallelize our model and use high perfomance computing (HPC) equipment in order to reduce the computation times for the linked DEM-PBM simulations. Specific objectives of each individual study are listed below: 
+	    \begin{itemize}
+	    \item Developed a 4-Dimensional PBM that is parallelized using hybrid techniques (MPI + OpenMP)  for optimal utilization of modern high performance computing equipment.
+	    \item LIGGGHTS\textsuperscript{\textregistered} has been used to perfrom Discrete Element Model (DEM) simulations to  model the micromechanics of the Lodgitech granulator. 
+		\item These 2 techniques were linked uni-directionally to provide an accurate model of the granulator.	    
+	    \end{itemize}
+
 	
 
 	\section{Background \& Motivation}
 	
 	  \subsection{Particulate Processes}
-	  \par Particulate processes are ones in which a system of discrete species exist, such as granules or catalyst pellets, that undergo changes in average composition, size, or other pertinent properties.
-  \par pharma / particulate processes information prevalence etc
-  \par difficult physics bec micro phenomena etc 
+	  \par Particulate processes are ones in which a system of discrete species exist, such as granules or catalyst pellets, that undergo changes in average composition, size, or other pertinent properties. Such processes are prevalent in the pharmaceutical industry. These processes have great oppurtunities in better equipment design, process efficiency and scale-up. \cite{Ketterhagen2008}   
+  \par The modelling of such process compared to fluid systems is that the particles in these processes need to be considered as individual entities unlike as a continuum in liquid processes. These simulations are complex and time consuming. 
+   
   \par as result use time consuming and expensive heuristics or inefficient operation protocol  dotdotdot also reason most blah done in batch mode still bec continuous mode compounds complexity of these systems \par will need to switch to continuous etc  
   \par segway with need to better understand these systems from a modelling/theory point of view dotdotdot QbD etc 
 	  
@@ -115,7 +120,7 @@
 	      \begin{figure}[H]
 	      \centering
 	      \includegraphics[scale=0.2]{shell_final_pic.pdf}
-	      \caption{ a) Shows an isometric view of the granulator casing. b) and c) show the front and back views of the granulator casing corresponding to the inlet and outlet ends respectively.}
+	      \caption{ Shows an isometric view of the granulator casing.}
 	      %\caption{hello yuktesh}
 	      \label{fig:mthdsDemCharlesGranShell}
 	      \end{figure}
@@ -131,11 +136,29 @@
 	      \end{figure}    
 	    
 	      \begin{figure}[H]
-	      \centering
-	      \includegraphics[scale=0.075]{feed_element.pdf}
-	      \includegraphics[scale=0.075]{shear_element.pdf}
+			
+	      \begin{subfigure}{.3\textwidth}
+  			\centering
+  			\includegraphics[scale=0.075]{feed_element.pdf}	      
+  			\caption{Feed element}
+  			\label{fig:mthds_dem_feed_element}
+			\end{subfigure}%
+			\begin{subfigure}{.3\textwidth}
+  			\centering
+			\includegraphics[scale=0.075]{shear_element.pdf}
+  			\caption{Shear element}
+  			\label{fig:mthds_dem_shear_element}
+			\end{subfigure}
+	      	\begin{subfigure}{.3\textwidth}
+  			\centering
 	      \includegraphics[scale=0.075]{exit_element.pdf}
-	      \caption{a) Inlet feed element. b) Middle shearing element.  c) Exit blade. blah blah Isometric view of the granulator case with the rotating element }
+  			\caption{Exit element}
+  			\label{fig:mthds_dem_exit_element}
+			\end{subfigure}
+	      
+
+
+	      \caption{ Various components of the impeller}
 	      %\caption{hello tesh}
 	      \label{fig:mthds_dem_charles_fig5pt3and4_blades_n_isometric}
 	      \end{figure}     
@@ -150,7 +173,7 @@
 	    %The shell did not have any skewed elements \textcolor{cyan}{(FUTURE SOLUTION? - perhaps we can use the output from liggghts exclusion list to find exact elements of issue. then we can use meshlab to exclude those peices or remesh thos individual pieces into better shapes with less skewed elements. might be better for a letter paper though}
 	    
 	    \subsubsection{DEM input file settings}
-	    \par For the DEM simulations, a input script has to be prepared for LIGGGHTS. The input file consists of various physical parameters of the particles being simulated, command lines for the desired outputs from LIGGGHTS and various dump command which is used for post - processing of the data. 
+	    \par The DEM simulation in LIGGGHTS are setup using an input script which defines the physical parameters of the particles, importing of the geometry, particle insertion commands, various physics models to be used during the simulation as well as various compute and dump commands to help print the data required for post-processing of the data. A script was prepared with the physical parameters 
 	    \par Talk about mono and advantages and then psd. All the physical data is represented in the Table \ref{table:mthds_dem_input}
 	    \par Need to add contact models, movement commands, all the start options, 
 	    	\begin{table}[!htb][H]

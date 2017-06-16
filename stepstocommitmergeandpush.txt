@@ -14,8 +14,9 @@ git pull
 #Switch to branch <branch_name>
 git checkout <branch_name>
 
-#Merger master to branch <branch_name>
-git merge master
+#Rebase branch <branch_name> to synced master
+#this will revert your changes, shift your branch to synced master and apply your changes
+git rebase master
 
    ***Resolve conflicts if any at this step***
 

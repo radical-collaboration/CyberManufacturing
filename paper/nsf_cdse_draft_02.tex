@@ -54,14 +54,14 @@
 
 	\section{Background \& Motivation}
 	
-	  \subsection{Particulate Processes}
-	  \par Particulate processes are ones in which a system of discrete species exist, such as granules or catalyst pellets, that undergo changes in average composition, size, or other pertinent properties. Such processes are prevalent in the pharmaceutical industry. These processes have great oppurtunities in better equipment design, process efficiency and scale-up. \cite{Ketterhagen2008}   
-  \par The modelling of such process compared to fluid systems is that the particles in these processes need to be considered as individual entities unlike as a continuum in liquid processes. These simulations are complex and time consuming. 
-   
-  \par as result use time consuming and expensive heuristics or inefficient operation protocol  dotdotdot also reason most blah done in batch mode still bec continuous mode compounds complexity of these systems \par will need to switch to continuous etc  
-  \par segway with need to better understand these systems from a modelling/theory point of view dotdotdot QbD etc 
+	  %\subsection{Particulate Processes}
+	  \par Particulate processes are ones in which a system of discrete species exist, such as granules or catalyst pellets, that undergo changes in average composition, size, or other pertinent properties. Such processes are prevalent in the pharmaceutical industry. These processes have great oppurtunities in better equipment design, process efficiency and scale-up (\cite{Ketterhagen2009}). 
+	     
+  %\par as result use time consuming and expensive heuristics or inefficient operation protocol  dotdotdot also reason most blah done in batch mode still bec continuous mode compounds complexity of these systems \par will need to switch to continuous etc  
+  %\par segway with need to better understand these systems from a modelling/theory point of view dotdotdot QbD etc 
 	  
 	  \subsection{Modeling}
+		\par The quality by design (QbD) concept i.e, theoritically modelling the process for better quality of the product is being implemented by the pharmaceutical industry due to its cost benefits. Also, the paradigm shift of the industry towards continuous manufacturing, emphasizes the need to model these processes more accurately. This further helps develop better control stratergies for the process.The modelling of these processes is more time consuming and computationally expensive when compared to a fluid systems since the particles are considered as individual entities rather than a continuum like in fluid systems. The models discussed represent the particle-particle interaction at meso and micro-scale.	  
 	    \subsubsection{Discrete Element Modeling (DEM)}
 	    \par Discrete Element Method is a simulation technique used to monitor the behaviour of each particle as a separate entity compared to other bulk continuum models. This method tracks the movement of each of the particles with in the space, records the collisions of each particle with the geometry as well as with each other and it is also subject to other force fields like gravity (\cite{Barrasso2015cerd})  This model is based on the Newton's laws of the motion and is expressed as in Equations \ref{eqn:bkgd_dem_n2law} and  \ref{eqn:bkgd_dem_forcebal} : \\
 	\begin{align}
@@ -92,11 +92,12 @@
 	
 	
 	  \subsection{Parallel Computing and Computer Architectures}
-	    \subsubsection{Overview}
+	    %\subsubsection{Overview}
 	    \par The goal of parallel computing is to distribute large amounts of computation across many compute cores to solve problems faster (\cite{wilkinson2005}).
 		\subsubsection{Computer Architecture}
 	    \par Parallel programs are commonly run on computer clusters. Computer clusters are a collection of nodes interconnected by a high speed communication network for message passing from one node to another. Analogously to a conventional PC each node as one or more CPUs and RAM. Commonly nodes are manufactured with two CPUs, each CPU is a multi-core meaning it has multiple compute cores that each can carry out calculations separately from one another. CPUs also have built in memory called cache that is much faster than RAM which is why for optimal performance cache utilization should be favoured over RAM when possible. On a node memory is divided by CPU sockets, so each CPU has direct access to memory local to its own socket, but accessing memory on another socket is much slower \cite{Jin2011}. For this reason data that is needed for computation should be stored locally to the CPU that needs it.  
-	    \par Computer architectures are often classified by memory locality features. There are two distinct classes, distributed memory systems and shared memory systems. A cluster is a combination of the two classes. Each node operates its memory independently of the other nodes and explicit message passing is needed to share memory between nodes. While the cores on a node can operate in shared memory mode since memory updates can be made without explicit message passing statements from the user. All of these aspects of the computer architecture should be considered when designing a parallel program for the best performance (\cite{Adhianto2007}) \textcolor{cyan}{maybe reword better to make more like CACE paper}.
+	    \par Two common classes of computer architecture classified by memory locality features are distributed memory systems and shared memory systems. These two classes co-exist in a cluster, thus providing the benfits of each. All the nodes share memory using explicit message passing while each has its own independent memory. The cores on each node can access data from the shared memory without any explicit message passing statements from the user. While designing a parallel program all these aspects need to be considered for optimal perfomance of the code (\cite{Adhianto2007}).
+	    %Computer architectures are often classified by memory locality features. There are two distinct classes, distributed memory systems and shared memory systems. A cluster is a combination of the two classes. Each node operates its memory independently of the other nodes and explicit message passing is needed to share memory between nodes. While the cores on a node can operate in shared memory mode since memory updates can be made without explicit message passing statements from the user. All of these aspects of the computer architecture should be considered when designing a parallel program for the best performance  \textcolor{cyan}{maybe reword better to make more like CACE paper}.
 		
 	    \subsubsection{Parallel Application Program Interfaces}
 	    \par Message Passing Interface (MPI) is a common parallel computing application interface standard. MPI is used for distributed memory parallel computing, this is because MPI will operate every MPI process as a discrete unit that does not share memory with the other processes unless explicit message passing is used. Even on shared a single node where the hardware is supports shared memory computing, MPI will still operate it in a distributed memory fashion \cite{Jin2011}. Operating all cores as distinct units also means they each need their own copy of all variables used for computation which results in a large overall memory foot print compared to a same system if it was operated in shared memory. 
@@ -109,7 +110,7 @@
 	
 	  \subsection{DEM}
 	    \subsubsection{LIGGGHTS}
-	    	\par LIGGGHTSv3.60 (\cite{Kloss2012}) developed by DCS computing was used for all the simulation performed in this study. Edits were made to the compute\_contact\_atom source file to obtain particle $-$ particle collisions. The aforementioned version of LIGGGHTS was compiled using the mvapich (mvapich2 v2.1) and intel (intel v15.0.2) compilers with the -o3 optimisation option as well as an option to use OpenMP threads was implemented. The speed improvements and the disadvantages are illustrated in Table (refer to the speed table). The studies were performed on STAMPEDE supercomputer located at Univeristy of Texas, Austin. The hardware configuration of each node consists of 2 8-core Intel Xeon E5-2680 processors based on the Sandy Bridge architecture, 32 gb of memory with QPI interconnects at 8.0 GT/s PCI-e lanes.
+	    	\par LAMMPS Improved for general granular and granular heat transfer simulations (LIGGGHTS\textsuperscript{\textregistered} v3.60) (\cite{Kloss2012}) developed by DCS computing was used for all the simulation performed in this study. Edits were made to the compute\_contact\_atom source file to obtain particle $-$ particle collisions. The aforementioned version of LIGGGHTS was compiled using the mvapich (mvapich2 v2.1) and intel (intel v15.0.2) compilers with the -o3 optimisation option as well as an option to use OpenMP threads was implemented. The speed improvements and the disadvantages are illustrated in Table (refer to the speed table). The studies were performed on STAMPEDE supercomputer located at Univeristy of Texas, Austin. The hardware configuration of each node consists of 2 8-core Intel Xeon E5-2680 processors based on the Sandy Bridge architecture, 32 gb of memory with QPI interconnects at 8.0 GT/s PCI-e lanes.
 
 	        
 	    \subsubsection{Geometry}    
@@ -168,50 +169,35 @@
 	
 	    \subsubsection{Meshing}
 	    \par After the geometry was built in SolidWorks$^{TM}$ (Dassault Syst\`{e}mes) the shell and impeller were exported as STL files. The coarsest output option was used to keep the STL files small and simple for faster computations times. They were also exported not keeping there original coordinates  This resulted in the impeller having 2802 faces and 1281 points with approximately a file size of 775 KBs. The shell had 1948 faces and 720 points and size was about 544 KBs.  
-	    \par Meshlab was used to align the STL files for importing into LIGGGHTS. No mesh treatments were used on the STLs. 
-	    \par The meshes were then imported into LIGGGHTS using the write command. This resulted in 50 elements of the impeller file having "highly skewed elements", which have more than 5 neighbours per surface or have an angle < 0.0181185 degrees, that according to LIGGGHTS would degrade parallel performance. The write exclusion list command in LIGGGHTS was used and this exclusion list file as then used in the simulation to skip the highly skewed elements during the simulation 
+	    \par Meshlab was used to align the STL files for importing into LIGGGHTS\textsuperscript{\textregistered}. No mesh treatments were used on the STLs. 
+	    \par The meshes were then imported into LIGGGHTS\textsuperscript{\textregistered} using the write command. This resulted in 50 elements of the impeller file having "highly skewed elements", which have more than 5 neighbours per surface or have an angle less than 0.0181185 degrees, that according to LIGGGHTS\textsuperscript{\textregistered} would degrade parallel performance. The write exclusion list command in LIGGGHTS\textsuperscript{\textregistered} was used and this exclusion list file as then used in the simulation to skip the highly skewed elements during the simulation 
 	    %The shell did not have any skewed elements \textcolor{cyan}{(FUTURE SOLUTION? - perhaps we can use the output from liggghts exclusion list to find exact elements of issue. then we can use meshlab to exclude those peices or remesh thos individual pieces into better shapes with less skewed elements. might be better for a letter paper though}
 	    
 	    \subsubsection{DEM input file settings}
-	    \par The DEM simulation in LIGGGHTS are setup using an input script which defines the physical parameters of the particles, importing of the geometry, particle insertion commands, various physics models to be used during the simulation as well as various compute and dump commands to help print the data required for post-processing of the data. A script was prepared with the physical parameters 
-	    \par Talk about mono and advantages and then psd. All the physical data is represented in the Table \ref{table:mthds_dem_input}
-	    \par Need to add contact models, movement commands, all the start options, 
-	    	\begin{table}[!htb][H]
-	\caption{Physical Properties of the particle for the LIGGGHTS input script (Currently a placeholder)} \label{table:mthds_dem_input}
+	    \par The DEM simulation in LIGGGHTS\textsuperscript{\textregistered} are setup using an input script which defines the physical parameters of the particles, importing of the geometry, particle insertion commands, various physics models to be used during the simulation as well as various compute and dump commands to help print the data required for post-processing of the data. A script was prepared each of the particle was considered granular in nature. The Hertzian model was used for non-adhesive elastic contact between the granular particles. The particles were inserted inside the granluator from the inlet at a constant mass flow rate of 15 kilgrams per hour. The rotation speed of the impeller was kept throughout the study at 2000 rotations per minute. Such a high rotation speed was chosens since this would lead to high shear between the particles and the walls of the shell resulting in better size control of the granules. There were 2 sets of simulations that were performed, one with mono-sized partcles and second consisting of a distribution of sizes. The particle radii chosen for mono-sized simulation varied 0.59mm - 2mm, consecutive particles radii had volume twice of one before them. The radii range of the distributed size simulation was 1mm - 3mm. The difference in the mechanics of these two simulations is dicussed later in the results section. The physical constants used for the simulations are given in Table \ref{table:mthds_dem_input}.
+	    \par The simulation data was collected after a constant number of iterations for the visulation of the particles inside the shell, further post processing and to be used in the PBM. The collisions between each of the particles and the collisions between of the particle and the geometry was also collected. 
+
+	    	\begin{table}[!htb]%[H]
+	\caption{Physical Properties of the particle for the LIGGGHTS\textsuperscript{\textregistered} input script} \label{table:mthds_dem_input}
 	\begin{center}
-	\begin{tabular}{c|c|c|c}
+	\begin{tabular}{l|c|c}
 	\hline
-	\bf{Parameter} &\bf{Symbol} &\bf{Value} &\bf{Units}\\
+	\bf{Parameter} &\bf{Value} &\bf{Units}\\
 	\hline
-	Boltzmann constant & $k$ & $1.3806488 \times 10^{-23}$ & $m^2~kg~s^{-2}~K^{-1}$\\
-	Charge of electron & $e$ & $1.60217657 \times 10^{-19}$ & $Coulombs$\\
-	Avogadro Number & $N_A$ & $6.0221413 \times 10^{23}$ & $-$\\
-	Hamaker constant & $A_H$ & $3 \times 10^{-21}$ & $J$\\
-	Hydration force constant & $F_0$ & $10^{-2}$ & $N~m^{-1}$\\
-	Temperature of the medium & $T$ & $298$ & $K$\\
-	Viscosity of the medium & $\mu$ & $0.8999 \times 10^{-3}$ & $Pa.s$\\
-	Permittivity of the medium & $\epsilon_0 \epsilon_r$ & $6.93\times 10^{-10}$ & $C^2~N^{-1}~m^{-2}$ \\
-	Valence of ions in medium & $z$ & $1$ & $-$\\
-	Bulk concentration of ions in medium & $C^b$ & $1 \times 10^{-2}$ & $kg~m^{-3}$\\
-	Debye length & $\frac{1}{\kappa} $ & $1.3581 \times 10^{-7}$ & $m$\\
-	Decay length & $\delta_0$ & $6 \times 10^{-10}$ & $m$\\
-	Density of alginate & $\rho_{Alginate}$ & $1050$ & $kg~m^{-3}$ \\
-	Density of chitosan & $\rho_{Chitosan}$ & $1000$ & $kg~m^{-3}$ \\
-	Surface potential of alginate & $\Psi_{Alginate}$ & $-46 \times 10^{-3}$ & $Volts$\\
-	Surface potential of chitosan & $\Psi_{Chitosan}$ & $56 \times 10^{-3}$ & $Volts$\\
-	Volume of the system & $V$ & $10\times10^{-6}$ & $m^3$\\
-	Volume of the smallest alginate bin & $a_1$ & $1.5 \times 10^{-17}$ & $m^{3}$\\
-	Volume of the smallest chitosan bin & $c_1$ & $0.3 \times 10^{-17}$ & $m^{3}$ \\
-	Aggregation kernel constant & $K_0$ & $5 \times 10^{9}$ & $-$\\
-	Simulated Process Time & $t$ & $10$ & $s$\\
-	Simulation Time-Step & $dt$ & $0.01$ & $s$\\
+	Young's Modulus of particles  & $8 \times 10^{6}$ & $N.m^{-2}$\\
+	Young's Modulus of Geometry  & $1 \times 10^{9}$ & $N.m^{-2}$\\
+	Poisson's Ratio & $0.2$ & $-$\\
+	Coefficient of restitution (constant for all collisions) & $0.4$ & $-$\\
+	Coefficient of static friction & $0.5$ & $-$\\
+	Coefficient of rolling friction  & $0.2$ & $-$\\
+	Density of the granules & $500$ & $kg.m^{-3}$\\
 	\hline
 	\end{tabular}
 	\end{center}
 	\end{table}
 
 	    \subsubsection{DEM data post processing}
-	    \par The post processing of the data obtained from the DEM simulations was done using MATLAB\textsuperscript{\textregistered}. The first test run on the output data was to determine if the simulation had reached steady-state. The mass inside the granulator was found out by averaging it over 5 time steps and then compared to mass inside the granulator after every 10000 time steps (about $5$x$10^{-4}$ seconds) with a tolerance of about 10%. If the mass was found to be constant for most of the iterations, it was considered to be at steady state. Another test to determine steady state was to monitor the nuber of collision inside the granulator. It can be seen that the number of collision start to oscillate around a mean value. The number of collisions were then plotted and steady state time was determined. 
+	    \par The post processing of the data obtained from the DEM simulations was done using MATLAB\textsuperscript{\textregistered}. The first test run on the output data was to determine if the simulation had reached steady-state. The mass inside the granulator was found out by averaging it over 5 time steps and then compared to mass inside the granulator after every 10000 time steps (about $5$x$10^{-4}$ seconds) with a tolerance of about 10\%. If the mass was found to be constant for most of the iterations, it was considered to be at steady state. Another test to determine steady state was to monitor the number of collision inside the granulator. It can be seen that the number of collision start to oscillate around a mean value. The number of collisions were then plotted and steady state time was determined. 
 	    \par A precautionary script was also run so as to determine that no particles were lost due to overlap of the geometry with the particles as well as from particle particle overlap.
 	     
 	    

@@ -235,15 +235,31 @@
 	     \end{align}
 	     \par \textcolor{red}{citation?}
 	     
-	    \par where, the aggregation kernel, $\beta(s_1,s_2, s_1',s_2',x)$ is expressed as –
+	    \par where, the aggregation kernel, $\beta(s_1,s_2, s_1',s_2',x)$ is expressed as a function of collision frequency ($C$) and collision efficiency ($\psi$) –
 	    \begin{align}
-	    \beta(s_1,s_2,s_1',s_2',x) = & \beta_o*(V(s_1,s_2,x)+V(s_1',s_2',x))^{\gamma}*(c(s_1,s_2,x)\notag\\
-	    &+c(s_1',s_2',x))^{\alpha}\left(1-\frac{(c(s_1,s_2,x)+c(s_1',s_2',x))^{\delta}}{2}\right)^{\alpha}
+	    \beta(s_1,s_2,s_1',s_2',x) = & \beta_oC(s_1,s_2,s_1',s_2')\psi(s_1,s_2,s_1',s_2',x)
+	    %\beta(s_1,s_2,s_1',s_2',x) = & \beta_o*(V(s_1,s_2,x)+V(s_1',s_2',x))^{\gamma}*(c(s_1,s_2,x)\notag\\
+	    %&+c(s_1',s_2',x))^{\alpha}\left(1-\frac{(c(s_1,s_2,x)+c(s_1',s_2',x))^{\delta}}{2}\right)^{\alpha}
 	    \label{eqn:mthds_pbm_beta_kernal}
 	    \end{align}
-	    \par \textcolor{red}{citation?}
+	    %\par \textcolor{red}{citation?}
 	    
-	    \par where, $\beta_o$,  $\alpha$ , $\delta$ and $\gamma$ are aggregation rate constants, $V(s_1,s_2, x)$ and $V(s_1',s_2',x)$ are the volumes of the aggregating particles. $c(s_1,s_2, x)$ and $c(s_1',s_2',x)$ are the external liquid fraction of the aggregating particles. 
+	    where, $\beta_o$ is aggregation rate constant.
+	    \par Collision frequency is a function of particle size and is calculated from the number of collisions between group of particles obtained from LIGGGHTS\textsuperscript{\textregistered}. A recent study shows that collision frequency depends on PSD as well (\cite{sen2014}). Collision frerquency can be expressed as:
+	    \begin{align}
+	    C(s_1,s_2,s_1',s_2')=\frac{N_{coll}(s_1,s_2,s_1',s_2')}{F(s_1,s_2)F(s_1',s_2')\Delta t}
+	    \label{eqn:collfreq}
+	    \end{align}
+	    \par In equation(\ref{eqn:collfreq}), $N_{coll}$ is the number of collision between two solid particles in time interval $\Delta t$. The $\psi$ in equation (\ref{eqn:mthds_pbm_beta_kernal}) can be expressed asvi 
+	    
+	    \begin{align}
+	    \psi((s_1,s_2,s_1',s_2') = 
+	    \left\{\begin{matrix}
+	    \psi_0,\hspace{0.2cm} LC((s_1,s_2) \geq LC_{min}\hspace{0.2cm} or\hspace{0.2cm} LC((s_1',s_2') \geq LC_{min}	\\ 
+	    0,\hspace{0.2cm} LC((s_1,s_2) < LC_{min}\hspace{0.2cm} or\hspace{0.2cm} LC((s_1',s_2') < LC_{min}
+	    \end{matrix}\right.
+	    \end{align}
+	    \par In above equation, $LC$ is the liquid content of particles and $LC_{min}$ stands for minimum liquid content required for coalescence of particle.  
 	    \par Similarly, the breakage rate is expressed as-
 	
 	    \begin{align}
@@ -254,11 +270,12 @@
 	    \par where, the breakage kernel $K_{break}(s_1,s_2,x)$ is formulated as – 
 	    
 	    \begin{align}
-	    K_{break}(s_1,s_2,x)=\left(\frac{4}{15\pi}\right)^{(\frac{1}{2})}G_{shear}exp\left(-\frac{B}{R(s_1,s_2,x)}\right)
+	    K_{break}(s_1,s_2,x) = C_{impact}\int_{U_{break}}^{\infty}p(U)dU
+	    %K_{break}(s_1,s_2,x)=\left(\frac{4}{15\pi}\right)^{(\frac{1}{2})}G_{shear}exp\left(-\frac{B}{R(s_1,s_2,x)}\right)
 	    \end{align}
 	    \par \textcolor{red}{citation?}
 	
-	      \par where, $G_{shear}$ is the shear rate exerted by the impeller on the granules. $R(s_1,s_2,x)$ is the radius of the granule that breaks and $B$ is the breakage kernel constant. $G_shear$ is calculated as $\frac{\nu_{impeller}*D_{impeller}*PI}{60}$ where $\nu_{impeller}$ and $D_{impeller}$ are respectively the rotational speed and diameter of the impeller.
+	      %\par where, $G_{shear}$ is the shear rate exerted by the impeller on the granules. $R(s_1,s_2,x)$ is the radius of the granule that breaks and $B$ is the breakage kernel constant. $G_shear$ is calculated as $\frac{\nu_{impeller}*D_{impeller}*PI}{60}$ where $\nu_{impeller}$ and $D_{impeller}$ are respectively the rotational speed and diameter of the impeller.
 	      \par The rate of increase of liquid volume of one particle, $\dot{l}_{add}(s_1,s_2,x)$ is expressed as $\frac{(s_1+s_2)(\dot{m}_{spray}(1-c_{binder})-\dot{m}_evap)}{m_{solid}(x)}$ where, $(s_1+s_2)$  is the total solid volume of the particle; $\dot{m}_spray$ is the rate of external liquid addition, $c_{binder}$ is the concentration of binder in the external liquid (which is assumed to be zero in this case as pure liquid is added); $\dot{m}_{evap}$ is the rate of evaporation of liquid from the system (which is also assumed to be zero in this case) and $m_{solid}$ is the total amount of solid present in the compartment.
 	      \par The rate of decrease in gas volume per particle due to consolidation is calculated using the following expression: 
 	      
@@ -274,32 +291,26 @@
 	\begin{table}[!htb]
 	\caption{Parameters for PBM from Anik's hetero. agg. paper. currently place holder} \label{table:mthds_pbm_parameters}
 	\begin{center}
-	\begin{tabular}{c|c|c|c}
+	\begin{tabular}{l|c|c|c}
 	\hline
 	\bf{Parameter} &\bf{Symbol} &\bf{Value} &\bf{Units}\\
 	\hline
-	Boltzmann constant & $k$ & $1.3806488 \times 10^{-23}$ & $m^2~kg~s^{-2}~K^{-1}$\\
-	Charge of electron & $e$ & $1.60217657 \times 10^{-19}$ & $Coulombs$\\
-	Avogadro Number & $N_A$ & $6.0221413 \times 10^{23}$ & $-$\\
-	Hamaker constant & $A_H$ & $3 \times 10^{-21}$ & $J$\\
-	Hydration force constant & $F_0$ & $10^{-2}$ & $N~m^{-1}$\\
-	Temperature of the medium & $T$ & $298$ & $K$\\
-	Viscosity of the medium & $\mu$ & $0.8999 \times 10^{-3}$ & $Pa.s$\\
-	Permittivity of the medium & $\epsilon_0 \epsilon_r$ & $6.93\times 10^{-10}$ & $C^2~N^{-1}~m^{-2}$ \\
-	Valence of ions in medium & $z$ & $1$ & $-$\\
-	Bulk concentration of ions in medium & $C^b$ & $1 \times 10^{-2}$ & $kg~m^{-3}$\\
-	Debye length & $\frac{1}{\kappa} $ & $1.3581 \times 10^{-7}$ & $m$\\
-	Decay length & $\delta_0$ & $6 \times 10^{-10}$ & $m$\\
-	Density of alginate & $\rho_{Alginate}$ & $1050$ & $kg~m^{-3}$ \\
-	Density of chitosan & $\rho_{Chitosan}$ & $1000$ & $kg~m^{-3}$ \\
-	Surface potential of alginate & $\Psi_{Alginate}$ & $-46 \times 10^{-3}$ & $Volts$\\
-	Surface potential of chitosan & $\Psi_{Chitosan}$ & $56 \times 10^{-3}$ & $Volts$\\
-	Volume of the system & $V$ & $10\times10^{-6}$ & $m^3$\\
-	Volume of the smallest alginate bin & $a_1$ & $1.5 \times 10^{-17}$ & $m^{3}$\\
-	Volume of the smallest chitosan bin & $c_1$ & $0.3 \times 10^{-17}$ & $m^{3}$ \\
-	Aggregation kernel constant & $K_0$ & $5 \times 10^{9}$ & $-$\\
-	Simulated Process Time & $t$ & $10$ & $s$\\
-	Simulation Time-Step & $dt$ & $0.01$ & $s$\\
+	Time step & $\delta t$ & $0.5$ & $s$\\
+	Total granulation time & $T$ & $20, 120$ & $s$\\
+	Velocity in axial direction & $v_{axial}$ & $1$ & $ms^{-1}$\\
+	Velocity in radial direction & $v_{radial}$ & $1$ & $ms^{-1}$\\
+	Aggregation constant & $\beta_0$ & $1\times10^{-12}$ & $-$\\
+	Initial particle diameter & $R$ & $15$ & $\mu m$\\
+	Breakage kernel constant & $B$ & $5\times10^{4}$ & $-$\\
+	Diameter of impeller & $D$ & $0.1$ & $m$ \\
+	Impeller rotation speed & $RPM$ & $300$ & $rmp$\\
+	Minimum granule porosity & $\epsilon_{min}$ & $0.1$ & $-$\\
+	Consolidation rate & $C$ & $1\times10^{-3}$ & $-$\\
+	Total starting particles in batch & $F_{initial}$ & $1 \times 10^{6}$ & $-$\\
+	Liquid to solid ratio & $L/S$ & $0.7$ & $-$ \\
+	Number of Compartments & $c$ & $3$ & $-$ \\
+	Number of first solid bins & $s$ & $16$ & $-$\\
+	Number of second solid bins & $ss$ & $16$ & $-$\\
 	\hline
 	\end{tabular}
 	\end{center}

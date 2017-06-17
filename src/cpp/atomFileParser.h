@@ -1,7 +1,6 @@
 #ifndef ATOMFILEPARSER_H
 #define ATOMFILEPARSER_H
 
-
 #include <vector>
 #include <array>
 #include <map>
@@ -11,8 +10,8 @@
 
 typedef struct
 {
-    std::array <double, 3> velocity;
-    std::vector <int> c_ccVec;
+    std::array<double, 3> velocity;
+    std::vector<int> c_ccVec;
     double f_fpacc;
 } collisionData;
 
@@ -24,8 +23,7 @@ typedef std::map<int, tupleDiameterAndCollisionData> mapCollisionData;
 //second value for impact with impeller
 typedef std::pair<int, int> pairImpactData;
 
+mapCollisionData collisionFileParser(std::string filePath, std::string collisionFileName, double &time);
 
-mapCollisionData collisionFileParser (std::string filePath, std::string collisionFileName, double& time);
-
-pairImpactData impactFileParser (std::string filePath, std::string impactFileName);
+pairImpactData impactFileParser(std::string filePath, std::string impactFileName);
 #endif // ATOMFILEDATA_H

@@ -6,7 +6,7 @@
 
 #define DOUBLEPRECISION std::numeric_limits<double>::epsilon()
 #define FLOATPRECISION std::numeric_limits<float>::epsilon()
-#define EPSILON 0.0//DOUBLEPRECISION
+#define EPSILON 0.0 //DOUBLEPRECISION
 
 //TUNING PARAMETERS
 #define AGGREGATIONKERNELCONSTANT 1.0e-6 //1.0e-3 //240.0
@@ -25,39 +25,38 @@
 //MATERIAL & PROCESS PARAMETERS
 #define GRANULATORLENGTH 0.38 //meter
 #define NUMBEROFCOMPARTMENTS 3
-#define DISTANCEBETWEENCOMPARTMENTS  (GRANULATORLENGTH / NUMBEROFCOMPARTMENTS) // m
-#define PARTICLERESIDENCETIME 20.0 //11.07 // seconds
-#define PARTICLEAVERAGEVELOCITY (GRANULATORLENGTH/PARTICLERESIDENCETIME)
+#define DISTANCEBETWEENCOMPARTMENTS (GRANULATORLENGTH / NUMBEROFCOMPARTMENTS) // m
+#define PARTICLERESIDENCETIME 20.0                                            //11.07 // seconds
+#define PARTICLEAVERAGEVELOCITY (GRANULATORLENGTH / PARTICLERESIDENCETIME)
 
 #define IMPELLERDIAMETER 0.114 // meter
-#define IMPELLERSPEED 1000.0 //2000.0 // RPM
+#define IMPELLERSPEED 1000.0   //2000.0 // RPM
 
-#define PREMIXINGTIME 45.0 //0.0 // seconds
-#define LIQUIDADDITIONTIME 45.0 // seconds
+#define PREMIXINGTIME 45.0                             //0.0 // seconds
+#define LIQUIDADDITIONTIME 45.0                        // seconds
 #define FINALTIME (PREMIXINGTIME + LIQUIDADDITIONTIME) // seconds
 //#define TIMESTEP 1e-1 // seconds
 
-#define THROUGHPUT 15.0 // kg / hr
+#define THROUGHPUT 15.0    // kg / hr
 #define SOLIDDENSITY 476.0 // kg / m^3
 #define LIQUIDTOSOLIDRATIO 0.35
-#define LIQUIDDENSITY 1000.0 // kg / m^3
-#define LIQUIDADDITIONRATE (((LIQUIDTOSOLIDRATIO*THROUGHPUT) / LIQUIDDENSITY) / 3600.0) // m3 / s
-#define SHEARRATE (0.10472*IMPELLERSPEED*(IMPELLERDIAMETER/2))
+#define LIQUIDDENSITY 1000.0                                                              // kg / m^3
+#define LIQUIDADDITIONRATE (((LIQUIDTOSOLIDRATIO * THROUGHPUT) / LIQUIDDENSITY) / 3600.0) // m3 / s
+#define SHEARRATE (0.10472 * IMPELLERSPEED * (IMPELLERDIAMETER / 2))
 
 // DEFINE BINS
 #define NUMBEROFFIRSTSOLIDBINS 16 //Number of first solid bins
-#define SCOEF 5.0e-16 // m^3
-#define SBASE 3.0 // Volume increment between two bins
+#define SCOEF 5.0e-16             // m^3
+#define SBASE 3.0                 // Volume increment between two bins
 
 #define NUMBEROFSECONDSOLIDBINS 16 //Number of second solid bins
-#define SSCOEF 5.0e-16 // m^3
-#define SSBASE 3.0 // Volume increment between two bins
+#define SSCOEF 5.0e-16             // m^3
+#define SSBASE 3.0                 // Volume increment between two bins
 
 //DEM data
 #define COLLISIONEFFICIENCYCONSTANT 0.01
 #define TIMESTEPDEM 1.0e-7
 #define NUMBEROFDEMBINS 16
-
 
 #define DEMAGGREGATIONKERNELVALUE 0.0
 #define DEMAGGREGATIONKERNELCONST 1.0

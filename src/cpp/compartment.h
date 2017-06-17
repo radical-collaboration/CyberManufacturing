@@ -57,9 +57,9 @@ typedef struct
 
 typedef struct
 {
-    std::vector <double> DEMDiameter;
+    std::vector<double> DEMDiameter;
     arrayOfDouble2D numberOfCollisions;
-    std::vector <double> numberOfImpacts;
+    std::vector<double> numberOfImpacts;
 } CompartmentDEMIn;
 
 typedef struct
@@ -71,7 +71,6 @@ typedef struct
     arrayOfDouble2D fgComingIn;
 } PreviousCompartmentIn;
 
-CompartmentOut performCompartmentCalculations (PreviousCompartmentIn prevCompIn, CompartmentIn compartmentIn, CompartmentDEMIn compartmentDEMIn, double time, double timeStep);
+CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, CompartmentIn compartmentIn, CompartmentDEMIn compartmentDEMIn, double time, double timeStep);
 
 #endif // COMPARTMENT_H
-

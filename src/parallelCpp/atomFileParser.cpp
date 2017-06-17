@@ -7,14 +7,13 @@
 
 using namespace std;
 
-
-mapCollisionData collisionFileParser (string filePath, string collisionFileName, double& time)
+mapCollisionData collisionFileParser(string filePath, string collisionFileName, double &time)
 {
     //Reading Dump files
     mapCollisionData mapData;
     ifstream collisionFile;
-    collisionFile.open ((filePath + collisionFileName).c_str(), ifstream::in);
-    if(!collisionFile.is_open())
+    collisionFile.open((filePath + collisionFileName).c_str(), ifstream::in);
+    if (!collisionFile.is_open())
     {
         std::cout << "Unable to open " << collisionFileName << " file" << endl;
         return mapData;
@@ -41,30 +40,30 @@ mapCollisionData collisionFileParser (string filePath, string collisionFileName,
         lineData >> tmpStr;
     }
 
-    if(tmpStr.compare("ATOMS") || collisionFile.eof())
+    if (tmpStr.compare("ATOMS") || collisionFile.eof())
     {
         //cout << collisionFileName << " doesn't contain require info" << endl;
         return mapData;
     }
 
-    while(tmpStr.compare("fz"))
+    while (tmpStr.compare("fz"))
         lineData >> tmpStr;
 
-    if(tmpStr.compare("fz"))// || atomFile.eof())
+    if (tmpStr.compare("fz")) // || atomFile.eof())
     {
         //cout << collisionFileName << " doesn't contain require info" << endl;
         return mapData;
     }
 
     int c_ccCount = 0;
-    while(tmpStr.compare("f_fppacc"))
+    while (tmpStr.compare("f_fppacc"))
     {
         lineData >> tmpStr;
         c_ccCount++;
     }
     c_ccCount--;
 
-    if(tmpStr.compare("f_fppacc"))// || atomFile.eof())
+    if (tmpStr.compare("f_fppacc")) // || atomFile.eof())
     {
         //cout << fileName << " doesn't contain require info" << endl;
         return mapData;
@@ -80,10 +79,10 @@ mapCollisionData collisionFileParser (string filePath, string collisionFileName,
         lineData >> tmpStr >> tmpStr >> tmpStr; //read and ignore ix, iy & iz value;
         collisionData cData;
         lineData >> cData.velocity[0] >> cData.velocity[1] >> cData.velocity[2]; //read vx, vy & vz value;
-        lineData >> tmpStr >> tmpStr >> tmpStr; //read and ignore fx, fy & fz value;
+        lineData >> tmpStr >> tmpStr >> tmpStr;                                  //read and ignore fx, fy & fz value;
         //read collision data
         cData.c_ccVec.resize(c_ccCount);
-        for(int i = 0; i < c_ccCount; i++)
+        for (int i = 0; i < c_ccCount; i++)
             lineData >> cData.c_ccVec[i];
 
         lineData >> cData.f_fpacc; //read f_fpacc value
@@ -92,39 +91,38 @@ mapCollisionData collisionFileParser (string filePath, string collisionFileName,
         lineData >> radius;
 
         auto mapIt = mapData.find(particleType);
-        if( mapIt == mapData.end())
+        if (mapIt == mapData.end())
         {
             vector<collisionData> tmpVec;
             tmpVec.push_back(cData);
-            auto tupleEntry = make_tuple(radius*2, tmpVec);
+            auto tupleEntry = make_tuple(radius * 2, tmpVec);
             auto mapEntry = make_pair(particleType, tupleEntry);
             mapData.insert(mapEntry);
         }
         else
             get<1>(mapIt->second).push_back(cData);
-
     }
 
-//    cout << collisionFile << endl;
-//    cout << mapData.size() << endl;
-//    for(auto it = mapData.begin(); it != mapData.end(); it++)
-//        cout << (it->second).size() << endl;
-//    cout << endl;
+    //    cout << collisionFile << endl;
+    //    cout << mapData.size() << endl;
+    //    for(auto it = mapData.begin(); it != mapData.end(); it++)
+    //        cout << (it->second).size() << endl;
+    //    cout << endl;
 
     collisionFile.close();
 
     return mapData;
 }
 
-pairImpactData impactFileParser (string filePath, string impactFileName)
+pairImpactData impactFileParser(string filePath, string impactFileName)
 {
     //Read Collision file
     pairImpactData pairData;
     pairData.first = 0;
     pairData.second = 0;
     ifstream impactFile;
-    impactFile.open ((filePath + impactFileName).c_str(), ifstream::in);
-    if(!impactFile.is_open())
+    impactFile.open((filePath + impactFileName).c_str(), ifstream::in);
+    if (!impactFile.is_open())
     {
         std::cout << "Unable to open " << impactFileName << " file" << endl;
         return pairData;
@@ -147,7 +145,7 @@ pairImpactData impactFileParser (string filePath, string impactFileName)
         lineData >> tmpStr;
     }
 
-    if(tmpStr.compare("ENTRIES") || impactFile.eof())
+    if (tmpStr.compare("ENTRIES") || impactFile.eof())
     {
         //cout << impactFileName << " doesn't contain require info" << endl;
         return pairData;
@@ -159,9 +157,9 @@ pairImpactData impactFileParser (string filePath, string impactFileName)
     {
         lineData = move(stringstream(line));
         lineData >> impactType; //read impact type
-        if(impactType == 0)
+        if (impactType == 0)
             pairData.first += 1;
-        if(impactType == 1)
+        if (impactType == 1)
             pairData.second += 1;
     }
 

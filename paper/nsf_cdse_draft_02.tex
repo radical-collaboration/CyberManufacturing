@@ -375,6 +375,35 @@
 	  
 	  \subsection{RP \& PBM+DEM Communication}
 	
+
+A primary challenge faced is the scalable execution of multiple (often two,
+but possibly more) heterogeneous simulations that need to run independently
+but have a need to communicate and exchange information. Traditionally each
+simulation is submitted as an individual job, but that brings invariably leads
+to the situation where each simulations gets through the batch-queue systems
+independent of the other. So although the first-through-the-queue is ready to
+run, it stalls fairly soon waiting for the other simulation to make it through
+the queue.  On the other hand MPI capabilities can used to  execute both
+simulations as part of a single multi-node job.  Thus whereas the former
+method suffers from unpredictable queue time for each job, the latter is
+suitable to execute tasks that are homogeneous and have no dependencies, and
+relies on the fault tolerance of MPI which are inadequate.
+
+
+The Pilot abstraction~\cite{review_pilotreview} solves these issues:  The
+pilot abstraction, (i) uses a container-job as a placeholder to acquire
+resources via the local resource management system (LRMS) and,  (ii) to
+decouple the initial resource acquisition from task-to-resource assignment.
+Once the pilot (container-job) is scheduled via the LRMS, it can then directly
+be populated with the computational tasks. This functionality allows all the
+computational tasks to be executed directly on the resources, without being
+queued at the LRMS individually. This approach thus supports the requirements
+of task-level parallelism and high-throughput as needed by science drivers.
+
+RADICAL-Pilot is an implementation of the pilot abstraction, engineered to
+support scalable and efficient launching of heterogeneous tasks
+across different platforms.
+
 	
 	  
 	\section{Results}
@@ -564,5 +593,5 @@
 	
 	\section*{References} 
 	\bibliographystyle{elsarticle-harv}
-	\bibliography{Bibli}
+	\bibliography{Bibli,radical_publications}
 	\end{document}

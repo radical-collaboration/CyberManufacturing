@@ -4,7 +4,6 @@
 #<tab>action
 
 CC=mpic++ -fopenmp -std=c++11 -O3
-#CC=clang -std=c++11 -O3
 
 all: model.out
 
@@ -27,7 +26,7 @@ atomFileParser.o: atomFileParser.cpp atomFileParser.h
 	$(CC) -Wall -c atomFileParser.cpp
 
 utility.o: utility.cpp utility.h
-	$(CC) -Wall -c  utility.cpp
+	$(CC) -Wall -c utility.cpp
 
 clean:
 	rm -f *.o *.out

@@ -902,17 +902,17 @@ int main(int argc, char *argv[])
                 if (cumulativeVolumeDistribution[d - 1] < 0.5 && cumulativeVolumeDistribution[d] >= 0.5)
                 {
                     double value = 0.5 - cumulativeVolumeDistribution[d - 1];
-                    d50 = value * value1 * +value2;
+                    d50 = value * value1 + value2;
                 }
                 if (cumulativeVolumeDistribution[d - 1] < 0.1 && cumulativeVolumeDistribution[d] >= 0.1)
                 {
                     double value = 0.1 - cumulativeVolumeDistribution[d - 1];
-                    d10 = value * value1 * +value2;
+                    d10 = value * value1 + value2;
                 }
                 if (cumulativeVolumeDistribution[d - 1] < 0.1 && cumulativeVolumeDistribution[d] >= 0.1)
                 {
                     double value = 0.9 - cumulativeVolumeDistribution[d - 1];
-                    d90 = value * value1 * +value2;
+                    d90 = value * value1 + value2;
                 }
             }
             d10OverTime[n][c] = d10;

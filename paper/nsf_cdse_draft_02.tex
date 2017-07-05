@@ -11,6 +11,7 @@
 	\usepackage{algorithm}
 	\usepackage{algpseudocode}
 	\usepackage{textcomp}
+	\usepackage{graphicx}
 	%\usepackage[section]{placeins} %prevents floats from appearing before their sections. web address  https://tex.stackexchange.com/questions/32598/force-latex-image-to-appear-in-the-section-in-which-its-declared
 	\usepackage{float}
 	
@@ -84,7 +85,7 @@
 	    
     \par In equation (\ref{eqn:bkgd_pbm_general}), $\textbf{v}$ is a vector of internal coordinates. For modelling a granulation process $\textbf{v}$ is commonly used to describe the solid, liquid, and gas content of each type of particle. The vector $\textbf{x}$ represents external coordinates, usually spatial variance. For a granulation process this  account for spatial variance in the particles as they flow along the granulator.
     \par PBM extensively used for calculating granulation rate processes (e.g.~aggregation, consolidation and breakage) but it cannot provide information related to mechanistic kernels of these rate processes i.e.~collision frequency, collision efficiency, particle velocity etc.~(\cite{sen2014}). On the other hand, DEM able to determine these entities. A hybrid model for one-way coupling has been reported for continuous mixing (\cite{sen2013} \& \cite{sen2013b}) and is discussed in later section.
-	    \par \textcolor{cyan}{talk about kernels - empirical, semi mech, and DEM informed? talking about kernels then mentioning there is DEM informed could be GREAT SEGWAY to multi-physics models dotdotdot combined PBM DEM etc.}
+	    
 	    
 	
 	    \subsubsection{Multi-physics models}
@@ -103,7 +104,7 @@
 	    \subsubsection{Parallel Application Program Interfaces}
 	    \par Message Passing Interface (MPI) is a common parallel computing application interface standard. MPI is used for distributed memory parallel computing, this is because MPI will operate every MPI process as a discrete unit that does not share memory with the other processes unless explicit message passing is used. Even on shared a single node where the hardware is supports shared memory computing, MPI will still operate it in a distributed memory fashion \cite{Jin2011}. Operating all cores as distinct units also means they each need their own copy of all variables used for computation which results in a large overall memory foot print compared to a same system if it was operated in shared memory. 
 	    \par Open Multi-Processing (OMP) is another application program interface stand for parallel computing. OMP is used for shared memory and can take advantage of shared memory systems which can result in much faster computation. It does not work well on distributed systems though. This prevents it from being used to efficiently carry out computations across multiple nodes of a cluster simultaneously \cite{Jin2011}. 
-	    \par Since MPI is best for distributed computing and OMP is better for shared computing many individuals have studied the performance of MPI vs MPI+OMP methods and many studies have used MPI+OMP for scientific computation for improved performance. Often times a trade of is made between optimizing a program for performance and trying to make it flexible enough to run on many different computer architectures \textcolor{cyan}{might need reference for this}. A summary of some works addressing MPI+OMP methods for scientific computing and architecture features and concerns can be found in \cite{Bettencourt2017}. In the conclusion to the work by \cite{Bettencourt2017} it was found that hybrid methods for PBMs allow the code flexibility for different architectures while still maintaining good performance. \textcolor{cyan}{should I mention load balancing techniques of gunawan paper?}. In the work of \cite{Bettencourt2017} only the external(spatial) coordinates of the PBM were parallelized. In this current work external and internal(compositions) calculations are parallelized. \textcolor{cyan}{comment about how int and ext pll methods means better model for xyz reasons dotdotdot helps to explicitly say reason} 
+	    \par Since MPI is preferred for distributed computing and OMP is better for shared computing many individuals have studied the performance of MPI vs MPI+OMP methods and many studies have used MPI+OMP for scientific computation for improved performance. Often times a trade of is made between optimizing a program for performance and trying to make it flexible enough to run on many different computer architectures \textcolor{cyan}{might need reference for this}. A summary of some works addressing MPI+OMP methods for scientific computing and architecture features and concerns can be found in \cite{Bettencourt2017}. In the conclusion to the work by \cite{Bettencourt2017} it was found that hybrid methods for PBMs allow the code flexibility for different architectures while still maintaining good performance. \textcolor{cyan}{should I mention load balancing techniques of gunawan paper?}. In the work of \cite{Bettencourt2017} only the external(spatial) coordinates of the PBM were parallelized. In this current work external and internal(compositions) calculations are parallelized. \textcolor{cyan}{comment about how int and ext pll methods means better model for xyz reasons dotdotdot helps to explicitly say reason} 
 	      
 	
 	
@@ -492,7 +493,7 @@ across different platforms.
 	     \par 1. fig range of some parameters?
 	     \par 2. fig range of other pbm parameter ?
 	     
-	\begin{table}[h]
+	%\begin{table}[h]
 	%\caption{Parameters used in the Population Balance Model} %\label{table:rslts_pll_pbm}
 	%\begin{center}
 	%\begin{tabular}{c|c|c|c|c|c|c|c|c}
@@ -504,19 +505,37 @@ across different platforms.
 	%\hline
 	%\end{tabular}
 	%\end{center}
-	\end{table}   
+	%\end{table}   
 	   
 	  
 	  \subsection{DEM}
 	    \subsubsection{DEM Spacial Decomposition Studies}
-	    \par The effect of spacial decomposition on the simulation time
+	    \par LIGGGHTS\textsuperscript{\textregistered} divides the work space into various sections and each section being sent to a core for calculation. Thus, the division of the space becomes an important criteria for the simulation for efficient load balancing. The initial stuides were undertaken for a mono-sized particle of size 1mm and the simulation was carried out for 0.5 seconds of wall time. These studies were performed using 64 cores  
+	    %\par LIGGGHTS\textsuperscript{\textregistered} natively supports only MPI parallel implementation. But using openMP helped distibute the load of one MPI process over various other cores thus giving speed improvements of about 30\%. These time improvements with various configurations can be observed in Table \ref{table:rslts_dem_slicing_studies}. The distibution of the 
+	    %This was also observed by the 
 	    \par Speed improvements and issues using only MPI and hybrid (MPI + OpenMP)
-	      \begin{figure}[H]
-	      \centering
-	      \includegraphics[scale=0.8]{slicing_studies.png}
-	      \caption{The effect of spacial decomposition on the performance of the simulation}
-	      \label{fig:rslts_DEM_slicing_studies}
-	      \end{figure} 
+	      \begin{table}[ht]
+	      %\centering
+	      %\resizebox{\textwidth}{!}
+	      \caption{The effect of spatial decomposition on the performance of the DEM simulations}
+		  \label{table:rslts_dem_slicing_studies}
+		  \begin{center}
+		  \begin{tabular}{l|c|c|c|c|c|c}
+		  \hline
+		  \bf{Type of parallelisation used}&\bf{Total Number of Cores}&\bf{Slices in x-direction}&\bf{Slices in y-direction}&\bf{Slices in z-direction}&\bf{Number of OpenMP threads}& Time taken for a 0.5 second simulation (in minutes)\\
+		  \hline
+		  
+		  \end{tabular}
+
+\end{center}		  	      
+	      \end{table}H]
+				  
+		  \begin{figure}[H]
+		  \centering		  	      
+	      \includegraphics[scale=0.75]{slicing_studies.png}
+	      \caption{ Slicing Studies}
+	      \end{figure}
+	    
 	    \par fig vary PSD ( range and/or particle sizes) to see how $C_{coll}$ etc will be affected - important for PBM Kernel
 	      \begin{figure}[H]
 	      \centering

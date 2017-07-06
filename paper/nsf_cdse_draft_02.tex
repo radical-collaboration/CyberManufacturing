@@ -112,7 +112,7 @@
 	
 	  \subsection{DEM}
 	    \subsubsection{LIGGGHTS}
-	    	\par LAMMPS Improved for general granular and granular heat transfer simulations (LIGGGHTS\textsuperscript{\textregistered} v3.60) (\cite{Kloss2012}) developed by DCS computing was used for all the simulation performed in this study. Edits were made to the compute\_contact\_atom source file to obtain particle $-$ particle collisions. The aforementioned version of LIGGGHTS was compiled using the mvapich (mvapich2 v2.1) and intel (intel v15.0.2) compilers with the -o3 optimisation option as well as an option to use OpenMP threads was implemented. The speed improvements and the disadvantages are illustrated in Table (refer to the speed table). The studies were performed on STAMPEDE supercomputer located at Univeristy of Texas, Austin. The hardware configuration of each node consists of 2 8-core Intel Xeon E5-2680 processors based on the Sandy Bridge architecture, 32 gb of memory with QPI interconnects at 8.0 GT/s PCI-e lanes.
+	    	\par LAMMPS Improved for general granular and granular heat transfer simulations (LIGGGHTS\textsuperscript{\textregistered} v3.60) (\cite{Kloss2012}) developed by DCS computing was used for all the simulation performed in this study. Edits were made to the compute\_contact\_atom source file to obtain particle $-$ particle collisions. The aforementioned version of LIGGGHTS was compiled using the mvapich (mvapich2 v2.1) and intel (intel v15.0.2) compilers with the -o3 optimisation option as well as an option to sideload the process to the Xeon phi co-processors was added. The studies were performed on STAMPEDE supercomputer located at Univeristy of Texas, Austin. The hardware configuration of each node consists of 2 8-core Intel Xeon E5-2680 processors based on the Sandy Bridge architecture, 32 gb of memory with QPI interconnects at 8.0 GT/s PCI-e lanes.
 
 	        
 	    \subsubsection{Geometry}    
@@ -510,18 +510,15 @@ across different platforms.
 	  
 	  \subsection{DEM}
 	    \subsubsection{DEM Spacial Decomposition Studies}
-	    \par LIGGGHTS\textsuperscript{\textregistered} divides the work space into various sections and each section being sent to a core for calculation. Thus, the division of the space becomes an important criteria for the simulation for efficient load balancing. The initial stuides were undertaken for a mono-sized particle of size 1mm and the simulation was carried out for 0.5 seconds of wall time. These studies were performed using 64 cores  
-	    %\par LIGGGHTS\textsuperscript{\textregistered} natively supports only MPI parallel implementation. But using openMP helped distibute the load of one MPI process over various other cores thus giving speed improvements of about 30\%. These time improvements with various configurations can be observed in Table \ref{table:rslts_dem_slicing_studies}. The distibution of the 
-	    %This was also observed by the 
-	    \par Speed improvements and issues using only MPI and hybrid (MPI + OpenMP)
+	    \par LIGGGHTS\textsuperscript{\textregistered} divides the work space into various sections and each section being sent to a core for calculation. Thus, the division of the space becomes an important criteria for the simulation for efficient load balancing. The initial stuides were undertaken for a mono-sized particle of size 1mm and the simulation was carried out for 0.5 seconds of wall time. The initial timing stuides for the decomposition were performed using 64 cores. The effect of the decomposition on the simulation time can be seen in Table \ref{table:rslts_dem_slicing_studies}. This indicates that dividing the x-direction in more number of compartments help increase the speed of the simulation. This is easy to comprehend since the granulator has its length parallel to the x-axis. These results also show that if the geometry is divided into more than 2 compartments in the y-axis or the z-axis the simulation time increases. This can be accounted to the increased communication required to transfer the rotating impeller mesh from one compartment in the y-axis or the z-axis to the another compartment for each time step. Since MPI is limited by communication in between the nodes, a speed decrease is observed due to increased partitioning in these directions.
+	    
 	      \begin{table}[ht]
 	      %\centering
 	      %\resizebox{\textwidth}{!}
 	      \caption{The effect of spatial decomposition on the performance of the DEM simulations}
 		  \label{table:rslts_dem_slicing_studies}
 		  \begin{center}
-		  \resizebox{\textwidth}{!}{\begin{tabular}{
-		  c|c|c|c}
+		  \resizebox{\textwidth}{!}{\begin{tabular}{c|c|c|c}
 		  \hline
 		  \bf{Slices in x-direction}&\bf{Slices in y-direction}&\bf{Slices in z-direction}& Time taken for a 0.5 second simulation (in minutes)\\
 		  \hline
@@ -530,7 +527,9 @@ across different platforms.
 
 \end{center}		  	      
 	      \end{table}H]
-				  
+	      
+		  \par Thus, follwowing the above convention of not dividing the y and the z-axes in more than 2 compartments was followed for 128 and 256 core simulation as well. This meant that the x-axis was divided into 32 and 64 compartments respectively. 
+		  
 		  \begin{figure}[H]
 		  \centering		  	      
 	      \includegraphics[scale=0.75]{slicing_studies.png}

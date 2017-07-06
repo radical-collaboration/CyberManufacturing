@@ -520,12 +520,13 @@ across different platforms.
 	      \caption{The effect of spatial decomposition on the performance of the DEM simulations}
 		  \label{table:rslts_dem_slicing_studies}
 		  \begin{center}
-		  \begin{tabular}{l|c|c|c|c|c|c}
+		  \resizebox{\textwidth}{!}{\begin{tabular}{
+		  c|c|c|c}
 		  \hline
-		  \bf{Type of parallelisation used}&\bf{Total Number of Cores}&\bf{Slices in x-direction}&\bf{Slices in y-direction}&\bf{Slices in z-direction}&\bf{Number of OpenMP threads}& Time taken for a 0.5 second simulation (in minutes)\\
+		  \bf{Slices in x-direction}&\bf{Slices in y-direction}&\bf{Slices in z-direction}& Time taken for a 0.5 second simulation (in minutes)\\
 		  \hline
 		  
-		  \end{tabular}
+		  \end{tabular}}
 
 \end{center}		  	      
 	      \end{table}H]
@@ -537,13 +538,6 @@ across different platforms.
 	      \end{figure}
 	    
 	    \par fig vary PSD ( range and/or particle sizes) to see how $C_{coll}$ etc will be affected - important for PBM Kernel
-	      \begin{figure}[H]
-	      \centering
-	      \includegraphics[scale=0.5]{dana_quad_impact_coll_vs_RPM}
-	      \caption{ fig showing sensitivity of $C_{coll}$ and etc to RPM}
-	      %\caption{hello tesh}
-	      \label{fig:rslts_psd_velocity}
-	      \end{figure} 
 	        
 	    \par Talk about over-slicing or excess decomposition(confirm with profs)
 	      \begin{figure}[H]

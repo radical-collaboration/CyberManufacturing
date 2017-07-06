@@ -5,6 +5,7 @@
 #include <float.h>
 #include <string>
 #include <random>
+#include <ctime>
 
 #include "parameters.h"
 #include "utility.h"
@@ -32,7 +33,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     //cout << "CodeBegins" << endl << endl;
-
+    double serialStartTime = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC);
     //Read Dump Atom Files
     liggghtsData *lData = liggghtsData::getInstance();
     lData->readLiggghtsDataFiles();
@@ -44,7 +45,9 @@ int main(int argc, char *argv[])
     ierr = MPI_Init(&argc, &argv);
     ierr = MPI_Comm_size(MPI_COMM_WORLD, &num_mpi);
     ierr = MPI_Comm_rank(MPI_COMM_WORLD, &mpi_id);
-
+    double parallelStartTime = 0.0;
+    if (mpi_id == 0)
+        parallelStartTime = MPI_Wtime();
     //MPI HELLO World Test!
 
     cout << "hello world, I am mpi_id= " << mpi_id << '\n';
@@ -971,7 +974,14 @@ int main(int argc, char *argv[])
     }
     ierr = MPI_Barrier(MPI_COMM_WORLD);
     cout << "Code End" << endl;
+    double parallelEndTime = 0.0;
+    if (mpi_id == 0)
+    {
+        parallelEndTime = MPI_Wtime();
+        cout << "That took " << parallelEndTime - parallelStartTime << " seconds for parallel code" << endl;
+    }
     ierr = MPI_Finalize();
-
+    double serialEndTime = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC);
+    cout << "That took " << serialEndTime - serialStartTime << " seconds for parallel + serial code" << endl;
     return 0;
 }

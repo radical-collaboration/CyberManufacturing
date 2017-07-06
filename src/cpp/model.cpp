@@ -5,6 +5,7 @@
 #include <float.h>
 #include <string>
 #include <random>
+#include <ctime>
 
 #include "parameters.h"
 #include "utility.h"
@@ -30,7 +31,7 @@ using namespace std;
 int main()
 {
     //cout << "CodeBegins" << endl << endl;
-
+    double startTime = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC);
     //Read Dump Atom Files
     liggghtsData *lData = liggghtsData::getInstance();
     lData->readLiggghtsDataFiles();
@@ -698,7 +699,8 @@ int main()
     //    dumpDiaCSV(Time, d10OverTime, string("d10OverTime") + appendFileName);
     //    dumpDiaCSV(Time, d50OverTime, string("d50OverTime") + appendFileName);
     //    dumpDiaCSV(Time, d90OverTime, string("d90OverTime") + appendFileName);
-
+    double endTime = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC);
+    cout << "That took " << endTime - startTime << " seconds" << endl;
     cout << "Code End" << endl;
     return 0;
 }

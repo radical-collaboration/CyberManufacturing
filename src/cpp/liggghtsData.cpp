@@ -246,13 +246,15 @@ arrayOfDouble2D liggghtsData::getFinalNumberOfCollisions()
         return nCollisions;
 
     nCollisions = getArrayOfDouble2D(NUMBEROFDEMBINS, NUMBEROFDEMBINS);
-
+    
+    vector<size_t> particleTypeCount;
     for (auto itMapData = mapData.begin(); itMapData != mapData.end(); itMapData++)
     {
         int row = itMapData->first;
 
         vector<collisionData> vecCollisionData = get<1>(itMapData->second);
 
+        particleTypeCount.push_back(vecCollisionData.size());
         for (auto data : vecCollisionData)
         {
             vector<int> c_ccVec = data.c_ccVec;
@@ -261,6 +263,11 @@ arrayOfDouble2D liggghtsData::getFinalNumberOfCollisions()
                 nCollisions[row - 1][c_ccCount++] += c_cc;
         }
     }
+
+    for (size_t i = 0; i < nCollisions.size(); i++)
+        for (size_t j = 0; j < nCollisions[i].size(); j++)
+            nCollisions[i][j] = nCollisions[i][j] / (particleTypeCount[i] * particleTypeCount[j]);
+            
     return nCollisions;
 }
 

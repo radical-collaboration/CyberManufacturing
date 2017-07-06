@@ -30,23 +30,39 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
     for (int i = 0; i < NUMBEROFDEMBINS; i++)
         scaledDEMDiameter[i] = DEMdiameter[i] * (maxDiameter / maxDEMDiameter);
 
+    int count = 0;
     for (int s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
         for (int ss1 = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
-            for (int s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
-                for (int ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
-                    for (int i = 0; i < NUMBEROFDEMBINS - 1; i++)
-                        for (int j = 0; j < NUMBEROFDEMBINS - 1; j++)
+        {
+            //int i = 0;
+            for (int s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)//, i++)
+            {
+                //int j = 0;
+                for (int ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)//, j++)
+                    //for (int i = 0; i < NUMBEROFDEMBINS - 1; i++)
+                        //for (int j = 0; j < NUMBEROFDEMBINS - 1; j++)
                         {
-                            bool flag1 = fAll[s1][ss1] >= 1.0 && fAll[s2][ss2] >= 1.0;
-                            bool flag2 = diameter[s1][ss1] <= scaledDEMDiameter[i + 1] && diameter[s1][ss1] > scaledDEMDiameter[i];
-                            bool flag3 = diameter[s2][ss2] <= scaledDEMDiameter[j + 1] && diameter[s2][ss2] > scaledDEMDiameter[j];
+                            double tolerance = 0.0;//1.0e-16;
+                            bool flag1 = fAll[s1][ss1] >= tolerance && fAll[s2][ss2] >= tolerance;
+                            bool flag2 = true; //diameter[s1][ss1] <= scaledDEMDiameter[i + 1] && diameter[s1][ss1] > scaledDEMDiameter[i];
+                            bool flag3 = true; //diameter[s2][ss2] <= scaledDEMDiameter[j + 1] && diameter[s2][ss2] > scaledDEMDiameter[j];
 
                             if (flag1 && flag2 && flag3)
-                                collisionFrequency[s1][ss1][s2][ss2] = (numberOfCollisions[i][j] * timeStep) / (fAll[s1][ss1] * fAll[s2][ss2] * TIMESTEPDEM);
+                            {
+                                count++;
+                                collisionFrequency[s1][ss1][s2][ss2] = (numberOfCollisions[s2][ss2]/*[i][j]*/ * timeStep) / (/*fAll[s1][ss1] * fAll[s2][ss2] **/ TIMESTEPDEM);
+                            }
                         }
+            }
+        }
+    if (count > 0)
+    {
+        double total = NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS * NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS /** NUMBEROFDEMBINS * NUMBEROFDEMBINS*/;
+        cout << "collisionFrequency fraction = " << count << " / " << total << " = " << count / total << endl;
+    }
 
-    //Constant Collision Efficiency
-    //FROM Barrasso, Tamrakar, Ramachandran. Procedia Engineering 102 (2015) 1295�1304. (p. 1298)
+    // Constant Collision Efficiency
+    // FROM Barrasso, Tamrakar, Ramachandran. Procedia Engineering 102 (2015) 1295�1304. (p. 1298)
     //    for (int s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
     //        for (int ss1  = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
     //            for (int s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
@@ -54,18 +70,25 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
     //                    collisionEfficiency[s1][ss1][s2][ss2] = COLLISIONEFFICIENCYCONSTANT;
 
     // FROM Sen, Barrasso, Singh, Ramachandran. Processes 2014, 2, 89-111. (p. 96)
-    //double collisionEfficiencyConstant=0.01;
+    // double collisionEfficiencyConstant=0.01;
     double criticialExternalLiquid = 0.2;
-
+    count = 0;
     for (int s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
         for (int ss1 = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
             for (int s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
                 for (int ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
                 {
                     if (externalLiquidContent[s1][ss1] >= criticialExternalLiquid && externalLiquidContent[s2][ss2] >= criticialExternalLiquid)
+                    {
+                        count++;
                         collisionEfficiency[s1][ss1][s2][ss2] = COLLISIONEFFICIENCYCONSTANT;
+                    }
                 }
-
+    if (count > 0)
+    {
+        double total = NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS * NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS;
+        cout << "collisionEfficiency fraction = " << count << " / " << total << " = " << count / total << endl;
+    }
     //Aggregation Kernel Calculation
     for (int s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
         for (int ss1 = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)

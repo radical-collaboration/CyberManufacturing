@@ -71,18 +71,25 @@ int main()
         for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
             compartmentIn.diameter[s][ss] = cbrt((6 / M_PI) * (compartmentIn.vs[s] + compartmentIn.vss[ss]));
 
+    vector<double> particleIn;
+    particleIn.push_back(726657587.0);
+    particleIn.push_back(286654401.0);
+    particleIn.push_back(118218011.0);
+    particleIn.push_back(50319795.0);
+    particleIn.push_back(20954036.0);
+    particleIn.push_back(7345998.0);
+    particleIn.push_back(1500147.0);
+    particleIn.push_back(76518.0);
+    particleIn.push_back(149.0);
+
     //cout << "Creating fIn and assigning zeros" << endl << endl;
     arrayOfDouble2D fIn = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    //cout << "Begin initialize hard coded values to fIn" << endl;
-    fIn[0][0] = 726657587.0;
-    fIn[1][1] = 286654401.0;
-    fIn[2][2] = 118218011.0;
-    fIn[3][3] = 50319795.0;
-    fIn[4][4] = 20954036.0;
-    fIn[5][5] = 7345998.0;
-    fIn[6][6] = 1500147.0;
-    fIn[7][7] = 76518.0;
-    fIn[8][8] = 149.0;
+    cout << "Begin initialize hard coded values to fIn" << endl;
+    // for (size_t i = 0; i < particleIn.size(); i++)
+    //    for (size_t j = 0; j < particleIn.size(); j++)
+    //        fIn[i][j] = sqrt(particleIn[i] * particleIn[j]);
+    for (size_t i = 0; i < particleIn.size(); i++)
+        fIn[i][i] = particleIn[i];
     //cout << "End initialize hard coded values to fIn" << endl << endl;
 
     //MATLAB ndgrid
@@ -304,23 +311,31 @@ int main()
     arrayOfDouble2D internalVolumeBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
     arrayOfDouble2D externalVolumeBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
 
-    //compartmentDEMIn.DEMDiameter = vector <double>(NUMBEROFDEMBINS, 0.0);
-    //compartmentDEMIn.numberOfCollisions = getArrayOfDouble2D(NUMBEROFDEMBINS, NUMBEROFDEMBINS);
+    compartmentDEMIn.DEMDiameter = vector <double>(NUMBEROFDEMBINS, 0.0);
+    //compartmentDEMIn.numberOfCollisions = getArrayOfDouble2D(NUMBEROFDEMBINS, NUMBEROFDEMBINS,0.0);
     //compartmentDEMIn.numberOfImpacts = vector <double> (NUMBEROFDEMBINS, 0.0);
 
     //default_random_engine generator;
-    //uniform_real_distribution<double> distribution(0.0,1.0);
+    // uniform_real_distribution<double> distribution(0.0,1.0);
 
-    //for (int i = 0; i < NUMBEROFDEMBINS; i++)
-    //{
-    //compartmentDEMIn.DEMDiameter[i] = 1.0e3;//distribution(generator)*1.0e3;
-    //compartmentDEMIn.numberOfImpacts[i] = 1.0; //distribution(generator);
-    //for(int j = 0; j < NUMBEROFDEMBINS; j++)
-    //compartmentDEMIn.numberOfCollisions[i][j] = 1.0; //distribution(generator);
-    //}
-    compartmentDEMIn.DEMDiameter = lData->getParticleDiameters();
-    if ((compartmentDEMIn.DEMDiameter).size() == 0)
-        cout << "Diameter data is missing in LIGGGHTS output file" << endl;
+    for (int i = 0; i < NUMBEROFDEMBINS; i++)
+    {
+      compartmentDEMIn.DEMDiameter[i] = (i+1)*1.0e-3; //distribution(generator)*1.0e3;
+    // // used (i+1)*1.0e-3 bec distrib fxn give rand values in non size order which not work with DEM based scaled data kernel
+    //// also note that we may have to do dem data converison in liggghts side then send over to PBM -subhodh
+    // compartmentDEMIn.numberOfImpacts[i] = 1.0; //distribution(generator);
+    // for(int j = 0; j < NUMBEROFDEMBINS; j++)
+    //   compartmentDEMIn.numberOfCollisions[i][j] = 1.0; //distribution(generator);
+    }
+    // ***************** synthetic ligghts data  end ****************
+
+    // ***************** read liggghts files START ******************
+    // uncomment this section if you want to read acgtualy ligggghts files
+    // use dem data ... make sure to comment section before this one which makes syn data
+
+    // compartmentDEMIn.DEMDiameter = lData->getParticleDiameters();
+    // if ((compartmentDEMIn.DEMDiameter).size() == 0)
+    //     cout << "Diameter data is missing in LIGGGHTS output file" << endl;
 
     compartmentDEMIn.numberOfImpacts = lData->getFinalNumberOfImpacts();
     if ((compartmentDEMIn.numberOfImpacts).size() == 0)
@@ -329,6 +344,19 @@ int main()
     compartmentDEMIn.numberOfCollisions = lData->getFinalNumberOfCollisions();
     if ((compartmentDEMIn.numberOfCollisions)[0].size() == 0)
         cout << "Collision data is missing in LIGGGHTS output file" << endl;
+    // ************ read liggghts files end ******************
+
+    double maxDiameter = getMaximumOf2DArray(compartmentIn.diameter);
+    double maxDEMDiameter = getMaximumOfArray(compartmentDEMIn.DEMDiameter);
+
+    vector<double> scaledDEMDiameter(NUMBEROFDEMBINS, 0.0);
+    for (int i = 0; i < NUMBEROFDEMBINS; i++)
+        scaledDEMDiameter[i] = compartmentDEMIn.DEMDiameter[i] * (maxDiameter / maxDEMDiameter);
+
+    DUMP2D(compartmentDEMIn.numberOfCollisions);
+    DUMP(compartmentDEMIn.DEMDiameter);
+    DUMP(compartmentDEMIn.numberOfImpacts);
+    DUMP(scaledDEMDiameter);
 
     vector<double> liquidAdditionRateAllCompartments(NUMBEROFCOMPARTMENTS, 0.0);
     liquidAdditionRateAllCompartments[0] = LIQUIDADDITIONRATE;
@@ -344,10 +372,8 @@ int main()
 
     while (time <= FINALTIME)
     {
-        Time.push_back(time);
-        cout << endl
-             << "time = " << time << endl;
-
+        if (time > PREMIXINGTIME + LIQUIDADDITIONTIME)
+            fIn = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
         for (int c = 0; c < NUMBEROFCOMPARTMENTS; c++)
         {
 
@@ -415,7 +441,6 @@ int main()
 
         while (maxofthree > 0.1 / timeStep && timeStep > 5.0e-5)
             timeStep /= 2.0;
-        cout << "timeStep = " << timeStep << endl;
 
         int nanCount = 0;
         double minfAll = -DBL_MAX;
@@ -446,6 +471,8 @@ int main()
             cout << endl
                  << "******fAllCompartments has negative values********" << endl
                  << endl;
+            cout << "Aborting..." << endl;
+            return 0;
         }
 
         //BIN RECALCULATION
@@ -485,8 +512,11 @@ int main()
         liquidBinsAllCompartmentsOverTime.push_back(liquidBinsAllCompartments);
         gasBinsAllCompartmentsOverTime.push_back(gasBinsAllCompartments);
 
+        cout << "time = " << time << endl;
+        cout << "timeStep = " << timeStep << endl;
+        cout << endl;
+        Time.push_back(time);
         time += timeStep;
-        //time = FINALTIME+1;
     }
 
     size_t nTimeSteps = Time.size();
@@ -634,12 +664,12 @@ int main()
                 if (cumulativeVolumeDistribution[d - 1] < 0.1 && cumulativeVolumeDistribution[d] >= 0.1)
                 {
                     double value = 0.1 - cumulativeVolumeDistribution[d - 1];
-                    d10 = value * value1 + value2;
+                    d10 = value * value1  + value2;
                 }
                 if (cumulativeVolumeDistribution[d - 1] < 0.1 && cumulativeVolumeDistribution[d] >= 0.1)
                 {
                     double value = 0.9 - cumulativeVolumeDistribution[d - 1];
-                    d90 = value * value1 + value2;
+                    d90 = value * value1  + value2;
                 }
             }
             d10OverTime[n][c] = d10;

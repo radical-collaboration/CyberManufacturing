@@ -39,9 +39,11 @@
 	\section{Introduction \& Objectives} 
 
 	\par Half of all industrial chemical production is carried out using particulate processes (\cite{seville1997}). Important products that are produced using particulate processes include detergents, aerosols, fertilizers, and pharmaceuticals. Particulate processes have complex phenomena due to the chaotic microscale behaviour of individual particles in the system that determine the bulk behaviour of the system. Due to the complex nature of these processes there is a lack of governing equations which can accurately describe them (\cite{sen2013}). As a result industries such as pharmaceuticals use expensive heuristic studies and inefficient operational protocols with high recycle ratios to meet strict regulatory standards (\cite{Ramachandran2009}). In an effort to cut costs and improve efficiencies there is a high demand for accurate models that can be used for process design and control systems.   
-	\par Discrete element methods (DEM) have proven to be an accurate way to model a bulk material using microscale particle level interactions. The downside to these models is that they take large amounts of time to solve. Another more computationally efficient, but less accurate, technique used for these systems are population balance models (PBM). To achieve high levels of accuracy with out the long simulation times of DEM there have been numerous works on hybrid PBM-DEM methods.
-	\par \textcolor{cyan}{in the past when faced with comp heavy tasks scientists have used parallel computing. divide big prob into small pieces that are simultaneously solved. time to solve is time to solve small piece.} 
-	\par potential benefits this could have 1. unprecedented accuracy 2.wide adoption of using these models since they are so fast 3. cheaper drugs 4. MPC accurate but in real time 5. parameter estimation for QbD 6. etc. 
+	\par Discrete element methods (DEM) have proven to be an accurate way to model a bulk material using microscale particle level interactions. The downside to these models is that they take large amounts of time to solve. Another more computationally efficient, but less accurate, technique used for these systems are population balance models (PBM). To achieve high levels of accuracy without the long simulation times of DEM there have been numerous works on hybrid PBM-DEM methods \citep{Barrasso2015cerd}.
+	\par Use of parallel techniques by scientists have helped reduce the amount of time required to solve computationally heavy tasks into a array of smaller and more manageable tasks, which are solved simultaneously in various smaller processes. 
+	\par Some of the potential benefits of using HPCs in the pharmaceutical industry include really high accuracy for parameter estimation, on-line modelling of continuous processes, better control of processes. This would lead lesser production costs leading to cheaper drug for the consumer.
+	%\textcolor{cyan}{in the past when faced with comp heavy tasks scientists have used parallel computing. divide big prob into small pieces that are simultaneously solved. time to solve is time to solve small piece.} 
+	%\par potential benefits this could have 1. unprecedented accuracy 2.wide adoption of using these models since they are so fast 3. cheaper drugs 4. MPC accurate but in real time 5. parameter estimation for QbD 6. etc. 
 	
 	    \subsection{Objectives}
 	    \par The main objective of this study was to develop new techniques to parallelize our model and use high perfomance computing (HPC) equipment in order to reduce the computation times for the linked DEM-PBM simulations. Specific objectives of each individual study are listed below: 
@@ -104,7 +106,7 @@
 	    \subsubsection{Parallel Application Program Interfaces}
 	    \par Message Passing Interface (MPI) is a common parallel computing application interface standard. MPI is used for distributed memory parallel computing, this is because MPI will operate every MPI process as a discrete unit that does not share memory with the other processes unless explicit message passing is used. Even on shared a single node where the hardware is supports shared memory computing, MPI will still operate it in a distributed memory fashion \cite{Jin2011}. Operating all cores as distinct units also means they each need their own copy of all variables used for computation which results in a large overall memory foot print compared to a same system if it was operated in shared memory. 
 	    \par Open Multi-Processing (OMP) is another application program interface stand for parallel computing. OMP is used for shared memory and can take advantage of shared memory systems which can result in much faster computation. It does not work well on distributed systems though. This prevents it from being used to efficiently carry out computations across multiple nodes of a cluster simultaneously \cite{Jin2011}. 
-	    \par Since MPI is preferred for distributed computing and OMP is better for shared computing many individuals have studied the performance of MPI vs MPI+OMP methods and many studies have used MPI+OMP for scientific computation for improved performance. Often times a trade of is made between optimizing a program for performance and trying to make it flexible enough to run on many different computer architectures \textcolor{cyan}{might need reference for this}. A summary of some works addressing MPI+OMP methods for scientific computing and architecture features and concerns can be found in \cite{Bettencourt2017}. In the conclusion to the work by \cite{Bettencourt2017} it was found that hybrid methods for PBMs allow the code flexibility for different architectures while still maintaining good performance. \textcolor{cyan}{should I mention load balancing techniques of gunawan paper?}. In the work of \cite{Bettencourt2017} only the external(spatial) coordinates of the PBM were parallelized. In this current work external and internal(compositions) calculations are parallelized. \textcolor{cyan}{comment about how int and ext pll methods means better model for xyz reasons dotdotdot helps to explicitly say reason} 
+	    \par Since MPI is preferred for distributed computing and OMP is better for shared computing many individuals have studied the performance of MPI vs MPI+OMP methods and many studies have used MPI+OMP for scientific computation for improved performance. Often times a trade of is made between optimizing a program for performance and trying to make it flexible enough to run on many different computer architectures. A summary of some works addressing MPI+OMP methods for scientific computing and architecture features and concerns can be found in \cite{Bettencourt2017}. In the conclusion to the work by \cite{Bettencourt2017} it was found that hybrid methods for PBMs allow the code flexibility for different architectures while still maintaining good performance.  In the work of \cite{Bettencourt2017} only the external(spatial) coordinates of the PBM were parallelized. In this current work external and internal(compositions) calculations are parallelized.% \textcolor{cyan}{comment about how int and ext pll methods means better model for xyz reasons dotdotdot helps to explicitly say reason} 
 	      
 	
 	
@@ -210,7 +212,7 @@
 	    \frac{d}{dt}F(s_1,s_2,x)=\Re_{agg}(s_1,s_2,x)+R_{break}(s_1,s_2,x)+\dot{F}_{in}(s_1,s_2,x)-\dot{F}_{out}(s_1,s_2,x)
 	    \label{eqn:mthds_pbm_overall} 
 	    \end{align}
-	    \par \textcolor{red}{citation?}    
+%	    \par \textcolor{red}{citation?}    
 	    
 	    \par where, $F(s_1,s_2,x)$ is the number of particles with an API volume of $s_1$ and an excipient volume of $s_2$ in the spatial compartment $x$. The rate of change of number of particles with time in different size classes depend on the rate of aggregation $\Re_{agg}(s_1,s_2,x)$ and the rate of breakage $\Re_{break}(s_1,s_2,x)$. Also, the rate of particles coming into, $F_{in}(s_1,s_2,x)$ and going out, $F_{out}(s_1,s_2,x)$ of the spatial compartment due to particle transfer affect the number of particles in different size classes. 
 	The rate of change of liquid volume is calculated using the equation: 
@@ -226,7 +228,7 @@
 	    \frac{d}{dt}F(s_1,s_2,x)g(s_1,s_2,x)=& \Re_{gas,agg}(s_1,s_2,x)+\Re_{gas,break}(s_1,s_2,x)+\dot{F}_{in}(s_1,s_2,x)g_{in}(s_1,s_2,x)\notag\\
 	    &-\dot{F}_{out}(s_1,s_2,x)g_{out}(s_1,s_2,x)+F(s_1,s_2,x)\dot{g}_{cons}(s_1,s_2,x)
 	    \end{align}
-	    \par \textcolor{red}{citation?}
+%	    \par \textcolor{red}{citation?}
 	    
 	    \par where, $g(s_1,s_2,x)$ is the gas volume of each particle with API volume of $s_1$ and excipient volume of $s_2$ in the spatial compartment $x$. $\Re_{gas,agg}(s_1,s_2,x)$ and $\Re_{gas,break}(s_1,s_2,x)$ are respectively the rates of gas transferred between size classed due to aggregation and breakage. $g_{in}(s_1,s_2,x)$ and $g_{out}(s_1,s_2,x)$ are respectively the gas volume of the particles entering and leaving the spatial compartment. $g_{cons}(s_1,s_2,x)$ is the volume of gas coming out of each particle in the compartment at every time-step due to consolidation of the particles. 
 	    \par The rate of aggregation, $\Re_{agg}(s_1,s_2,x)$ in Equation \ref{eqn:mthds_pbm_overall} is calculated as  
@@ -234,7 +236,7 @@
 	     \Re_{agg}(s_1,s_2,x)=& \frac{1}{2}\int _0^{s_1} \int_0^{s_2} \beta(s_1',s_2',s_1-s_1',s_2-s_2',x)F(s_1',s_2',x)F(s_1-s_1',s_2-s_2',x)ds_1'ds_2'\notag\\ 
 	     &- F(s_1,s_2,x)\int _0^{s_{max_1}-s_1} \int_0^{s_{max_2}-s_2} \beta(s_1,s_2,s_1',s_2',x)F(s_1',s_2',x)ds_1'ds_2'
 	     \end{align}
-	     \par \textcolor{red}{citation?}
+%	     \par \textcolor{red}{citation?}
 	     
 	    \par where, the aggregation kernel, $\beta(s_1,s_2, s_1',s_2',x)$ is expressed as a function of collision frequency ($C$) and collision efficiency ($\psi$) –
 	    \begin{align}
@@ -266,7 +268,7 @@
 	    \begin{align}
 	    \Re_{break}(s_1,s_2,x) = \int_0^{s_{max_1}} \int_0^{s_{max_2}} K_{break}(s_1',s_2',x)F(s_1',s_2',x)ds_1'ds_2' - K_{break}(s_1,s_2,x)F(s_1,s_2,x)
 	    \end{align}
-	    \par \textcolor{red}{citation?}
+%	    \par \textcolor{red}{citation?}
 	    
 	    \par where, the breakage kernel $K_{break}(s_1,s_2,x)$ is formulated as – 
 	    
@@ -274,7 +276,7 @@
 	    K_{break}(s_1,s_2,x) = C_{impact}\int_{U_{break}}^{\infty}p(U)dU
 	    %K_{break}(s_1,s_2,x)=\left(\frac{4}{15\pi}\right)^{(\frac{1}{2})}G_{shear}exp\left(-\frac{B}{R(s_1,s_2,x)}\right)
 	    \end{align}
-	    \par \textcolor{red}{citation?}
+%	    \par \textcolor{red}{citation?}
 	
 	      %\par where, $G_{shear}$ is the shear rate exerted by the impeller on the granules. $R(s_1,s_2,x)$ is the radius of the granule that breaks and $B$ is the breakage kernel constant. $G_shear$ is calculated as $\frac{\nu_{impeller}*D_{impeller}*PI}{60}$ where $\nu_{impeller}$ and $D_{impeller}$ are respectively the rotational speed and diameter of the impeller.
 	      \par The rate of increase of liquid volume of one particle, $\dot{l}_{add}(s_1,s_2,x)$ is expressed as $\frac{(s_1+s_2)(\dot{m}_{spray}(1-c_{binder})-\dot{m}_evap)}{m_{solid}(x)}$ where, $(s_1+s_2)$  is the total solid volume of the particle; $\dot{m}_spray$ is the rate of external liquid addition, $c_{binder}$ is the concentration of binder in the external liquid (which is assumed to be zero in this case as pure liquid is added); $\dot{m}_{evap}$ is the rate of evaporation of liquid from the system (which is also assumed to be zero in this case) and $m_{solid}$ is the total amount of solid present in the compartment.
@@ -526,9 +528,9 @@ across different platforms.
 		  \end{tabular}}
 
 \end{center}		  	      
-	      \end{table}H]
+	      \end{table}
 	      
-		  \par Thus, follwowing the above convention of not dividing the y and the z-axes in more than 2 compartments was followed for 128 and 256 core simulation as well. This meant that the x-axis was divided into 32 and 64 compartments respectively. 
+		  \par When MPI is used for parallelization of a task, load balancing becomes an important parameter that needs to be considered. Each processor used during the task is utilised with the similar usage as compared to other processors being used. Following the results from the initial timing studies,the y and the z-axes were not divided in more than 2 compartments for 128 and 256 core simulation as well. This meant that the x-axis was divided into 32 and 64 compartments respectively. In order to avoid the expensive communication between the processes, LIGGGHTS\textsuperscript{\textregistered} tries to insert the particles towards the centre of the compartment such that the number of ghost atoms are minimized. But, slicing in the x-axis reduced the space available for the insertion of the particles thus, many of the particles were inserted incorrectly. Another abnormal behaviour observed during these simulation was the particles halted at certain compartment and no particle travelled beyond this compartment in the x-direction. Thus, another set of timing studies were performed for the 128 and 256 core simulations. The comparison of simulation times have been shown in figure.
 		  
 		  \begin{figure}[H]
 		  \centering		  	      

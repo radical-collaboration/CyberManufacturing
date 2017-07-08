@@ -16,6 +16,8 @@
 
 using namespace std;
 
+#define MASTER 0
+
 //MACROS
 //Call to these macros will dump values to file name as variableName.txt
 #define DUMP(varName) dumpData(varName, #varName)
@@ -40,40 +42,45 @@ int main(int argc, char *argv[])
 
     //return 0;//to stop execution after reading liggghts data
     //**************************************************************************************************
-    int ierr, num_mpi, mpi_id = 0;
+    int num_mpi = 0;
+    int mpi_id = 0;
     // spawn MPI processes
-    ierr = MPI_Init(&argc, &argv);
-    ierr = MPI_Comm_size(MPI_COMM_WORLD, &num_mpi);
-    ierr = MPI_Comm_rank(MPI_COMM_WORLD, &mpi_id);
-    double parallelStartTime = 0.0;
-    if (mpi_id == 0)
-        parallelStartTime = MPI_Wtime();
-    //MPI HELLO World Test!
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &num_mpi);
+    MPI_Comm_rank(MPI_COMM_WORLD, &mpi_id);
+    MPI_Barrier(MPI_COMM_WORLD);
 
+    double parallelStartTime = 0.0;
+    if (mpi_id == MASTER)
+        parallelStartTime = MPI_Wtime();
+
+    //MPI HELLO World Test!
     cout << "hello world, I am mpi_id= " << mpi_id << '\n';
-    ierr = MPI_Barrier(MPI_COMM_WORLD);
+
+    if (mpi_id == MASTER)
+    {
+        cout << "Number of Compartments = " << NUMBEROFCOMPARTMENTS << endl;
+        cout << "Number of Processes = " << num_mpi << endl;
+    }    
+    
     //**************** MPI load Array Start *******************
     int print = 1;
     int print_load = 1;
     vector<int> load(2 * num_mpi, 0);
     vector<int> load_rev(2 * num_mpi, 0);
 
-    if (mpi_id == 0)
-        cout << "nc = " << NUMBEROFCOMPARTMENTS << " and mpi_proc = " << num_mpi << endl;
-
     int load_xi = 0;
-    //int load_pp=0;
 
-    ierr = MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
 
-    if (print == 1)
+    if (print == 1 && mpi_id == MASTER)
         cout << "we now start to fill load with values" << endl;
 
     for (int i = 0; i < NUMBEROFCOMPARTMENTS; i++)
     {
-        load[load_xi] += 1; //=load[load_xi]+1;
+        load[load_xi] += 1;
 
-        if (print_load == 1 && mpi_id == 0)
+        if (print_load == 1 && mpi_id == MASTER)
             cout << "load[" << load_xi << "] = " << load[load_xi] << endl;
 
         load_xi++;
@@ -82,7 +89,7 @@ int main(int argc, char *argv[])
             load_xi = 0;
     }
 
-    ierr = MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
 
     if (print == 1)
         cout << "start 2nd part of load calcs" << endl;
@@ -90,7 +97,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i < num_mpi + 1; i++)
     {
         load_rev[num_mpi - i] = load[i];
-        if (print_load == 1 && mpi_id == 0)
+        if (print_load && mpi_id == MASTER)
             cout << "load_rev[" << num_mpi - i << "] = " << load_rev[num_mpi - i] << endl;
     }
 
@@ -99,41 +106,39 @@ int main(int argc, char *argv[])
 
     //memcpy(load,load_rev, sizeof(load));
     load = load_rev;
-    ierr = MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
+
     for (int i = 0; i < num_mpi + 1; i++)
     {
-        if (i > 0)
+        if (i != MASTER)
             load[i] = load[i] + load[i - 1];
 
-        if (print_load == 1)
-        {
-            if (mpi_id == 0)
+        if (print_load && mpi_id == MASTER)
                 cout << "load[" << i << "] = " << load[i] << endl;
-        }
     }
 
-    ierr = MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
     /*dist lower and upper chunks to cores*/
-    if (print == 1)
+    if (print && mpi_id == MASTER)
         cout << "now distribute core_low and core_up to each process" << endl;
 
     int core_low = 0, core_up = 0;
 
-    for (int i = 0; i < num_mpi; i++)
-    {
-        if (mpi_id == i)
-        {
+    //for (int i = 0; i < num_mpi; i++)
+    //{
+        //if (mpi_id == i)
+        //{
             core_low = load[mpi_id] /*core_low=load[id]+1*/;
             core_up = load[mpi_id + 1] /*core_up=load[id+1]*/;
-            cout << "my name = " << mpi_id << ", core_low = " << core_low << ", core_up = " << core_up << endl;
-        }
-    }
+            
+        //}
+    //}
 
     //MPI workload distribute end
 
-    ierr = MPI_Barrier(MPI_COMM_WORLD);
-    //MPI_Finalize ();
-    //return 0;
+    MPI_Barrier(MPI_COMM_WORLD);
+    cout << "my process id = " << mpi_id << ", core_low = " << core_low << ", core_up = " << core_up << endl;
+    
 
     //*************** MPI load Array End   ********************
 
@@ -185,7 +190,7 @@ int main(int argc, char *argv[])
 
     //cout << "Creating fIn and assigning zeros" << endl << endl;
     arrayOfDouble2D fIn = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    cout << "Begin initialize hard coded values to fIn" << endl;
+    //cout << "Begin initialize hard coded values to fIn" << endl;
     // for (size_t i = 0; i < particleIn.size(); i++)
     //    for (size_t j = 0; j < particleIn.size(); j++)
     //        fIn[i][j] = sqrt(particleIn[i] * particleIn[j]);
@@ -459,14 +464,14 @@ int main(int argc, char *argv[])
     for (int i = 0; i < NUMBEROFDEMBINS; i++)
         scaledDEMDiameter[i] = compartmentDEMIn.DEMDiameter[i] * (maxDiameter / maxDEMDiameter);
 
-    if (mpi_id == 0)
+    if (mpi_id == MASTER)
     {
         DUMP2D(compartmentDEMIn.numberOfCollisions);
         DUMP(compartmentDEMIn.DEMDiameter);
         DUMP(compartmentDEMIn.numberOfImpacts);
         DUMP(scaledDEMDiameter);
     }
-    ierr = MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
     vector<double> liquidAdditionRateAllCompartments(NUMBEROFCOMPARTMENTS, 0.0);
     liquidAdditionRateAllCompartments[0] = LIQUIDADDITIONRATE;
     double time = 0.0;
@@ -478,7 +483,7 @@ int main(int argc, char *argv[])
     arrayOfDouble4D liquidBinsAllCompartmentsOverTime;
     arrayOfDouble4D gasBinsAllCompartmentsOverTime;
     vector<double> particleAverageVelocity(NUMBEROFCOMPARTMENTS, PARTICLEAVERAGEVELOCITY);
-
+    
     while (time <= FINALTIME)
     {
         if (time > PREMIXINGTIME + LIQUIDADDITIONTIME)
@@ -528,133 +533,98 @@ int main(int argc, char *argv[])
         // *************************************************************
         MPI_Status status;
         vector<double> buff_sr(NUMBEROFCOMPARTMENTS * NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS, 0.0);
-        ierr = MPI_Barrier(MPI_COMM_WORLD);
-
+        
+        MPI_Barrier(MPI_COMM_WORLD);
+        
         // MPI SR dFdT_AllComaprments START
 
-        for (int i = 1; i < num_mpi; i++)
+        //for (int i = 1; i < num_mpi; i++)
+        //{
+        if (mpi_id != MASTER)
         {
-            if (mpi_id == i)
-            {
-                /* send */
-                //printf("msg pre dfdt sent i=%d\n",i);
-                buff_sr = linearize3DVector(dfdtAllCompartments); //memcpy(&buff_sr, &dfdtAllCompartments,sizeof(dfdtAllCompartments));
-                MPI_Send(buff_sr.data(), static_cast<int>(buff_sr.size()), MPI_DOUBLE, 0, i, MPI_COMM_WORLD);
-                //printf("msg dfdt sent i=%d\n",i);
-            }
+            /* send */
+            //printf("msg pre dfdt sent i=%d\n",i);
+            buff_sr = linearize3DVector(dfdtAllCompartments); //memcpy(&buff_sr, &dfdtAllCompartments,sizeof(dfdtAllCompartments));
+            MPI_Send(buff_sr.data(), static_cast<int>(buff_sr.size()), MPI_DOUBLE, MASTER, mpi_id, MPI_COMM_WORLD);
+            //printf("msg dfdt sent i=%d\n",i);
+        }
 
-            if (mpi_id == 0)
+        if (mpi_id == MASTER)
+        {
+            for (int i = 1; i < num_mpi; i++)
             {
-                /* recv   */
-                //printf("msg pre dfdt recv i=%d\n",i);
-                MPI_Recv(buff_sr.data(), static_cast<int>(buff_sr.size()), MPI_DOUBLE, i, i, MPI_COMM_WORLD, &status);
-                //printf("msg dfdt recv'd i=%d\n",i);
+                MPI_Recv(buff_sr.data(), static_cast<int>(buff_sr.size()), MPI_DOUBLE, i, i, MPI_COMM_WORLD, &status);                
 
-                /*  loop to put correct array values into masters copy */
-                //if(mpi_fill_on==1)
-                //{
-                /*c=i;*/
                 for (int c = load[i]; c < load[i + 1]; c++)
                     for (int i0 = 0; i0 < NUMBEROFFIRSTSOLIDBINS; i0++)
                         for (int ix = 0; ix < NUMBEROFSECONDSOLIDBINS; ix++)
                             dfdtAllCompartments[c][i0][ix] = buff_sr[c * NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS + i0 * NUMBEROFSECONDSOLIDBINS + ix];
-                //}
-                /*  end loop to put   ....                              */
             }
+            
         }
-        // MPI SR dFDT_AllCompartments END
+        
+        MPI_Barrier(MPI_COMM_WORLD);
 
-        ierr = MPI_Barrier(MPI_COMM_WORLD);
-
-        // MPI SR dFLdT_AllComaprments START
-        //buff_sr.clear();
-        for (int i = 1; i < num_mpi; i++)
+        if (mpi_id != MASTER)
         {
-            if (mpi_id == i)
-            {
-                /* send */
-                //printf("msg pre dfdt sent i=%d\n",i);
-                buff_sr = linearize3DVector(dfldtAllCompartments); //memcpy(&buff_sr, &dfdtAllCompartments,sizeof(dfdtAllCompartments));
-                MPI_Send(buff_sr.data(), static_cast<int>(buff_sr.size()), MPI_DOUBLE, 0, i, MPI_COMM_WORLD);
-                //printf("msg dfdt sent i=%d\n",i);
-            }
+            buff_sr = linearize3DVector(dfldtAllCompartments); 
+            MPI_Send(buff_sr.data(), static_cast<int>(buff_sr.size()), MPI_DOUBLE, MASTER, mpi_id, MPI_COMM_WORLD);
+        }
 
-            if (mpi_id == 0)
+        if (mpi_id == MASTER)
+        {
+            for (int i = 1; i < num_mpi; i++)
             {
-                /* recv   */
-                //printf("msg pre dfdt recv i=%d\n",i);
                 MPI_Recv(buff_sr.data(), static_cast<int>(buff_sr.size()), MPI_DOUBLE, i, i, MPI_COMM_WORLD, &status);
-                //printf("msg dfdt recv'd i=%d\n",i);
-
-                /*  loop to put correct array values into masters copy */
-                //if(mpi_fill_on==1)
-                //{
-                /*c=i;*/
+                
                 for (int c = load[i]; c < load[i + 1]; c++)
                     for (int i0 = 0; i0 < NUMBEROFFIRSTSOLIDBINS; i0++)
                         for (int ix = 0; ix < NUMBEROFSECONDSOLIDBINS; ix++)
                             dfldtAllCompartments[c][i0][ix] = buff_sr[c * NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS + i0 * NUMBEROFSECONDSOLIDBINS + ix];
-                //}
-                /*  end loop to put   ....                              */
             }
         }
-        // MPI SR dFLDT_AllCompartments END
-        ierr = MPI_Barrier(MPI_COMM_WORLD);
+        
+        MPI_Barrier(MPI_COMM_WORLD);
 
-        // MPI SR dFgdT_AllComaprments START
-        //buff_sr.clear();
-        for (int i = 1; i < num_mpi; i++)
+        if (mpi_id != MASTER)
         {
-            if (mpi_id == i)
-            {
-                /* send */
-                //printf("msg pre dfdt sent i=%d\n",i);
-                buff_sr = linearize3DVector(dfgdtAllCompartments); //memcpy(&buff_sr, &dfdtAllCompartments,sizeof(dfdtAllCompartments));
-                MPI_Send(buff_sr.data(), static_cast<int>(buff_sr.size()), MPI_DOUBLE, 0, i, MPI_COMM_WORLD);
-                //printf("msg dfdt sent i=%d\n",i);
-            }
+            buff_sr = linearize3DVector(dfgdtAllCompartments); 
+            MPI_Send(buff_sr.data(), static_cast<int>(buff_sr.size()), MPI_DOUBLE, MASTER, mpi_id, MPI_COMM_WORLD);
+        }
 
-            if (mpi_id == 0)
+        if (mpi_id == MASTER)
+        {
+            for (int i = 1; i < num_mpi; i++)
             {
-                /* recv   */
-                //printf("msg pre dfdt recv i=%d\n",i);
                 MPI_Recv(buff_sr.data(), static_cast<int>(buff_sr.size()), MPI_DOUBLE, i, i, MPI_COMM_WORLD, &status);
-                //printf("msg dfdt recv'd i=%d\n",i);
-
-                /*  loop to put correct array values into masters copy */
-                //if(mpi_fill_on==1)
-                //{
-                /*c=i;*/
+                
                 for (int c = load[i]; c < load[i + 1]; c++)
                     for (int i0 = 0; i0 < NUMBEROFFIRSTSOLIDBINS; i0++)
                         for (int ix = 0; ix < NUMBEROFSECONDSOLIDBINS; ix++)
                             dfgdtAllCompartments[c][i0][ix] = buff_sr[c * NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS + i0 * NUMBEROFSECONDSOLIDBINS + ix];
-                //}
-                /*  end loop to put   ....                              */
             }
         }
-        // MPI SR dFGDT_AllCompartments END
 
         //*************************MPI MSG PASSING End  ********************************************************
 
         // ************************ MPI BCAST START     ********************************************************
 
-        ierr = MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
 
         vector<double> buff_dfdt = linearize3DVector(dfdtAllCompartments);
         vector<double> buff_dfldt = linearize3DVector(dfldtAllCompartments);
         vector<double> buff_dfgdt = linearize3DVector(dfgdtAllCompartments);
         /* now doing MPI_Bcast all of the fvalues needed to all cores .... */
         //printf("early bcast dfdt\n");
-        ierr = MPI_Bcast(buff_dfdt.data(), buff_dfdt.size(), MPI_DOUBLE, 0, MPI_COMM_WORLD);
+        MPI_Bcast(buff_dfdt.data(), buff_dfdt.size(), MPI_DOUBLE, 0, MPI_COMM_WORLD);
         //printf("early bcast dfl dt\n");
-        ierr = MPI_Bcast(buff_dfldt.data(), buff_dfldt.size(), MPI_DOUBLE, 0, MPI_COMM_WORLD);
+        MPI_Bcast(buff_dfldt.data(), buff_dfldt.size(), MPI_DOUBLE, 0, MPI_COMM_WORLD);
         //printf("early bcast dfg dt\n");
-        ierr = MPI_Bcast(buff_dfgdt.data(), buff_dfgdt.size(), MPI_DOUBLE, 0, MPI_COMM_WORLD);
+        MPI_Bcast(buff_dfgdt.data(), buff_dfgdt.size(), MPI_DOUBLE, 0, MPI_COMM_WORLD);
         /*ierr = MPI_Bcast(&timeStep,sizeof(double),MPI_DOUBLE,0,MPI_COMM_WORLD);*/
-        ierr = MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
 
-        if (mpi_id != 0)
+        if (mpi_id != MASTER)
         {
             for (int c = 0; c < NUMBEROFCOMPARTMENTS; c++)
                 for (int i0 = 0; i0 < NUMBEROFFIRSTSOLIDBINS; i0++)
@@ -666,7 +636,7 @@ int main(int argc, char *argv[])
                     }
         }
 
-        ierr = MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
 
         // *************************************************************
         //************** end   MPI Send Recv ***************************
@@ -690,10 +660,13 @@ int main(int argc, char *argv[])
                         maxGas = max(maxGas, -dfgdtAllCompartments[c][s][ss] / fgAllCompartments[c][s][ss]);
                     maxofthree = max(maxofthree, max(maxAll, max(maxLiquid, maxGas)));
                 }
-        cout << "maxAll = " << maxAll << endl;
-        cout << "maxLiquid = " << maxLiquid << endl;
-        cout << "maxGas = " << maxGas << endl;
-        cout << "maxofthree = " << maxofthree << endl;
+        if (mpi_id == MASTER)
+        {
+            cout << "maxAll = " << maxAll << endl;
+            cout << "maxLiquid = " << maxLiquid << endl;
+            cout << "maxGas = " << maxGas << endl;
+            cout << "maxofthree = " << maxofthree << endl;
+        }
 
         while (maxofthree < 0.1 / timeStep && timeStep < 0.25)
             timeStep *= 2.0;
@@ -720,19 +693,26 @@ int main(int argc, char *argv[])
                 }
 
         if (nanCount)
-            cout << endl
-                 << "*****fAllCompartments has " << nanCount << "nan values******" << endl
-                 << endl;
+        {
+            int mpi_err = 0;
+
+            cout << endl;
+            cout << "My process id = " << mpi_id << endl;
+            cout << "*****fAllCompartments has " << nanCount << " nan values******" << endl;
+            cout << " Aborting..." << endl;
+            MPI_Abort(MPI_COMM_WORLD, mpi_err);
+        }
 
         minfAll = getMinimumOf3DArray(fAllCompartments);
-        if (minfAll < 0.0 /*&& fabs(minfAll) > 1e-16*/)
+        if (minfAll < 0.0)
         {
+            int mpi_err = 0;
+            cout << endl;
+            cout << "My process id = " << mpi_id << endl;
             cout << "minfAll" << minfAll << endl;
-            cout << endl
-                 << "******fAllCompartments has negative values********" << endl
-                 << endl;
-            cout << " Aborting..." << endl; 
-            MPI_Abort(MPI_COMM_WORLD, ierr);
+            cout << "******fAllCompartments has negative values********" << endl;
+            cout << " Aborting..." << endl;
+            MPI_Abort(MPI_COMM_WORLD, mpi_err);
         }
 
         //******************************** END time step calcs ****************************************************
@@ -774,27 +754,35 @@ int main(int argc, char *argv[])
         liquidBinsAllCompartmentsOverTime.push_back(liquidBinsAllCompartments);
         gasBinsAllCompartmentsOverTime.push_back(gasBinsAllCompartments);
 
-        if (mpi_id == 0)
+        if (mpi_id == MASTER)
         {
             cout << "time = " << time << endl;
             cout << "timeStep = " << timeStep << endl;
-            cout << endl;
-            Time.push_back(time);
-            time += timeStep;
+            cout << endl;            
         }
+        Time.push_back(time);
+        time += timeStep;
     }
 
     size_t nTimeSteps = Time.size();
-    if (mpi_id == 0)
+    if (mpi_id == MASTER)
     {
-        cout << endl
-             << "nTimeSteps = " << nTimeSteps << endl
-             << endl;
+        cout << endl;
+        cout << "Number of time steps = " << nTimeSteps << endl;
+        cout << endl;
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
+    
+    double parallelEndTime = 0.0;
+    if (mpi_id == MASTER)
+    {
+        parallelEndTime = MPI_Wtime();
+        cout << "That took " << parallelEndTime - parallelStartTime << " seconds for parallel code" << endl;
     }
 
-    arrayOfDouble3D dumpedLastValue = *(fAllCompartmentsOverTime.end() - 1);
+    // arrayOfDouble3D dumpedLastValue = *(fAllCompartmentsOverTime.end() - 1);
 
-    DUMP3DCSV(dumpedLastValue);
+    // DUMP3DCSV(dumpedLastValue);
     //    string fileName = string("last_f_for_") + to_string(DEMAGGREGATIONKERNELVALUE) + string("_");
     //    fileName += to_string(DEMAGGREGATIONKERNELCONST) + string("_");
     //    fileName += to_string(DEMBREAKAGEKERNELVALUE) + string("_");
@@ -972,16 +960,15 @@ int main(int argc, char *argv[])
         // it--;
         DUMP3DCSV(dumpedLastValue);
     }
-    ierr = MPI_Barrier(MPI_COMM_WORLD);
-    cout << "Code End" << endl;
-    double parallelEndTime = 0.0;
-    if (mpi_id == 0)
-    {
-        parallelEndTime = MPI_Wtime();
-        cout << "That took " << parallelEndTime - parallelStartTime << " seconds for parallel code" << endl;
-    }
-    ierr = MPI_Finalize();
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    cout << "Testing... my process id = " << mpi_id << endl;
+    MPI_Finalize();
     double serialEndTime = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC);
-    cout << "That took " << serialEndTime - serialStartTime << " seconds for parallel + serial code" << endl;
-    return 0;
+    if (mpi_id == MASTER)
+    {
+        cout << "That took " << serialEndTime - serialStartTime << " seconds for parallel + serial code" << endl;
+        cout << "Code End" << endl;
+    }
+    //return 0;
 }

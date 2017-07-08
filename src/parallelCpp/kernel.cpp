@@ -30,7 +30,6 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
     for (int i = 0; i < NUMBEROFDEMBINS; i++)
         scaledDEMDiameter[i] = DEMdiameter[i] * (maxDiameter / maxDEMDiameter);
 
-    int count = 0;
     for (int s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
         for (int ss1 = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
         {
@@ -48,18 +47,10 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
                             bool flag3 = true; //diameter[s2][ss2] <= scaledDEMDiameter[j + 1] && diameter[s2][ss2] > scaledDEMDiameter[j];
 
                             if (flag1 && flag2 && flag3)
-                            {
-                                count++;
                                 collisionFrequency[s1][ss1][s2][ss2] = (numberOfCollisions[s2][ss2]/*[i][j]*/ * timeStep) / (/*fAll[s1][ss1] * fAll[s2][ss2] **/ TIMESTEPDEM);
-                            }
                         }
             }
         }
-    if (count > 0)
-    {
-        double total = NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS * NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS /** NUMBEROFDEMBINS * NUMBEROFDEMBINS*/;
-        cout << "collisionFrequency fraction = " << count << " / " << total << " = " << count / total << endl;
-    }
 
     // Constant Collision Efficiency
     // FROM Barrasso, Tamrakar, Ramachandran. Procedia Engineering 102 (2015) 1295�1304. (p. 1298)
@@ -72,23 +63,15 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
     // FROM Sen, Barrasso, Singh, Ramachandran. Processes 2014, 2, 89-111. (p. 96)
     // double collisionEfficiencyConstant=0.01;
     double criticialExternalLiquid = 0.2;
-    count = 0;
     for (int s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
         for (int ss1 = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
             for (int s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
                 for (int ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
                 {
-                    if (externalLiquidContent[s1][ss1] >= criticialExternalLiquid && externalLiquidContent[s2][ss2] >= criticialExternalLiquid)
-                    {
-                        count++;
+                    if (externalLiquidContent[s1][ss1] >= criticialExternalLiquid && externalLiquidContent[s2][ss2] >= criticialExternalLiquid)                        
                         collisionEfficiency[s1][ss1][s2][ss2] = COLLISIONEFFICIENCYCONSTANT;
-                    }
                 }
-    if (count > 0)
-    {
-        double total = NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS * NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS;
-        cout << "collisionEfficiency fraction = " << count << " / " << total << " = " << count / total << endl;
-    }
+    
     //Aggregation Kernel Calculation
     for (int s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
         for (int ss1 = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)

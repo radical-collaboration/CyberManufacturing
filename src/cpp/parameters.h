@@ -26,13 +26,13 @@
 #define GRANULATORLENGTH 0.38 //meter
 #define NUMBEROFCOMPARTMENTS 4
 #define DISTANCEBETWEENCOMPARTMENTS (GRANULATORLENGTH / NUMBEROFCOMPARTMENTS) // m
-#define PARTICLERESIDENCETIME 20.0                                            //11.07 // seconds
+#define PARTICLERESIDENCETIME 49.0//490.0//20.0                                            //11.07 // seconds
 #define PARTICLEAVERAGEVELOCITY (GRANULATORLENGTH / PARTICLERESIDENCETIME)
 
 #define IMPELLERDIAMETER 0.114 // meter
-#define IMPELLERSPEED 1000.0   //2000.0 // RPM
+#define IMPELLERSPEED 2000.0//1000.0   //2000.0 // RPM
 
-#define PREMIXINGTIME 5.00//45.0                             //0.0 // seconds
+#define PREMIXINGTIME 45.0//45.0                             //0.0 // seconds
 #define LIQUIDADDITIONTIME 45.0//105.0//75.0//45.0
 #define POSTMIXINGTIME 0.0//25.0                        // seconds
 #define FINALTIME (PREMIXINGTIME + LIQUIDADDITIONTIME + POSTMIXINGTIME) // seconds

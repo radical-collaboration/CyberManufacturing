@@ -5,7 +5,6 @@
 #include <float.h>
 #include <string>
 #include <random>
-#include <ctime>
 
 #include "parameters.h"
 #include "utility.h"
@@ -35,7 +34,6 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     //cout << "CodeBegins" << endl << endl;
-    double serialStartTime = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC);
     //Read Dump Atom Files
     liggghtsData *lData = liggghtsData::getInstance();
     lData->readLiggghtsDataFiles();
@@ -50,9 +48,9 @@ int main(int argc, char *argv[])
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_id);
     MPI_Barrier(MPI_COMM_WORLD);
 
-    double parallelStartTime = 0.0;
+    double startTime = 0.0;
     if (mpi_id == MASTER)
-        parallelStartTime = MPI_Wtime();
+        startTime = MPI_Wtime();
 
     //MPI HELLO World Test!
     cout << "hello world, I am mpi_id= " << mpi_id << '\n';
@@ -772,13 +770,6 @@ int main(int argc, char *argv[])
         cout << endl;
     }
     MPI_Barrier(MPI_COMM_WORLD);
-    
-    double parallelEndTime = 0.0;
-    if (mpi_id == MASTER)
-    {
-        parallelEndTime = MPI_Wtime();
-        cout << "That took " << parallelEndTime - parallelStartTime << " seconds for parallel code" << endl;
-    }
 
     // arrayOfDouble3D dumpedLastValue = *(fAllCompartmentsOverTime.end() - 1);
 
@@ -963,12 +954,13 @@ int main(int argc, char *argv[])
 
     MPI_Barrier(MPI_COMM_WORLD);
     cout << "Testing... my process id = " << mpi_id << endl;
-    MPI_Finalize();
-    double serialEndTime = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC);
+    double endTime = 0.0;
     if (mpi_id == MASTER)
     {
-        cout << "That took " << serialEndTime - serialStartTime << " seconds for parallel + serial code" << endl;
+        endTime = MPI_Wtime();
+        cout << "That took " << endTime - startTime << " seconds for parallel code" << endl;
         cout << "Code End" << endl;
     }
+    MPI_Finalize();
     //return 0;
 }

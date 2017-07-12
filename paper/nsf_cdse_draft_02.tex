@@ -39,17 +39,17 @@
 	\section{Introduction \& Objectives} 
 
 	\par Half of all industrial chemical production is carried out using particulate processes (\cite{seville1997}). Important products that are produced using particulate processes include detergents, aerosols, fertilizers, and pharmaceuticals. Particulate processes have complex phenomena due to the chaotic microscale behaviour of individual particles in the system that determine the bulk behaviour of the system. Due to the complex nature of these processes there is a lack of governing equations which can accurately describe them (\cite{sen2013}). As a result industries such as pharmaceuticals use expensive heuristic studies and inefficient operational protocols with high recycle ratios to meet strict regulatory standards (\cite{Ramachandran2009}). In an effort to cut costs and improve efficiencies there is a high demand for accurate models that can be used for process design and control systems.   
-	\par Discrete element methods (DEM) have proven to be an accurate way to model a bulk material using microscale particle level interactions. The downside to these models is that they take large amounts of time to solve. Another more computationally efficient, but less accurate, technique used for these systems are population balance models (PBM). To achieve high levels of accuracy without the long simulation times of DEM there have been numerous works on hybrid PBM-DEM methods \citep{Barrasso2015cerd}.
-	\par Use of parallel techniques by scientists have helped reduce the amount of time required to solve computationally heavy tasks into a array of smaller and more manageable tasks, which are solved simultaneously in various smaller processes. 
+	\par Discrete element methods (DEM)(\cite{Cundall1979}) have proven to be an accurate way to model a bulk material using microscale particle level interactions. The downside to these models is that they take large amounts of time to solve. Another more computationally efficient, but less accurate, technique used for these systems are population balance models (PBM). To achieve high levels of accuracy without the long simulation times of DEM there have been numerous works on hybrid PBM-DEM methods \citep{Barrasso2015cerd}.
+	\par  The idea of parallelization to reduce the amount of time required has been employed by various researchers in the past. \cite{Gunawan2008} used high-resolution finite volumes solution methods for the parallelization of their PBM. \cite{Gunawan2008} performed load balancing effectively by decomposing the internal coordinates of their PBM. They acheived speed improvements upto 100 cores on one system size, but was not tested for models with more dimensions. Moreover, they mentioned that the parallelisation could be improved using shared memory processing. \cite{Bettencourt2017} took a hybrid approach towards the parallelization of the PBM using both Message Parsing Interface (MPI) and Open Multi-Processing. The hybrid parallelisation helped achieve a speed up of about 98\% over the serial code. \cite{Prakash2013a},\cite{Prakash2013b} used the inbuilt Parallel Computation Toolbox (PCT) in Matlab to parallelize their PBM on lower number of cores, but this faced the shortcomings of Matlab's internal processing and could not achieve the speed improvements of parallelistion of a program if it were written in a native programming language like C or FORTRAN. 
+	\par  LIGGGHTS is an open-source software used to perform DEM simulations. This package natively supports MPI for parallelizing the simulation by static decomposition which partitions space such that the area of communication between the the MPI ranks is minimized. \cite{kacianauskas2010} used load balancing methods similar to a static decompostion and observed that this works well for a mono-dispersed system but the computational effort increases for simulations for poly-dispersed material. \cite{Gopalakrishnan2013} also reported a speed increase and a parallel efficiency of about 81\% in their CFD-DEM simulation. LIGGGHTS could not take advantage of shared memory interfaces since it did not support OpenMP. \cite{Berger2015} implemented hybrid parallelization methods for the particle-particle interaction and the particle-wall interaction modules in LIGGGHTS and also used the Zoltan library \citep{Boman2012} developed by Sandia National Laboratories for dynamic load balancing. They achieved a speed improvement of about 44\% for simulations performed on higher number of cores, but there was no significant speed improvement for smaller core counts.
+	%\par Use of parallel techniques by scientists have helped reduce the amount of time required to solve computationally heavy tasks into a array of smaller and more manageable tasks, which are solved simultaneously in various smaller processes. 
 	\par Some of the potential benefits of using HPCs in the pharmaceutical industry include really high accuracy for parameter estimation, on-line modelling of continuous processes, better control of processes. This would lead lesser production costs leading to cheaper drug for the consumer.
-	%\textcolor{cyan}{in the past when faced with comp heavy tasks scientists have used parallel computing. divide big prob into small pieces that are simultaneously solved. time to solve is time to solve small piece.} 
-	%\par potential benefits this could have 1. unprecedented accuracy 2.wide adoption of using these models since they are so fast 3. cheaper drugs 4. MPC accurate but in real time 5. parameter estimation for QbD 6. etc. 
 	
 	    \subsection{Objectives}
 	    \par The main objective of this study was to develop new techniques to parallelize our model and use high perfomance computing (HPC) equipment in order to reduce the computation times for the linked DEM-PBM simulations. Specific objectives of each individual study are listed below: 
 	    \begin{itemize}
 	    \item Developed a 4-Dimensional PBM that is parallelized using hybrid techniques (MPI + OpenMP)  for optimal utilization of modern high performance computing equipment.
-	    \item LIGGGHTS\textsuperscript{\textregistered} has been used to perfrom Discrete Element Model (DEM) simulations to  model the micromechanics of the Lodgitech granulator. 
+	    \item LIGGGHTS (MPI-only implementation) has been used to perfrom Discrete Element Model (DEM) simulations to  model the micromechanics of the Lodgitech granulator. 
 		\item These 2 techniques were linked uni-directionally to provide an accurate model of the granulator.	    
 	    \end{itemize}
 
@@ -299,19 +299,19 @@
 	\bf{Parameter} &\bf{Symbol} &\bf{Value} &\bf{Units}\\
 	\hline
 	Time step & $\delta t$ & $0.5$ & $s$\\
-	Total granulation time & $T$ & $20, 120$ & $s$\\
+	Total granulation time & $T$ & $45, 45$ & $s$\\
 	Velocity in axial direction & $v_{axial}$ & $1$ & $ms^{-1}$\\
 	Velocity in radial direction & $v_{radial}$ & $1$ & $ms^{-1}$\\
-	Aggregation constant & $\beta_0$ & $1\times10^{-12}$ & $-$\\
-	Initial particle diameter & $R$ & $15$ & $\mu m$\\
-	Breakage kernel constant & $B$ & $5\times10^{4}$ & $-$\\
-	Diameter of impeller & $D$ & $0.1$ & $m$ \\
-	Impeller rotation speed & $RPM$ & $300$ & $rmp$\\
-	Minimum granule porosity & $\epsilon_{min}$ & $0.1$ & $-$\\
-	Consolidation rate & $C$ & $1\times10^{-3}$ & $-$\\
+	Aggregation constant & $\beta_0$ & $1\times10^{-9}$ & $-$\\
+	Initial particle diameter & $R$ & $150$ & $\mu m$\\
+	Breakage kernel constant & $B$ & $0$ & $-$\\
+	Diameter of impeller & $D$ & $0.114$ & $m$ \\
+	Impeller rotation speed & $RPM$ & $2000$ & $rmp$\\
+	Minimum granule porosity & $\epsilon_{min}$ & $0.2$ & $-$\\
+	Consolidation rate & $C$ & $0$ & $-$\\
 	Total starting particles in batch & $F_{initial}$ & $1 \times 10^{6}$ & $-$\\
-	Liquid to solid ratio & $L/S$ & $0.7$ & $-$ \\
-	Number of Compartments & $c$ & $3$ & $-$ \\
+	Liquid to solid ratio & $L/S$ & $0.35$ & $-$ \\
+	Number of Compartments & $c$ & $4$ & $-$ \\
 	Number of first solid bins & $s$ & $16$ & $-$\\
 	Number of second solid bins & $ss$ & $16$ & $-$\\
 	\hline
@@ -324,17 +324,17 @@
 	    
 	  \subsection{PBM Parallel C++}
 	    \subsubsection{Discretization \& Parallelizing PBM}
-	    \par The PBM was discretized by converting each of its coordinates in to discrete bins. For the spatial coordinates a linear bin spacing was used. For the internal coordinates, solid,liquid, and gas a nonlinear binning was used. \textcolor{cyan}{get more details from Anik on this will probably need more detail on binning for reproducability}
-	    \par Once the PBM had been discretized (compartmentalized/binned) a finite differences method was used which created a system of ordinary differential equations (ODEs). The numerical integration technique used to evaluate the system of ODEs was first order Euler integration \textcolor{cyan}{check with Anik that is what we used} as it is commonly used to solve these types of systems and author  found it improved speeds while having minimal impact on accuracy. To obtain the most optimal parallel performance, when solving the PBM, work loads were distributed in a manner which took into account the shared memory and distributed memory aspects of the clusters the PBM was being run on. To parallelize the model in a why which could take advantage of shared memory but still effectively run across a distributed system both OMP and MPI were implemented. 
-	    \par One MPI process was used per CPU socket and one OMP process was used per CPU core, as authors (\cite{Bettencourt2017}) found it resulted in the best performance. MPI was used for message passing from one node to another while OMP was used for calculations on each node that could be efficiently solved using a shared memory system \textcolor{cyan}{i.e. calculations were inter-dependent but could be computed simultaneously.} 
-	    \par Pseudo code is presented below illustrating how the calculations are distributed and carried out during the simulation. For each time step the MPI processes are made responsible for a specific chunk of the spatial compartments. Then each OMP thread, inside of each MPI process, is allocated to one of the cores of the the multi-core CPU the MPI process is bound too. The OMP processes divide up and compute $\Re_{agg}$ and $\Re_{brk}$. (\textcolor{cyan}{include more detail about how they do it? last paper reviewer complained that could not understand figure by JUST reading what I wrote about it in meat of paper}) 
+	    \par The PBM was discretized by converting each of its coordinates in to discrete bins. For the spatial coordinates a linear bin spacing was used. For the internal coordinates, solid,liquid, and gas a nonlinear binning was used. %\textcolor{cyan}{get more details from Anik on this will probably need more detail on binning for reproducability}
+	    \par Once the PBM had been discretized (compartmentalized/binned) a finite differences method was used which created a system of ordinary differential equations (ODEs). The numerical integration technique used to evaluate the system of ODEs was first order Euler integration as it is commonly used to solve these types of systems and author  found it improved speeds while having minimal impact on accuracy. To obtain the most optimal parallel performance, when solving the PBM, work loads were distributed in a manner which took into account the shared memory and distributed memory aspects of the clusters the PBM was being run on. To parallelize the model in a why which could take advantage of shared memory but still effectively run across a distributed system both OMP and MPI were implemented. 
+	    \par One MPI process was used per CPU socket and one OMP process was used per CPU core, as authors (\cite{Bettencourt2017}) found it resulted in the best performance. MPI was used for message passing from one node to another while OMP was used for calculations on each node that could be efficiently solved using a shared memory system %\textcolor{cyan}{i.e. calculations were inter-dependent but could be computed simultaneously.} 
+	    \par Pseudo code is presented below illustrating how the calculations are distributed and carried out during the simulation. For each time step the MPI processes are made responsible for a specific chunk of the spatial compartments. Then each OMP thread, inside of each MPI process, is allocated to one of the cores of the the multi-core CPU the MPI process is bound too. The OMP processes divide up and compute $\Re_{agg}$ and $\Re_{brk}$. %(\textcolor{cyan}{include more detail about how they do it? last paper reviewer complained that could not understand figure by JUST reading what I wrote about it in meat of paper}) 
 	    \par After $\Re_{agg}$ and $\Re_{brk}$ are calculated the MPI processes calculate the new PSD value for their chunk at that specific time step, $F_{t,c}$. The slave processes send their $F_{t,c}$ to the master processes which collects them into the complete $F_{t,all}$. The master process then broadcasts the $F_{t,all}$ value to all slave processes. 	
 	    \par A crucial feature of the PBM is that the current PSD ($F_{t,all}$) value is used to compute a new time step size for the next iteration. This means all of the MPI processes need to have the same dynamic time step size at each iteration for the calculations to be properly carried out in parallel. Since the completely updated $F_{t,all}$ value is shared before calculating a new time step each process will have the same $F_{t,all}$ value. As a result each process calculates the same size for the new time step. 
-	\textcolor{cyan}{ Did not include the liquid and gas PBMs in this but hoping they will be some what assumed? Also the Ragg omp distributed work is an a}
-	\textcolor{red}{what about private OMP vars specified that has impact on how model is solved etc. Should look into this. might change based on locking/blocking tests that need to be implemented still.}   
+	%\textcolor{cyan}{ Did not include the liquid and gas PBMs in this but hoping they will be some what assumed? Also the Ragg omp distributed work is an a}
+	%\textcolor{red}{what about private OMP vars specified that has impact on how model is solved etc. Should look into this. might change based on locking/blocking tests that need to be implemented still.}   
 	
-	  \begin{algorithm*}[!h]
-	   \caption{Pseudo code}
+	  \begin{algorithm}[!h]
+	   \caption*{\bf{Algorithm: }Pseudo code}
 	    \begin{algorithmic}[*]
 	     \While{ $t<t_{final}$ }
 	      \par // the spatial domain is divided into equal chunks (with in 1 bin size)
@@ -373,7 +373,7 @@
 	     \EndWhile   
 	
 	\end{algorithmic}
-	\end{algorithm*}   
+	\end{algorithm}   
 	    
 	  
 	  \subsection{RP \& PBM+DEM Communication}

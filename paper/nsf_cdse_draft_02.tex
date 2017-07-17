@@ -207,7 +207,7 @@
 	    
 	  \subsection{PBM}
 	    \subsubsection{Model Development}
-	    \par The main PBM equation developed for this work can be expressed as shown below:
+	    \par The PBM equation developed for this work can be expressed as shown below:
 	    \begin{align}
 	    \frac{d}{dt}F(s_1,s_2,x)=\Re_{agg}(s_1,s_2,x)+R_{break}(s_1,s_2,x)+\dot{F}_{in}(s_1,s_2,x)-\dot{F}_{out}(s_1,s_2,x)
 	    \label{eqn:mthds_pbm_overall} 
@@ -218,14 +218,14 @@
 	The rate of change of liquid volume is calculated using the equation: 
 	
 	    \begin{align}
-	    \frac{d}{dt}F(s_1,s_2,x)l(s_1,s_2,x)=& \Re_{liq,agg}(s_1,s_2,x)+\Re_{liq,break}(s_1,s_2,x)+\dot{F}_{in}(s_1,s_2,x)l_{in}(s_1,s_2,x)\notag\\
+	    \frac{d}{dt}F(s_1,s_2,x)l(s_1,s_2,x)&= \Re_{liq,agg}(s_1,s_2,x)+\Re_{liq,break}(s_1,s_2,x)+\dot{F}_{in}(s_1,s_2,x)l_{in}(s_1,s_2,x)\notag\\
 	    &-\dot{F}_{out}(s_1,s_2,x)l_{out}(s_1,s_2,x)+F(s_1,s_2,x)\dot{l}_{add}(s_1,s_2,x)
 	    \end{align}
 	    
 	    \par where, $l(s_1,s_2,x)$ is the amount of liquid volume in each particle with API volume of $s_1$ and excipient volume of $s_2$ in the spatial compartment $x$. $\Re_{liq,agg}(s_1,s_2,x)$ and $\Re_{liq,break}(s_1,s_2,x)$ are respectively the rates of liquid transferred between size classed due to aggregation and breakage. $l_{in}(s_1,s_2,x)$ and $l_{out}(s_1,s_2,x)$ are respectively the liquid volumes of the particles coming in and going out of the spatial compartment. $l_{add}(s_1,s_2,x)$ is the volume of liquid acquired by each particle in the compartment at every time step due to external liquid addition. 
 	    \par Similarly, the rate of change of gas volume is calculated using the following equation: 
 	    \begin{align}
-	    \frac{d}{dt}F(s_1,s_2,x)g(s_1,s_2,x)=& \Re_{gas,agg}(s_1,s_2,x)+\Re_{gas,break}(s_1,s_2,x)+\dot{F}_{in}(s_1,s_2,x)g_{in}(s_1,s_2,x)\notag\\
+	    \frac{d}{dt}F(s_1,s_2,x)g(s_1,s_2,x)&= \Re_{gas,agg}(s_1,s_2,x)+\Re_{gas,break}(s_1,s_2,x)+\dot{F}_{in}(s_1,s_2,x)g_{in}(s_1,s_2,x)\notag\\
 	    &-\dot{F}_{out}(s_1,s_2,x)g_{out}(s_1,s_2,x)+F(s_1,s_2,x)\dot{g}_{cons}(s_1,s_2,x)
 	    \end{align}
 %	    \par \textcolor{red}{citation?}
@@ -233,14 +233,14 @@
 	    \par where, $g(s_1,s_2,x)$ is the gas volume of each particle with API volume of $s_1$ and excipient volume of $s_2$ in the spatial compartment $x$. $\Re_{gas,agg}(s_1,s_2,x)$ and $\Re_{gas,break}(s_1,s_2,x)$ are respectively the rates of gas transferred between size classed due to aggregation and breakage. $g_{in}(s_1,s_2,x)$ and $g_{out}(s_1,s_2,x)$ are respectively the gas volume of the particles entering and leaving the spatial compartment. $g_{cons}(s_1,s_2,x)$ is the volume of gas coming out of each particle in the compartment at every time-step due to consolidation of the particles. 
 	    \par The rate of aggregation, $\Re_{agg}(s_1,s_2,x)$ in Equation \ref{eqn:mthds_pbm_overall} is calculated as  
 	     \begin{align}
-	     \Re_{agg}(s_1,s_2,x)=& \frac{1}{2}\int _0^{s_1} \int_0^{s_2} \beta(s_1',s_2',s_1-s_1',s_2-s_2',x)F(s_1',s_2',x)F(s_1-s_1',s_2-s_2',x)ds_1'ds_2'\notag\\ 
+	     \Re_{agg}(s_1,s_2,x)&= \frac{1}{2}\int _0^{s_1} \int_0^{s_2} \beta(s_1',s_2',s_1-s_1',s_2-s_2',x)F(s_1',s_2',x)F(s_1-s_1',s_2-s_2',x)ds_1'ds_2'\notag\\ 
 	     &- F(s_1,s_2,x)\int _0^{s_{max_1}-s_1} \int_0^{s_{max_2}-s_2} \beta(s_1,s_2,s_1',s_2',x)F(s_1',s_2',x)ds_1'ds_2'
 	     \end{align}
 %	     \par \textcolor{red}{citation?}
 	     
-	    \par where, the aggregation kernel, $\beta(s_1,s_2, s_1',s_2',x)$ is expressed as a function of collision frequency ($C$) and collision efficiency ($\psi$) –
+	    \par where, the aggregation kernel, $\beta(s_1,s_2, s_1',s_2',x)$ is expressed as a function of collision rate coefficient ($C$) and probability that collision results in agglomeration($\psi$) \citep{ingram2005} –
 	    \begin{align}
-	    \beta(s_1,s_2,s_1',s_2',x) = & \beta_oC(s_1,s_2,s_1',s_2')\psi(s_1,s_2,s_1',s_2',x)
+	    \beta(s_1,s_2,s_1',s_2',x) = \beta_oC(s_1,s_2,s_1',s_2')\psi(s_1,s_2,s_1',s_2',x)
 	    %\beta(s_1,s_2,s_1',s_2',x) = & \beta_o*(V(s_1,s_2,x)+V(s_1',s_2',x))^{\gamma}*(c(s_1,s_2,x)\notag\\
 	    %&+c(s_1',s_2',x))^{\alpha}\left(1-\frac{(c(s_1,s_2,x)+c(s_1',s_2',x))^{\delta}}{2}\right)^{\alpha}
 	    \label{eqn:mthds_pbm_beta_kernal}
@@ -248,12 +248,12 @@
 	    %\par \textcolor{red}{citation?}
 	    
 	    where, $\beta_o$ is aggregation rate constant.
-	    \par Collision frequency is a function of particle size and is calculated from the number of collisions between group of particles obtained from LIGGGHTS\textsuperscript{\textregistered}. A recent study shows that collision frequency depends on PSD as well (\cite{sen2014}). Collision frerquency can be expressed as:
+	    \par Collision rate coefficient ($C$) is a function of particle sizes and is calculated by normalizing the number of collisions between group of particles \citep{gantt2006} and is obtained from LIGGGHTS\textsuperscript{\textregistered} DEM simulation. A recent study shows that collision frequency depends on PSD as well \citep{sen2014}. Collision rate coefficient can be expressed as:
 	    \begin{align}
-	    C(s_1,s_2,s_1',s_2')=\frac{N_{coll}(s_1,s_2,s_1',s_2')}{F(s_1,s_2)F(s_1',s_2')\Delta t}
+	    C(s_1,s_2,s_1',s_2')=\frac{N_{coll}(s_1,s_2,s_1',s_2')}{N_p(s_1,s_2)N_p(s_1',s_2')\Delta t}
 	    \label{eqn:collfreq}
 	    \end{align}
-	    \par In equation(\ref{eqn:collfreq}), $N_{coll}$ is the number of collision between two solid particles in time interval $\Delta t$. The $\psi$ in equation (\ref{eqn:mthds_pbm_beta_kernal}) can be expressed asvi 
+	    \par In equation(\ref{eqn:collfreq}), $N_{coll}$ is the number of collision between two solid particles in time interval $\Delta t$ \& $N_p$ is number of particle of particular size. The $\psi$ in equation (\ref{eqn:mthds_pbm_beta_kernal}) can be expressed as 
 	    
 	    \begin{align}
 	    \psi((s_1,s_2,s_1',s_2') = 
@@ -261,38 +261,60 @@
 	    \psi_0,\hspace{0.2cm} LC((s_1,s_2) \geq LC_{min}\hspace{0.2cm} or\hspace{0.2cm} LC((s_1',s_2') \geq LC_{min}	\\ 
 	    0,\hspace{0.2cm} LC((s_1,s_2) < LC_{min}\hspace{0.2cm} or\hspace{0.2cm} LC((s_1',s_2') < LC_{min}
 	    \end{matrix}\right.
+	    \label{eqn:colleff}
 	    \end{align}
-	    \par In above equation, $LC$ is the liquid content of particles and $LC_{min}$ stands for minimum liquid content required for coalescence of particle.  
-	    \par Similarly, the breakage rate is expressed as-
-	
-	    \begin{align}
-	    \Re_{break}(s_1,s_2,x) = \int_0^{s_{max_1}} \int_0^{s_{max_2}} K_{break}(s_1',s_2',x)F(s_1',s_2',x)ds_1'ds_2' - K_{break}(s_1,s_2,x)F(s_1,s_2,x)
-	    \end{align}
-%	    \par \textcolor{red}{citation?}
+	    \par In equation \ref{eqn:colleff}, $LC$ is the liquid content of particles and $LC_{min}$ stands for minimum liquid content required for coalescence of particle. 
 	    
-	    \par where, the breakage kernel $K_{break}(s_1,s_2,x)$ is formulated as – 
+	    %%%%% commented the breakage details as we aren't including in results
 	    
-	    \begin{align}
-	    K_{break}(s_1,s_2,x) = C_{impact}\int_{U_{break}}^{\infty}p(U)dU
-	    %K_{break}(s_1,s_2,x)=\left(\frac{4}{15\pi}\right)^{(\frac{1}{2})}G_{shear}exp\left(-\frac{B}{R(s_1,s_2,x)}\right)
-	    \end{align}
+	     
+%	    \par Similarly, the breakage rate is expressed as-
+%	
+%	    \begin{align}
+%	    \Re_{break}(s_1,s_2,x) = \int_0^{s_{max_1}} \int_0^{s_{max_2}} K_{break}(s_1',s_2',x)F(s_1',s_2',x)ds_1'ds_2' - K_{break}(s_1,s_2,x)F(s_1,s_2,x)
+%	    \end{align}
+%%	    \par \textcolor{red}{citation?}
+%	    
+%	    \par where, the breakage kernel $K_{break}(s_1,s_2,x)$ is formulated as – 
+%	    
+%	    \begin{align}
+%	    K_{break}(s_1,s_2,x) = C_{impact}\int_{U_{break}}^{\infty}p(U)dU
+%	    %K_{break}(s_1,s_2,x)=\left(\frac{4}{15\pi}\right)^{(\frac{1}{2})}G_{shear}exp\left(-\frac{B}{R(s_1,s_2,x)}\right)
+%	    \end{align}
 %	    \par \textcolor{red}{citation?}
 	
 	      %\par where, $G_{shear}$ is the shear rate exerted by the impeller on the granules. $R(s_1,s_2,x)$ is the radius of the granule that breaks and $B$ is the breakage kernel constant. $G_shear$ is calculated as $\frac{\nu_{impeller}*D_{impeller}*PI}{60}$ where $\nu_{impeller}$ and $D_{impeller}$ are respectively the rotational speed and diameter of the impeller.
-	      \par The rate of increase of liquid volume of one particle, $\dot{l}_{add}(s_1,s_2,x)$ is expressed as $\frac{(s_1+s_2)(\dot{m}_{spray}(1-c_{binder})-\dot{m}_evap)}{m_{solid}(x)}$ where, $(s_1+s_2)$  is the total solid volume of the particle; $\dot{m}_spray$ is the rate of external liquid addition, $c_{binder}$ is the concentration of binder in the external liquid (which is assumed to be zero in this case as pure liquid is added); $\dot{m}_{evap}$ is the rate of evaporation of liquid from the system (which is also assumed to be zero in this case) and $m_{solid}$ is the total amount of solid present in the compartment.
-	      \par The rate of decrease in gas volume per particle due to consolidation is calculated using the following expression: 
+	      \par The rate of increase of liquid volume of one particle, $\dot{l}_{add}(s_1,s_2,x)$ is expressed as
 	      
 	      \begin{align}
-	      \dot{g}_{cons}(s_1,s_2,x)=c*(\nu_{impeller})^{\omega}*V(s_1,s_2,x)\frac{(1-\epsilon_{min})}{s} [g(s_1,s_2,x)+l(s_1,s_2,x) -(s_1+s_2)\frac{\epsilon_{min}}{1-\epsilon_{min}}]
-	      \end{align}          
+	      \dot{l}_{add}(s_1,s_2,x) = \frac{(s_1+s_2)(\dot{m}_{spray}(1-c_{binder})-\dot{m}_evap)}{m_{solid}(x)}
+	      \end{align}
+	      
+	       where, $(s_1+s_2)$  is the total solid volume of the particle; $\dot{m}_spray$ is the rate of external liquid addition, $c_{binder}$ is the concentration of binder in the external liquid (which is assumed to be zero in this case as pure liquid is added); $\dot{m}_{evap}$ is the rate of evaporation of liquid from the system (which is also assumed to be zero in this case) and $m_{solid}$ is the total amount of solid present in the compartment.
+	      \par The rate of decrease in gas volume per particle due to consolidation is calculated using the following expression: 
+	      
+%	      \begin{align}
+%	      \dot{g}_{cons}(s_1,s_2,x)=c*(\nu_{impeller})^{\omega}*V(s_1,s_2,x)\frac{(1-\epsilon_{min})}{s} \left[g(s_1,s_2,x)+l(s_1,s_2,x) -(s_1+s_2)\frac{\epsilon_{min}}{1-\epsilon_{min}}\right]
+%	      \end{align}  
+
+\begin{align}
+\dot{g}_{cons}(s_1,s_2,x)=c(\nu_{impeller})^{\omega}V(s_1,s_2,x)\frac{(1-\epsilon_{min})}{s} \left[g(s_1,s_2,x)+l(s_1,s_2,x) -(s_1+s_2)\frac{\epsilon_{min}}{1-\epsilon_{min}}\right]
+\end{align}        
 	    
 	    \par where, $c$ and $\omega$ are the consolidation constants; $v_{impeller}$ is the impeller rotational speed; $V(s_1,s_2,x)$ is the volume of particle, $\epsilon_{min}$ is the minimum porosity; $g(s_1,s_2,x)$ and $l(s_1,s_2,x)$ are respectively the gas and liquid volume of the particle.
 	  
-	    \par Particle transfer rate, $F_{out}(s_1,s_2,x)$ in Equation \ref{eqn:mthds_pbm_overall} is calculated as $F(s_1,s_2,x)*\frac{\nu_{compartment(x)}*dt}{d_{compartment}}$ where, $\nu_{compartment(x)}$ and $d_{compartment}$ are respectively the average velocity of particles in compartment $x$ and the distance between the mid-points of two adjacent compartment, which is the distance particles have to travel to move to the next spatial compartment. $dt$ is the time-step.
+	    \par Particle transfer rate, $F_{out}(s_1,s_2,x)$ in Equation \ref{eqn:mthds_pbm_overall} is calculated as:
+	    
+	    \begin{align}
+	    F_{out}(s_1,s_2,x) = F(s_1,s_2,x)*\frac{\nu_{compartment(x)}*dt}{d_{compartment}}
+	    \end{align}
+	    
+	     where, $\nu_{compartment(x)}$ and $d_{compartment}$ are respectively the average velocity of particles in compartment $x$ and the distance between the mid-points of two adjacent compartment, which is the distance particles have to travel to move to the next spatial compartment. $dt$ is the time-step.
 	The values of various parameters used in the model are provided in Table \ref{table:mthds_pbm_parameters}.
 	
 	\begin{table}[!htb]
-	\caption{Parameters for PBM from Anik's hetero. agg. paper. currently place holder} \label{table:mthds_pbm_parameters}
+	\caption{Parameters for PBM}
+	 \label{table:mthds_pbm_parameters}
 	\begin{center}
 	\begin{tabular}{l|c|c|c}
 	\hline

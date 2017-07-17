@@ -512,7 +512,7 @@ across different platforms.
 	  
 	  \subsection{DEM}
 	    \subsubsection{DEM Spacial Decomposition Studies}
-	    \par LIGGGHTS\textsuperscript{\textregistered} divides the work space into various sections and each section being sent to a core for calculation. Thus, the division of the space becomes an important criteria for the simulation for efficient load balancing. The initial stuides were undertaken for a mono-sized particle of size 1mm and the simulation was carried out for 0.5 seconds of wall time. The initial timing stuides for the decomposition were performed using 64 cores. The effect of the decomposition on the simulation time can be seen in Table \ref{table:rslts_dem_slicing_studies}. This indicates that dividing the x-direction in more number of compartments help increase the speed of the simulation. This is easy to comprehend since the granulator has its length parallel to the x-axis. These results also show that if the geometry is divided into more than 2 compartments in the y-axis or the z-axis the simulation time increases. This can be accounted to the increased communication required to transfer the rotating impeller mesh from one compartment in the y-axis or the z-axis to the another compartment for each time step. Since MPI is limited by communication in between the nodes, a speed decrease is observed due to increased partitioning in these directions.
+	    \par LIGGGHTS\textsuperscript{\textregistered} as discussed above, statically decomposes the work space and each section is sent to a MPI process for calculations. Thus, the division of the space becomes an important criteria for the simulation for efficient load balancing. The initial studies were undertaken for a mono-sized particle of size 1 mm and the simulation was carried out for 0.5 seconds of wall time. The initial timing studies for the decomposition were performed using 64 cores. The effect of the decomposition on the simulation time can be seen in Table \ref{table:rslts_dem_slicing_studies}. This indicates that dividing the x-direction in more number of compartments help increase the speed of the simulation. This is easy to comprehend since the granulator has its length parallel to the x-axis. These results also show that if the geometry is divided into more than 2 compartments in the y-axis or the z-axis the simulation time increases. This can be accounted to the increased communication required to transfer the rotating impeller mesh from one compartment in the y-axis or the z-axis to the another compartment for each time step. Since MPI is limited by communication in between the nodes, a speed decrease is observed due to increased partitioning in these directions.
 	    
 	      \begin{table}[ht]
 	      %\centering
@@ -532,42 +532,20 @@ across different platforms.
 	      
 		  \par When MPI is used for parallelization of a task, load balancing becomes an important parameter that needs to be considered. Each processor used during the task is utilised with the similar usage as compared to other processors being used. Following the results from the initial timing studies,the y and the z-axes were not divided in more than 2 compartments for 128 and 256 core simulation as well. This meant that the x-axis was divided into 32 and 64 compartments respectively. In order to avoid the expensive communication between the processes, LIGGGHTS\textsuperscript{\textregistered} tries to insert the particles towards the centre of the compartment such that the number of ghost atoms are minimized. But, slicing in the x-axis reduced the space available for the insertion of the particles thus, many of the particles were inserted incorrectly. Another abnormal behaviour observed during these simulation was the particles halted at certain compartment and no particle travelled beyond this compartment in the x-direction. Thus, another set of timing studies were performed for the 128 and 256 core simulations. The comparison of simulation times have been shown in figure.
 		  
-		  \begin{figure}[H]
-		  \centering		  	      
-	      \includegraphics[scale=0.75]{slicing_studies.png}
-	      \caption{ Slicing Studies}
-	      \end{figure}
-	    
-	    \par fig vary PSD ( range and/or particle sizes) to see how $C_{coll}$ etc will be affected - important for PBM Kernel
-	        
-	    \par Talk about over-slicing or excess decomposition(confirm with profs)
-	      \begin{figure}[H]
-	      \centering
-	      \includegraphics[scale=0.5]{rslts_dem_psd_velocity}
-	      \caption{ fig from dana 2015 mechanistic bi-directional}
-	      %\caption{hello tesh}
-	      \label{fig:rslts_psd_velocity}
-	      \end{figure}
-	      
+		  
 	      
 	    \subsubsection{DEM Performance}
-	    \par Talk about how the time for simulation varies with \# of cores
+	    \par A test case was run for mono-sized particle of 2mm diameter for timing comparison studies. The times are plotted in figure \textcolor{blue}{cite the figure for timing studies of 16 -256 cores for 2mm}. Figure \textcolor{blue}{insert the plot} indicates that using lower number of cores is not feasible for long simulations since the time taken is about \_x times slower. Thus, the simulations were carried out in core configurations of 64, 128 and 256 cores. The studies undertaken had 5 mono-sized simulations and one simulation consisted of particle size distribution. Figure \ref{fig:rslts_DEM_timing_studies} shows that the amount of CPU time required for the
+	    
 	    \par 1. fig scaling 
 	      \begin{figure}[H]
 	      \centering
-	      \includegraphics[scale=0.7]{timing_plot.pdf}
+	      \includegraphics[scale=0.7]{rslts_DEM_timing_plots.pdf}
 	      \caption{The variation in the amount of time taken for the simulation as a function of \# of cores}
 	      %\caption{hello tesh}
-	      \label{fig:rslts_DEM_strong_scale}
+	      \label{fig:rslts_DEM_timing_studies}
 	      \end{figure}
 	    \par 2. fig scaling w/ RP  
-	      \begin{figure}[H]
-	      \centering
-	      \includegraphics[scale=0.5]{rslts_pbmbyrp_strng}
-	      \caption{ DEM scale with RP}
-	      %\caption{hello tesh}
-	      \label{fig:rslts_dembyRP_strng}
-	      \end{figure}
 	      
 	    %\subsubsection{DEM Parameter Space} 
 	 

@@ -541,24 +541,55 @@ across different platforms.
 	      \caption{The effect of spatial decomposition on the performance of the DEM simulations}
 		  \label{table:rslts_dem_slicing_studies}
 		  \begin{center}
-\begin{tabulary}{\linewidth}{CCCC}
+\begin{tabulary}{\linewidth}{C|C|C|C}
 				  
 		  \hline
 		  \bf{Slices in x-direction}&\bf{Slices in y-direction}&\bf{Slices in z-direction}& \bf{Time taken for a 0.5 second simulation (in minutes)}\\
 		  \hline
-		  
+		  $64$ & $1$ & $1$ & $10.27$\\
+		  $32$ & $2$ & $1$ & $8.7$\\
+		  $16$ & $2$ & $2$ & $6.83$\\
+		  $8$ & $4$ & $2$ & $7.2$\\		  
+		  $8$ & $2$ & $4$ & $7.96$\\
+		  \hline  		  
 		  \end{tabulary}
 \end{center}
 		  	      
 	      \end{table}
 	      
-		  \par When MPI is used for parallelization of a task, load balancing becomes an important parameter that needs to be considered. Each processor used during the task is utilised with the similar usage as compared to other processors being used. Following the results from the initial timing studies,the y and the z-axes were not divided in more than 2 compartments for 128 and 256 core simulation as well. This meant that the x-axis was divided into 32 and 64 compartments respectively. In order to avoid the expensive communication between the processes, LIGGGHTS\textsuperscript{\textregistered} tries to insert the particles towards the centre of the compartment such that the number of ghost atoms are minimized. But, slicing in the x-axis reduced the space available for the insertion of the particles thus, many of the particles were inserted incorrectly. Another abnormal behaviour observed during these simulation was the particles halted at certain compartment and no particle travelled beyond this compartment in the x-direction. Thus, another set of timing studies were performed for the 128 and 256 core simulations. The comparison of simulation times have been shown in figure.
+		  \par When MPI is used for parallelization of a task, load balancing becomes an important parameter that needs to be considered. Each processor used during the task is utilised with the similar usage as compared to other processors being used. Following the results from the initial timing studies,the y and the z-axes were not divided in more than 2 compartments for 128 and 256 core simulation as well. This meant that the x-axis was divided into 32 and 64 compartments respectively. In order to avoid the expensive communication between the processes, LIGGGHTS\textsuperscript{\textregistered} tries to insert the particles towards the centre of the compartment such that the number of ghost atoms are minimized. But, slicing in the x-axis reduced the space available for the insertion of the particles thus, many of the particles were inserted incorrectly. Another abnormal behaviour observed during these simulation was the particles halted at certain compartment and no particle travelled beyond this compartment in the x-direction. Thus, another set of timing studies were performed for the 128 and 256 core simulations. The comparison of simulation times have been shown in table .
 		  
+		  \begin{table}[ht]
+	      \caption{Spatial decomposition  of the DEM simulations for higher core counts}
+		  \label{table:rslts_dem_128_256_decomp}
+		  \begin{center}
+\begin{tabulary}{\linewidth}{C|C|C|C|C}
+				  
+		  \hline
+		  \bf{Number of cores used}&\bf{Slices in x-direction}&\bf{Slices in y-direction}&\bf{Slices in z-direction}& \bf{Time taken for a 10 second simulation (in minutes)}\\
+		  \hline
+		  $128$ & $16$ & $2$ & $4$ & $264.67$\\
+		  $128$ & $16$ & $4$ & $2$ & $247.2$\\
+		  $256$ & $16$ & $2$ & $8$ & $271.5$\\		  
+		  $256$ & $16$ & $8$ & $2$ & $252$\\
+		  $256$ & $16$ & $4$ & $4$ & $265.32$\\
+		  \hline  		  
+		  \end{tabulary}
+\end{center}
+		  	      
+	      \end{table}
 		  
 	      
 	    \subsubsection{DEM Performance}
-	    \par A test case was run for mono-sized particle of 2mm diameter for timing comparison studies. The times are plotted in figure \textcolor{blue}{cite the figure for timing studies of 16 -256 cores for 2mm}. Figure \textcolor{blue}{insert the plot} indicates that using lower number of cores is not feasible for long simulations since the time taken is about \_x times slower.
+	    \par A test case was run for mono-sized particle of 2mm diameter for timing comparison studies. The times are plotted in figure \ref{fig:rslts_DEM_2mm_timing} indicate that using lower number of cores is not feasible for long simulations since the time taken while using 1 core is about $11$x times slower.
 	    Thus, the simulations were carried out in core configurations of 64, 128 and 256 cores. The studies undertaken had 5 mono-sized population of particles of diameter 0.63, 1, 1.26, 1.59 and 2 mm simulations and one simulation consisted of particle size distribution. Figure \ref{fig:rslts_DEM_timing_studies} shows that the amount of CPU time required for a 10 second simulation of the granulator. The post processing MATLAB script was run on the dump files obtained from the simulation and it was observed that the system reached a steady state about 3-5 seconds of the simulation time. Particles with larger diameter reached steady state at a faster rate with an average hold-up of particles of about 6500. 
+		  \begin{figure}[H]
+	      \centering
+	      \includegraphics[scale=0.5]{rslts_DEM_2mm_timing.pdf}
+	      \caption{The variation in the amount of time taken for the simulation as a function of \# of cores}
+	      %\caption{hello tesh}
+	      \label{fig:rslts_DEM_2mm_timing}
+	      \end{figure}	    
 	    \par The figure \ref{fig:rslts_DEM_timing_studies} indicates that there is not a significant amount of speed improvment when 256 cores are used for the simulation over 128 cores. This speed decrease can be accounted to the communication time between the MPI processes. When the particles move from one section to another of the space, they are transfered as ghost particles from one process to another process. Thus, there is large amount of communication which is required. One of the issues of using a cluster with shared memory within the nodes but none in between nodes is that it has to rely on the netwrking infrastructure of the cluster which bottlenecks the communications thus leading to higher communication times. There are more sections present when 256 cores are used for the simulation, thus there is more communication in this system when compared to 128 core simulation. This excess communication makes the simulation slower though there is more processing power and it requires lesser time for other calculations.
 	    
 	      \begin{figure}[H]

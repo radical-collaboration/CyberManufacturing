@@ -11,23 +11,17 @@ git checkout master
 #Pull changes from repository
 git pull
 
-#Switch to branch <branch_name>
-git checkout <branch_name>
-
-#Rebase branch <branch_name> to synced master
-#this will revert your changes, shift your branch to synced master and apply your changes
-git rebase master
-
-   ***Resolve conflicts if any at this step***
-
-#Switch to master branch
-git checkout master
-
 #Merger branch <branch_name> to master 
-git merge <branch_name>
+git merge master <branch_name>
 
-#Push branch <branch_name> to remote server
-git push origin <branch_name>
+**RESOLVE ANY POSSIBLE CONFLICTS ****
+    Commit the resolve: git commit -m "Conflicts resolved!"
+
+#Push commits to remote server
+git push
+
+
+Further instructions:
 
 #Merge pushed branch <branch_name> to master in remote server
 git push origin <branch_name>:master

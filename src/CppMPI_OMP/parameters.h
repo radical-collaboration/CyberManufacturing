@@ -24,7 +24,7 @@
 
 //MATERIAL & PROCESS PARAMETERS
 #define GRANULATORLENGTH 0.38 //meter
-#define NUMBEROFCOMPARTMENTS 6
+#define NUMBEROFCOMPARTMENTS 16
 #define DISTANCEBETWEENCOMPARTMENTS (GRANULATORLENGTH / NUMBEROFCOMPARTMENTS) // m
 #define PARTICLERESIDENCETIME 49.0//490.0//20.0                                            //11.07 // seconds
 #define PARTICLEAVERAGEVELOCITY (GRANULATORLENGTH / PARTICLERESIDENCETIME)
@@ -32,8 +32,8 @@
 #define IMPELLERDIAMETER 0.114 // meter
 #define IMPELLERSPEED 2000.0//1000.0   //2000.0 // RPM
 
-#define PREMIXINGTIME 45.00//45.0                             //0.0 // seconds
-#define LIQUIDADDITIONTIME 45.0//105.0//75.0//45.0
+#define PREMIXINGTIME 25.00//45.0                             //0.0 // seconds
+#define LIQUIDADDITIONTIME 125.0//105.0//75.0//45.0
 #define POSTMIXINGTIME 0.0//25.0                        // seconds
 #define FINALTIME (PREMIXINGTIME + LIQUIDADDITIONTIME + POSTMIXINGTIME) // seconds
 //#define TIMESTEP 1e-1 // seconds

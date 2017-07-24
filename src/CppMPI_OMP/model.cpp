@@ -10,6 +10,7 @@
 #include "utility.h"
 #include "compartment.h"
 #include "liggghtsData.h"
+#include "timeStamp.h"
 
 #include <mpi.h>
 
@@ -48,9 +49,13 @@ int main(int argc, char *argv[])
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_id);
     MPI_Barrier(MPI_COMM_WORLD);
 
+    char * startTimeStr = nullptr;
     double startTime = 0.0;
     if (mpi_id == MASTER)
+    {
+        startTimeStr = timestring();
         startTime = MPI_Wtime();
+    }
 
     //MPI HELLO World Test!
     cout << "hello world, I am mpi_id= " << mpi_id << '\n';
@@ -954,13 +959,18 @@ int main(int argc, char *argv[])
 
     MPI_Barrier(MPI_COMM_WORLD);
     cout << "Testing... my process id = " << mpi_id << endl;
-    double endTime = 0.0;
     if (mpi_id == MASTER)
     {
-        endTime = MPI_Wtime();
+        char *endTimeStr = timestring();
+        double endTime = MPI_Wtime();
         cout << "That took " << endTime - startTime << " seconds for parallel code" << endl;
+        if (startTimeStr)
+            cout << "wall clock time at beginning = " << startTimeStr << endl;
+        if (endTimeStr)
+            cout << "wall clock time at end = " << endTimeStr << endl;
         cout << "Code End" << endl;
     }
     MPI_Finalize();
+    
     //return 0;
 }

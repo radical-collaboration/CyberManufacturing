@@ -7,10 +7,10 @@ CC=mpic++ -fopenmp -std=c++11 -O3
 
 all: model.out
 
-model.out: model.o compartment.o kernel.o utility.o liggghtsData.o atomFileParser.o
-	$(CC) model.o compartment.o kernel.o utility.o liggghtsData.o atomFileParser.o -o model.out
+model.out: model.o compartment.o kernel.o utility.o timeStamp.o liggghtsData.o atomFileParser.o
+	$(CC) model.o compartment.o kernel.o utility.o timeStamp.o liggghtsData.o atomFileParser.o -o model.out
 
-model.o: model.cpp liggghtsData.h compartment.h utility.h parameters.h
+model.o: model.cpp liggghtsData.h compartment.h utility.h timeStamp.h parameters.h
 	$(CC) -Wall -c model.cpp
 
 compartment.o: compartment.cpp compartment.h liggghtsData.h utility.h parameters.h
@@ -27,6 +27,9 @@ atomFileParser.o: atomFileParser.cpp atomFileParser.h
 
 utility.o: utility.cpp utility.h
 	$(CC) -Wall -c utility.cpp
+
+timeStamp.o: timeStamp.cpp timeStamp.h
+	$(CC) -Wall -c timeStamp.cpp
 
 clean:
 	rm -f *.o *.out

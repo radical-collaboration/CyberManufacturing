@@ -2,7 +2,8 @@
 
 #target: dependencies
 #<tab>action
-
+CORES=256
+DIAM=555
 CC=mpic++ -fopenmp -std=c++11 -O3
 
 all: model.out
@@ -11,7 +12,7 @@ model.out: model.o compartment.o kernel.o utility.o timeStamp.o liggghtsData.o a
 	$(CC) model.o compartment.o kernel.o utility.o timeStamp.o liggghtsData.o atomFileParser.o -o model.out
 
 model.o: model.cpp liggghtsData.h compartment.h utility.h timeStamp.h parameters.h
-	$(CC) -Wall -c model.cpp
+	$(CC) -Wall -DCORES=$(CORES) -DDIAM=$(DIAM) -c model.cpp
 
 compartment.o: compartment.cpp compartment.h liggghtsData.h utility.h parameters.h
 	$(CC) -Wall -c compartment.cpp
@@ -20,7 +21,7 @@ kernel.o: kernel.cpp kernel.h compartment.h
 	$(CC) -Wall -c kernel.cpp
 
 liggghtsData.o: liggghtsData.cpp liggghtsData.h atomFileParser.h utility.h parameters.h
-	$(CC) -Wall -c liggghtsData.cpp
+	$(CC) -Wall -DCORES=$(CORES) -DDIAM=$(DIAM) -c liggghtsData.cpp
 
 atomFileParser.o: atomFileParser.cpp atomFileParser.h
 	$(CC) -Wall -c atomFileParser.cpp

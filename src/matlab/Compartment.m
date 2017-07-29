@@ -148,7 +148,7 @@ for s=1:ns
         end
     end
 end
-arep=repmat(vs',[1 nss]);
+arep=repmat(vs',[1 nss]); %'
 crep=repmat(vss,[ns 1]);
 
 

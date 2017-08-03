@@ -2,8 +2,8 @@
 
 #target: dependencies
 #<tab>action
-CORES=256
-DIAM=555
+CORES=128
+DIAM=200
 CC=mpic++ -std=c++11 -O3
 
 all: model.out

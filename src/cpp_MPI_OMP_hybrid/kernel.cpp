@@ -27,7 +27,7 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
     int s1, ss1, s2, ss2;
 
     arrayOfDouble2D DEMCollisionData = compartmentDEMIn.DEMCollisionData;
-    #pragma omp parallel for shared(criticalExternalLiquid, collisionFrequency, collisionEfficiency, aggregationKernel) private(s1, ss1, s2, ss2)
+    #pragma omp parallel for shared(criticalExternalLiquid, collisionFrequency, collisionEfficiency, aggregationKernel) private(s1, ss1, s2, ss2) 
     for (s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
         for (ss1 = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
             for (s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
@@ -40,6 +40,7 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
                     if (flag1 && flag2)                        
                         collisionEfficiency[s1][ss1][s2][ss2] = COLLISIONEFFICIENCYCONSTANT;
 
+                    #pragma omp atomic write
                     aggregationKernel[s1][ss1][s2][ss2] = AGGREGATIONKERNELCONSTANT * collisionFrequency[s1][ss1][s2][ss2] * collisionEfficiency[s1][ss1][s2][ss2];
                 }
     return aggregationKernel;

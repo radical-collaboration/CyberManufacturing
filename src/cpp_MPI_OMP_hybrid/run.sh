@@ -12,6 +12,6 @@ echo "Running model.out"
 
 export OMP_NUM_THREADS=2
 
-mpirun -n 2 ./model.out > output_test.txt
+mpiexec -n 2 --bind-to core  ./model.out > output_test.txt
 
 echo "DONE"

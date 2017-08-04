@@ -156,15 +156,16 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
         for (s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
             for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
             {
-                if (fabs(fAll[s][ss]) > EPSILON) //If there are particles in the bin...
+                double temp = fAll[s][ss];
+                if (fabs(temp) > EPSILON) //If there are particles in the bin...
                 {
                     //New liquid bins are calculated as total amount liquid in that size class divided by
                     //the number of particle in that size class
-                    liquidBins[s][ss] = fLiquid[s][ss] / fAll[s][ss];
+                    liquidBins[s][ss] = fLiquid[s][ss] / temp;
 
                     // New gas bins are calculated as total amount liquid in that size class divided by
                     //the number of particle in that size class
-                    gasBins[s][ss] = fGas[s][ss] / fAll[s][ss];
+                    gasBins[s][ss] = fGas[s][ss] / temp;
                 }
                 else
                 {
@@ -182,9 +183,17 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
     	{
             for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
             {
-                internalLiquid[s][ss] = min(GRANULESATURATIONFACTOR * gasBins[s][ss], liquidBins[s][ss]);
-                externalLiquid[s][ss] = max(0.0, liquidBins[s][ss] - internalLiquid[s][ss]);
-                externalLiquidContent[s][ss] = externalLiquid[s][ss] / liquidBins[s][ss];
+                double temp = liquidBins[s][ss];
+                double temp1 = min(GRANULESATURATIONFACTOR * gasBins[s][ss], temp);
+                double temp2 = max(0.0, temp - internalLiquid[s][ss]);
+                //internalLiquid[s][ss] = min(GRANULESATURATIONFACTOR * gasBins[s][ss], liquidBins[s][ss]);
+                //externalLiquid[s][ss] = max(0.0, liquidBins[s][ss] - internalLiquid[s][ss]);
+                //#pragma omp critical
+                {
+                    externalLiquidContent[s][ss] = temp2 / temp;
+                    internalLiquid[s][ss] = temp1;
+                    externalLiquid[s][ss] = temp2;
+                }
             }
         }
         //cout << "End Internal & External liquid" << endl;
@@ -199,11 +208,19 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
             {
                 for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
                 {
-                    internalVolumeBins[s][ss] = sMeshXY[s][ss] + ssMeshXY[s][ss] + internalLiquid[s][ss] + gasBins[s][ss];
-                    //internalVolumeBins[s][ss] += internalLiquid[s][ss] + gasBins[s][ss];
-                    externalVolumeBins[s][ss] = sMeshXY[s][ss] + ssMeshXY[s][ss] + liquidBins[s][ss] + gasBins[s][ss];
-                    //externalVolumeBins[s][ss] += liquidBins[s][ss] + gasBins[s][ss];
-                    volumeBins[s][ss] = sMeshXY[s][ss] + ssMeshXY[s][ss];
+                    double t1 = sMeshXY[s][ss]; double t2 = ssMeshXY[s][ss]; double t3 = gasBins[s][ss];
+                    double temp1 = t1 + t2 + internalLiquid[s][ss] + t3;
+                    double temp2 = t1 + t2 + liquidBins[s][ss] + t3;
+                    double temp3 = t1 + t2;
+
+                    //#pragma omp critical
+                    {
+                        internalVolumeBins[s][ss] = temp1;
+                        //internalVolumeBins[s][ss] += internalLiquid[s][ss] + gasBins[s][ss];
+                        externalVolumeBins[s][ss] = temp2;
+                        //externalVolumeBins[s][ss] += liquidBins[s][ss] + gasBins[s][ss];
+                        volumeBins[s][ss] = temp3;
+                    }
                 }
             }
     
@@ -243,7 +260,14 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
                 {
                     //#pragma omp ordered simd safelen(8)
                     for (ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
-                        aggregationRate[s1][ss1][s2][ss2] = sAggregationCheck[s1][ss1] * ssAggregationCheck[s2][ss2] * aggregationKernel[s1][ss1][s2][ss2] * fAll[s1][ss1] * fAll[s2][ss2];
+                    {    
+                        double temp1 = sAggregationCheck[s1][ss1] * ssAggregationCheck[s2][ss2] * aggregationKernel[s1][ss1][s2][ss2] * fAll[s1][ss1] * fAll[s2][ss2];
+                        //#pragma omp critical
+                        aggregationRate[s1][ss1][s2][ss2] = temp1;
+                        depletionThroughAggregation[s1][ss1] += temp1;
+                        depletionThroughAggregation[s2][ss2] += temp1;
+                    
+                    }
                 }
 
         //cout << "End aggregationRate" << endl;
@@ -251,7 +275,7 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
     
         //cout << "Begin depletionThroughAggregation" << endl;
         //#pragma omp for schedule(static, chunk)
-        if (tid == 0) 
+        /*if (tid == 0) 
         {
             for (s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
                 for (ss1 = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
@@ -261,7 +285,7 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
                             depletionThroughAggregation[s1][ss1] += aggregationRate[s1][ss1][s2][ss2];
                             depletionThroughAggregation[s2][ss2] += aggregationRate[s1][ss1][s2][ss2];
                         }
-        }
+        }*/
     
         //cout << "End depletionThroughAggregation" << endl;
 
@@ -272,10 +296,16 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
         {
             for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
             {
-            	#pragma omp atomic write
-                depletionOfGasThroughAggregation[s][ss] = depletionThroughAggregation[s][ss] * gasBins[s][ss];
-                depletionOfLiquidThroughAggregation[s][ss] = depletionThroughAggregation[s][ss] * liquidBins[s][ss];
+                double temp3 = depletionThroughAggregation[s][ss];
+                double temp1 = temp3 * gasBins[s][ss];
+                double temp2 = temp3 * liquidBins[s][ss];
+                //#pragma omp critical
+                {
+                    depletionOfGasThroughAggregation[s][ss] = temp1;
+                    depletionOfLiquidThroughAggregation[s][ss] = temp2;
+                }
             }
+
         }
         //cout << "End depletionOfGasThroughAggregation & depletionOfLiquidThroughAggregation" << endl << endl;
 
@@ -316,16 +346,13 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
         for (s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
             for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
             {
-                if (fabs(birthThroughAggregation[s][ss]) > EPSILON)
+                double temp1 = birthThroughAggregation[s][ss];
+                if (fabs(temp1) > EPSILON)
                 {
-                    firstSolidVolumeThroughAggregation[s][ss] = firstSolidBirthThroughAggregation[s][ss] / birthThroughAggregation[s][ss];
-                    secondSolidVolumeThroughAggregation[s][ss] = secondSolidBirthThroughAggregation[s][ss] / birthThroughAggregation[s][ss];
+                    firstSolidVolumeThroughAggregation[s][ss] = firstSolidBirthThroughAggregation[s][ss] / temp1;
+                    secondSolidVolumeThroughAggregation[s][ss] = secondSolidBirthThroughAggregation[s][ss] / temp1;
                 }
-                else
-                {
-                    firstSolidVolumeThroughAggregation[s][ss] = 0.0;
-                    secondSolidVolumeThroughAggregation[s][ss] = 0.0;
-                }
+                
             }
         //cout << "After VolBins: I am omp_id = " << tid << endl;   
     
@@ -340,28 +367,32 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
             for (s = 0; s < NUMBEROFFIRSTSOLIDBINS - 1; s++)
             {    for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS - 1; ss++)
                 {
+                    double tvs1 = vs[s + 1]; double tvs = vs[s]; double tvss1 = vss[ss + 1]; double tvss = vss[ss];
+                    double temp_first = firstSolidVolumeThroughAggregation[s][ss]; double temp_second = secondSolidVolumeThroughAggregation[s][ss]; 
+                    double temp_birthagg = birthThroughAggregation[s][ss]; double temp_liqbirth = liquidBirthThroughAggregation[s][ss];
+                    double temp_gasagg = gasBirthThroughAggregation[s][ss];
                 	#pragma omp atomic write
-                    birthAggLowLow[s][ss] = ((vs[s + 1] - firstSolidVolumeThroughAggregation[s][ss]) / (vs[s + 1] - vs[s])) * \
-                    ((vss[ss + 1] - secondSolidVolumeThroughAggregation[s][ss]) / (vss[ss + 1] - vss[ss])) * birthThroughAggregation[s][ss];
+                    birthAggLowLow[s][ss] = ((tvs1 - temp_first) / (tvs1 - tvs)) * \
+                    ((tvss1 - temp_second) / (tvss1 - tvss)) * temp_birthagg;
                     //#pragma omp atomic update
                     //birthAggLowLow[s][ss] *= ((vss[ss + 1] - secondSolidVolumeThroughAggregation[s][ss]) / (vss[ss + 1] - vss[ss]));
                     //birthAggLowLow[s][ss] *= birthThroughAggregation[s][ss];
                 	
                 	#pragma omp atomic write
-                    birthAggHighHigh[s + 1][ss + 1] = ((firstSolidVolumeThroughAggregation[s][ss] - vs[s]) / (vs[s + 1] - vs[s])) * \
-                    ((secondSolidVolumeThroughAggregation[s][ss] - vss[ss]) / (vss[ss + 1] - vss[ss])) * birthThroughAggregation[s][ss];
+                    birthAggHighHigh[s + 1][ss + 1] = ((temp_first - tvs) / (tvs1 - tvs)) * \
+                    ((temp_second - tvss) / (tvss1 - tvss)) * temp_birthagg;
                     //birthAggHighHigh[s + 1][ss + 1] *= (secondSolidVolumeThroughAggregation[s][ss] - vss[ss]) / (vss[ss + 1] - vss[ss]);
                     //birthAggHighHigh[s + 1][ss + 1] *= birthThroughAggregation[s][ss];
                 	
                 	#pragma omp atomic write
-                    birthAggLowHigh[s][ss + 1] = ((vs[s + 1] - firstSolidVolumeThroughAggregation[s][ss]) / (vs[s + 1] - vs[s])) * \
-                    ((secondSolidVolumeThroughAggregation[s][ss] - vss[ss]) / (vss[ss + 1] - vss[ss])) * birthThroughAggregation[s][ss];
+                    birthAggLowHigh[s][ss + 1] = ((tvs1 - temp_first) / (tvs1 - tvs)) * \
+                    ((temp_second - tvss) / (tvss1 - tvss)) * temp_birthagg;
                     //birthAggLowHigh[s][ss + 1] *= (secondSolidVolumeThroughAggregation[s][ss] - vss[ss]) / (vss[ss + 1] - vss[ss]);
                     //birthAggLowHigh[s][ss + 1] *= birthThroughAggregation[s][ss];
 
                 	#pragma omp atomic write
-                    birthAggHighLow[s + 1][ss] = ((firstSolidVolumeThroughAggregation[s][ss] - vs[s]) / (vs[s + 1] - vs[s])) * \
-                    ((vss[ss + 1] - secondSolidVolumeThroughAggregation[s][ss]) / (vss[ss + 1] - vss[ss])) * birthThroughAggregation[s][ss];
+                    birthAggHighLow[s + 1][ss] = ((temp_first - tvs) / (tvs1 - tvs)) * \
+                    ((tvss1 - temp_second) / (tvss1 - tvss)) * temp_birthagg;
                     //birthAggHighLow[s + 1][ss] *= (vss[ss + 1] - secondSolidVolumeThroughAggregation[s][ss]) / (vss[ss + 1] - vss[ss]);
                     //birthAggHighLow[s + 1][ss] *= birthThroughAggregation[s][ss];
 
@@ -370,26 +401,26 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
             //cout << "Begin birth_agg_low_low_liq, birth_agg_high_high_liq, birth_agg_low_high_liq & birth_agg_high_low_liq" << endl;
 
                 	#pragma omp atomic write
-                    birthAggLowLowLiq[s][ss] = ((vs[s + 1] - firstSolidVolumeThroughAggregation[s][ss]) / (vs[s + 1] - vs[s])) * \
-                    ((vss[ss + 1] - secondSolidVolumeThroughAggregation[s][ss]) / (vss[ss + 1] - vss[ss])) * liquidBirthThroughAggregation[s][ss];
+                    birthAggLowLowLiq[s][ss] = ((tvs1 - temp_first) / (tvs1 - tvs)) * \
+                    ((tvss1 - temp_second) / (tvss1 - tvss)) * temp_liqbirth;
                     //birthAggLowLowLiq[s][ss] *= (vss[ss + 1] - secondSolidVolumeThroughAggregation[s][ss]) / (vss[ss + 1] - vss[ss]);
                     //birthAggLowLowLiq[s][ss] *= liquidBirthThroughAggregation[s][ss];
 
                 	#pragma omp atomic write
-                    birthAggHighHighLiq[s + 1][ss + 1] = ((firstSolidVolumeThroughAggregation[s][ss] - vs[s]) / (vs[s + 1] - vs[s])) * \
-                    ((secondSolidVolumeThroughAggregation[s][ss] - vss[ss]) / (vss[ss + 1] - vss[ss])) * liquidBirthThroughAggregation[s][ss];
+                    birthAggHighHighLiq[s + 1][ss + 1] = ((temp_first - tvs) / (tvs1 - tvs)) * \
+                    ((temp_second - tvss) / (tvss1 - tvss)) * temp_liqbirth;
                     //birthAggHighHighLiq[s + 1][ss + 1] *= (secondSolidVolumeThroughAggregation[s][ss] - vss[ss]) / (vss[ss + 1] - vss[ss]);
                     //birthAggHighHighLiq[s + 1][ss + 1] *= liquidBirthThroughAggregation[s][ss];
 
                 	#pragma omp atomic write
-                    birthAggLowHighLiq[s][ss + 1] = ((vs[s + 1] - firstSolidVolumeThroughAggregation[s][ss]) / (vs[s + 1] - vs[s])) * \
-                    ((secondSolidVolumeThroughAggregation[s][ss] - vss[ss]) / (vss[ss + 1] - vss[ss])) * liquidBirthThroughAggregation[s][ss];
+                    birthAggLowHighLiq[s][ss + 1] = ((tvs1 - temp_first) / (tvs1 - tvs)) * \
+                    ((temp_second - tvss) / (tvss1 - tvss)) * temp_liqbirth;
                     //birthAggLowHighLiq[s][ss + 1] *= (secondSolidVolumeThroughAggregation[s][ss] - vss[ss]) / (vss[ss + 1] - vss[ss]);
                     //birthAggLowHighLiq[s][ss + 1] *= liquidBirthThroughAggregation[s][ss];
 
                 	#pragma omp atomic write
-                    birthAggHighLowLiq[s + 1][ss] = ((firstSolidVolumeThroughAggregation[s][ss] - vs[s]) / (vs[s + 1] - vs[s])) * \
-                    ((vss[ss + 1] - secondSolidVolumeThroughAggregation[s][ss]) / (vss[ss + 1] - vss[ss])) * liquidBirthThroughAggregation[s][ss];
+                    birthAggHighLowLiq[s + 1][ss] = ((temp_first - tvs) / (tvs1 - tvs)) * \
+                    ((tvss1 - temp_second) / (tvss1 - tvss)) * temp_liqbirth;
                     //birthAggHighLowLiq[s + 1][ss] *= (vss[ss + 1] - secondSolidVolumeThroughAggregation[s][ss]) / (vss[ss + 1] - vss[ss]);
                     //birthAggHighLowLiq[s + 1][ss] *= liquidBirthThroughAggregation[s][ss];
             //cout << "End birth_agg_low_low_liq, birth_agg_high_high_liq, birth_agg_low_high_liq & birth_agg_high_low_liq" << endl << endl;
@@ -397,26 +428,26 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
             //cout << "Begin birth_agg_low_low_gas, birth_agg_high_high_gas, birth_agg_low_high_gas & birth_agg_high_low_gas" << endl;
 
                 	#pragma omp atomic write
-                    birthAggLowLowGas[s][ss] = ((vs[s + 1] - firstSolidVolumeThroughAggregation[s][ss]) / (vs[s + 1] - vs[s])) * \
-                    ((vss[ss + 1] - secondSolidVolumeThroughAggregation[s][ss]) / (vss[ss + 1] - vss[ss])) * gasBirthThroughAggregation[s][ss];
+                    birthAggLowLowGas[s][ss] = ((tvs1 - temp_first) / (tvs1 - tvs)) * \
+                    ((tvss1 - temp_second) / (tvss1 - tvss)) * temp_gasagg;
                     //birthAggLowLowGas[s][ss] *= (vss[ss + 1] - secondSolidVolumeThroughAggregation[s][ss]) / (vss[ss + 1] - vss[ss]);
                     //birthAggLowLowGas[s][ss] *= gasBirthThroughAggregation[s][ss];
 
                 	#pragma omp atomic write
-                    birthAggHighHighGas[s + 1][ss + 1] = ((firstSolidVolumeThroughAggregation[s][ss] - vs[s]) / (vs[s + 1] - vs[s])) * \
-                    ((secondSolidVolumeThroughAggregation[s][ss] - vss[ss]) / (vss[ss + 1] - vss[ss])) * gasBirthThroughAggregation[s][ss];
-                    //birthAggHighHighGas[s + 1][ss + 1] *= (secondSolidVolumeThroughAggregation[s][ss] - vss[ss]) / (vss[ss + 1] - vss[ss]);
+                    birthAggHighHighGas[s + 1][ss + 1] = ((temp_first - tvs) / (tvs1 - tvs)) * \
+                    ((temp_second - tvss) / (tvss1 - tvss)) * temp_gasagg;
+                    //birthAggHighHighGas[s + 1][ss + 1] *= (secondSolidVolumeThroughAggregation[s][ss] - vss[ss]) / (tvss1 - vss[ss]);
                     //birthAggHighHighGas[s + 1][ss + 1] *= gasBirthThroughAggregation[s][ss];
 
                 	#pragma omp atomic write
-                    birthAggLowHighGas[s][ss + 1] = ((vs[s + 1] - firstSolidVolumeThroughAggregation[s][ss]) / (vs[s + 1] - vs[s])) * \
-                    ((secondSolidVolumeThroughAggregation[s][ss] - vss[ss]) / (vss[ss + 1] - vss[ss])) * gasBirthThroughAggregation[s][ss];
+                    birthAggLowHighGas[s][ss + 1] = ((tvs1 - temp_first) / (tvs1 - tvs)) * \
+                    ((temp_second - tvss) / (tvss1 - tvss)) * temp_gasagg;
                     //birthAggLowHighGas[s][ss + 1] *= (secondSolidVolumeThroughAggregation[s][ss] - vss[ss]) / (vss[ss + 1] - vss[ss]);
                     //birthAggLowHighGas[s][ss + 1] *= gasBirthThroughAggregation[s][ss];
 
                     #pragma omp atomic write
-                    birthAggHighLowGas[s + 1][ss] = ((firstSolidVolumeThroughAggregation[s][ss] - vs[s]) / (vs[s + 1] - vs[s])) * \
-                    ((vss[ss + 1] - secondSolidVolumeThroughAggregation[s][ss]) / (vss[ss + 1] - vss[ss])) * gasBirthThroughAggregation[s][ss];
+                    birthAggHighLowGas[s + 1][ss] = ((temp_first - tvs) / (tvs1 - tvs)) * \
+                    ((tvss1 - temp_second) / (tvss1 - tvss)) * temp_gasagg;
                     //birthAggHighLowGas[s + 1][ss] *= (vss[ss + 1] - secondSolidVolumeThroughAggregation[s][ss]) / (vss[ss + 1] - vss[ss]);
                     //birthAggHighLowGas[s + 1][ss] *= gasBirthThroughAggregation[s][ss];
                 }
@@ -473,9 +504,8 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
                         for (s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
                             for (ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
                             {
-                                breakageRate[s1][ss1][s2][ss2] = sCheckB[s1][s2] * ssCheckB[ss1][ss2];
-                                breakageRate[s1][ss1][s2][ss2] *= breakageKernel[s1][ss1][s2][ss2] * fAll[s1][ss1];
-
+                                breakageRate[s1][ss1][s2][ss2] = sCheckB[s1][s2] * ssCheckB[ss1][ss2] * breakageKernel[s1][ss1][s2][ss2] * fAll[s1][ss1];
+                                //breakageRate[s1][ss1][s2][ss2] *= breakageKernel[s1][ss1][s2][ss2] * fAll[s1][ss1];
                                 depletionThroughBreakage[s1][ss1] += breakageRate[s1][ss1][s2][ss2];
                                 depletionOfLiquidthroughBreakage[s1][ss1] = depletionThroughBreakage[s1][ss1] * liquidBins[s1][ss1];
                                 depletionOfGasThroughBreakage[s1][ss1] = depletionThroughBreakage[s1][ss1] * gasBins[s1][ss1];
@@ -642,7 +672,7 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
         for (s = 0; s < NUMBEROFFIRSTSOLIDBINS - 1; s++)
             for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS - 1; ss++)
             {
-               	#pragma omp atomic write
+               	//#pragma omp atomic write
                 dfAlldt[s][ss] = particleMovement[s][ss] + formationThroughAggregationCA[s][ss] - depletionThroughAggregation[s][ss] + birthThroughBreakage1[s][ss] \
                 + formationThroughBreakageCA[s][ss] - depletionThroughBreakage[s][ss];
                 //dfAlldt[s][ss] += formationThroughAggregationCA[s][ss] - depletionThroughAggregation[s][ss];
@@ -654,7 +684,7 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
                     transferThroughLiquidAddition[s][ss] = liquidAdditionRate * value;
                 }
 
-                #pragma omp atomic write
+                //#pragma omp atomic write
                 dfLiquiddt[s][ss] = liquidMovement[s][ss] + fAll[s][ss] * transferThroughLiquidAddition[s][ss] + formationOfLiquidThroughAggregationCA[s][ss] - depletionOfLiquidThroughAggregation[s][ss] \
                 + liquidBirthThroughBreakage1[s][ss] + formationOfLiquidThroughBreakageCA[s][ss] - depletionOfLiquidthroughBreakage[s][ss];
                 //dfLiquiddt[s][ss] += fAll[s][ss] * transferThroughLiquidAddition[s][ss];
@@ -662,7 +692,7 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
                 //dfLiquiddt[s][ss] += liquidBirthThroughBreakage1[s][ss] + formationOfLiquidThroughBreakageCA[s][ss];
                 //dfLiquiddt[s][ss] -= depletionOfLiquidthroughBreakage[s][ss];
 
-               	#pragma omp atomic write
+               	//#pragma omp atomic write
                 dfGasdt[s][ss] = gasMovement[s][ss] + fAll[s][ss] * transferThroughConsolidation[s][ss] + formationOfGasThroughAggregationCA[s][ss] - depletionOfGasThroughAggregation[s][ss] \
                 + gasBirthThroughBreakage1[s][ss] + formationOfGasThroughBreakageCA[s][ss] - depletionOfGasThroughBreakage[s][ss];
                 //dfGasdt[s][ss] += fAll[s][ss] * transferThroughConsolidation[s][ss];

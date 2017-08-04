@@ -39,7 +39,9 @@ int main(int argc, char *argv[])
     double startTime = 0.0;
     liggghtsData *lData = nullptr;
 
-    //return 0;//to stop execution after reading liggghts data
+    string coreVal;
+    string diaVal;
+
     //**************************************************************************************************
     int num_mpi = 0;
     int mpi_id = 0;
@@ -52,8 +54,15 @@ int main(int argc, char *argv[])
     {
         startTimeStr = string(timestring());
         startTime = MPI_Wtime();
-        //(liggghtsData::getInstance())->readLiggghtsDataFiles();
+        if (argc < 3)
+        {
+            cout << "Core and Diameter values aren't available as input parameters" << endl;
+            int mpi_err = 0;
+            MPI_Abort(MPI_COMM_WORLD, mpi_err);
+        }
     }
+    coreVal = string(argv[1]);
+    diaVal = string(argv[2]);
 
     MPI_Barrier(MPI_COMM_WORLD);
 
@@ -438,19 +447,37 @@ int main(int argc, char *argv[])
 
     if (!lData)
         cout << "mpi_id = " << mpi_id << ", LIGGGHTS Data pointer is null" << endl;
-    lData->readLiggghtsDataFiles();
+    lData->readLiggghtsDataFiles(coreVal, diaVal);
 
     vector<double> DEMDiameter = lData->getDEMParticleDiameters();
     if ((DEMDiameter).size() == 0)
+    {
+        cout << "My process id = " << mpi_id << endl;
         cout << "Diameter data is missing in LIGGGHTS output file" << endl;
+        cout << "Input parameters for DEM core and diameter aren't matching with LIGGGHTS output file" << endl;
+        int mpi_err = 0;
+        MPI_Abort(MPI_COMM_WORLD, mpi_err);
+    }
 
     vector<double> DEMImpactData = lData->getFinalDEMImpactData();
     if ((DEMImpactData).size() == 0)
+    {
+        cout << "My process id = " << mpi_id << endl;
         cout << "Impact data is missing in LIGGGHTS output file" << endl;
+        cout << "Input parameters for DEM core and diameter aren't matching with LIGGGHTS output file" << endl;
+        int mpi_err = 0;
+        MPI_Abort(MPI_COMM_WORLD, mpi_err);
+    }
 
     arrayOfDouble2D DEMCollisionData = lData->getFinalDEMCollisionData();
     if (DEMCollisionData.size() == 0)
+    {
+        cout << "My process id = " << mpi_id << endl;
         cout << "Collision data is missing in LIGGGHTS output file" << endl;
+        cout << "Input parameters for DEM core and diameter aren't matching with LIGGGHTS output file" << endl;
+        int mpi_err = 0;
+        MPI_Abort(MPI_COMM_WORLD, mpi_err);
+    }
     // ************ read liggghts files end ******************
 
     if (mpi_id == MASTER)
@@ -946,7 +973,7 @@ int main(int argc, char *argv[])
     //cout << "End computing D10, D50, D90" << endl;
     if (mpi_id == 0)
     {
-        string appendFileName = string("_") + to_string(CORES) + string("_") + to_string(DIAM);
+        string appendFileName = string("_") + coreVal + string("_") + diaVal;
         
 
         dumpDiaCSV(Time, d10OverTime, string("d10") + appendFileName);

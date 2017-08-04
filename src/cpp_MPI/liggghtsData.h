@@ -22,7 +22,7 @@ class liggghtsData
     //liggghtsData() = delete;
     static liggghtsData *getInstance();
 
-    void readLiggghtsDataFiles();
+    void readLiggghtsDataFiles(std::string coreVal, std::string diaVal);
 
     mapCollisionData getMapCollisionData(double time);
     pairImpactData getPairImpactData(double time);

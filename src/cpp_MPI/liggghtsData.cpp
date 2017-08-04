@@ -73,15 +73,13 @@ bool liggghtsData::checkFileConsistency(std::string collisionFile, std::string i
     return (timeInCollisionFile == timeInImpactFile);
 }
 
-void liggghtsData::readLiggghtsDataFiles()
+void liggghtsData::readLiggghtsDataFiles(string coreVal, string diaVal)
 {
     if (!mapCollisionDataOverTime.empty() && !mapImpactDataOverTime.empty())
         return;
 
     // vector<string> fileList = listFiles(ATOMFILEPATH, "atom");
-    string ncores = string(to_string(CORES));
-    string diaval = string(to_string(DIAM));
-    string fileExt = ncores + string("_") + diaval;
+    string fileExt = coreVal + string("_") + diaVal;
     vector<string> fileList = listFiles(ATOMFILEPATH, fileExt);
 
     string subStrCollision = "collision";
@@ -272,7 +270,7 @@ arrayOfDouble2D liggghtsData::getFinalDEMCollisionData()
         for (size_t j = 0; j < nCollisions[i].size(); j++)
         {
             nCollisions[i][j] = nCollisions[i][j] / (particleTypeCount[i] * particleTypeCount[j]);
-            nCollisions[i][j] = isnan(nCollisions[i][j]) ? 0.0 : nCollisions[i][j];
+            nCollisions[i][j] = std::isnan(nCollisions[i][j]) ? 0.0 : nCollisions[i][j];
         }
 
     return nCollisions;

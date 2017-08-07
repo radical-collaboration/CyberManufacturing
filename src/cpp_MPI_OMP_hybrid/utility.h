@@ -5,35 +5,54 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <array>
+#include <algorithm>
+
+#include "parameters.h"
 
 #define CSVFILEPATH "./csvDump/"
 #define TXTFILEPATH "./txtDump/"
 
-typedef std::vector<std::vector<int>> arrayOfInt2D;
-typedef std::vector<std::vector<std::vector<int>>> arrayOfInt3D;
-typedef std::vector<std::vector<std::vector<std::vector<int>>>> arrayOfInt4D;
-typedef std::vector<std::vector<double>> arrayOfDouble2D;
-typedef std::vector<std::vector<std::vector<double>>> arrayOfDouble3D;
-typedef std::vector<std::vector<std::vector<std::vector<double>>>> arrayOfDouble4D;
+typedef std::vector<std::vector<int>> vectorOfInt2D;
+typedef std::vector<std::vector<std::vector<int>>> vectorOfInt3D;
+typedef std::vector<std::vector<std::vector<std::vector<int>>>> vectorOfInt4D;
+typedef std::vector<std::vector<double>> vectorOfDouble2D;
+typedef std::vector<std::vector<std::vector<double>>> vectorOfDouble3D;
+typedef std::vector<std::vector<std::vector<std::vector<double>>>> vectorOfDouble4D;
+
+typedef std::array<std::array<int, NUMBEROFSECONDSOLIDBINS>, NUMBEROFFIRSTSOLIDBINS> arrayOfInt2D;
+
+typedef std::array<std::array<double, NUMBEROFSECONDSOLIDBINS>, NUMBEROFFIRSTSOLIDBINS> arrayOfDouble2D;
+typedef std::array<std::array<std::array<double, NUMBEROFSECONDSOLIDBINS>, NUMBEROFFIRSTSOLIDBINS>, NUMBEROFCOMPARTMENTS> arrayOfDouble3D;
+typedef std::array<std::array<std::array<std::array<double, NUMBEROFSECONDSOLIDBINS>, NUMBEROFFIRSTSOLIDBINS>, NUMBEROFSECONDSOLIDBINS>, NUMBEROFFIRSTSOLIDBINS> arrayOfDouble4D;
 
 void fun();
 
-arrayOfInt2D getArrayOfInt2D(int n, int m, int val = 0);
-arrayOfInt3D getarrayOfInt3D(int n, int m, int p, int val = 0);
-arrayOfInt4D getArrayOfInt4D(int n, int m, int p, int q, int val = 0);
-arrayOfDouble2D getArrayOfDouble2D(int n, int m, double val = 0.0);
-arrayOfDouble3D getArrayOfDouble3D(int n, int m, int p, double val = 0.0);
-arrayOfDouble4D getArrayOfDouble4D(int n, int m, int p, int q, double val = 0.0);
+vectorOfInt2D getVectorOfInt2D(int n, int m, int val = 0);
+vectorOfInt3D getVectorOfInt3D(int n, int m, int p, int val = 0);
+vectorOfInt4D getVectorOfInt4D(int n, int m, int p, int q, int val = 0);
+vectorOfDouble2D getVectorOfDouble2D(int n, int m, double val = 0.0);
+vectorOfDouble3D getVectorOfDouble3D(int n, int m, int p, double val = 0.0);
+vectorOfDouble4D getVectorOfDouble4D(int n, int m, int p, int q, double val = 0.0);
 
-double getMinimumOf2DArray(arrayOfDouble2D array2D);
-double getMinimumOf3DArray(arrayOfDouble3D array3D);
+arrayOfInt2D vector2Array2D(vectorOfInt2D vector2D);
 
-double getMaximumOfArray(std::vector<double> vec);
+arrayOfDouble2D vector2Array2D(vectorOfDouble2D vector2D);
+arrayOfDouble3D vector2Array3D(vectorOfDouble3D vector2D);
+arrayOfDouble4D vector2Array4D(vectorOfDouble4D vector2D);
+
+vectorOfDouble2D array2Vector2D(arrayOfDouble2D array2D);
+
+double getMinimumOf2DVector(vectorOfDouble2D vector2D);
+double getMinimumOf3DVector(vectorOfDouble3D vector3D);
+
+double getMaximumOfVector(std::vector<double> vec);
+//double getMaximumOf2DVector(vectorOfDouble2D vector2D);
 double getMaximumOf2DArray(arrayOfDouble2D array2D);
 
-int getCountOfNegativeIn3DArray(arrayOfDouble3D array3D);
+int getCountOfNegativeIn3DVector(vectorOfDouble3D vector3D);
 
-std::vector<double> linearize3DVector(arrayOfDouble3D array3D);
+std::vector<double> linearize3DVector(vectorOfDouble3D vector3D);
 
 std::string moreSigs(double d, int prec); //return string of 'd' with ''prec' sig digits: trailing zeros removed
 

@@ -20,135 +20,132 @@ using namespace std;
 CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, CompartmentIn compartmentIn, CompartmentDEMIn compartmentDEMIn, double time, double timeStep)
 {
     CompartmentOut compartmentOut;
-
-    arrayOfInt2D sInd = compartmentIn.sInd;
-    arrayOfInt2D ssInd = compartmentIn.ssInd;
-    arrayOfInt2D sIndB = compartmentIn.sIndB;
-    arrayOfInt2D ssIndB = compartmentIn.ssIndB;
-    vector<double> vs = compartmentIn.vs;
-    vector<double> vss = compartmentIn.vss;
-    arrayOfDouble2D fAll = compartmentIn.fAll;
-    arrayOfDouble2D fLiquid = compartmentIn.fLiquid;
-    arrayOfDouble2D fGas = compartmentIn.fGas;
-    arrayOfDouble2D sMeshXY = compartmentIn.sMeshXY;
-    arrayOfDouble2D ssMeshXY = compartmentIn.ssMeshXY;
-    arrayOfInt2D sAggregationCheck = compartmentIn.sAggregationCheck;
-    arrayOfInt2D ssAggregationCheck = compartmentIn.ssAggregationCheck;
-    arrayOfInt2D sCheckB = compartmentIn.sCheckB;
-    arrayOfInt2D ssCheckB = compartmentIn.ssCheckB;
-    arrayOfDouble2D sLow = compartmentIn.sLow;
-    arrayOfDouble2D sHigh = compartmentIn.sHigh;
-    arrayOfDouble2D ssLow = compartmentIn.ssLow;
-    arrayOfDouble2D ssHigh = compartmentIn.ssHigh;
+    
+    int s, ss, s1, ss1, s2, ss2, /*chunk,*/ tid = 0, /*nthreads,*/ a, b = 0;
+    double totalSolidVolume = 0.0;
     double liquidAdditionRate = compartmentIn.liquidAdditionRate;
 
-    arrayOfDouble2D fAllComingIn = prevCompIn.fAllComingIn;
-    arrayOfDouble2D fAllPreviousCompartment = prevCompIn.fAllPreviousCompartment;
-    arrayOfDouble2D flPreviousCompartment = prevCompIn.flPreviousCompartment;
-    arrayOfDouble2D fgComingIn = prevCompIn.fgComingIn;
-    arrayOfDouble2D fgPreviousCompartment = prevCompIn.fgPreviousCompartment;
+    #pragma omp parallel default(shared) private(s, ss, s1, ss1, s2, ss2, a, b, tid)
+    {
+    arrayOfInt2D sInd = vector2Array2D(compartmentIn.sInd);
+    arrayOfInt2D ssInd = vector2Array2D(compartmentIn.ssInd);
+    arrayOfInt2D sIndB = vector2Array2D(compartmentIn.sIndB);
+    arrayOfInt2D ssIndB = vector2Array2D(compartmentIn.ssIndB);
+    vector<double> vs = compartmentIn.vs;
+    vector<double> vss = compartmentIn.vss;
+    arrayOfDouble2D fAll = vector2Array2D(compartmentIn.fAll);
+    arrayOfDouble2D fLiquid = vector2Array2D(compartmentIn.fLiquid);
+    arrayOfDouble2D fGas = vector2Array2D(compartmentIn.fGas);
+    arrayOfDouble2D sMeshXY = vector2Array2D(compartmentIn.sMeshXY);
+    arrayOfDouble2D ssMeshXY = vector2Array2D(compartmentIn.ssMeshXY);
+    arrayOfInt2D sAggregationCheck = vector2Array2D(compartmentIn.sAggregationCheck);
+    arrayOfInt2D ssAggregationCheck = vector2Array2D(compartmentIn.ssAggregationCheck);
+    arrayOfInt2D sCheckB = vector2Array2D(compartmentIn.sCheckB);
+    arrayOfInt2D ssCheckB = vector2Array2D(compartmentIn.ssCheckB);
+    arrayOfDouble2D sLow = vector2Array2D(compartmentIn.sLow);
+    arrayOfDouble2D sHigh = vector2Array2D(compartmentIn.sHigh);
+    arrayOfDouble2D ssLow = vector2Array2D(compartmentIn.ssLow);
+    arrayOfDouble2D ssHigh = vector2Array2D(compartmentIn.ssHigh);
+    //double liquidAdditionRate = compartmentIn.liquidAdditionRate;
 
-    //Declaration of arrays required initially for OMP implementation
-    arrayOfDouble2D internalLiquid = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D externalLiquid = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D externalLiquidContent = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D externalVolumeBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D volumeBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble4D aggregationRate = getArrayOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS,
-                                                         NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D depletionOfGasThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D depletionOfLiquidThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D firstSolidBirthThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D secondSolidBirthThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D liquidBirthThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D gasBirthThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D firstSolidVolumeThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D secondSolidVolumeThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggLowLow = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggHighHigh = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggLowHigh = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggHighLow = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggLowLowLiq = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggHighHighLiq = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggLowHighLiq = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggHighLowLiq = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D fAllComingIn = vector2Array2D(prevCompIn.fAllComingIn);
+    arrayOfDouble2D fAllPreviousCompartment = vector2Array2D(prevCompIn.fAllPreviousCompartment);
+    arrayOfDouble2D flPreviousCompartment = vector2Array2D(prevCompIn.flPreviousCompartment);
+    arrayOfDouble2D fgComingIn = vector2Array2D(prevCompIn.fgComingIn);
+    arrayOfDouble2D fgPreviousCompartment = vector2Array2D(prevCompIn.fgPreviousCompartment);
 
-    arrayOfDouble2D birthAggLowLowGas = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggHighHighGas = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggLowHighGas = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggHighLowGas = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D formationThroughAggregationCA = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D formationOfLiquidThroughAggregationCA = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D formationOfGasThroughAggregationCA = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble4D breakageRate = getArrayOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS,
-                                                      NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    //Declaration of vectors required initially for OMP implementation
+    arrayOfDouble2D internalLiquid{{0.0}};
+    arrayOfDouble2D externalLiquid{{0.0}};
+    arrayOfDouble2D externalLiquidContent{{0.0}};
+    arrayOfDouble2D externalVolumeBins{{0.0}};
+    arrayOfDouble2D volumeBins{{0.0}};
+    arrayOfDouble4D aggregationRate{{0.0}};
+    arrayOfDouble2D depletionOfGasThroughAggregation{{0.0}};
+    arrayOfDouble2D depletionOfLiquidThroughAggregation{{0.0}};
+    arrayOfDouble2D birthThroughAggregation{{0.0}};
+    arrayOfDouble2D firstSolidBirthThroughAggregation{{0.0}};
+    arrayOfDouble2D secondSolidBirthThroughAggregation{{0.0}};
+    arrayOfDouble2D liquidBirthThroughAggregation{{0.0}};
+    arrayOfDouble2D gasBirthThroughAggregation{{0.0}};
+    arrayOfDouble2D firstSolidVolumeThroughAggregation{{0.0}};
+    arrayOfDouble2D secondSolidVolumeThroughAggregation{{0.0}};
+    arrayOfDouble2D birthAggLowLow{{0.0}};
+    arrayOfDouble2D birthAggHighHigh{{0.0}};
+    arrayOfDouble2D birthAggLowHigh{{0.0}};
+    arrayOfDouble2D birthAggHighLow{{0.0}};
+    arrayOfDouble2D birthAggLowLowLiq{{0.0}};
+    arrayOfDouble2D birthAggHighHighLiq{{0.0}};
+    arrayOfDouble2D birthAggLowHighLiq{{0.0}};
+    arrayOfDouble2D birthAggHighLowLiq{{0.0}};
 
-    arrayOfDouble2D depletionThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D depletionThroughBreakage = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D depletionOfGasThroughBreakage = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D depletionOfLiquidthroughBreakage = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D birthAggLowLowGas{{0.0}};
+    arrayOfDouble2D birthAggHighHighGas{{0.0}};
+    arrayOfDouble2D birthAggLowHighGas{{0.0}};
+    arrayOfDouble2D birthAggHighLowGas{{0.0}};
+    arrayOfDouble2D formationThroughAggregationCA{{0.0}};
+    arrayOfDouble2D formationOfLiquidThroughAggregationCA{{0.0}};
+    arrayOfDouble2D formationOfGasThroughAggregationCA{{0.0}};
+    arrayOfDouble4D breakageRate{{0.0}};
 
-    arrayOfDouble2D birthThroughBreakage1 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthThroughBreakage2 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D depletionThroughAggregation{{0.0}};
+    arrayOfDouble2D depletionThroughBreakage{{0.0}};
+    arrayOfDouble2D depletionOfGasThroughBreakage{{0.0}};
+    arrayOfDouble2D depletionOfLiquidthroughBreakage{{0.0}};
 
-    arrayOfDouble2D firstSolidBirthThroughBreakage = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D secondSolidBirthThroughBreakage = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D birthThroughBreakage1{{0.0}};
+    arrayOfDouble2D birthThroughBreakage2{{0.0}};
 
-    arrayOfDouble2D liquidBirthThroughBreakage1 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D gasBirthThroughBreakage1 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D firstSolidBirthThroughBreakage{{0.0}};
+    arrayOfDouble2D secondSolidBirthThroughBreakage{{0.0}};
 
-    arrayOfDouble2D liquidBirthThroughBreakage2 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D gasBirthThroughBreakage2 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D liquidBirthThroughBreakage1{{0.0}};
+    arrayOfDouble2D gasBirthThroughBreakage1{{0.0}};
 
-    arrayOfDouble2D firstSolidVolumeThroughBreakage = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D secondSolidVolumeThroughBreakage = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D fractionBreakage00 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D fractionBreakage01 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D fractionBreakage10 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D fractionBreakage11 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D formationThroughBreakageCA = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D formationOfLiquidThroughBreakageCA = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D formationOfGasThroughBreakageCA = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D transferThroughLiquidAddition = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D transferThroughConsolidation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D liquidBirthThroughBreakage2{{0.0}};
+    arrayOfDouble2D gasBirthThroughBreakage2{{0.0}};
 
-    arrayOfDouble2D particleMovement = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D liquidMovement = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D gasMovement = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D firstSolidVolumeThroughBreakage{{0.0}};
+    arrayOfDouble2D secondSolidVolumeThroughBreakage{{0.0}};
+    arrayOfDouble2D fractionBreakage00{{0.0}};
+    arrayOfDouble2D fractionBreakage01{{0.0}};
+    arrayOfDouble2D fractionBreakage10{{0.0}};
+    arrayOfDouble2D fractionBreakage11{{0.0}};
+    arrayOfDouble2D formationThroughBreakageCA{{0.0}};
+    arrayOfDouble2D formationOfLiquidThroughBreakageCA{{0.0}};
+    arrayOfDouble2D formationOfGasThroughBreakageCA{{0.0}};
+    arrayOfDouble2D transferThroughLiquidAddition{{0.0}};
+    arrayOfDouble2D transferThroughConsolidation{{0.0}};
+
+    arrayOfDouble2D particleMovement{{0.0}};
+    arrayOfDouble2D liquidMovement{{0.0}};
+    arrayOfDouble2D gasMovement{{0.0}};
 
     //Calculation of liquid and gas bins
     //cout << "Begin liquidBins & gasBins" << endl;
-    arrayOfDouble2D liquidBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D gasBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D internalVolumeBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D liquidBins{{0.0}};
+    arrayOfDouble2D gasBins{{0.0}};
+    arrayOfDouble2D internalVolumeBins{{0.0}};
 
-    arrayOfDouble2D dfAlldt = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D dfLiquiddt = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D dfGasdt = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D dfAlldt{{0.0}};
+    arrayOfDouble2D dfLiquiddt{{0.0}};
+    arrayOfDouble2D dfGasdt{{0.0}};
     
-    arrayOfDouble2D meshXYSum = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D meshXYSum{{0.0}};
 
-    arrayOfDouble4D aggregationKernel;
-    arrayOfDouble4D breakageKernel = getArrayOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);;
+    arrayOfDouble4D aggregationKernel{{0.0}};
+    arrayOfDouble4D breakageKernel{{0.0}};// = getVectorOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);;
 
-    double totalSolidVolume = 0.0;
-    int s, ss, s1, ss1, s2, ss2, chunk, tid = 0, nthreads, a, b = 0;
+    //double totalSolidVolume = 0.0;
+    /*int s, ss, s1, ss1, s2, ss2, /*chunk, tid = 0, /*nthreads, a, b = 0;
 
-    //#pragma omp parallel shared(liquidBins,gasBins,chunk,nthreads,internalLiquid,externalLiquid,externalLiquidContent,fAll,fLiquid,fGas,ssMeshXY,sMeshXY,internalVolumeBins,volumeBins,aggregationKernel, \
-        aggregationRate,sAggregationCheck,ssAggregationCheck,depletionThroughAggregation,depletionOfGasThroughAggregation,depletionOfLiquidThroughAggregation,birthThroughAggregation,firstSolidBirthThroughAggregation, \
-        secondSolidBirthThroughAggregation,gasBirthThroughAggregation,liquidBirthThroughAggregation, firstSolidVolumeThroughAggregation, secondSolidVolumeThroughAggregation, vs, vss, sInd, ssInd, \
-        birthAggLowLow, birthAggLowHigh, birthAggHighHigh, birthAggHighLow, birthAggLowLowGas, birthAggLowHighGas, birthAggHighHighGas, birthAggHighLowGas , birthAggLowLowLiq, birthAggLowHighLiq, \
-        birthAggHighHighLiq, birthAggHighLowLiq, formationThroughAggregationCA, formationOfGasThroughAggregationCA, formationOfLiquidThroughAggregationCA, meshXYSum, particleMovement, gasMovement, liquidMovement, \
-        dfAlldt, dfGasdt, dfLiquiddt, transferThroughLiquidAddition, totalSolidVolume)  private(s,ss,s1,ss1,s2,ss2,a,b,tid)
     #pragma omp parallel default(shared) private(s, ss, s1, ss1, s2, ss2, a, b, tid)
-    {
+    { */
         tid = omp_get_thread_num();
         if (tid == 0)
         {
-            nthreads = omp_get_num_threads();
-            //printf("Starting matrix multiple example with %d threads\n",nthreads);
-            chunk = static_cast<int>(NUMBEROFFIRSTSOLIDBINS / nthreads);
+            //nthreads = omp_get_num_threads();
+            //chunk = static_cast<int>(NUMBEROFFIRSTSOLIDBINS / nthreads);
         }
         //cout << "Before Schedule: I am omp_id = " << tid << endl;   
         
@@ -200,7 +197,7 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
 
         //cout << "Begin Internal, External & Volume Bins" << endl;
 
-        //compartmentOut.internalVolumeBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+        //compartmentOut.internalVolumeBins = getVectorOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
         #pragma omp for 
         //if (tid == OPENMP_MASTER)
         //{
@@ -227,7 +224,7 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
         //cout << "End Internal, External & Volume Bins" << endl;
 
         //cout << "Begin Aggregation Kernel" << endl;
-        //    compartmentOut.aggregationKernel = getArrayOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS,
+        //    compartmentOut.aggregationKernel = getVectorOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS,
         //                                       NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
         //    for (int s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
         //        for (int ss1  = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
@@ -326,10 +323,15 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
                                 {
                                     if (sInd[s1][s2] == (a + 1) && ssInd[ss1][ss2] == (b + 1))
                                     {
+                                        #pragma omp atomic update
                                         birthThroughAggregation[a][b] += aggregationRate[s1][ss1][s2][ss2];
+                                        #pragma omp atomic update
                                         firstSolidBirthThroughAggregation[a][b] += (vs[s1] + vs[s2]) * aggregationRate[s1][ss1][s2][ss2];
+                                        #pragma omp atomic update
                                         secondSolidBirthThroughAggregation[a][b] += (vss[ss1] + vss[ss2]) * aggregationRate[s1][ss1][s2][ss2];
+                                        #pragma omp atomic update
                                         liquidBirthThroughAggregation[a][b] += (liquidBins[s1][ss1] + liquidBins[s2][ss2]) * aggregationRate[s1][ss1][s2][ss2];
+                                        #pragma omp atomic update
                                         gasBirthThroughAggregation[a][b] += (gasBins[s1][ss1] + gasBins[s2][ss2]) * aggregationRate[s1][ss1][s2][ss2];
                                     }
                                 }
@@ -474,8 +476,8 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
         //BREAKAGE
         //Breakage kernel Calculation inside time loop becasue gas and liquid bins change with time
         //cout << "Begin Breakage Kernel" << endl;
-        //compartmentOut.breakageKernel = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);//, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-        //compartmentOut.breakageKernel = getArrayOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+        //compartmentOut.breakageKernel = getVectorOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);//, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+        //compartmentOut.breakageKernel = getVectorOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
         //    for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
         //        for (int ss  = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
         //        {
@@ -485,14 +487,14 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
         //            //compartmentOut.breakageKernel[s][ss] = DEMBREAKAGEKERNELCONST * DEMBREAKAGEKERNELVALUE;
         //        }
         //    //reset to zero values
-        //    compartmentOut.breakageKernel = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+        //    compartmentOut.breakageKernel = getVectorOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
         //compartmentOut.breakageKernel = DEMDependentBreakageKernel(compartmentIn, compartmentDEMIn, timeStep);
         if (tid == OPENMP_MASTER)
         {
             if (INCLUDEBREAKAGE)
                 breakageKernel = DEMDependentBreakageKernel(compartmentIn, compartmentDEMIn, timeStep);
             //else
-                //breakageKernel = getArrayOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+                //breakageKernel = getVectorOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
 
             //cout << "End Breakage Kernel" << endl;
 
@@ -662,9 +664,9 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
             for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS - 1; ss++)
                 totalSolidVolume = totalSolidVolume + fAll[s][ss] * (vs[s] + vss[ss]);
     
-        //compartmentOut.dfAlldt = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-        //compartmentOut.dfLiquiddt = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-        //compartmentOut.dfGasdt = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+        //compartmentOut.dfAlldt = getVectorOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+        //compartmentOut.dfLiquiddt = getVectorOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+        //compartmentOut.dfGasdt = getVectorOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
 
         #pragma omp for 
         //if (tid == 0)
@@ -672,7 +674,7 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
         for (s = 0; s < NUMBEROFFIRSTSOLIDBINS - 1; s++)
             for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS - 1; ss++)
             {
-               	//#pragma omp atomic write
+               	#pragma omp atomic write
                 dfAlldt[s][ss] = particleMovement[s][ss] + formationThroughAggregationCA[s][ss] - depletionThroughAggregation[s][ss] + birthThroughBreakage1[s][ss] \
                 + formationThroughBreakageCA[s][ss] - depletionThroughBreakage[s][ss];
                 //dfAlldt[s][ss] += formationThroughAggregationCA[s][ss] - depletionThroughAggregation[s][ss];
@@ -684,7 +686,7 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
                     transferThroughLiquidAddition[s][ss] = liquidAdditionRate * value;
                 }
 
-                //#pragma omp atomic write
+                #pragma omp atomic write
                 dfLiquiddt[s][ss] = liquidMovement[s][ss] + fAll[s][ss] * transferThroughLiquidAddition[s][ss] + formationOfLiquidThroughAggregationCA[s][ss] - depletionOfLiquidThroughAggregation[s][ss] \
                 + liquidBirthThroughBreakage1[s][ss] + formationOfLiquidThroughBreakageCA[s][ss] - depletionOfLiquidthroughBreakage[s][ss];
                 //dfLiquiddt[s][ss] += fAll[s][ss] * transferThroughLiquidAddition[s][ss];
@@ -692,7 +694,7 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
                 //dfLiquiddt[s][ss] += liquidBirthThroughBreakage1[s][ss] + formationOfLiquidThroughBreakageCA[s][ss];
                 //dfLiquiddt[s][ss] -= depletionOfLiquidthroughBreakage[s][ss];
 
-               	//#pragma omp atomic write
+               	#pragma omp atomic write
                 dfGasdt[s][ss] = gasMovement[s][ss] + fAll[s][ss] * transferThroughConsolidation[s][ss] + formationOfGasThroughAggregationCA[s][ss] - depletionOfGasThroughAggregation[s][ss] \
                 + gasBirthThroughBreakage1[s][ss] + formationOfGasThroughBreakageCA[s][ss] - depletionOfGasThroughBreakage[s][ss];
                 //dfGasdt[s][ss] += fAll[s][ss] * transferThroughConsolidation[s][ss];
@@ -709,16 +711,17 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
     //#pragma omp master 
     if (tid == OPENMP_MASTER)
     {
-	    compartmentOut.liquidBins = liquidBins;
-	    compartmentOut.gasBins = gasBins;
-	    compartmentOut.internalVolumeBins = internalVolumeBins;
-	    compartmentOut.aggregationKernel = aggregationKernel;
-	    compartmentOut.breakageKernel = breakageKernel;
-	    compartmentOut.dfAlldt = dfAlldt;
-	    compartmentOut.dfLiquiddt = dfLiquiddt;
-	    compartmentOut.dfGasdt = dfGasdt;
+    
+	    compartmentOut.liquidBins = array2Vector2D(liquidBins);
+	    compartmentOut.gasBins = array2Vector2D(gasBins);
+	    compartmentOut.internalVolumeBins = array2Vector2D(internalVolumeBins);
+	    //compartmentOut.aggregationKernel = aggregationKernel;
+	    //compartmentOut.breakageKernel = breakageKernel;
+	    compartmentOut.dfAlldt = array2Vector2D(dfAlldt);
+	    compartmentOut.dfLiquiddt = array2Vector2D(dfLiquiddt);
+	    compartmentOut.dfGasdt = array2Vector2D(dfGasdt);
 	}
     //#pragma omp barrier
-    }
+    } // omp parallel closed 
     return compartmentOut;
 }

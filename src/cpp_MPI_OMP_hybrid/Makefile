@@ -2,7 +2,7 @@
 
 #target: dependencies
 #<tab>action
-CC=mpic++ -fopenmp -std=c++11 -O3
+CC=mpicxx -qopenmp -std=c++11 -O3 -fPIC
 
 all: model.out
 
@@ -24,7 +24,7 @@ liggghtsData.o: liggghtsData.cpp liggghtsData.h atomFileParser.h utility.h param
 atomFileParser.o: atomFileParser.cpp atomFileParser.h
 	$(CC) -Wall -c atomFileParser.cpp
 
-utility.o: utility.cpp utility.h
+utility.o: utility.cpp utility.h parameters.h
 	$(CC) -Wall -c utility.cpp
 
 timeStamp.o: timeStamp.cpp timeStamp.h

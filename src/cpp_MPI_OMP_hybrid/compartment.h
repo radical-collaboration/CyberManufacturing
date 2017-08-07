@@ -7,66 +7,66 @@
 
 typedef struct
 {
-    arrayOfDouble2D fAll;
-    arrayOfDouble2D fLiquid;
-    arrayOfDouble2D fGas;
+    vectorOfDouble2D fAll;
+    vectorOfDouble2D fLiquid;
+    vectorOfDouble2D fGas;
     double liquidAdditionRate;
 
     std::vector<double> vs;
     std::vector<double> vss;
 
-    arrayOfDouble2D sMeshXY;
-    arrayOfDouble2D ssMeshXY;
+    vectorOfDouble2D sMeshXY;
+    vectorOfDouble2D ssMeshXY;
 
-    arrayOfInt2D sAggregationCheck;
-    arrayOfInt2D ssAggregationCheck;
+    vectorOfInt2D sAggregationCheck;
+    vectorOfInt2D ssAggregationCheck;
 
-    arrayOfInt2D sInd;
-    arrayOfInt2D ssInd;
+    vectorOfInt2D sInd;
+    vectorOfInt2D ssInd;
 
-    arrayOfInt2D sIndB;
-    arrayOfInt2D ssIndB;
+    vectorOfInt2D sIndB;
+    vectorOfInt2D ssIndB;
 
-    arrayOfDouble2D sLow;
-    arrayOfDouble2D sHigh;
+    vectorOfDouble2D sLow;
+    vectorOfDouble2D sHigh;
 
-    arrayOfDouble2D ssLow;
-    arrayOfDouble2D ssHigh;
+    vectorOfDouble2D ssLow;
+    vectorOfDouble2D ssHigh;
 
-    arrayOfInt2D sCheckB;
-    arrayOfInt2D ssCheckB;
+    vectorOfInt2D sCheckB;
+    vectorOfInt2D ssCheckB;
 
-    arrayOfDouble2D diameter;
+    vectorOfDouble2D diameter;
 
 } CompartmentIn;
 
 typedef struct
 {
-    arrayOfDouble2D dfAlldt;
-    arrayOfDouble2D dfLiquiddt;
-    arrayOfDouble2D dfGasdt;
-    arrayOfDouble2D liquidBins;
-    arrayOfDouble2D gasBins;
-    arrayOfDouble2D internalVolumeBins;
-    arrayOfDouble2D externalVolumeBins;
-    arrayOfDouble4D aggregationKernel;
-    arrayOfDouble4D breakageKernel;
+    vectorOfDouble2D dfAlldt;
+    vectorOfDouble2D dfLiquiddt;
+    vectorOfDouble2D dfGasdt;
+    vectorOfDouble2D liquidBins;
+    vectorOfDouble2D gasBins;
+    vectorOfDouble2D internalVolumeBins;
+    vectorOfDouble2D externalVolumeBins;
+    vectorOfDouble4D aggregationKernel;
+    vectorOfDouble4D breakageKernel;
 } CompartmentOut;
 
 typedef struct
 {
     std::vector<double> DEMDiameter;
-    arrayOfDouble2D DEMCollisionData;
+    vectorOfDouble2D DEMCollisionData;
     std::vector<double> DEMImpactData;
 } CompartmentDEMIn;
 
 typedef struct
 {
-    arrayOfDouble2D fAllPreviousCompartment;
-    arrayOfDouble2D flPreviousCompartment;
-    arrayOfDouble2D fgPreviousCompartment;
-    arrayOfDouble2D fAllComingIn;
-    arrayOfDouble2D fgComingIn;
+    vectorOfDouble2D fAllPreviousCompartment;
+    vectorOfDouble2D flPreviousCompartment;
+    vectorOfDouble2D fgPreviousCompartment;
+    vectorOfDouble2D fAllComingIn;
+    vectorOfDouble2D fgComingIn;
 } PreviousCompartmentIn;
 
 CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, CompartmentIn compartmentIn, CompartmentDEMIn compartmentDEMIn, double time, double timeStep);

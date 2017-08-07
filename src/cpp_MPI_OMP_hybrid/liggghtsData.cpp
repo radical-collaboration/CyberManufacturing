@@ -230,9 +230,9 @@ vector<double> liggghtsData::getFinalDEMImpactData()
     return nImpacts;
 }
 
-arrayOfDouble2D liggghtsData::getFinalDEMCollisionData()
+vectorOfDouble2D liggghtsData::getFinalDEMCollisionData()
 {
-    arrayOfDouble2D nCollisions;
+    vectorOfDouble2D nCollisions;
 
     if (!instanceFlag)
         return nCollisions;
@@ -247,7 +247,7 @@ arrayOfDouble2D liggghtsData::getFinalDEMCollisionData()
     if (mapData.empty())
         return nCollisions;
 
-    nCollisions = getArrayOfDouble2D(NUMBEROFDEMBINS, NUMBEROFDEMBINS);
+    nCollisions = getVectorOfDouble2D(NUMBEROFDEMBINS, NUMBEROFDEMBINS);
     
     vector<size_t> particleTypeCount;
     for (auto itMapData = mapData.begin(); itMapData != mapData.end(); itMapData++)

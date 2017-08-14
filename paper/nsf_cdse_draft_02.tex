@@ -524,7 +524,8 @@ Thus, the simulations were carried out in core configurations of 64, 128 and 256
 
 \subsection{PBM}
 \subsubsection{PBM Model Validation}
-For PBM aggregation, smaller particles agglomerate to form lager particles. Model developed in this study is based on 2 particles aggregation. Hence, the ratio of formation to depletion should have value close to 0.5. Figure (\ref{fig:pbm_model_validation_ratio})shows this ratio for first few compartments and similar nature was observed for remaining compartments. This validates the assumption for mechanism of aggregation in \cite{Barrasso2013}. Figure(\ref{fig:pbm_model_validation_psd}) shows PSD of PBM model captured the aggregation at time 30s, 50s, 75s \& 100s. \textcolor{cyan}{Do we need to add PSD for Serial, MPI and hybrid?}
+\par The PBM used in this study used an aggregation kernel that takes in account the formation of a larger partcle from two smaller particles. The ratio of the rate of formation and the rate of depletion due to aggregation helps us monitor whether the PBM is running correctly. Since this PBM takes into account only 2 particles at once, the ratio is expected to have a value of 0.5 during the aggregation process. 
+%For PBM aggregation, smaller particles agglomerate to form lager particles. Model developed in this study is based on 2 particles aggregation. Hence, the ratio of formation to depletion should have value close to 0.5. Figure (\ref{fig:pbm_model_validation_ratio})shows this ratio for first few compartments and similar nature was observed for remaining compartments. This validates the assumption for mechanism of aggregation in \cite{Barrasso2013}. Figure(\ref{fig:pbm_model_validation_psd}) shows PSD of PBM model captured the aggregation at time 30s, 50s, 75s \& 100s. \textcolor{cyan}{Do we need to add PSD for Serial, MPI and hybrid?}
 
 \begin{figure}[H]
 	\centering

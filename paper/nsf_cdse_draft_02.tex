@@ -524,24 +524,45 @@ Thus, the simulations were carried out in core configurations of 64, 128 and 256
 
 \subsection{PBM}
 \subsubsection{PBM Model Validation}
-The Population Balance Model implemented was considered to have an inlet in the first compartment in a log normal distribution with mean of about 12 $\mu$m and the particles were assumed to get accumulated inside the granulator. Thus, the number of particles of the smaller bins (Bins 1 - 3) of the granulator will be higher when compared to the number of particles of other bin sizes. This one of the drawbacks of the PBM model since inclusion of an outlet would hinder the rp 
-The PBM used in this study used an aggregation kernel that takes in account the formation of a larger partcle from two smaller particles. The ratio of the rate of formation and the rate of depletion due to aggregation helps us monitor whether the PBM is running correctly. Since this PBM takes into account only 2 particles at once, the ratio is expected to have a value of 0.5 during the aggregation process. 
-%For PBM aggregation, smaller particles agglomerate to form lager particles. Model developed in this study is based on 2 particles aggregation. Hence, the ratio of formation to depletion should have value close to 0.5. Figure (\ref{fig:pbm_model_validation_ratio})shows this ratio for first few compartments and similar nature was observed for remaining compartments. This validates the assumption for mechanism of aggregation in \cite{Barrasso2013}. Figure(\ref{fig:pbm_model_validation_psd}) shows PSD of PBM model captured the aggregation at time 30s, 50s, 75s \& 100s. \textcolor{cyan}{Do we need to add PSD for Serial, MPI and hybrid?}
+The Population Balance Model implemented was considered to have an inlet flow of particles in the first compartment at a constant mass flow rate of 15 kilograms per hour. The particles were introduced in a log normal distribution with minimum diameter of the particles being about 12 $\mu$m and the maximum of 2.1 mm. \\
+%Since such a large range of diameters are being covered, the number of particles of the smaller bins (Bins 1 - 4) of the granulator will be higher than the number of particles in the larger bin sizes. \\ 
+The PBM used in this study employs an aggregation kernel that takes in account the formation of a larger partcle from only two smaller particles. The ratio of the rate of formation and the rate of depletion due to aggregation helps us monitor whether the PBM is running correctly. Since this PBM takes into account only 2 particles at once, the ratio is expected to have a value of 0.5 during the aggregation process. Figure \ref{fig:rslts_PBM_ratio_plot_2mm} illustrates this ratio to be 0.5 throughout the simulation, validating the stability of the PBM used.\\
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.5]{rslts_PBM_2mm_validation.pdf}
+\caption{The ratio of rate of formation to the rate of depletion due to aggraetion as a function of time. The constant value of 0.5 shows that the PBM is stable through the simulation time}
+\label{fig:rslts_PBM_ratio_plot_2mm}
+\end{center}
+\end{figure}
+Figure \ref{fig:rslts_PBM_d50_plots} shows four different d50 plots at four different time instants.Figure \ref{fig:rslts_PBM_d50_plots}(\subref{fig:30s}) shows the distribution of the particles at 30 seconds, where we expect to have the highest number of the smaller particles. This is observed since the degree of aggregation that has happened is very low, but we can see an increase in the particles as other bins show a slight increase. The particle size distributions at 2 intermmediate times of 50 seconds and 75 seconds are plotted in Figures \ref{fig:rslts_PBM_d50_plots}(\subref{fig:50s}) and \ref{fig:rslts_PBM_d50_plots}(\subref{fig:75s}) respectively. These illustrate that there is an increase in the number of particles with higher diameter and a subsequent decrease in the number of particles for lower diameter particles. Figure \ref{fig:rslts_PBM_d50_plots}(\subref{fig:100s}) shows the distribution of the particle size at the end of the granulation process. It can be seen that the number of particles in the higher diameter bins increase for both the solids.
 
 \begin{figure}[H]
-	\centering
-	\includegraphics[scale=0.5]{rslts_PBM_2mm_validation.pdf}
-	\caption{Ratio of rate of particles formed to the rate of particles depleted for aggregation}
-	\label{fig:pbm_model_validation_ratio}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[scale=0.5]{rslts_PBM_2mm_validation.pdf}
-	\caption{PSD}
-	\label{fig:pbm_model_validation_psd}
-\end{figure}
-
+\begin{subfigure}{.5\textwidth}
+\includegraphics[scale=0.45]{rslts:PBM_30s_psd.pdf}
+	\caption{•}	
+	\label{fig:30s}
+\end{subfigure}\hfill
+\begin{subfigure}{.5\textwidth}
+	
+\includegraphics[scale=0.6]{rslts:PBM_50s_psd.pdf}
+	\caption{•}
+	\label{fig:50s}
+\end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+	
+\includegraphics[scale=0.45]{rslts:PBM_75s_psd.pdf}
+\caption{•}
+	\label{fig:75s}
+\end{subfigure}\hfill
+	\begin{subfigure}{.5\textwidth}
+	
+\includegraphics[scale=0.5]{rslts:PBM_100s_psd.pdf}
+\caption{•}
+	\label{fig:100s}
+\end{subfigure}
+\caption{The plots for the number of particles of solid 1 and solid 2 and with their respective d50 in mm after (\subref{fig:30s}) 30s (\subref{fig:50s}) 50s (\subref{fig:75s}) 75s and (\subref{fig:100s}) 100s}
+\label{fig:rslts_PBM_d50_plots}
+\end{figure}   
 
 \subsubsection{Parallel PBM Parameter space and Parameter Estimation}
 

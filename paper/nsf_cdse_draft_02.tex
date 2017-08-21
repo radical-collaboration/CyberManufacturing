@@ -565,7 +565,7 @@ Figure \ref{fig:rslts_PBM_d50_plots} shows four different d\textsubscript{50} pl
 \end{figure}   
 
 \subsubsection{Parallel PBM performance studies}
-\par The PBM was run for 
+\par The PBM was run for the results obtained from each of the aforementioned DEM simulations. Since the PBM has been parallelised using hybrid techniques, a combination of MPI and OMP cores were used to perform the simulations. Figure \ref{fig:rslts_PBM_timing_studies} shows the average time taken by a PBM simulation for simulation a total of 100 seconds of the process, which included 25 seconds of the mixing time and 75 seconds of granulation time. The time taken for simulating all DEM scenarios by a single set of core configuration of in less than 10\% of each other, thus, an  average time for a single core configuration was used to illustate the performance. Figure \ref{fig:rslts_PBM_timing_studies} shows that the program scales really well to about 32 cores but then, the improvement in the performance is negligible. The times represented have the core configurations of only MPI up till 16 cores after which 32, 64 and 128 core simulations employed 8 OMP threads each. The scaling with the only MPI cores shows great increase in performance. \\
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.7]{rslts_PBM_Time_analysis.pdf}
@@ -573,6 +573,35 @@ Figure \ref{fig:rslts_PBM_d50_plots} shows four different d\textsubscript{50} pl
 %\caption{hello tesh}
 \label{fig:rslts_PBM_timing_studies}
 \end{figure}
+
+Pure timing studies are not really a good measure to represent the parallel performance of a program. Speedup of a parallle program indicates the speed increase of the program when it is run on more compute cores compared to the wall clock time when it is run in serial. It is the most common way to represnt the parallel performance. Speedup is the ratio of the time taken to run the program in serial to the time taken by the program to run in parallel as shown in Equation \ref{eqn:rslts_PBM_Speed_Up}. For an ideally parallelised program, the speedup is 'n' times, where n is the number of cores used.\\
+
+\begin{align}
+\textit{Speedup} = \frac{\textit{Serial Wall Clock Time}}{\textit{Parallel Wall Clock Time}}
+\label{eqn:rslts_PBM_Speed_Up}
+\end{align}
+
+Speedup does not take into account number of processors used in the simulation, thus another metric that is used to determine the s parallel performance is parallel efficiency. This metric is nothig by speedup divided by the number of cores used. Thus, parallel efficiency normalizes speedup and gives a fractional value of the ideal speedup a program achieves with the increase in the number of cores.\\
+
+\begin{align}
+\textit{Speedup} = \frac{\textit{Serial Wall Clock Time}}{\textit{Parallel Wall Clock Time $\times$ $n_{cores}$}}
+\label{eqn:rslts_PBM_parallel_efficiency}
+\end{align}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{rslts_PBM_Speed_Up.pdf}
+\caption{Average time taken to run the PBM simulation which consisted of 25 seconds of mixing time and 75 seconds of granulation time at different core configurations}
+%\caption{hello tesh}
+\label{fig:rslts_PBM_speed_up}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{rslts_PBM_Efficiency.pdf}
+\caption{Average time taken to run the PBM simulation which consisted of 25 seconds of mixing time and 75 seconds of granulation time at different core configurations}
+%\caption{hello tesh}
+\label{fig:rslts_PBM_parallel_efficiency}
+\end{figure}
+
 
 \subsection{PBM+DEM - RP} 
 \subsubsection{PBM+DEM Validation/Accuracy?}

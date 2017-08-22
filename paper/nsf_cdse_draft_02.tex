@@ -588,24 +588,50 @@ Speedup does not take into account number of processors used in the simulation, 
 \label{eqn:rslts_PBM_parallel_efficiency}
 \end{align}
 \begin{figure}[H]
+Figure \ref{fig:rslts_PBM_speed_up} depicts the speed up achieved by the hybrid parallel PBM code. It can be seen when the MPI cores used are increased from 1 to 16 cores the speed upp achieved is almost linear. This speed can be accounted to the way MPI has been implemented inside the code. Each comparment of the granulator is  offloaded on one MPI process, thus making 16 MPI processes the ideal since, the granulator has been divided into 16 compartments. When the numberof cores were lesser than 16 cores, more than 1 compartment is sent to a single MPI process, this leads to a decrease in perfomance. The implementation of OMP on top of the MPI parallelisation helps increase the perfomance by the about 10\%. The calculations inside the OMP parallel section of the code consists of large number of nested loop which have been known to be diffucult to parallelize \citep{He2016} using the native C++'s OMP libraries. The amount of communication time spent in between these threads is much higher than the speed increase achieved by using higher number of cores. One thread waits for another thread to complete processing the outer loops thus lower performance increase is achieved by using the OMP implementation. \\
+
 \centering
 \includegraphics[scale=0.7]{rslts_PBM_Speed_Up.pdf}
-\caption{Average time taken to run the PBM simulation which consisted of 25 seconds of mixing time and 75 seconds of granulation time at different core configurations}
-%\caption{hello tesh}
+\caption{The speedup achieved by the hybrid parallel implementation of the PBM program. It can be seen the inital speedup upto 16 cores as expected as from an ideal parallel program where as it becomes almost constant from 32 cores to 128 cores}
 \label{fig:rslts_PBM_speed_up}
 \end{figure}
+
+A similar nature as above is observed in Figure \ref{fig:rslts_PBM_parallel_efficiency} where the parallel efficiency of the program has been plotted against the number of the cores used. This efficiency decreases as the number of cores used increase. The fall in efficiency initially uptil 8 cores is steep as the communication time in between the MPI process decreases the efficiency, deviating its value from the ideal of 1 to about 0.4. But with the increase in the MPI processes to 16 and then the implementation of OMP the efficiency decreases as there is no major increase in the performance when compared to the increase in the number of cores used. The efficiency falls to as low as 11\% when 128 cores are used. Thus, there is scope for improving the OMP parallelising the program especially where nested loops are present to decrease communication times.
+
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.7]{rslts_PBM_Efficiency.pdf}
-\caption{Average time taken to run the PBM simulation which consisted of 25 seconds of mixing time and 75 seconds of granulation time at different core configurations}
-%\caption{hello tesh}
+\caption{The parallel efficiency for the hybrid (MPI + OMP) parallelized PBM code. The efficiency of the code decreases as the number of cores are increased. The higher number of cores have very low efficiency of about 11\% which depicts that there is large time being spent in communication in between the cores.}
 \label{fig:rslts_PBM_parallel_efficiency}
+\end{figure}
+
+\subsection{DEM + PBM physics}
+\par DEM simulations provide an insight about the physics of the system by tracking each particle. This micro-scale data is useful for the development of macro-scale mechanistic models which take into account the bulk of the particles and not individual particles. A similar approach has been implemented in this work, where a mechanistic aggregation kernel was developed from the DEM particle-particle collisions. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{rslts_pbm_psd_validation.pdf}
+\caption{The ratio of rate of formation to the rate of depletion due to aggregation as a function of time. The constant value of 0.5 shows that the PBM is stable through the simulation time. This is similar to Figure \ref{fig:rslts_PBM_ratio_plot_2mm} which was for the 2mm mono-sized DEM simulation}
+\label{fig:rslts_PBM_psd_ratio}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{rslts_pbm_d50_128_200.pdf}
+\caption{The parallel efficiency for the hybrid (MPI + OMP) parallelized PBM code. The efficiency of the code decreases as the number of cores are increased. The higher number of cores have very low efficiency of about 11\% which depicts that there is large time being spent in communication in between the cores.}
+\label{fig:rslts_PBM_2mm_d50}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{rslts_pbm_d50_128_555.pdf}
+\caption{The parallel efficiency for the hybrid (MPI + OMP) parallelized PBM code. The efficiency of the code decreases as the number of cores are increased. The higher number of cores have very low efficiency of about 11\% which depicts that there is large time being spent in communication in between the cores.}
+\label{fig:rslts_PBM_psd_d50}
 \end{figure}
 
 
 \subsection{PBM+DEM - RP} 
 \subsubsection{PBM+DEM Validation/Accuracy?}
-%	   	\par Talk about how the physics remain the same whether mono-sized particles are used or a size distribution is used.
 %	   \par Figs comparing the one-way coupling from both these sources.
 %	    
 \subsubsection{PBM+DEM Performance}

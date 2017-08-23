@@ -606,7 +606,9 @@ A similar nature as above is observed in Figure \ref{fig:rslts_PBM_parallel_effi
 \end{figure}
 
 \subsection{DEM + PBM physics}
-\par DEM simulations provide an insight about the physics of the system by tracking each particle. This micro-scale data is useful for the development of macro-scale mechanistic models which take into account the bulk of the particles and not individual particles. A similar approach has been implemented in this work, where a mechanistic aggregation kernel was developed from the DEM particle-particle collisions. 
+\par Micro-scale simulations provide an insight about the physics of the system usually by tracking each particle. This micro-scale simulation data is useful for the development of macro-scale mechanistic models which take into account the dynamics of bulk of the particles and not individual particles. A similar approach has been implemented in this work, where a mechanistic aggregation kernel was developed from the DEM particle-particle collisions. Thus, the aim of this section is to illustrate that the physics of the system does not change to a great extent with the change in the size of the particles or the distribution of the particles.\\
+Two simulations from the current sceanrio will be compared, the DEM + PBM simulation of the 2mm mono-sized particle and the second being the simulation where the inserted particles were in a size distribution. Figure \ref{fig:rslts_PBM_psd_ratio} shows the ratio of rate of formation to the rate of depletion, both due to aggregation. The ratio obtained is 0.5 which inidicates that the PBM is stable. Figure \ref{fig:rslts_PBM_psd_ratio} is also similar to Figure \ref{fig:rslts_PBM_ratio_plot_2mm}, thus indicating they have similar stability throughtout the granulation process. \\
+One of the metrics to determine the physics of the system after a PBM simulation is to check the d\textsubscript{50} plots of the system after the granulation process. D\textsubscript{50} indicates the maximum diameter of particles that constitute 50\% of the total mass. These diameters vary along the length of the granulator since the granulated particles take time to pass throught the granulator and that there is not enough liquid content in the later sections of the granulator to encourage the formation of granules. Thus, the d\textsubscript{50} for compartments in the latter section of the granulator is low. Figures \ref{fig:rslts_PBM_2mm_d50} and \ref{fig:rslts_PBM_psd_d50} show the d\textsubscript{50} plots of the mono-sized and psd respectively. It can be seen that both these plots have a similar behaviour when it comes to the nature of the increase of the d\textsubscript{50} during the granulation process. There is a difference of about 20\% difference in the final diameter of the particles predicted, which at the of micrometers does not affect the final product quality. This slight deviation is observed due to the sudden jump in the rate of the aggregation which increases when particles from one compartment with higher d\textsubscript{50} get transfered to the next compartment with a lower d\textsubscript{50}. But, the advantage of running the mono-sized simulation compared to the psd simulation is the time taken to simulate the DEM. It can be seen from Figure \ref{fig:rslts_DEM_timing_studies} that the 2mm mono-sized particle took about 1.6 times less than the psd simulation time for the DEM. Since the physics of both the systems are not different, using the mono-sized simulations for the DEM help save time on the overall simulations. 
 
 \begin{figure}[H]
 \centering
@@ -618,14 +620,14 @@ A similar nature as above is observed in Figure \ref{fig:rslts_PBM_parallel_effi
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{rslts_pbm_d50_128_200.pdf}
-\caption{The parallel efficiency for the hybrid (MPI + OMP) parallelized PBM code. The efficiency of the code decreases as the number of cores are increased. The higher number of cores have very low efficiency of about 11\% which depicts that there is large time being spent in communication in between the cores.}
+\caption{d\textsubscript{50} plot after running the PBM for 100s for the 2mm mono-sized particle DEM simulation}
 \label{fig:rslts_PBM_2mm_d50}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{rslts_pbm_d50_128_555.pdf}
-\caption{The parallel efficiency for the hybrid (MPI + OMP) parallelized PBM code. The efficiency of the code decreases as the number of cores are increased. The higher number of cores have very low efficiency of about 11\% which depicts that there is large time being spent in communication in between the cores.}
+\caption{d\textsubscript{50} plot after running the PBM for 100s for the distribured particle size DEM simulation. The trend observed is very similar to the trend found in Figure \ref{fig:rslts_PBM_2mm_d50}}
 \label{fig:rslts_PBM_psd_d50}
 \end{figure}
 

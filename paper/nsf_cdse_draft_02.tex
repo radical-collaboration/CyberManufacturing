@@ -1,4 +1,4 @@
-\documentclass[preprint,11pt,authoryear]{elsarticle}
+		\documentclass[preprint,11pt,authoryear]{elsarticle}
 \usepackage{amsmath}
 \usepackage[font=sf, labelfont={sf,bf}, margin=0cm]{caption}
 \usepackage[inline]{enumitem}
@@ -7,7 +7,6 @@
 \usepackage{lineno}
 \usepackage{placeins}
 \usepackage{subcaption}
-%\usepackage{color}
 \usepackage[usenames, dvipsnames]{color}
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 \usepackage{algorithm}
@@ -15,7 +14,7 @@
 \usepackage{textcomp}
 \usepackage{graphicx}
 \usepackage{tabulary}
-%\usepackage[section]{placeins} %prevents floats from appearing before their sections. web address  https://tex.stackexchange.com/questions/32598/force-latex-image-to-appear-in-the-section-in-which-its-declared
+
 \usepackage{float}
 	
 \journal{Chemical Engineering Research and Design}
@@ -40,7 +39,7 @@ Population balance model \sep Granulation \sep Discrete element methods  \sep MP
 \linenumbers
 	
 	\section{Introduction \& Objectives} 
-	\par Half of all industrial chemical production is carried out using particulate processes (\cite{seville1997}) and important products made using these processes include detergents, aerosols, fertilizers, and pharmaceuticals. \textcolor{cyan}{pp are divrse and blah but in general are described as }. Despite how common particulate processes are the underlying physics of these procesess is poorly understood \textcolor{cyan}{when compared to the well developed theory of fluid processes}. As a results industries that rely on these processes, in particular pharmecuticals, have to use expensive heuristic studies and inefficient operational protocols with high recycle ratios to meet strict regulatory standards (\cite{Ramachandran2009}). This drives up the costs and delays the release of new drugs to patients. What makes these processes so challenging to design is that there are no governing equations to accurately predict their behavior \cite(sen2013). However in place of exact governing equations highly accurate models could be used because of this there has been a great deal of research in to how best to model the complex physics of these processes. 
+	\par Half of all industrial chemical production is carried out using particulate processes (\cite{seville1997}) and important products made using these processes include detergents, aerosols, fertilizers, and pharmaceuticals. These processes account for about 70\% of the products of such industries \citep{Litster2016}. These processes are widely popular as these partculate products have great advantages over counterpart liquid formulations like better chemical and physical stability and reduced transportation cost. Despite the prevalence of these particulate processes, the underlying physics of these procesess is poorly understood \citep{Rogers2013}. \textcolor{cyan}{when compared to the well developed theory of fluid processes}. As a results industries that rely on these processes, in particular pharmecuticals, have to use expensive heuristic studies and inefficient operational protocols with high recycle ratios to meet strict regulatory standards (\cite{Ramachandran2009}). This drives up the costs and delays the release of new drugs to patients. What makes these processes so challenging to design is that there are no governing equations to accurately predict their behavior \citep{sen2013}. However in place of exact governing equations highly accurate models could be used because of this there has been a great deal of research in to how best to model the complex physics of these processes. 
 	\par Particulate processes are defined by chaotic microscale phenomena that result from the many particle-particle interactions of these systems. These small scale phenomena develop into the complex bulk behavior of these processes. To successfully predict the bulk behavior of these systems, models need to capture their particle-particle interactions and emergent mesoscale scale phenomena.  
 	\par \textcolor{cyan}{DEM breif concept - model microscale great - takes to long to run}
 	\par Discrete element methods (DEM) have proven to be an accurate way of  model a bulk material properties of particulate systems using microscale particle level interactions ( CITE SOME DEM PAPERS?). DEMs use newton's equations of motion to model each particle in the system of study and it's interactions with the system geometry and other particles, which is what enables DEMs to model the small scale phenomena that determines the bulk behavior of particulate systems. However becuase many forces and particle interactions are being calculated for each particle DEMs take a large amount of time to run \textcolor{cyan}{(maybe give estimated time scale)}.  Often times scientists need to alter simulation properties to make DEMs run faster but it makes them less accruate (CITE NUMEROUS DEM WORKS WE LATER USE). Another more computationally efficient, but less accurate technique, used for these particulate processes are population balance models (PBMs).

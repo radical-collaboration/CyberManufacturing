@@ -1,14 +1,15 @@
 #!/usr/bin/env python
-
+from __future__ import division
 __copyright__ = 'Copyright 2013-2014, http://radical.rutgers.edu'
 __license__   = 'MIT'
 __author__    = 'Ioannis Paraskevakos'
 
-from __future__ import division
+
 import os
 import sys
 import argparse
 import numpy as np
+import textwrap
 # ------------------------------------------------------------------------------
 #
 # READ the RADICAL-Pilot documentation: http://radicalpilot.readthedocs.org/
@@ -23,12 +24,12 @@ helloworld_mpi_path = '%s/%s' % (os.path.abspath(os.path.dirname(__file__)),
 #------------------------------------------------------------------------------
 #
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('config ',help="JSON file that contains the following information:\
-        resource, cores,runtime, path to LIGGHTS,path to LIGGHTS inputs,path to PBM executable,session,\
-        project.")
-    parser.add_argument('--verbose', help="Verbosity level",defalut='REPORT')
-    parser.add_argument('--profile', help="Profile value", defalut='FALSE')
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('config',help=textwrap.dedent('JSON file that contains the following information:\n\
+        resource, cores,runtime,queue, path to LIGGHTS,path to LIGGHTS inputs,path to PBM executable,session,\n\
+        project. Check config.json for more details'))
+    parser.add_argument('--verbose', help="Verbosity level",default='REPORT')
+    parser.add_argument('--profile', help="Profile value", default='FALSE')
     args = parser.parse_args()
 
 
@@ -39,12 +40,17 @@ if __name__ == '__main__':
     import radical.utils as ru
 
     # we use a reporter class for nicer output
-    report = ru.LogReporter(name='radical.pilot', level=verbose)
+    report = ru.LogReporter(name='radical.pilot', level=args.verbose)
     report.title('Getting Started (RP version %s)' % rp.version)
+
+    # read the config used for resource details
+    report.info('read config')
+    config = ru.read_json(args.config)
+    report.ok('>>ok\n')
 
     # Create a new session. No need to try/except this: if session creation
     # fails, there is not much we can do anyways...
-    session = rp.Session()
+    session = rp.Session(uid=config['session'])
 
     # all other pilot code is now tried/excepted.  If an exception is caught, we
     # can rely on the session object to exist and be valid, and we can thus tear
@@ -52,15 +58,10 @@ if __name__ == '__main__':
     # clause...
     try:
 
-        # read the config used for resource details
-        report.info('read config')
-        config = ru.read_json(args.config)
-        report.ok('>>ok\n')
-
         report.header('submit pilots')
 
         # Add a Pilot Manager. Pilot managers manage one or more ComputePilots.
-        pmgr = rp.PilotManager(session=session,uid=config['session'])
+        pmgr = rp.PilotManager(session=session)
 
         # Define an [n]-core local pilot that runs for [x] minutes
         # Here we use a dict to initialize the description object

@@ -45,6 +45,10 @@ if __name__ == '__main__':
     # Create a new session. No need to try/except this: if session creation
     # fails, there is not much we can do anyways...
     session = rp.Session(uid=config['session'])
+    cfg = session.get_resource_config(config['resource'])
+    new_cfg=rp.ResourceConfig(config['resource'],cfg)
+    new_cfg.mpi_launch_method='IBRUN'
+    session.add_resource_config(new_cfg)
 
     # all other pilot code is now tried/excepted.  If an exception is caught, we
     # can rely on the session object to exist and be valid, and we can thus tear

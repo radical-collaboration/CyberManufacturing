@@ -15,12 +15,6 @@ import textwrap
 # READ the RADICAL-Pilot documentation: http://radicalpilot.readthedocs.org/
 #
 # ------------------------------------------------------------------------------
-
-helloworld_mpi_bin  = 'helloworld_mpi.py'
-helloworld_mpi_path = '%s/%s' % (os.path.abspath(os.path.dirname(__file__)),
-                                 helloworld_mpi_bin)
-
-
 #------------------------------------------------------------------------------
 #
 if __name__ == '__main__':
@@ -97,48 +91,65 @@ if __name__ == '__main__':
         cud.pre_exec       = ['mkdir CSVs','mkdir post','mkdir restart']
         cud.executable     = 'lmp_micstam'
         cud.arguments      = ['-in','in.*' ]
-        cud.input_staging  = []
+        cud.input_staging  = [{'source': config['pathtoLIGGHTSinputs']+'in.final_2mm',
+                               'target':'unit:///in.final_2mm',
+                               'action'  :rp.LINK},
+                              {'source': config['pathtoLIGGHTSinputs']+'shell_closed.stl',
+                               'target':'unit:///shell_closed.stl',
+                               'action'  :rp.LINK},
+                              {'source': config['pathtoLIGGHTSinputs']+'shell',
+                               'target':'unit:///shell',
+                               'action'  :rp.LINK},
+                              {'source': config['pathtoLIGGHTSinputs']+'impeller',
+                               'target':'unit:///impeller',
+                               'action'  :rp.LINK},
+                              {'source': config['pathtoLIGGHTSinputs']+'impeller_coarse.stl',
+                               'target':'unit:///impeller_coarse.stl',
+                               'action'  :rp.LINK},
+                            ]
         cud.output_staging = [{'source': 'unit:///post/collision200000.atom',
                                'target': 'pilot:///collision200000.atom',
-                               'mode'  : rp.LINK},
+                               'action'  : rp.LINK},
                               {'source': 'unit:///post/impact200000.atom',
                                'target': 'pilot:///impact200000.atom',
-                               'mode'  : rp.LINK}]
+                               'action'  : rp.LINK}]
         cud.cores          = config['cores']
         cud.mpi            = True
-        cuds.append(cud)
         report.progress()
         report.ok('>>ok\n')
 
         # Submit the previously created ComputeUnit descriptions to the
         # PilotManager. This will trigger the selected scheduler to start
         # assigning ComputeUnits to the ComputePilots.
-        units = umgr.submit_units(cuds)
+        units = umgr.submit_units(cud)
 
         # Wait for all compute units to reach a final state (DONE, CANCELED or FAILED).
         report.header('gather results')
         umgr.wait_units()
     
         report.info('\n')
-        collision = {'source': 'pilot:///post/collision200000.atom',
+        collision = {'source': 'pilot:///collision200000.atom',
                      'target': 'unit:///sampledumpfiles/collision200000.%d_200'%config['cores'],
-                     'mode'  : rp.LINK}
+                     'action'  : rp.LINK}
 
         impact = {'source': 'pilot:///impact200000.atom',
                   'target': 'unit:///sampledumpfiles/impact200000.%d_200'%config['cores'],
-                  'mode'  : rp.LINK}
+                  'action'  : rp.LINK}
         # create a new CU description, and fill it.
         # Here we don't use dict initialization.
         cud = rp.ComputeUnitDescription()
-        cud.environment    = ['PATH='+config['pathtoPBM']+':$PATH']
-        cud.pre_exec       = ['mkdir sampledumpfiles']
+        cud.environment    = ['PATH='+config['pathtoPBMexecutable']+':$PATH']
         cud.executable     = 'model.out'
         cud.input_staging  = [collision,impact]
         cud.cores          = 16
         cud.mpi            = True
-        cuds.append(cud)
         report.progress()
         report.ok('>>ok\n')
+        
+        units = umgr.submit_units(cud)
+        report.header('gather results')
+        umgr.wait_units()
+
 
     except Exception as e:
         # Something unexpected happened in the pilot code above

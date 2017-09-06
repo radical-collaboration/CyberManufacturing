@@ -1,11 +1,11 @@
 {
-    "resource":"xsede.stampede2_ssh", 
+    "resource":"xsede.stampede2_ssh, 
     "cores": 68,
-    "runtime": 30, 
+    "runtime":30, 
     "queue":"normal",
-    "pathtoLIGGHTS":"/work/03170/tg824689/stampede2/LIGGHTS/lig_coll/src",
-    "pathtoLIGGHTSinputs":"/work/03170/tg824689/stampede2/CyberManufacturing/src/Experiments/DEMdata",
-    "pathtoPBMexecutable":"/work/03170/tg824689/stampede2/CyberManufacturing/src/cpp_MPI_OMP_hybrid",
+    "pathtoLIGGHTS":,
+    "pathtoLIGGHTSinputs":,
+    "pathtoPBMexecutable":,
     "session":null,
-    "project":"TG-MCB09174"
+    "project":
 }

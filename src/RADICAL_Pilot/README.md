@@ -49,3 +49,7 @@ For additional information about the scripts arguments execute:
 ```
 python rp_script.py -h
 ````
+
+When the script has finished executing, the user can inspect their output data in RADICAL-Pilot's sandbox. The sandbox 
+exist in the selected remote resource, under the folder ```radical.pilot.sandbox```.  A folder with the session name will exist.
+For example, if the session was named ```foo``` in the json config file, the result of the execution will be under ```radical.pilot.sandbox/foo```. DEM results are under ```unit.000000``` and PBM results under ```unit.000001``` folder.

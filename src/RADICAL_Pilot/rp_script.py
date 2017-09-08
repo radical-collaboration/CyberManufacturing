@@ -144,7 +144,14 @@ if __name__ == '__main__':
         cud = rp.ComputeUnitDescription()
         cud.environment    = ['PATH='+config['pathtoPBMexecutable']+':$PATH']
         cud.executable     = 'model.out'
-        cud.input_staging  = [collision,impact]
+        cud.arguments      = [config['cores'],config['diameter']]
+        cud.input_staging  = [collision,imp
+        act]
+        cud.post_exec      = ['tar cfz csvDump.tar.gz csvDump']
+        cud.output_staging = [{'source': 'unit:///csvDump.tar.gz',
+                               'target': 'client:///csvDump.tar.gz',
+                               'action'  : rp.TRANSFER}]
+
         cud.cores          = 16
         cud.mpi            = True
         report.progress()

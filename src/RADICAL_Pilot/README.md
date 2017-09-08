@@ -30,6 +30,7 @@ of information to configure the execution. Those are:
 
 *    resource: RADICAL-Pilot Resource label,
 *    cores: Number of cores that will be used by the agent,
+*    diameter: The diameter of the DEM particles
 *    runtime: Total Requested runtime,
 *    queue: The queue that will be used,
 *    pathtoLIGGGHTS: Path to LIGGGHTS executable on the remote resource,
@@ -39,6 +40,13 @@ of information to configure the execution. Those are:
 *    project: Allocation number
 
 An example would look like the json file in this folder.
+
+Create a MongoDB database on MLab or some other MongoService and do:
+
+```
+export RADICAL_PILOT_DBURL=<mongodburl>
+```
+
 
 When finished run as
 ```

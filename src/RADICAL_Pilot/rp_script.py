@@ -145,8 +145,7 @@ if __name__ == '__main__':
         cud.environment    = ['PATH='+config['pathtoPBMexecutable']+':$PATH']
         cud.executable     = 'model.out'
         cud.arguments      = [config['cores'],config['diameter']]
-        cud.input_staging  = [collision,imp
-        act]
+        cud.input_staging  = [collision,impact]
         cud.post_exec      = ['tar cfz csvDump.tar.gz csvDump']
         cud.output_staging = [{'source': 'unit:///csvDump.tar.gz',
                                'target': 'client:///csvDump.tar.gz',

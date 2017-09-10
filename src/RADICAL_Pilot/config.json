@@ -1,0 +1,12 @@
+{
+    "resource":"xsede.stampede2_ssh, 
+    "cores": 68,
+    "runtime":30, 
+    "queue":"normal",
+    "diameter":200,
+    "pathtoLIGGHTS":,
+    "pathtoLIGGHTSinputs":,
+    "pathtoPBMexecutable":,
+    "session":null,
+    "project":
+}

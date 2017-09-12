@@ -21,7 +21,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('config',help=textwrap.dedent('JSON file that contains the following information:\n\
         resource, cores,runtime,queue, path to LIGGHTS,path to LIGGHTS inputs,path to PBM executable,session,\n\
-        project. Check config.json for more details'))
+        project,timesteps, diameter, and the number of cores for DEM and PBM. Check config.json for more details'))
     parser.add_argument('--verbose', help="Verbosity level",default='REPORT')
     parser.add_argument('--profile', help="Profile value", default='FALSE')
     args = parser.parse_args()
@@ -95,8 +95,8 @@ if __name__ == '__main__':
         cud.pre_exec       = ['mkdir CSVs','mkdir post','mkdir restart']
         cud.executable     = 'lmp_micstam'
         cud.arguments      = ['-in','in.*' ]
-        cud.input_staging  = [{'source': config['pathtoLIGGHTSinputs']+'in.final_2mm',
-                               'target':'unit:///in.final_2mm',
+        cud.input_staging  = [{'source': config['pathtoLIGGHTSinputs']+'in.final_%fmm'%config['diameter'],
+                               'target':'unit:///in.final_%fmm'%config['diameter'],
                                'action'  :rp.LINK},
                               {'source': config['pathtoLIGGHTSinputs']+'shell_closed.stl',
                                'target':'unit:///shell_closed.stl',
@@ -111,13 +111,13 @@ if __name__ == '__main__':
                                'target':'unit:///impeller_coarse.stl',
                                'action'  :rp.LINK},
                             ]
-        cud.output_staging = [{'source': 'unit:///post/collision200000.atom',
-                               'target': 'pilot:///collision200000.atom',
+        cud.output_staging = [{'source': 'unit:///post/collision%d.atom'%config['timesteps'],
+                               'target': 'pilot:///collision%d.atom'%config['timesteps'],
                                'action'  : rp.LINK},
-                              {'source': 'unit:///post/impact200000.atom',
-                               'target': 'pilot:///impact200000.atom',
+                              {'source': 'unit:///post/impact%d.atom'%config['timesteps'],
+                               'target': 'pilot:///impact%d.atom'%config['timesteps'],
                                'action'  : rp.LINK}]
-        cud.cores          = config['cores']
+        cud.cores          = config['DEMcores']
         cud.mpi            = True
         report.progress()
         report.ok('>>ok\n')
@@ -132,12 +132,12 @@ if __name__ == '__main__':
         umgr.wait_units()
     
         report.info('\n')
-        collision = {'source': 'pilot:///collision200000.atom',
-                     'target': 'unit:///sampledumpfiles/collision200000.%d_200'%config['cores'],
+        collision = {'source': 'pilot:///collision%d.atom'%config['timesteps'],
+                     'target': 'unit:///sampledumpfiles/collision%d.%d_%f'%(config['timesteps'],config['cores'],config['diameter'])
                      'action'  : rp.LINK}
 
         impact = {'source': 'pilot:///impact200000.atom',
-                  'target': 'unit:///sampledumpfiles/impact200000.%d_200'%config['cores'],
+                  'target': 'unit:///sampledumpfiles/impact%d.%d_%f'%(config['timesteps'],config['cores'],config['diameter'])
                   'action'  : rp.LINK}
         # create a new CU description, and fill it.
         # Here we don't use dict initialization.
@@ -151,7 +151,7 @@ if __name__ == '__main__':
                                'target': 'client:///csvDump.tar.gz',
                                'action'  : rp.TRANSFER}]
 
-        cud.cores          = 16
+        cud.cores          = config['PBMcores']
         cud.mpi            = True
         report.progress()
         report.ok('>>ok\n')

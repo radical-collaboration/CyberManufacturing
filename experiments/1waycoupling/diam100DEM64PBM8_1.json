@@ -1,1 +1,15 @@
-{"queue": "normal", "resource": "xsede.stampede2_ssh", "pathtoLIGGHTS": "/work/03170/tg824689/stampede2/LIGGHTS/lig_coll/src", "diameter": 100, "project": "TG-MCB090174", "pathtoPBMexecutable": "/work/03170/tg824689/stampede2/CyberManufacturing/src/cpp_MPI_OMP_hybrid", "session": "diam100DEM64PBM8_1", "cores": 64.0, "runtime": 600, "pathtoLIGGHTSinputs": "/work/03170/tg824689/stampede2/CyberManufacturing/src/liggghts_input_files"}
+{
+ "queue": "normal", 
+ "resource": "xsede.stampede2_ssh", 
+ "pathtoLIGGHTS": "/work/03170/tg824689/stampede2/LIGGHTS/lig_coll/src", 
+ "diameter": 100, 
+ "DEMcores": 64, 
+ "project": "TG-MCB090174", 
+ "PBMcores": 8, 
+ "pathtoPBMexecutable": "/work/03170/tg824689/stampede2/CyberManufacturing/src/cpp_MPI_OMP_hybrid", 
+ "session": "diam100DEM64PBM8_1", 
+ "timesteps": 20000000, 
+ "cores": 68.0, 
+ "runtime": 600, 
+ "pathtoLIGGHTSinputs": "/work/03170/tg824689/stampede2/CyberManufacturing/src/liggghts_input_files"
+}

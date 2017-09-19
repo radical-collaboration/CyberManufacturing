@@ -4,7 +4,7 @@
 \usepackage[inline]{enumitem}
 \usepackage{epstopdf}   
 \usepackage[margin=1in]{geometry}
-%\usepackage{lineno}
+\usepackage{lineno}
 \usepackage{placeins}
 \usepackage{subcaption}
 \usepackage[usenames, dvipsnames]{color}
@@ -16,11 +16,11 @@
 \usepackage{tabulary}
 
 \usepackage{float}
-	
+
 \journal{Chemical Engineering Research and Design}
 \begin{document}
 \begin{frontmatter}
-\title{Parallel uni-directional coupled DEM-PBM model for High Performance Computers}
+\title{Parallel uni-directional coupled DEM-PBM model for high performance computing systems}
 \author{A1 }
 \author{A2 }
 \author{A3 }
@@ -28,8 +28,8 @@
 \author{A5\corref{cor1}} 
 \ead{A5}
 \cortext[cor1]{Corresponding author}
-\address{Department of Chemical and Biochemical Engineering, Rutgers, The State University of New 
-    Jersey, Piscataway, NJ, USA 08854}
+\address{Department of Chemical and Biochemical Engineering, Rutgers, The State University of New
+Jersey, Piscataway, NJ, USA 08854}
 \begin{abstract}
 Particulate processes are prevalent in the pharmaceutical industry but the physics underlying these 
 processes are complex and modelling them requires great amounts of computation. In this work, a 
@@ -37,8 +37,8 @@ multi-dimensional PBM was developed (should I include lumped parameter part) whi
 mechanistic aggregation kernel, which obtained the collision data from the DEM simulation, which was 
 performed on LIGGGHTS. The PBM code was run in parallel using the MPI + OMP hybrid technique. 
 Speedup of about 14 times was obtained on the PBM simulations and around 12 on the DEM 
-simulation. This coupling was performed using the radical pilot for scaling studies from 1 processor to 
-128 for the PBM and 256 cores for the DEM.
+simulation. This coupling was performed using the radical pilot for scaling studies from 1 processor
+to 128 for the PBM and 256 cores for the DEM.
 \end{abstract}
 \begin{keyword}
 Population balance model \sep Granulation \sep Discrete element methods  \sep MPI and OpenMP 
@@ -46,106 +46,107 @@ Population balance model \sep Granulation \sep Discrete element methods  \sep MP
 \end{keyword}
 \end{frontmatter}
 \linenumbers
-	
-	\section{Introduction \& Objectives} 
-	\par Half of all industrial chemical production is carried out using particulate processes 
-    (\cite{seville1997}) and important products made using these processes include detergents, 
-    aerosols, fertilizers, and pharmaceuticals. These processes account for about 70\% of the products 
-    of such industries \citep{Litster2016}. These processes are widely popular as these partculate 
-    products have great advantages over counterpart liquid formulations like better chemical and 
-    physical stability and reduced transportation cost. Despite the prevalence of these particulate 
-    processes, the underlying physics of these procesess is poorly understood \citep{Rogers2013}. As a 
-    results industries that rely on these processes, especially pharmecutical, have to use expensive 
-    heuristic studies and inefficient operational protocols with high recycle ratios to meet strict 
-    regulatory standards (\cite{Ramachandran2009}). This drives up the costs and delays the release of 
-    new drugs. What makes these processes so challenging to design is that there are no governing 
-    equations to accurately predict their behaviour \citep{sen2013}. The complex physics of such 
-    processes do not have exact governing equations, thus the need of a precise model arises. There 
-    has been active research in this area on how to accurately model the  physics of these processes.
-	\par Particulate processes are defined by chaotic micro-scale phenomena that result from the many 
-    particle-particle interactions inside these systems. These small scale phenomenon develop into 
-    complex bulk behaviour of these processes. To successfully predict the bulk behaviour of these 
-    systems, a model needs to capture the particle-particle interactions and emergent meso-scale scale 
-    phenomena. Discrete Element Method (DEM)\citep{Cundall1979} has proven to be an accurate way 
-    to  model a bulk material properties of particulate systems using micro-scale particle level 
-    interactions for pharmaceutical processes \citep{Hancock2011}. DEM uses Newton's equations of 
-    motion to model the forces on each particle in the system and it's interactions with the system 
-    geometry and other particles. This enables DEM to model the small scale phenomena that 
-    determines the bulk behaviour of particulate system. Since DEM includes large amount of interaction 
-    and force computations take a large amount of time to run. Thus another more computationally 
-    efficient, but less accurate technique, used to model these particulate processes is population 
-    balance model (PBM).
-	\par PBM takes into account the changes in particle size and the property related mechanisms. This 
-    model lacks sensitivity to process parameters and the equipment geometry. It is semi-mechanistic in 
-    nature, meaning they use population averages and probability to capture bulk behaviour but still 
-    seek to capture some of the micro-phenomena of particle-particle interactions using correlations or 
-    empirically developed kernels to approximate those interactions. Even though PBM is much faster 
-    than DEM, detailed PBM can still take a significant amount of time to solve which prevents them 
-    from being used as widely as they could be academia and industry \citep{Barrasso2013}. Due to the 
-    populating averaging and their semi-mechansitc kernels, highly detailed PBMs still can have 
-    difficulties in capturing the microscale phenomena that are crucial to predicting the dynamics of 
-    particluate processes. 
-	\par Thus, to complement the limitations of each of these modelling methods they are coupled to 
-    provide a more accurate model.  The typical work flow of such a PBM-DEM coupled model involves 
-    using a short DEM simulation to capture the particle-particle level interactions of the system and 
-    then this physics is fed into the PBM, so that the PBM can more accurately simulate bulk system 
-    behavior \citep{Goldschmidt2003} \citep{Reinhold2012}\citep{Barrasso2013}. This PBM-DEM 
-    method is more accurate than a PBM simulation alone but runs much faster than a complete DEM 
-    simulation. Despite the performance benefits of these coupled PBM-DEM models they still take too 
-    long to solve. In the past parallel computing has been used to speed up computationally intensive 
-    problems such as Molecular Dynamics (MD), Computational Fluid Dynamics (CFD), but in recent 
-    years  this technique has been applied to DEM and PBM simulations 
-    \citep{Bettencourt2017}\citep{Prakash2013a}\citep{Gunawan2008}.
-	\par In order to solve large computational problems parallel computing can be used to distribute the 
-    problem across many CPUs which can work together to solve the problem more quickly. To solve 
-    problems in parallel, computing clusters are often used and with drop  in the prices of the hardware, 
-    they are becoming popular. A cluster is essentially a collection of conventional computers 
-    connected together via a high speed network like Ethernet or Infiniband. The difficulty with 
-    implementing parallel computing to solve a computational problem is that it involves a lot of 
-    computer-computer communication and algorithm redesigning which needs to be done very 
-    carefully to ensure numerical consistency and with consideration of the cluster the program will be 
-    run on.
-	\par Some of the potential benefits of using High Performance Computer (HPCs) in the 
-    pharmaceutical industry include really high accuracy for parameter estimation as detailed 
-    particle-scale simulations can be performed quickly. On-line modelling of continuous processes as 
-    discussed by \citep{Bettencourt2017}, as they performed the simulations more than two times faster 
-    than the actual granulation time. Such quick simulations can also help improve control of 
-    continuous pharmaceutical processes. Modelling these processes also abides to the 
-    Quality-by-Design(QbD) approach being employed by the industry. This work showcases the speed 
-    improvements that can be achieved using HPCs and how they can help improve process design.  
-	
-	    \subsection{Objectives}
-	    \par The main objective of this work is to develop a uni-directional DEM-PBM model that runs in 
-        parallel so that modern computing clusters can be used to solve the coupled model in the 
-        shortest amount of time possible and so that more detail can be used in modelling than was 
-        possible with out the performance improvements of parallel computing. Specific goals include the 
-        following:
-	    \begin{itemize}
-	    \item Developed a 4-Dimensional PBM that is parallelized using hybrid techniques (MPI + 
-        OpenMP)  for optimal utilization of modern high performance computing equipment.
-	    \item Used LIGGGHTS to perform DEM simulations to  model the micromechanics of the 
-        Lodgitech granulator. 
-		\item Uni-directionally coupled DEM to PBM using RP, to create an accurate model which can be 
-        run quickly on high performance computing clusters
-	    \end{itemize}
+
+\section{Introduction \& Objectives} 
+\par Half of all industrial chemical production is carried out using particulate processes 
+(\cite{seville1997}). These processes account for about 70\% of the products 
+of industries like detergents, aerosols, fertilizers, and pharmaceuticals\citep{Litster2016}. 
+These processes are widely popular as these partculate products have great advantages over 
+counterpart liquid formulations like better chemical and physical stability and reduced 
+transportation cost. Despite the prevalence of these particulate processes, the underlying 
+physics of these procesess is poorly understood \citep{Rogers2013}. As a results industries 
+that rely on these processes, especially pharmecutical, have to use expensive 
+heuristic studies and inefficient operational protocols with high recycle ratios to meet strict 
+regulatory standards (\cite{Ramachandran2009}). This drives up the costs and delays the release of 
+new drugs. What makes these processes so challenging to design is that there are no governing 
+equations to accurately predict their behaviour \citep{sen2013}. The complex physics of such 
+processes do not have exact governing equations, thus the need of a precise model arises. There 
+has been active research in this area on how to accurately model the  physics of these processes.
+\par Particulate processes are defined by chaotic micro-scale phenomena that result from the many 
+particle-particle interactions inside these systems. These small scale phenomenon develop into 
+complex bulk behaviour of these processes. To successfully predict the bulk behaviour of these 
+systems, a model needs to capture the particle-particle interactions and emergent meso-scale scale 
+phenomena. Discrete Element Method (DEM)\citep{Cundall1979} has proven to be an accurate way 
+to  model a bulk material properties of particulate systems using micro-scale particle level 
+interactions for pharmaceutical processes \citep{Hancock2011}. DEM uses Newton's equations of 
+motion to model the forces on each particle in the system and it's interactions with the system 
+geometry and other particles. This enables DEM to model the small scale phenomena that 
+determines the bulk behaviour of particulate system. Since DEM includes large amount of interaction 
+and force computations take a large amount of time to run. Thus another more computationally 
+efficient, but less accurate technique, used to model these particulate processes is population 
+balance model (PBM).
+\par PBM takes into account the changes in particle size and the property related mechanisms. This 
+model lacks sensitivity to process parameters and the equipment geometry. It is semi-mechanistic in 
+nature, meaning they use population averages and probability to capture bulk behaviour but still 
+seek to capture some of the micro-phenomena of particle-particle interactions using correlations or 
+empirically developed kernels to approximate those interactions. Even though PBM is much faster 
+than DEM, detailed PBM can still take a significant amount of time to solve which prevents them 
+from being used as widely as they could be academia and industry \citep{Barrasso2013}. Due to the 
+populating averaging and their semi-mechansitc kernels, highly detailed PBMs still can have 
+difficulties in capturing the microscale phenomena that are crucial to predicting the dynamics of 
+particluate processes. 
+\par Thus, to complement the limitations of each of these modelling methods they are coupled to 
+provide a more accurate model.  The typical work flow of such a PBM-DEM coupled model involves 
+using a short DEM simulation to capture the particle-particle level interactions of the system and 
+then this physics is fed into the PBM, so that the PBM can more accurately simulate bulk system 
+behavior \citep{Goldschmidt2003} \citep{Reinhold2012}\citep{Barrasso2013}. This PBM-DEM 
+method is more accurate than a PBM simulation alone but runs much faster than a complete DEM 
+simulation. Despite the performance benefits of these coupled PBM-DEM models they still take too 
+long to solve. In the past parallel computing has been used to speed up computationally intensive 
+problems such as Molecular Dynamics (MD), Computational Fluid Dynamics (CFD), but in recent 
+years  this technique has been applied to DEM and PBM simulations 
+\citep{Bettencourt2017}\citep{Prakash2013a}\citep{Gunawan2008}.
+\par In order to solve large computational problems parallel computing can be used to distribute the 
+problem across many CPUs which can work together to solve the problem more quickly. To solve 
+problems in parallel, computing clusters are often used and with drop  in the prices of the hardware, 
+they are becoming popular. A cluster is essentially a collection of conventional computers 
+connected together via a high speed network like Ethernet or Infiniband. The difficulty with 
+implementing parallel computing to solve a computational problem is that it involves a lot of 
+computer-computer communication and algorithm redesigning which needs to be done very 
+carefully to ensure numerical consistency and with consideration of the cluster the program will be 
+run on.
+\par High performance computing (HPC) is the utilization of supercomputers and parallel processing
+techniques for solving complicated computational problems. Some of the potential benefits of using
+HPC in the pharmaceutical industry include really high accuracy for parameter estimation as detailed 
+particle-scale simulations can be performed quickly. On-line modelling of continuous processes as 
+discussed by \citep{Bettencourt2017}, as they performed the simulations more than two times faster 
+than the actual granulation time. Such quick simulations can also help improve control of 
+continuous pharmaceutical processes. Modelling these processes also abides to the 
+Quality-by-Design(QbD) approach being employed by the industry. This work showcases the speed 
+improvements that can be achieved using HPCs and how they can help improve process design.  
+\subsection{Objectives}
+\par The main objective of this work is to develop a uni-directional DEM-PBM model that runs in 
+parallel so that modern computing clusters can be used to solve the coupled model in the 
+shortest amount of time possible and so that more detail can be used in modelling than was 
+possible with out the performance improvements of parallel computing. Specific goals include the 
+following:
+\begin{itemize}
+\item Developed a 4-Dimensional PBM that is parallelized using hybrid techniques (MPI + 
+OpenMP)  for optimal utilization of modern high performance computing equipment.
+\item Used LIGGGHTS to perform DEM simulations to  model the micromechanics of the 
+Lodgitech granulator. 
+\item Uni-directionally coupled DEM to PBM using Radical Pilot, which is a framework developed in
+Python which provides task level parallelisation, to help develop an accurate model which can be 
+run quickly on high performance computing systems
+\end{itemize}
 
 \section{Background \& Motivation}
 
 \subsection{Particulate Processes}
-      \par Particulate processes are ones in which a system of discrete species exist, such as granules 
-      or catalyst pellets, that undergo changes in average composition, size, or other pertinent 
-      properties. These processes are especially prevalent in the pharmaceutical industry, one of the 
-      most important is granulation.       \par Granulation is a key process in the manufacturing of tablets, 
-      where fine powders are converted to larger granules using a liquid binder. The three processes 
-      influencing granulation are wetting and nucleation, consolidation and aggregation and attrition and 
-      breakage\citep{Iveson2001}\citep{Cameron2005}. As the liquid is added to the fine powder, it 
-      forms a porous nuclei that can coalesce, deform and break\citep{Barrasso2015ces}. There is an 
-      alteration in the properties of these nuclei as they can take up additional liquid or finer powder.
-      \par To understand how a granulation processes will behave with different parameter settings and 
-      chemical mixtures, experimental studies of the process parameter space are performed which is a 
-      method referred to as Quality-by-Testing (QbT). This methodology is time consuming and 
-      expensive. Thus, newer research is focused on the quality by design (QbD) concept i.e, 
-      theoretically modelling the process for better quality of the product and its cost benefits. 
+  \par Particulate processes are ones in which a system of discrete species exist, such as granules 
+  or catalyst pellets, that undergo changes in average composition, size, or other pertinent 
+  properties. These processes are especially prevalent in the pharmaceutical industry, one of the 
+  most important is granulation.       \par Granulation is a key process in the manufacturing of tablets, 
+  where fine powders are converted to larger granules using a liquid binder. The three processes 
+  influencing granulation are wetting and nucleation, consolidation and aggregation and attrition and 
+  breakage\citep{Iveson2001}\citep{Cameron2005}. As the liquid is added to the fine powder, it 
+  forms a porous nuclei that can coalesce, deform and break\citep{Barrasso2015ces}. There is an 
+  alteration in the properties of these nuclei as they can take up additional liquid or finer powder.
+  \par To understand how a granulation processes will behave with different parameter settings and 
+  chemical mixtures, experimental studies of the process parameter space are performed which is a 
+  method referred to as Quality-by-Testing (QbT). This methodology is time consuming and 
+  expensive. Thus, newer research is focused on the quality by design (QbD) concept i.e, 
+  theoretically modelling the process for better quality of the product and its cost benefits. 
 
 \subsection{Modeling}
 \par The paradigm shift of the pharmaceutical industry towards continuous manufacturing, 
@@ -176,34 +177,34 @@ days to replicate a few seconds of real time experiments. Many methods have been
 increase the speed of these simulations, such as scaling by increasing the size of the particles. These 
 approximations are good in understanding the physics of the system but are not directly applicable to 
 process-level simulations. 
-  
+
 
 \subsubsection{PBM}
-	    \par Population balance models (PBM) predict how groups of discrete entities will behave on a 
-        bulk scale due to certain effects acting on the population with respect to time 
-        (\cite{ramkrishna2014}). In the context of process engineering and granulation, population 
-        balance models are used to describe how the number densities, of different types of particles, in 
-        the granulator change as rate processes such as aggregation and breakage reshape particles 
-        (\cite{Barrasso2013}). A general form of population balance model is shown here as equation 
-        \ref{eqn:bkgd_pbm_general}.
-	    
-	    \begin{align}
-	    \frac{ \partial}{\partial t}F(\textbf{v},\textbf{x},t) +& \frac{\partial}{\partial 
-            \textbf{v}}[F(\textbf{v},\textbf{x},t)\frac{d\textbf{v}}{dt}(\textbf{v},\textbf{x},t)] + 
-        \frac{\partial}{\partial \textbf{x}}[F(\textbf{v},\textbf{x},t)\frac{d\textbf{x}}{dt}(\textbf{v},\textbf{x},t)] 
-        \notag\\
-	    &= 
-        \Re_{formation}(\textbf{v},\textbf{x},t)+\Re_{depletion}(\textbf{v},\textbf{x},t)+\dot{F}_{in}(\textbf{v},
-        \textbf{x},t)-\dot{F}_{out}(\textbf{v},\textbf{x},t)
-	    \label{eqn:bkgd_pbm_general} 
-	    \end{align}
-	    
-    \par In equation (\ref{eqn:bkgd_pbm_general}), $\textbf{v}$ is a vector of internal coordinates. For 
-    modelling a granulation process $\textbf{v}$ is commonly used to describe the solid, liquid, and gas 
-    content of each type of particle. The vector $\textbf{x}$ represents external coordinates, usually 
-    spatial variance. For a granulation process this  account for spatial variance in the particles as they 
-    flow along the granulator.
+    \par Population balance models (PBM) predict how groups of discrete entities will behave on a 
+    bulk scale due to certain effects acting on the population with respect to time 
+    (\cite{ramkrishna2014}). In the context of process engineering and granulation, population 
+    balance models are used to describe how the number densities, of different types of particles, in 
+    the granulator change as rate processes such as aggregation and breakage reshape particles 
+    (\cite{Barrasso2013}). A general form of population balance model is shown here as equation 
+    \ref{eqn:bkgd_pbm_general}.
     
+    \begin{align}
+    \frac{ \partial}{\partial t}F(\textbf{v},\textbf{x},t) +& \frac{\partial}{\partial 
+        \textbf{v}}[F(\textbf{v},\textbf{x},t)\frac{d\textbf{v}}{dt}(\textbf{v},\textbf{x},t)] + 
+    \frac{\partial}{\partial \textbf{x}}[F(\textbf{v},\textbf{x},t)\frac{d\textbf{x}}{dt}(\textbf{v},\textbf{x},t)] 
+    \notag\\
+    &= 
+    \Re_{formation}(\textbf{v},\textbf{x},t)+\Re_{depletion}(\textbf{v},\textbf{x},t)+\dot{F}_{in}(\textbf{v},
+    \textbf{x},t)-\dot{F}_{out}(\textbf{v},\textbf{x},t)
+    \label{eqn:bkgd_pbm_general} 
+    \end{align}
+    
+\par In equation (\ref{eqn:bkgd_pbm_general}), $\textbf{v}$ is a vector of internal coordinates. For 
+modelling a granulation process $\textbf{v}$ is commonly used to describe the solid, liquid, and gas 
+content of each type of particle. The vector $\textbf{x}$ represents external coordinates, usually 
+spatial variance. For a granulation process this  account for spatial variance in the particles as they 
+flow along the granulator.
+
 \subsubsection{Coupled DEM-PBMs}
 \par The use of multi-physics models has recently been adapted to understand the behaviour of 
 particle systems. These models help understand the physics of the system at various scales 
@@ -234,16 +235,15 @@ of particles involved in the DEM process as well as PBM become very computationa
 \par The goal of parallel computing is to distribute large amounts of computation across many 
 compute cores to solve problems faster (\cite{wilkinson2005}).
 \subsubsection{Computer Architecture}
-\par Parallel programs are commonly run on computer clusters. Computer clusters are a collection of 
-nodes interconnected by a high speed communication network for message passing from one node to 
-another. Analogous to a conventional PC each node as one or more CPUs and RAM. Commonly nodes 
-are manufactured with two CPUs, each CPU is a multi-core meaning it has multiple compute cores 
-that each can carry out calculations separately from one another. CPUs also have built in memory 
-called cache that is much faster than RAM which is why for optimal performance cache utilization 
-should be favoured over RAM when possible. On a node memory is divided by CPU sockets, so each 
-CPU has direct access to memory local to its own socket, but accessing memory on another socket is 
-much slower \cite{Jin2011}. For this reason data that is needed for computation should be stored 
-locally to the CPU that needs it.  
+\par High Performance Computing clusters are a collection of nodes interconnected by a high speed 
+communication network for message passing from one node to another. Analogous to a conventional 
+PC each node as one or more CPUs and RAM. Commonly nodes are manufactured with two CPUs, each CPU 
+is a multi-core meaning it has multiple compute cores that each can carry out calculations 
+separately from one another. %CPUs also have built in memory called cache that is much faster than 
+%RAM which is why for optimal performance cache utilization should be favoured over RAM when possible. 
+On a node memory is divided by CPU sockets, so each CPU has direct access to memory local to its own 
+socket, but accessing memory on another socket is much slower \cite{Jin2011}. For this reason data 
+that is needed for computation should be stored locally to the CPU that needs it.  
 \par There are two classes of computer architecture classified by memory locality features are 
 distributed memory systems and shared memory systems. These two classes co-exist in a cluster, 
 thus providing the benfits of each. All the nodes exchange memory using explicit message passing 
@@ -253,7 +253,7 @@ parallel program all these aspects need to be considered for optimal perfomance 
 (\cite{Adhianto2007}).
 
 
-\subsubsection{Parallel Application Program Interfaces}
+\subsubsection{Parallel Application Programming Interfaces}
 \par Message Passing Interface (MPI) is a common parallel computing application interface standard. 
 MPI is used for distributed memory parallel computing, this is because MPI will operate every MPI 
 process as a discrete unit that does not share memory with the other processes unless explicit 
@@ -285,14 +285,14 @@ cores on one system size, but was not tested for models with more dimensions. Mo
 mentioned that the parallelisation could be improved using shared memory processing. 
 \cite{Bettencourt2017} took a hybrid approach towards the parallelization of the PBM using both 
 Message Parsing Interface (MPI) and Open Multi-Processing. The hybrid parallelisation helped achieve 
-a speed up of about 98\% over the serial code. \cite{Prakash2013a},\cite{Prakash2013b} used the 
-inbuilt Parallel Computation Toolbox (PCT) in Matlab to parallelize their PBM on lower number of cores, 
-but this faced the shortcomings of Matlab's internal processing and could not achieve the speed 
-improvements of parallelistion of a program if it were written in a native programming language like C 
-or FORTRAN. 
+a speed up of about 98\% using 128 cores over the serial code. \cite{Prakash2013a},\cite{Prakash2013b} 
+used the inbuilt Parallel Computation Toolbox (PCT) in Matlab to parallelize their PBM on lower number 
+of cores, but this faced the shortcomings of Matlab's internal processing and could not achieve the 
+speed improvements of parallelistion of a program if it were written in a native programming language 
+like C or FORTRAN. 
 \par  LIGGGHTS is an open-source software used to perform DEM simulations. This package natively 
 supports MPI for parallelizing the simulation by static decomposition which partitions space such that 
-the area of communication between the the MPI ranks is minimized. \cite{kacianauskas2010} used 
+the area of communication between the the MPI processes is minimized. \cite{kacianauskas2010} used 
 load balancing methods similar to a static decompostion and observed that this works well for a 
 mono-dispersed system but the computational effort increases for simulations for poly-dispersed 
 material. \cite{Gopalakrishnan2013} also reported a speed increase and a parallel efficiency of about 
@@ -350,7 +350,7 @@ configuration of the granulator is shown in figure
 \centering
 \includegraphics[scale=0.2]{impeller_final_pic.pdf}
 \caption{a) Shows the side view of the impeller. b) and c) show the front and back views of the impeller 
-    which correspond to the inlet and outlet ends respectively.}
+which correspond to the inlet and outlet ends respectively.}
 %\caption{hello yuk}
 \label{fig:mthds_dem_charles_impeller}
 \end{figure}    
@@ -358,22 +358,22 @@ configuration of the granulator is shown in figure
 \begin{figure}[H]
 
 \begin{subfigure}{.3\textwidth}
-	\centering
-	\includegraphics[scale=0.075]{feed_element.pdf}	      
-	\caption{Feed element}
-	\label{fig:mthds_dem_feed_element}
+\centering
+\includegraphics[scale=0.075]{feed_element.pdf}	      
+\caption{Feed element}
+\label{fig:mthds_dem_feed_element}
 \end{subfigure}%
 \begin{subfigure}{.3\textwidth}
-	\centering
+\centering
 \includegraphics[scale=0.075]{shear_element.pdf}
-	\caption{Shear element}
-	\label{fig:mthds_dem_shear_element}
+\caption{Shear element}
+\label{fig:mthds_dem_shear_element}
 \end{subfigure}
-	\begin{subfigure}{.3\textwidth}
-	\centering
+\begin{subfigure}{.3\textwidth}
+\centering
 \includegraphics[scale=0.075]{exit_element.pdf}
-	\caption{Exit element}
-	\label{fig:mthds_dem_exit_element}
+\caption{Exit element}
+\label{fig:mthds_dem_exit_element}
 \end{subfigure}
 
 
@@ -654,8 +654,7 @@ Number of second solid bins & $ss$ & $16$ & $-$\\
 \subsubsection{Discretization \& Parallelizing PBM}
 \par The PBM was discretized by converting each of its coordinates in to discrete bins. For the spatial 
 coordinates a linear bin spacing was used. For the internal coordinates, solid,liquid, and gas a 
-non-linear binning was used. \textbf{Anik and Prof Ramachandran - should we explain how we did 
-    non linear binning or is that too much detail?}
+non-linear binning was used.
 \par Once the PBM had been discretized (compartmentalized/binned) a finite differences method was 
 used which created a system of ordinary differential equations (ODEs) \citep{Barrasso2015cerd}. The 
 numerical integration technique used to evaluate the system of ODEs was first order Euler integration 
@@ -665,14 +664,14 @@ performance, when solving the PBM, work loads were distributed in a manner which
 the shared memory and distributed memory aspects of the clusters the PBM was being run on. To 
 parallelize the model in a why which could take advantage of shared memory but still effectively run 
 across a distributed system both OMP and MPI were implemented. 
-\par One MPI process was used per CPU socket and one OMP process was used per CPU core, as 
+\par One MPI process was used per CPU socket and one OMP thread was used per CPU core, as 
 authors (\cite{Bettencourt2017}) found it resulted in the best performance. MPI was used for message 
 passing from one node to another while OMP was used for calculations on each node that could be 
 efficiently solved using a shared memory system  
 \par Pseudo code is presented below illustrating how the calculations are distributed and carried out 
 during the simulation. For each time step the MPI processes are made responsible for a specific chunk 
 of the spatial compartments. Then each OMP thread, inside of each MPI process, is allocated to one of 
-the cores of the the multi-core CPU the MPI process is bound too. The OMP processes divide up and 
+the cores of the the multi-core CPU the MPI process is bound too. The OMP threads divide up and 
 compute $\Re_{agg}$ and $\Re_{brk}$. After $\Re_{agg}$ and $\Re_{brk}$ are calculated the MPI 
 processes calculate the new PSD value for their chunk at that specific time step, $F_{t,c}$. The slave 
 processes send their $F_{t,c}$ to the master processes which collects them into the complete 
@@ -709,14 +708,14 @@ step.
 \par // sum all $c_{low_i}$ to $c_{up_i}$ is = to [0,numCompartments]
 
 \For{each MPI processes} $c = c_{low_i}$ to $c_{up_i}$
-	\par   // each MPI process is further divided with OMP to take advantage of multi-core CPU
+\par   // each MPI process is further divided with OMP to take advantage of multi-core CPU
 \par   // each OMP process is allocated to a single compute core
 \par   // $\Re$ integrals $(i1)$ $\int_{0}^{s_2}$, $(i2)$ $\int_{0}^{s_{max_2}-s_2}$, and $(i3)$ 
 $\int_{0}^{s_{max_2}-s_2}$ are divided into smaller integrals
 \par  // $\int_{i_1low_n}^{i_1up_n}$, $\int_{i_2low_n}^{i_2up_n}$, and $\int_{i_3low_n}^{i_3up_n}$ which 
 are solved by the "n" OMP processes
 \par   // allocated to that MPI process (CPU)
-  \For{ each OMP process}
+\For{ each OMP process}
 
 \begin{align}
 \Re_{agg}(s_1,s_2,c)=& \frac{1}{2}\int_{0}^{s_{1}} \int_{i_1low_n}^{i_1up_n} 
@@ -727,10 +726,10 @@ are solved by the "n" OMP processes
 \begin{align*}
 \Re_{break}(s_1,s_2,c) = \int_{0}^{s_{max_1}} \int_{i_3low_n}^{i_3up_n} K_{break}(s_1',s_2',c)F(s_1',s_2',c)ds_1'ds_2' - K_{break}(s_1,s_2,c)F(s_1,s_2,c)
 \end{align*}
- \EndFor 
+\EndFor 
 \begin{align*}
 F_{t,c} &= \frac{\Delta F(s_1,s_2,c)}{\Delta t}\Delta t  + F(s_1,s_2,c)_{t-1}\\
-          &=   (\Re_{agg}(s_1,s_2,c)+\Re_{break}(s_1,s_2,c)+\dot{F}_{in}(s_1,s_2,c)-\dot{F}_{out}(s_1,s_2,c))\Delta t + F(s_1,s_2,c)_{t-1}
+      &=   (\Re_{agg}(s_1,s_2,c)+\Re_{break}(s_1,s_2,c)+\dot{F}_{in}(s_1,s_2,c)-\dot{F}_{out}(s_1,s_2,c))\Delta t + F(s_1,s_2,c)_{t-1}
 \end{align*}
 
 \EndFor
@@ -803,10 +802,10 @@ due to increased partitioning in these directions.
 \label{table:rslts_dem_slicing_studies}
 \begin{center}
 \begin{tabulary}{\linewidth}{C|C|C|C}
-	  
+  
 \hline
 \bf{Slices in x-direction}&\bf{Slices in y-direction}&\bf{Slices in z-direction}& \bf{Time taken for a 0.5 
-    second simulation (in minutes)}\\
+second simulation (in minutes)}\\
 \hline
 $64$ & $1$ & $1$ & $10.27$\\
 $32$ & $2$ & $1$ & $8.7$\\
@@ -816,7 +815,7 @@ $8$ & $2$ & $4$ & $7.96$\\
 \hline  		  
 \end{tabulary}
 \end{center}
-	      
+      
 \end{table}
 
 \par When MPI is used for parallelization of a task, load balancing becomes an important parameter 
@@ -837,10 +836,10 @@ comparison of simulation times have been shown in table .
 \label{table:rslts_dem_128_256_decomp}
 \begin{center}
 \begin{tabulary}{\linewidth}{C|C|C|C|C}
-	  
+  
 \hline
 \bf{Number of cores used}&\bf{Slices in x-direction}&\bf{Slices in y-direction}&\bf{Slices in 
-    z-direction}& \bf{Time taken for a 10 second simulation (in minutes)}\\
+z-direction}& \bf{Time taken for a 10 second simulation (in minutes)}\\
 \hline
 $128$ & $16$ & $2$ & $4$ & $264.67$\\
 $128$ & $16$ & $4$ & $2$ & $247.2$\\
@@ -850,7 +849,7 @@ $256$ & $16$ & $4$ & $4$ & $265.32$\\
 \hline  		  
 \end{tabulary}
 \end{center}
-	      
+      
 \end{table}
 \par The simulation times illustrated in Table \ref{table:rslts_dem_128_256_decomp} shows that 
 incorrectly slicing the geometry also affects the perforance of the system. It can be noted that slicing 
@@ -902,7 +901,7 @@ computationally more expensive.
 \centering
 \includegraphics[scale=0.7]{rslts_DEM_timing_plots.pdf}
 \caption{Time taken for a 10 second DEM simulation for diameters ranging from 0.63mm to 2mm and 
-    a particle size distribution ranging from 1mm - 3mm}
+a particle size distribution ranging from 1mm - 3mm}
 %\caption{hello tesh}
 \label{fig:rslts_DEM_timing_studies}
 \end{figure}
@@ -943,7 +942,7 @@ throughout the simulation, validating the stability of the PBM used.\\
 \begin{center}
 \includegraphics[scale=0.5]{rslts_PBM_2mm_validation.pdf}
 \caption{The ratio of rate of formation to the rate of depletion due to aggraetion as a function of time. 
-    The constant value of 0.5 shows that the PBM is stable through the simulation time}
+The constant value of 0.5 shows that the PBM is stable through the simulation time}
 \label{fig:rslts_PBM_ratio_plot_2mm}
 \end{center}
 \end{figure}
@@ -962,30 +961,30 @@ the higher diameter bins increase for both the solids.
 \begin{figure}[H]
 \begin{subfigure}{.5\textwidth}
 \includegraphics[scale=0.45]{rslts:PBM_30s_psd.pdf}
-	\caption{•}	
-	\label{fig:30s}
+\caption{•}	
+\label{fig:30s}
 \end{subfigure}\hfill
 \begin{subfigure}{.5\textwidth}
-	
+
 \includegraphics[scale=0.6]{rslts:PBM_50s_psd.pdf}
-	\caption{•}
-	\label{fig:50s}
+\caption{•}
+\label{fig:50s}
 \end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-	
+\begin{subfigure}{.5\textwidth}
+
 \includegraphics[scale=0.45]{rslts:PBM_75s_psd.pdf}
 \caption{•}
-	\label{fig:75s}
+\label{fig:75s}
 \end{subfigure}\hfill
-	\begin{subfigure}{.5\textwidth}
-	
+\begin{subfigure}{.5\textwidth}
+
 \includegraphics[scale=0.45]{rslts:PBM_100s_psd.pdf}
 \caption{•}
-	\label{fig:100s}
+\label{fig:100s}
 \end{subfigure}
 \caption{The plots for the number of particles of solid 1 and solid 2 and with their respective d50 in 
-    mm after (\subref{fig:30s}) 30s (\subref{fig:50s}) 50s (\subref{fig:75s}) 75s and (\subref{fig:100s}) 
-    100s}
+mm after (\subref{fig:30s}) 30s (\subref{fig:50s}) 50s (\subref{fig:75s}) 75s and (\subref{fig:100s}) 
+100s}
 \label{fig:rslts_PBM_d50_plots}
 \end{figure}   
 
@@ -1005,7 +1004,7 @@ each. The scaling with the only MPI cores shows great increase in performance. \
 \centering
 \includegraphics[scale=0.7]{rslts_PBM_Time_analysis.pdf}
 \caption{Average time taken to run the PBM simulation which consisted of 25 seconds of mixing time 
-    and 75 seconds of granulation time at different core configurations}
+and 75 seconds of granulation time at different core configurations}
 %\caption{hello tesh}
 \label{fig:rslts_PBM_timing_studies}
 \end{figure}
@@ -1049,8 +1048,8 @@ performance increase is achieved by using the OMP implementation. \\
 \centering
 \includegraphics[scale=0.7]{rslts_PBM_Speed_Up.pdf}
 \caption{The speedup achieved by the hybrid parallel implementation of the PBM program. It can be 
-    seen the inital speedup upto 16 cores as expected as from an ideal parallel program where as it 
-    becomes almost constant from 32 cores to 128 cores}
+seen the inital speedup upto 16 cores as expected as from an ideal parallel program where as it 
+becomes almost constant from 32 cores to 128 cores}
 \label{fig:rslts_PBM_speed_up}
 \end{figure}
 
@@ -1068,9 +1067,9 @@ especially where nested loops are present to decrease communication times.
 \centering
 \includegraphics[scale=0.7]{rslts_PBM_Efficiency.pdf}
 \caption{The parallel efficiency for the hybrid (MPI + OMP) parallelized PBM code. The efficiency of the 
-    code decreases as the number of cores are increased. The higher number of cores have very low 
-    efficiency of about 11\% which depicts that there is large time being spent in communication in 
-    between the cores.}
+code decreases as the number of cores are increased. The higher number of cores have very low 
+efficiency of about 11\% which depicts that there is large time being spent in communication in 
+between the cores.}
 \label{fig:rslts_PBM_parallel_efficiency}
 \end{figure}
 
@@ -1111,8 +1110,8 @@ using the mono-sized simulations for the DEM help save time on the overall simul
 \centering
 \includegraphics[scale=0.5]{rslts_pbm_psd_validation.pdf}
 \caption{The ratio of rate of formation to the rate of depletion due to aggregation as a function of time. 
-    The constant value of 0.5 shows that the PBM is stable through the simulation time. This is similar to 
-    Figure \ref{fig:rslts_PBM_ratio_plot_2mm} which was for the 2mm mono-sized DEM simulation}
+The constant value of 0.5 shows that the PBM is stable through the simulation time. This is similar to 
+Figure \ref{fig:rslts_PBM_ratio_plot_2mm} which was for the 2mm mono-sized DEM simulation}
 \label{fig:rslts_PBM_psd_ratio}
 \end{figure}
 
@@ -1120,7 +1119,7 @@ using the mono-sized simulations for the DEM help save time on the overall simul
 \centering
 \includegraphics[scale=0.5]{rslts_pbm_d50_128_200.pdf}
 \caption{d\textsubscript{50} plot after running the PBM for 100s for the 2mm mono-sized particle DEM 
-    simulation}
+simulation}
 \label{fig:rslts_PBM_2mm_d50}
 \end{figure}
 
@@ -1128,7 +1127,7 @@ using the mono-sized simulations for the DEM help save time on the overall simul
 \centering
 \includegraphics[scale=0.5]{rslts_pbm_d50_128_555.pdf}
 \caption{d\textsubscript{50} plot after running the PBM for 100s for the distributed particle size DEM 
-    simulation. The trend observed is very similar to the trend found in Figure \ref{fig:rslts_PBM_2mm_d50}}
+simulation. The trend observed is very similar to the trend found in Figure \ref{fig:rslts_PBM_2mm_d50}}
 \label{fig:rslts_PBM_psd_d50}
 \end{figure}
 

@@ -177,7 +177,14 @@ days to replicate a few seconds of real time experiments. Many methods have been
 increase the speed of these simulations, such as scaling by increasing the size of the particles. These 
 approximations are good in understanding the physics of the system but are not directly applicable to 
 process-level simulations. 
-
+\par The particle-particle collisions are not always elastic, thus there is a need for models for the 
+contact forces. The earliest model was developed by \cite{hertz1882} was elastic in nature. This model was 
+extended by \cite{mindlin1953} by accounting for the  tangential forces during the collisions. The dampening
+in the velocity during the plastic deformation during a collision was accounted by \cite{Cundall1979} and 
+\cite{walton1986}. \cite{tsuji1992} developed a more accurate model for predicting the behaviour of granular flow.
+The most commonly used contact force model   for modelling the flow of particles inside the granulation process 
+is the Hertz-Mindling contact model \citep{gantt2006}\citep{hassanpour2013}. 
+ 
 
 \subsubsection{PBM}
     \par Population balance models (PBM) predict how groups of discrete entities will behave on a 
@@ -313,7 +320,7 @@ number of cores, but there was no significant speed improvement for smaller core
 study. Edits were made to the compute\_contact\_atom source file to obtain particle $-$ particle 
 collisions. The aforementioned version of LIGGGHTS was compiled using the mvapich (mvapich2 v2.1) 
 and intel (intel v15.0.2) compilers with the -o3 optimisation option as well as an option to sideload the 
-process to the Xeon phi co-processors was added. The studies were performed on Stampede 
+process to the Xeon phi co-processors was added. The initail timing studies were performed on Stampede 
 supercomputer located at TACC, Univeristy of Texas, Austin. The hardware configuration of each node 
 consists of 2 8-core Intel Xeon E5-2680 processors based on the Sandy Bridge architecture, 32 gb of 
 memory with QPI interconnects at 8.0 GT/s PCI-e lanes.
@@ -421,9 +428,10 @@ particles radii had volume twice of one before them. The radii range of the dist
 was 1mm - 3mm. The difference in the mechanics of these two simulations is dicussed later in the 
 results section. The physical constants used for the simulations are given in Table 
 \ref{table:mthds_dem_input}.
-\par The simulation data was collected after a constant number of iterations for the visulation of the 
-particles inside the shell, further post processing . The collisions between each of the particles and the 
-collisions between of the particle and the geometry was collected and used in the PBM. 
+\par The simulation data was collected after ever 50,000 time steps (5$times 10^{-3}$ secoonds) 
+for the visulation of the particles inside the shell, further post processing . The collisions 
+between each of the particles and the collisions between of the particle and the geometry was 
+collected and used in the PBM. 
 
 \begin{table}[!htb]%[H]
 \caption{Physical Properties of the particle for the LIGGGHTS input script} 
@@ -693,6 +701,12 @@ dynamic time step size at each iteration for the calculations to be properly car
 the completely updated $F_{t,all}$ value is shared before calculating a new time step each process will 
 have the same $F_{t,all}$ value. As a result each process calculates the same size for the new time 
 step. 
+\par Since the PBM code developed used the std libraries present in C++ 11 and later. It requires gcc 5.3 or
+later for compilation. Since this module was not present on the Stampede, the execution of the PBM was done on
+the newer Stampede2 supercomputer. Each of the compute node of the cluster consists of Intel Xeon Phi 7250 
+("Knights Landing") which has 68 cores on a single socket clocked at 1.4 GHz, with 96 GB of DDR4 RAM. Each of 
+the cores consists of 4 hardware threads. The simulations were then run by varying the the number of MPI 
+processes from 1 to 16 and the number of OMP threads from 1 to 8, thus, using a maximum of 128 cores.
 %\textcolor{cyan}{ Did not include the liquid and gas PBMs in this but hoping they will be some what 
 %assumed? Also the Ragg omp distributed work is an a}
 %\textcolor{red}{what about private OMP vars specified that has impact on how model is solved etc. 
@@ -786,8 +800,8 @@ across different platforms.
 \par LIGGGHTS as discussed above, statically decomposes the work space and each section is sent to 
 a MPI process for calculations. Thus, the division of the space becomes an important criteria for the 
 simulation for efficient load balancing. The initial studies were undertaken for a mono-sized particle of 
-size 1 mm and the simulation was carried out for 0.5 seconds of wall time. The initial timing studies for 
-the decomposition were performed using 64 cores. The effect of the decomposition on the simulation 
+size 1 mm and the simulation was carried out for 0.5 seconds of granulation time. The initial timing studies
+ for the decomposition were performed using 64 cores. The effect of the decomposition on the simulation 
 time can be seen in Table \ref{table:rslts_dem_slicing_studies}. This indicates that dividing the 
 x-direction in more number of compartments help increase the speed of the simulation. This is easy to 
 comprehend since the granulator has its length parallel to the x-axis. These results also show that if 
@@ -819,8 +833,9 @@ $8$ & $2$ & $4$ & $7.96$\\
 \end{table}
 
 \par When MPI is used for parallelization of a task, load balancing becomes an important parameter 
-that needs to be considered. Each processor used during the task is utilised with the similar usage as 
-compared to other processors being used. Following the results from the initial timing studies,the y 
+that needs to be considered. When the geometry is divided, the amount of computation done by one core
+should be in a similar to other processors. This helps in better utilization of the resources as well as
+make the simulations run faster. Following the results from the initial timing studies,the y 
 and the z-axes were not divided in more than 2 compartments for 128 and 256 core simulation as well. 
 This meant that the x-axis was divided into 32 and 64 compartments respectively. In order to avoid the 
 expensive communication between the processes, LIGGGHTS tries to insert the particles towards the 
@@ -1132,38 +1147,54 @@ simulation. The trend observed is very similar to the trend found in Figure \ref
 \end{figure}
 
 
-\subsection{PBM+DEM - RP} 
-\subsubsection{PBM+DEM Validation/Accuracy?}
-%	   \par Figs comparing the one-way coupling from both these sources.
-%	    
-\subsubsection{PBM+DEM Performance}
-%	    \par strong scaling
-%	    \par fig PBM + DEM RP strong scaling 
-%	      \begin{figure}[!htb]
-%	      \centering
-%	      \includegraphics[scale=0.5]{rslts_pbmbyrp_strng}
-%	      \caption{PBM+DEM scale with RP}
-%	      %\caption{hello tesh}
-%	      \label{fig:rslts_dembyRP_strng}
-%	      \end{figure}
-%	
-%\par weak scaling
-%\par fig PBM + DEM RP weak scaling
+\subsection{One-way coupled DEM+PBM using RADICAL-Pilot} 
+\par The RADICAL pilot (RP) being a pilot job system it can bypass the need of waiting on the long scheduler
+queues on a cluster. With resources allocated to itself the pilot can execute multiple simulation runs 
+at once. The pilot job initiates the DEM simulation using the LIGGGHTS executable compiled for the DEM
+studies and then creates a link between the collision data obtained, which is utilized by then utilized 
+by the PBM executable. After the link is established, it also initiates the PBM. The timing profiles and
+results from both the simulations are then obtained. Since the executables and inputs files used in the 
+simulations and the RP job are the similar, we do not expect to see any changes in the physics of the 
+system, which is confirmed from the plots of the ratio of the rate of formation to the rate of depletion 
+due to aggregation in Figure \ref{fig:rslts_RP_ratio_plot}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{rslts_PBM_2mm_validation.pdf}
+\caption{The ratio of rate of formation to the rate of depletion due to aggraetion 
+as a function of time. Since the ratio is 0.5 as expected, we can say the physics does not change. 
+(\textbf{Currently a placeholder})}
+\label{fig:rslts_RP_ratio_plot}
+\end{figure}
 
-
-\subsubsection{PBM+DEM Parameter studies}
-%	   \par show how PBM+DEM captures multi-physics as parameters changed. helps validate and support model development. show we have made a useful tool for future work.
-%	   \par fig 
-%	      \begin{figure}[H]
-%	      \centering
-%	      \includegraphics[scale=0.7]{rslts_psd_evo_time}
-%	      \caption{PBM+DEM scale with RP}
-%	      %\caption{hello tesh}
-%	      \label{fig:rslts_psd_evo_time}
-%	      \end{figure}
-%	    
+\subsubsection{RADICAL-Pilot Performance}
+\par Since the platforms used for initial development and testing of the DEM and PBM respectively were different, 
+the DEM simulations were executed again on Stampede2 for a fair and accurate comparison. The need for re-running
+the simulations arises due to the clock speeds of the nodes and their configuration for the 2 platforms is different.
+The RADICAL-pilot was setup for Stampede2 and aforementioned experiments were replicated. The DEM simulations were 
+run for 64, 128 and 256 cores (MPI processes) and the PBM was run for 1, 2, 4, 8 and 16 MPI processes. No OMP threads 
+were implemented for the PBM run, since the current version of RP does not support threading. 
+\par The times for the individual DEM and PBM simulations were added to determine the total amount time taken to 
+simulate the one-way coupling. This time did not include the time spent by each executable in the queue of the 
+scheduler. This time could vary from a few hours to a few days depending upon the load of the cluster. The total 
+time taken for the simulation using the RADICAL-pilot was determined from the time the DEM was first executed until 
+the PBM execution completed. The Figure \textbf{refer bar plot here} shows a comparison of the total times of simulation 
+for the DEM and PBM individual simulations to the simulation obtained using RP. It can be observed that the times taken 
+by the pilot job are slightly higher than the summation of times of the individual simulations. The slight increase in 
+the times of the simulation can be accounted to the communication required for the pilot realise that the DEM simulation 
+has compeleted and link the data from the DEM to the PBM executable before it is executable. But, this communication is 
+lower than the amount of time the executable the job would spend in the scheduler. Thus, the benefits of using RP become 
+clear. An extension of this work would be to use RP to schedule multiple such coupled simulations as one job, thus 
+decreasing the wait times even further. 
+	    
 \section{Conclusions}
-
+\par A simple uni-directional DEM+PBM coupled study for a high shear granulator has been presented. DEM simulations were 
+used to determine the movement of the particles inside the granulator and to obtain the collision data. This collision data 
+was then used in the multi-dimensional PBM which was developed with 2 solid bins. Both these executables were parallelised 
+to help them utilize the multi-core hardware of a cluster. The DEM was parallelised using MPI where as the developed PBM used 
+MPI as well as OMP for a faster execution. The speedup acheived for the DEM simulation was about 12 times using 64 cores, 
+where as the PBM acheived a speedup of 14 times when 16 cores were used. RP was utilized to execute the simulations for lower 
+wait times.
+\par 
 \section*{References} 
 \bibliographystyle{elsarticle-harv}
 \bibliography{Bibli,radical_publications}

@@ -1181,7 +1181,7 @@ the PBM execution completed. The Figure \textbf{refer bar plot here} shows a com
 for the DEM and PBM individual simulations to the simulation obtained using RP. It can be observed that the times taken 
 by the pilot job are slightly higher than the summation of times of the individual simulations. The slight increase in 
 the times of the simulation can be accounted to the communication required for the pilot realise that the DEM simulation 
-has compeleted and link the data from the DEM to the PBM executable before it is executable. But, this communication is 
+has completed and link the data from the DEM to the PBM executable before it is executable. But, this communication is 
 lower than the amount of time the executable the job would spend in the scheduler. Thus, the benefits of using RP become 
 clear. An extension of this work would be to use RP to schedule multiple such coupled simulations as one job, thus 
 decreasing the wait times even further. 
@@ -1189,12 +1189,16 @@ decreasing the wait times even further.
 \section{Conclusions}
 \par A simple uni-directional DEM+PBM coupled study for a high shear granulator has been presented. DEM simulations were 
 used to determine the movement of the particles inside the granulator and to obtain the collision data. This collision data 
-was then used in the multi-dimensional PBM which was developed with 2 solid bins. Both these executables were parallelised 
-to help them utilize the multi-core hardware of a cluster. The DEM was parallelised using MPI where as the developed PBM used 
-MPI as well as OMP for a faster execution. The speedup acheived for the DEM simulation was about 12 times using 64 cores, 
-where as the PBM acheived a speedup of 14 times when 16 cores were used. RP was utilized to execute the simulations for lower 
+was then used in the multi-dimensional PBM which was developed with 2 solid bins. Both these executables were parallelized 
+to help them utilize the multi-core hardware of a cluster. The DEM was parallelized using MPI where as the developed PBM used 
+MPI as well as OMP for a faster execution. The speed-up achieved for the DEM simulation was about 12 times using 64 cores, 
+where as the PBM achieved a speed-up of 14 times when 16 cores were used. RP was utilized to execute the simulations for lower 
 wait times.
-\par 
+\par A more accurate model for the high shear granulator would be to couple the DEM and PBM bi-directionally i.e. these 
+two methods are executed iteratively up till a steady state is reached. For the two-way coupling, the computation resources 
+required would be really large as it would involve multiple DEM simulations. The role RP in such a situation would more crucial 
+as the communication required would increase and it would help reduce total time taken to complete the multiple runs required. 
+
 \section*{References} 
 \bibliographystyle{elsarticle-harv}
 \bibliography{Bibli,radical_publications}

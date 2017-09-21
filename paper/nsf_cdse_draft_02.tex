@@ -1177,7 +1177,7 @@ were implemented for the PBM run, since the current version of RP does not suppo
 simulate the one-way coupling. This time did not include the time spent by each executable in the queue of the 
 scheduler. This time could vary from a few hours to a few days depending upon the load of the cluster. The total 
 time taken for the simulation using the RADICAL-pilot was determined from the time the DEM was first executed until 
-the PBM execution completed. The Figure \textbf{refer bar plot here} shows a comparison of the total times of simulation 
+the PBM execution completed. Figure \ref{fig:rslts_RP_time_plot} shows a comparison of the total times of simulation 
 for the DEM and PBM individual simulations to the simulation obtained using RP. It can be observed that the times taken 
 by the pilot job are slightly higher than the summation of times of the individual simulations. The slight increase in 
 the times of the simulation can be accounted to the communication required for the pilot realise that the DEM simulation 
@@ -1185,6 +1185,13 @@ has completed and link the data from the DEM to the PBM executable before it is 
 lower than the amount of time the executable the job would spend in the scheduler. Thus, the benefits of using RP become 
 clear. An extension of this work would be to use RP to schedule multiple such coupled simulations as one job, thus 
 decreasing the wait times even further. 
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{rslts_RP_fake_plot.pdf}
+\caption{A comparison of times taken my 2 individual simulations (without adding queue time) v/s time taken by RP. 
+(\textbf{Currently a placeholder})}
+\label{fig:rslts_RP_time_plot}
+\end{figure}
 	    
 \section{Conclusions}
 \par A simple uni-directional DEM+PBM coupled study for a high shear granulator has been presented. DEM simulations were 

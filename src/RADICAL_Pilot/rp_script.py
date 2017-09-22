@@ -136,7 +136,7 @@ if __name__ == '__main__':
                      'target': 'unit:///sampledumpfiles/collision%d.%d_%f'%(config['timesteps'],config['cores'],config['diameter']),
                      'action'  : rp.LINK}
 
-        impact = {'source': 'pilot:///impact200000.atom',
+        impact = {'source': 'pilot:///impact%d.atom'%config['timesteps'],
                   'target': 'unit:///sampledumpfiles/impact%d.%d_%f'%(config['timesteps'],config['cores'],config['diameter']),
                   'action'  : rp.LINK}
         # create a new CU description, and fill it.

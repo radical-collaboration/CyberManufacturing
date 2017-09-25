@@ -175,12 +175,12 @@ days to replicate a few seconds of real time experiments. Many methods have been
 increase the speed of these simulations, such as scaling by increasing the size of the particles. These 
 approximations are good in understanding the physics of the system but are not directly applicable to 
 process-level simulations. 
- The particle-particle collisions are not always elastic, thus there is a need for models for the 
+The particle-particle collisions are not always elastic, thus there is a need for models for the 
 contact forces. The earliest model was developed by \cite{hertz1882} was elastic in nature. This model was 
 extended by \cite{mindlin1953} by accounting for the  tangential forces during the collisions. The dampening
-in the velocity during the plastic deformation during a collision was accounted by \cite{Cundall1979} and 
+in the velocity during the plastic deformation in a collision was accounted by \cite{Cundall1979} and 
 \cite{walton1986}. \cite{tsuji1992} developed a more accurate model for predicting the behaviour of granular flow.
-The most commonly used contact force model   for modelling the flow of particles inside the granulation process 
+The most commonly used contact force model for modelling the flow of particles inside the granulation process 
 is the Hertz-Mindling contact model \citep{gantt2006}\citep{hassanpour2013}. 
  
 
@@ -344,22 +344,20 @@ provided at one end of the casing and an angled outlet port is provided at the l
   The impeller consists of a cylindrical shaft of length 370 mm and diameter 68 mm with four 
 flattened sides 15 mm wide running along the axis. The blades are placed on these flattened sides as 
 shown in figure \ref{fig:mthds_dem_charles_impeller}. There are three different blade elements on the 
-shaft (figure \ref{fig:mthds_dem_charles_impeller}). At the granulator inlet, there are 4 paddle shaped 
+shaft (Figure \ref{fig:mthds_dem_charles_impeller}). At the granulator inlet, there are 4 paddle shaped 
 feed elements following which there are 20 tear drop shaped shearing elements  and finally 4 
 trapezoidal blades near the exit. All these elements are placed in a spiral configuration. The final 
-configuration of the granulator is shown in figure 
+configuration of the granulator is shown in Figure 
 \ref{fig:mthds_dem_charles_fig5pt3and4_blades_n_isometric}.
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.2]{impeller_final_pic.pdf}
-\caption{a) Shows the side view of the impeller. b) and c) show the front and back views of the impeller 
-which correspond to the inlet and outlet ends respectively.}
+\caption{This shows the isometric view of the impeller inisde the casing.}
 \label{fig:mthds_dem_charles_impeller}
 \end{figure}    
 
 \begin{figure}[H]
-
 \begin{subfigure}{.3\textwidth}
 \centering
 \includegraphics[scale=0.075]{feed_element.pdf}	      
@@ -378,10 +376,9 @@ which correspond to the inlet and outlet ends respectively.}
 \caption{Exit element}
 \label{fig:mthds_dem_exit_element}
 \end{subfigure}
-
-
-
-\caption{ Various components of the impeller}
+\caption{Components (\subref{fig:mthds_dem_feed_element}) and (\subref{fig:mthds_dem_exit_element}) help in 
+movement of the particles while (\subref{fig:mthds_dem_shear_element}) aids to throw the partilces to the wall 
+inside the granulator.}
 \label{fig:mthds_dem_charles_fig5pt3and4_blades_n_isometric}
 \end{figure}     
 
@@ -460,7 +457,7 @@ LIGGHTS post processing (LPP) script over the dump files to convert them into ST
 files were then loaded in to Paraview~\citep{henderson2004} for a graphical representation of the 
 simulation. It can be seen that the number of collision start to oscillate around a mean value. The 
 number of collisions were then plotted and steady state time was determined.
- A precautionary script was also run so as to determine that no particles were lost due to overlap 
+A precautionary script was also run so as to determine that no particles were lost due to overlap 
 of the geometry with the particles as well as from particle particle overlap.
 
 
@@ -471,9 +468,7 @@ of the geometry with the particles as well as from particle particle overlap.
 \frac{d}{dt}F(s_1,s_2,x)=\Re_{agg}(s_1,s_2,x)+\Re_{break}(s_1,s_2,x)+\dot{F}_{in}(s_1,s_2,x)-\dot{F}_{out}(s_1,s_2,x)
 \label{eqn:mthds_pbm_overall} 
 \end{align}
-%	     \textcolor{red}{citation?}    
-
- where, $F(s_1,s_2,x)$ is the number of particles with an active pharmaceutical ingredients (API) volume of $s_1$ and an excipient 
+where, $F(s_1,s_2,x)$ is the number of particles with an active pharmaceutical ingredients (API) volume of $s_1$ and an excipient 
 volume of $s_2$ in the spatial compartment $x$. The rate of change of number of particles with time 
 in different size classes depend on the rate of aggregation $\Re_{agg}(s_1,s_2,x)$ and the rate of 
 breakage $\Re_{break}(s_1,s_2,x)$. Also, the rate of particles coming into, $\dot{F}_{in}(s_1,s_2,x)$ and 
@@ -485,24 +480,26 @@ The rate of change of liquid volume in each particle is calculated using the equ
 \frac{d}{dt}F(s_1,s_2,x)l(s_1,s_2,x)&= 
 \Re_{liq,agg}(s_1,s_2,x)+\Re_{liq,break}(s_1,s_2,x)+\dot{F}_{in}(s_1,s_2,x)l_{in}(s_1,s_2,x)\notag\\
 &-\dot{F}_{out}(s_1,s_2,x)l_{out}(s_1,s_2,x)+F(s_1,s_2,x)\dot{l}_{add}(s_1,s_2,x)
+\label{eqn:mthds_pbm_rate} 
 \end{align}
 
- where, $l(s_1,s_2,x)$ is the amount of liquid volume in each particle with API volume of $s_1$ and 
+where, $l(s_1,s_2,x)$ is the amount of liquid volume in each particle with API volume of $s_1$ and 
 excipient volume of $s_2$ in the spatial compartment $x$. $\Re_{liq,agg}(s_1,s_2,x)$ and 
 $\Re_{liq,break}(s_1,s_2,x)$ are respectively the rates of liquid transferred between size classes due to 
 aggregation and breakage. $l_{in}(s_1,s_2,x)$ and $l_{out}(s_1,s_2,x)$ are respectively the liquid 
 volumes of the particles coming in and going out of the spatial compartment. $l_{add}(s_1,s_2,x)$ is 
 the volume of liquid acquired by each particle in the compartment at every time step due to external 
-liquid addition. 
- Similarly, the rate of change of gas volume is calculated using the following equation: 
+liquid addition.
+Similarly, the rate of change of gas volume is calculated using the following equation: 
+
 \begin{align}
 \frac{d}{dt}F(s_1,s_2,x)g(s_1,s_2,x)&= 
 \Re_{gas,agg}(s_1,s_2,x)+\Re_{gas,break}(s_1,s_2,x)+\dot{F}_{in}(s_1,s_2,x)g_{in}(s_1,s_2,x)\notag\\
 &-\dot{F}_{out}(s_1,s_2,x)g_{out}(s_1,s_2,x)+F(s_1,s_2,x)\dot{g}_{cons}(s_1,s_2,x)
+\label{eqn:mthds_pbm_gas_agg} 
 \end{align}
 
-
- where, $g(s_1,s_2,x)$ is the gas volume of each particle with API volume of $s_1$ and excipient 
+where, $g(s_1,s_2,x)$ is the gas volume of each particle with API volume of $s_1$ and excipient 
 volume of $s_2$ in the spatial compartment $x$. $\Re_{gas,agg}(s_1,s_2,x)$ and 
 $\Re_{gas,break}(s_1,s_2,x)$ are respectively the rates of gas transferred between size classes due to 
 aggregation and breakage. $g_{in}(s_1,s_2,x)$ and $g_{out}(s_1,s_2,x)$ are respectively the gas 
@@ -510,6 +507,7 @@ volume of the particles entering and leaving the spatial compartment. $\dot{g}_{
 volume of gas coming out of each particle at every time-step due to consolidation of the particles. 
 The rate of aggregation, $\Re_{agg}(s_1,s_2,x)$ in Equation \ref{eqn:mthds_pbm_overall} is 
 calculated as: \citep{Chaturbedi2017}
+
 \begin{align}
 \Re_{agg}(s_1,s_2,x)&= \frac{1}{2}\int _0^{s_1} \int_0^{s_2} 
 \beta(s_1',s_2',s_1-s_1',s_2-s_2',x)F(s_1',s_2',x)F(s_1-s_1',s_2-s_2',x)ds_1'ds_2'\notag\\ 
@@ -521,7 +519,7 @@ calculated as: \citep{Chaturbedi2017}
 where, the aggregation kernel, $\beta(s_1,s_2, s_1',s_2',x)$ is expressed as a function of collision 
 rate coefficient ($C$) and probability that collision results in agglomeration($\psi$) \citep{ingram2005}
 and is shown below: 
-–
+
 \begin{align}
 \beta(s_1,s_2,s_1',s_2',x) = \beta_oC(s_1,s_2,s_1',s_2',x)\psi(s_1,s_2,s_1',s_2',x)
 %\beta(s_1,s_2,s_1',s_2',x) = & \beta_o*(V(s_1,s_2,x)+V(s_1',s_2',x))^{\gamma}*(c(s_1,s_2,x)\notag\\
@@ -529,16 +527,18 @@ and is shown below:
 \label{eqn:mthds_pbm_beta_kernal}
 \end{align}
 
-where, $\beta_o$ is aggregation rate constant.
- Collision rate coefficient ($C$) is a function of particle sizes and is calculated by normalizing the 
+where, $\beta_o$ is aggregation rate constant.\\
+Collision rate coefficient ($C$) is a function of particle sizes and is calculated by normalizing the 
 number of collisions between group of particles \citep{gantt2006} and is obtained from LIGGGHTS 
 DEM simulation. A recent study shows that collision frequency depends on PSD as well 
 \citep{sen2014}. Collision rate coefficient can be expressed as:
+
 \begin{align}
 C(s_1,s_2,s_1',s_2')=\frac{N_{coll}(s_1,s_2,s_1',s_2')}{N_p(s_1,s_2)N_p(s_1',s_2')\Delta t}
 \label{eqn:collfreq}
 \end{align}
- In Equation \ref{eqn:collfreq}, $N_{coll}$ is the number of collision between two particles in 
+
+In Equation \ref{eqn:collfreq}, $N_{coll}$ is the number of collision between two particles in 
 time interval $\Delta t$ \& $N_p$ is number of particle of particular size. The agglomeration 
 ($\psi$) in equation (\ref{eqn:mthds_pbm_beta_kernal}) can be expressed as:
 

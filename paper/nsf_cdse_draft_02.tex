@@ -651,26 +651,26 @@ Number of second solid bins & $ss$ & $16$ & $-$\\
 \subsection{PBM Parallel C++}
 \subsubsection{Discretization \& parallelizing PBM}
  The PBM was discretized by converting each of its coordinates in to discrete bins. For the spatial 
-coordinates a linear bin spacing was used. For the internal coordinates, solid,liquid, and gas a 
-non-linear binning was used.
+coordinates a linear bin spacing was used. For the internal coordinates, solid, liquid and gas a 
+non-linear discretization was used.
  Once the PBM had been discretized, a finite differences method was 
 used which created a system of ordinary differential equations (ODEs) \citep{Barrasso2015cerd}. The 
 numerical integration technique used to evaluate the system of ODEs was first order Euler integration 
-as it is commonly used to solve these types of systems and author  found it improved speeds while 
-having minimal impact on accuracy \citep{Barrasso2013}. In order to avoid numerical instability due to the explicit nature of the Euler integration, Courant-Friedrichs-Lewis (CFL) condition must be satisfied~\citep{courant1967}. For our PBM model, time-step was calculated at each iteration such that, the number of particles leaving a particular bin at is less than the number of particles present at that time \citep{Ramachandran2010}. To obtain the most optimal parallel 
+as it is commonly used to solve these types of systems and author found an improvement in  speed while 
+having minimal impact on accuracy \citep{Barrasso2013}. In order to avoid numerical instability due to the explicit nature of the Euler integration, Courant-Friedrichs-Lewis (CFL) condition must be satisfied~\citep{courant1967}. For our PBM model, time-step was calculated at each iteration such that, the number of particles leaving a particular bin at any time is less than the number of particles present at that time \citep{Ramachandran2010}. To obtain the most optimal parallel 
 performance, when solving the PBM, work loads were distributed in a manner which took into account 
-the shared memory and distributed memory aspects of the clusters the PBM was being run on. To 
-parallelize the model in a why which could take advantage of shared memory but still effectively run 
-across a distributed system both OMP and MPI were implemented. 
+the shared and distributed memory aspects of the clusters, the PBM was being run on. To 
+parallelize the model in a way which could take advantage of shared memory but still effectively run 
+across a distributed system both MPI and OMP were implemented. 
  One MPI process was used per CPU socket and one OMP thread was used per CPU core, as 
 authors (\cite{Bettencourt2017}) found it resulted in the best performance. MPI was used for message 
 passing from one node to another while OMP was used for calculations on each node that could be 
-efficiently solved using a shared memory system  
- Pseudo code is presented below illustrating how the calculations are distributed and carried out 
-during the simulation. For each time step the MPI processes are made responsible for a specific chunk 
+efficiently solved using a shared memory system. 
+ An algorithm in the form of pseudo code is presented below illustrating how the calculations are distributed and carried out 
+during the simulation. For each time step, the MPI processes are made responsible for a specific chunk 
 of the spatial compartments. Then each OMP thread, inside of each MPI process, is allocated to one of 
-the cores of the the multi-core CPU the MPI process is bound too. The OMP threads divide up and 
-compute $\Re_{agg}$ and $\Re_{brk}$. After $\Re_{agg}$ and $\Re_{brk}$ are calculated the MPI 
+the cores of multi-core CPU the MPI process is bound too. The OMP threads divide up and 
+compute $\Re_{agg}$. After $\Re_{agg}$ is calculated the MPI 
 processes calculate the new PSD value for their chunk at that specific time step, $F_{t,c}$. The slave 
 processes send their $F_{t,c}$ to the master processes which collects them into the complete 
 $F_{t,all}$. The master process then broadcasts the $F_{t,all}$ value to all slave processes. This 
@@ -690,10 +690,10 @@ dynamic time step size at each iteration for the calculations to be properly car
 the completely updated $F_{t,all}$ value is shared before calculating a new time step each process will 
 have the same $F_{t,all}$ value. As a result each process calculates the same size for the new time 
 step. 
- Since the PBM code developed used the std libraries present in C++ 11 and later. It requires gcc 5.3 or
+ Since the PBM code developed used the Standard Template Library containers and their features available in C++ 11 and later. It requires intel v15.0.2 or
 later for compilation. Since this module was not present on the Stampede, the execution of the PBM was done on
 the newer Stampede2 supercomputer. Each of the compute node of the cluster consists of Intel Xeon Phi 7250 
-("Knights Landing") which has 68 cores on a single socket clocked at 1.4 GHz, with 96 GB of DDR4 RAM. Each of 
+(\textquotedblleft Knights Landing\textquotedblright) which has 68 cores on a single socket clocked at 1.4 GHz, with 96 GB of DDR4 RAM. Each of 
 the cores consists of 4 hardware threads. The simulations were then run by varying the the number of MPI 
 processes from 1 to 16 and the number of OMP threads from 1 to 8, thus, using a maximum of 128 cores.
 %\textcolor{cyan}{ Did not include the liquid and gas PBMs in this but hoping they will be some what 
@@ -703,7 +703,8 @@ processes from 1 to 16 and the number of OMP threads from 1 to 8, thus, using a 
 %still.}   
 
 \begin{algorithm}[!h]
-\caption{\bf{Algorithm: }Pseudo code}
+\caption*{\textbf{Pseudo Code}}
+\label{alg:MyAlgorithm}
 \begin{algorithmic}[*]
 \While{ $t<t_{final}$ }
 \par // the spatial domain is divided into equal chunks (with in 1 bin size)
@@ -789,7 +790,7 @@ across different platforms.
  LIGGGHTS as discussed above, statically decomposes the work space and each section is sent to 
 a MPI process for calculations. Thus, the division of the space becomes an important criteria for the 
 simulation for efficient load balancing. The initial studies were undertaken for a mono-sized particle of 
-size 1 mm and the simulation was carried out for 0.5 seconds of granulation time. The initial timing studies
+size 1 mm and the simulation was carried out for 0.5 second of granulation time. The initial timing studies
  for the decomposition were performed using 64 cores. The effect of the decomposition on the simulation 
 time can be seen in Table \ref{table:rslts_dem_slicing_studies}. This indicates that dividing the 
 x-direction in more number of compartments help increase the speed of the simulation. This is easy to 
@@ -937,7 +938,7 @@ times required to transfer the rotating mesh from one process to the other. From
 the modify time. This is expected since the impeller is rotating at a very high speed of 2000 rpm. So, if 
 the number of processes are increased the amount of time spent in transferring the mesh also 
 increases. In the studies, the modify time as a percentage of the simulation increased from 82\% to 
-about 90\% , when the core count was increased from the 64 cores to 256 cores. But, the using the 
+about 90\%, when the core count was increased from the 64 cores to 256 cores. But, the using the 
 higher number of cores reduces time taken to calculate particle-particle interaction as well as in 
 neighbour calculation. Thus, a better implementation for meshing as well as decomposition of the 
 geometry for faster simulations with higher core counts.

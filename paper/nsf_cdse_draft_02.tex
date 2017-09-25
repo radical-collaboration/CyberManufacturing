@@ -33,7 +33,7 @@ Jersey, Piscataway, NJ, USA 08854}
 \begin{abstract}
 Particulate processes are prevalent in the pharmaceutical industry but the physics underlying these 
 processes are complex and modelling them requires great amounts of computation. In this work, a 
-multi-dimensional PBM was developed (should I include lumped parameter part) which consisted of a 
+multi-dimensional PBM was developed which consisted of a 
 mechanistic aggregation kernel, which obtained the collision data from the DEM simulation, which was 
 performed on LIGGGHTS. The PBM code was run in parallel using the MPI + OMP hybrid technique. 
 Speedup of about 14 times was obtained on the PBM simulations and around 12 on the DEM 
@@ -65,8 +65,7 @@ has been active research in this area on how to accurately model the  physics of
 Particulate processes are defined by chaotic micro-scale phenomena that result from the many 
 particle-particle interactions inside these systems. These small scale phenomenon develop into 
 complex bulk behaviour of these processes. To successfully predict the bulk behaviour of these 
-systems, a model needs to capture the particle-particle interactions and emergent meso-scale scale 
-phenomena. Discrete Element Method (DEM)\citep{Cundall1979} has proven to be an accurate way 
+systems, a model needs to capture the particle-particle interactions and emergent meso-scale phenomena. Discrete Element Method (DEM)\citep{Cundall1979} has proven to be an accurate way 
 to  model a bulk material properties of particulate systems using micro-scale particle level 
 interactions for pharmaceutical processes \citep{Hancock2011}. DEM uses Newton's equations of 
 motion to model the forces on each particle in the system and it's interactions with the system 
@@ -81,7 +80,7 @@ nature, meaning they use population averages and probability to capture bulk beh
 seek to capture some of the micro-phenomena of particle-particle interactions using correlations or 
 empirically developed kernels to approximate those interactions. Even though PBM is much faster 
 than DEM, detailed PBM can still take a significant amount of time to solve which prevents them 
-from being used as widely as they could be academia and industry \citep{Barrasso2013}. Due to the 
+from being used as widely as they could be in academia and industries \citep{Barrasso2013}. Due to the 
 populating averaging and their semi-mechansitc kernels, highly detailed PBMs still can have 
 difficulties in capturing the microscale phenomena that are crucial to predicting the dynamics of 
 particluate processes. 
@@ -117,8 +116,7 @@ improvements that can be achieved using HPCs and how they can help improve proce
 \subsection{Objectives}
  The main objective of this work is to develop a uni-directional DEM-PBM model that runs in 
 parallel so that modern computing clusters can be used to solve the coupled model in the 
-shortest amount of time possible and so that more detail can be used in modelling than was 
-possible with out the performance improvements of parallel computing. Specific goals include the 
+shortest possible time and so that more detail can be used in modelling than was without the performance improvements of parallel computing. Specific goals include the 
 following:
 \begin{itemize}
 \item Developed a 4-Dimensional PBM that is parallelized using hybrid techniques (MPI + 
@@ -145,7 +143,7 @@ run quickly on high performance computing systems
    To understand how a granulation processes will behave with different parameter settings and 
   chemical mixtures, experimental studies of the process parameter space are performed which is a 
   method referred to as Quality-by-Testing (QbT). This methodology is time consuming and 
-  expensive. Thus, newer research is focused on the quality by design (QbD) concept i.e, 
+  expensive. Thus, newer research is focused on the QbD concept i.e, 
   theoretically modelling the process for better quality of the product and its cost benefits. 
 
 \subsection{Modeling}
@@ -215,8 +213,8 @@ flow along the granulator.
 \subsubsection{Coupled DEM-PBMs}
  The use of multi-physics models has recently been adapted to understand the behaviour of 
 particle systems. These models help understand the physics of the system at various scales 
-\textit{i\.e\.} micro, meso and macro scale(\cite{sen2014}). Particle process dynamics have been 
-inferred from coupling of various physics models \textit{viz.} Computational Fluid Dynamics (CFD), 
+\textit{i.e.} micro, meso and macro scale(\cite{sen2014}). Particle process dynamics have been 
+inferred from coupling of various physics models \textit{viz.} CFD, 
 DEM and PBM. Earlier works from \cite{sen2014} and \cite{Barrasso2015cerd} have successfully 
 predicted process dynamics of the granulation process using such multi-physics models.
  Initally, \cite{ingram2005} coupled PBM and DEM using two different mutliscale frameworks and 
@@ -265,7 +263,7 @@ parallel program all these aspects need to be considered for optimal perfomance 
 MPI is used for distributed memory parallel computing, this is because MPI will operate every MPI 
 process as a discrete unit that does not share memory with the other processes unless explicit 
 message passing is used. Even on shared a single node where the hardware is supports shared 
-memory computing, MPI will still operate it in a distributed memory fashion \cite{Jin2011}. Operating all 
+memory computing, MPI will still operate it in a distributed memory fashion \citep{Jin2011}. Operating all 
 cores as distinct units also means they each need their own copy of all variables used for computation 
 which results in a large overall memory foot print compared to a same system if it was operated in 
 shared memory. 
@@ -273,7 +271,7 @@ shared memory.
 computing. OMP is used for shared memory and can take advantage of shared memory systems which 
 can result in much faster computation. It does not work well on distributed systems though. This 
 prevents it from being used to efficiently carry out computations across multiple nodes of a cluster 
-simultaneously \cite{Jin2011}. 
+simultaneously \citep{Jin2011}. 
  Since MPI is preferred for distributed computing and OMP is better for shared computing many 
 individuals have studied the performance of MPI vs MPI+OMP methods and many studies have used 
 MPI+OMP for scientific computation for improved performance. Often times a trade of is made 
@@ -286,17 +284,17 @@ parallelized. In this current work external and internal(compositions) calculati
 \subsubsection{Previous works on parrallel PBM and DEM}
   The idea of parallelization to reduce the amount of time required has been employed by various 
 researchers in the past. \cite{Gunawan2008} used high-resolution finite volumes solution methods for 
-the parallelization of their PBM. \cite{Gunawan2008} performed load balancing effectively by 
+the parallelization of their PBM. They performed load balancing effectively by 
 decomposing the internal coordinates of their PBM. They acheived speed improvements upto 100 
 cores on one system size, but was not tested for models with more dimensions. Moreover, they 
 mentioned that the parallelisation could be improved using shared memory processing. 
 \cite{Bettencourt2017} took a hybrid approach towards the parallelization of the PBM using both 
-Message Parsing Interface (MPI) and Open Multi-Processing. The hybrid parallelisation helped achieve 
-a speed up of about 98\% using 128 cores over the serial code. \cite{Prakash2013a},\cite{Prakash2013b} 
-used the inbuilt Parallel Computation Toolbox (PCT) in Matlab to parallelize their PBM on lower number 
+MPI and OMP. The hybrid parallelisation helped achieve 
+a speed up of about 98\% using 128 cores over the serial code. \cite{Prakash2013a} and \cite{Prakash2013b} 
+used the inbuilt Parallel Computation Toolbox (PCT) in Matlab \citep{pctMatlab} to parallelize their PBM on lower number 
 of cores, but this faced the shortcomings of Matlab's internal processing and could not achieve the 
 speed improvements of parallelistion of a program if it were written in a native programming language 
-like C or FORTRAN. 
+like C/C++ or FORTRAN. 
   LIGGGHTS is an open-source software used to perform DEM simulations. This package natively 
 supports MPI for parallelizing the simulation by static decomposition which partitions space such that 
 the area of communication between the the MPI processes is minimized. \cite{kacianauskas2010} used 
@@ -317,10 +315,10 @@ number of cores, but there was no significant speed improvement for smaller core
 \subsubsection{LIGGGHTS}
  LAMMPS Improved for general granular and granular heat transfer simulations (LIGGGHTS v3.60) 
 (\cite{Kloss2012}) developed by DCS computing was used for all the simulation performed in this 
-study. Edits were made to the compute\_contact\_atom source file to obtain particle $-$ particle 
+study. Source code files were modified to obtain particle-particle 
 collisions. The aforementioned version of LIGGGHTS was compiled using the mvapich (mvapich2 v2.1) 
-and intel (intel v15.0.2) compilers with the -o3 optimisation option as well as an option to sideload the 
-process to the Xeon phi co-processors was added. The initail timing studies were performed on Stampede 
+and intel (intel v15.0.2) compilers with the -O3 optimisation option as well as an option to sideload the 
+process to the Xeon phi co-processors was added. The initial timing studies were performed on Stampede 
 supercomputer located at TACC, Univeristy of Texas, Austin. The hardware configuration of each node 
 consists of 2 8-core Intel Xeon E5-2680 processors based on the Sandy Bridge architecture, 32 gb of 
 memory with QPI interconnects at 8.0 GT/s PCI-e lanes.
@@ -392,18 +390,18 @@ which correspond to the inlet and outlet ends respectively.}
 
 \subsubsection{Meshing}
  After the geometry was built in SolidWorks$^{TM}$ (Dassault Syst\`{e}mes) the shell and impeller 
-were exported as STL files. The coarsest output option was used to keep the STL files small and 
-simple for faster computations times. They were also exported not keeping there original coordinates  
+were exported as stereolithography (STL) files. The coarsest output option was used to keep the STL files small and 
+simple for faster computations times. They were also exported not keeping there original coordinates.  
 This resulted in the impeller having 2802 faces and 1281 points with approximately a file size of 775 
-KBs. The shell had 1948 faces and 720 points and size was about 544 KBs.  
+kilobytes. The shell had 1948 faces and 720 points and size was about 544 kilobytes.  
  Meshlab was used to align the STL files for importing into LIGGGHTS. No mesh treatments were 
 used on the STLs. 
  The meshes were then imported into LIGGGHTS using the write command in serial. This resulted 
 in 50 elements of the impeller file having "highly skewed elements", which have more than 5 
-neighbours per surface or have an angle less than 0.0181185 degrees, that according to LIGGGHTS 
+neighbours per surface or have an angle less than 0.0181185 degree, that according to LIGGGHTS 
 would degrade parallel performance. The write exclusion list command in LIGGGHTS was used and 
 this exclusion list file as then used in the simulation to skip the highly skewed elements during the 
-simulation 
+simulation. 
 %The shell did not have any skewed elements \textcolor{cyan}{(FUTURE SOLUTION? - perhaps we 
 %can use the output from liggghts exclusion list to find exact elements of issue. then we can use 
 %meshlab to exclude those peices or remesh thos individual pieces into better shapes with less 
@@ -415,17 +413,17 @@ parameters of the particles, importing of the geometry, particle insertion comma
 models to be used during the simulation as well as various compute and dump commands to help print 
 the data required for post-processing of the data. The particles were considered to be granular in 
 nature. The Hertzian model was used for non-adhesive elastic contact between the granular particles. 
-The particles were inserted inside the granluator from the inlet at a constant mass flow rate of 15 
-kilgrams per hour. The rotation speed of the impeller was kept throughout the study at 2000 rotations 
-per minute. Such a high rotation speed was chosens since this would lead to high shear between the 
+The particles were inserted inside the granulator from the inlet at a constant mass flow rate of 15 
+kilograms per hour. The rotation speed of the impeller was kept throughout the study at 2000 rotations 
+per minute. Such a high rotation speed was chosen since this would lead to high shear between the 
 particles and the walls of the shell resulting in better size control of the granules. There were 2 sets of 
-simulations that were performed, one with mono-sized partcles and second consisting of a distribution 
+simulations that were performed, one with mono-sized particles and second consisting of a distribution 
 of sizes. The particle radii chosen for mono-sized simulation varied 0.59mm - 2mm, consecutive 
 particles radii had volume twice of one before them. The radii range of the distributed size simulation 
-was 1mm - 3mm. The difference in the mechanics of these two simulations is dicussed later in the 
-results section. The physical constants used for the simulations are given in Table 
+was 1mm - 3mm. The difference in the mechanics of these two simulations is discussed later in the Section \ref{sec:Results}. 
+The physical constants used for the simulations are given in Table 
 \ref{table:mthds_dem_input}.
- The simulation data was collected after ever 50,000 time steps (5$times 10^{-3}$ secoonds) 
+ The simulation data was collected after ever 50,000 time steps (5$\times 10^{-3}$ sec) 
 for the visulation of the particles inside the shell, further post processing . The collisions 
 between each of the particles and the collisions between of the particle and the geometry was 
 collected and used in the PBM. 
@@ -454,12 +452,12 @@ Density of the granules & $500$ & $kg.m^{-3}$\\
  The post processing of the data obtained from the DEM simulations was done using MATLAB. 
 The first test run on the output data was to determine if the simulation had reached steady-state. The 
 mass inside the granulator was found out by averaging it over 5 time steps and then compared to 
-mass inside the granulator after every 10000 time steps (about $5$x$10^{-4}$ seconds) with a 
+mass inside the granulator after every 10000 time steps (about 5$\times 10^{-4}$ sec) with a 
 tolerance of about 10\%. If the mass was found to be constant for most of the iterations, it was 
 considered to be at steady state. Another test to determine steady state was to monitor the number of 
 collision inside the granulator. The visualisation of the simulation data was done by running the 
-LIGGHTS post processing (LPP) script over the dump files to convert the dump files to .stl files. These 
-files were then loaded in to Paraview\citep{henderson2004} for a graphical representation of the 
+LIGGHTS post processing (LPP) script over the dump files to convert them into STL files. These 
+files were then loaded in to Paraview~\citep{henderson2004} for a graphical representation of the 
 simulation. It can be seen that the number of collision start to oscillate around a mean value. The 
 number of collisions were then plotted and steady state time was determined.
  A precautionary script was also run so as to determine that no particles were lost due to overlap 
@@ -475,7 +473,7 @@ of the geometry with the particles as well as from particle particle overlap.
 \end{align}
 %	     \textcolor{red}{citation?}    
 
- where, $F(s_1,s_2,x)$ is the number of particles with an API volume of $s_1$ and an excipient 
+ where, $F(s_1,s_2,x)$ is the number of particles with an active pharmaceutical ingredients (API) volume of $s_1$ and an excipient 
 volume of $s_2$ in the spatial compartment $x$. The rate of change of number of particles with time 
 in different size classes depend on the rate of aggregation $\Re_{agg}(s_1,s_2,x)$ and the rate of 
 breakage $\Re_{break}(s_1,s_2,x)$. Also, the rate of particles coming into, $\dot{F}_{in}(s_1,s_2,x)$ and 
@@ -655,11 +653,11 @@ Number of second solid bins & $ss$ & $16$ & $-$\\
  The PBM was discretized by converting each of its coordinates in to discrete bins. For the spatial 
 coordinates a linear bin spacing was used. For the internal coordinates, solid,liquid, and gas a 
 non-linear binning was used.
- Once the PBM had been discretized (compartmentalized/binned) a finite differences method was 
+ Once the PBM had been discretized, a finite differences method was 
 used which created a system of ordinary differential equations (ODEs) \citep{Barrasso2015cerd}. The 
 numerical integration technique used to evaluate the system of ODEs was first order Euler integration 
 as it is commonly used to solve these types of systems and author  found it improved speeds while 
-having minimal impact on accuracy \citep{Barrasso2013}. To obtain the most optimal parallel 
+having minimal impact on accuracy \citep{Barrasso2013}. In order to avoid numerical instability due to the explicit nature of the Euler integration, Courant-Friedrichs-Lewis (CFL) condition must be satisfied~\citep{courant1967}. For our PBM model, time-step was calculated at each iteration such that, the number of particles leaving a particular bin at is less than the number of particles present at that time \citep{Ramachandran2010}. To obtain the most optimal parallel 
 performance, when solving the PBM, work loads were distributed in a manner which took into account 
 the shared memory and distributed memory aspects of the clusters the PBM was being run on. To 
 parallelize the model in a why which could take advantage of shared memory but still effectively run 
@@ -785,7 +783,7 @@ across different platforms.
 
 
 \section{Results}
-
+\label{sec:Results}
 \subsection{DEM}
 \subsubsection{DEM Spacial Decomposition Studies}
  LIGGGHTS as discussed above, statically decomposes the work space and each section is sent to 

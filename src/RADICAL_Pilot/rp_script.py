@@ -143,6 +143,7 @@ if __name__ == '__main__':
         # Here we don't use dict initialization.
         cud = rp.ComputeUnitDescription()
         cud.environment    = ['PATH='+config['pathtoPBMexecutable']+':$PATH']
+        cud.pre_exec       = ['mkdir csvDump','mkdir txtDumps']
         cud.executable     = 'model.out'
         cud.arguments      = [config['cores'],config['diameter']]
         cud.input_staging  = [collision,impact]

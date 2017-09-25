@@ -7,7 +7,7 @@
 \usepackage{lineno}
 \usepackage{placeins}
 \usepackage{subcaption}
-\usepackage[usenames, dvipsnames]{color}
+\usepackage[usenames,dvipsnames]{color}
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
@@ -340,7 +340,6 @@ provided at one end of the casing and an angled outlet port is provided at the l
 \centering
 \includegraphics[scale=0.2]{shell_final_pic.pdf}
 \caption{ Shows an isometric view of the granulator casing.}
-%\caption{hello yuktesh}
 \label{fig:mthdsDemCharlesGranShell}
 \end{figure}
 
@@ -358,7 +357,6 @@ configuration of the granulator is shown in figure
 \includegraphics[scale=0.2]{impeller_final_pic.pdf}
 \caption{a) Shows the side view of the impeller. b) and c) show the front and back views of the impeller 
 which correspond to the inlet and outlet ends respectively.}
-%\caption{hello yuk}
 \label{fig:mthds_dem_charles_impeller}
 \end{figure}    
 
@@ -386,7 +384,6 @@ which correspond to the inlet and outlet ends respectively.}
 
 
 \caption{ Various components of the impeller}
-%\caption{hello tesh}
 \label{fig:mthds_dem_charles_fig5pt3and4_blades_n_isometric}
 \end{figure}     
 
@@ -514,7 +511,7 @@ aggregation and breakage. $g_{in}(s_1,s_2,x)$ and $g_{out}(s_1,s_2,x)$ are respe
 volume of the particles entering and leaving the spatial compartment. $\dot{g}_{cons}(s_1,s_2,x)$ is the 
 volume of gas coming out of each particle at every time-step due to consolidation of the particles. 
 The rate of aggregation, $\Re_{agg}(s_1,s_2,x)$ in Equation \ref{eqn:mthds_pbm_overall} is 
-calculated as  
+calculated as: \citep{Chaturbedi2017}
 \begin{align}
 \Re_{agg}(s_1,s_2,x)&= \frac{1}{2}\int _0^{s_1} \int_0^{s_2} 
 \beta(s_1',s_2',s_1-s_1',s_2-s_2',x)F(s_1',s_2',x)F(s_1-s_1',s_2-s_2',x)ds_1'ds_2'\notag\\ 
@@ -583,7 +580,7 @@ time interval $\Delta t$ \& $N_p$ is number of particle of particular size. The 
 %the radius of the granule that breaks and $B$ is the breakage kernel constant. $G_shear$ is 
 %calculated as $\frac{\nu_{impeller}*D_{impeller}*PI}{60}$ where $\nu_{impeller}$ and $D_{impeller}$ 
 %are respectively the rotational speed and diameter of the impeller.
-The rate of increase of liquid volume of a particle, $\dot{l}_{add}(s_1,s_2,x)$ is expressed as :
+The rate of increase of liquid volume of a particle, $\dot{l}_{add}(s_1,s_2,x)$ is expressed as:
 
 \begin{align}
 \dot{l}_{add}(s_1,s_2,x) = \frac{(s_1+s_2)(\dot{m}_{spray}(1-c_{binder})-\dot{m}_{evap})}{m_{solid}(x)}
@@ -595,12 +592,7 @@ be zero in this case); $\dot{m}_{evap}$ is the rate of evaporation of liquid fro
 the system (which is also assumed to be zero in this case) and $m_{solid}$ is the total amount of solid 
 present in the compartment.
 The rate of decrease in gas volume per particle due to consolidation is calculated using the 
-following expression: 
-
-%	      \begin{align}
-%	      \dot{g}_{cons}(s_1,s_2,x)=c*(\nu_{impeller})^{\omega}*V(s_1,s_2,x)\frac{(1-\epsilon_{min})}{s} 
-%\left[g(s_1,s_2,x)+l(s_1,s_2,x) -(s_1+s_2)\frac{\epsilon_{min}}{1-\epsilon_{min}}\right]
-%	      \end{align}  
+following expression: \citep{Verkoeijen2002} 
 
 \begin{align}
 \dot{g}_{cons}(s_1,s_2,x)=&c (\nu_{impeller})^{\omega}V(s_1,s_2,x)\frac{(1-\epsilon_{min})}{s} 
@@ -625,8 +617,10 @@ which is the distance particles have to travel to move to the next spatial compa
 time-step.
 The values of various parameters used in the model are provided in Table 
 \ref{table:mthds_pbm_parameters}.
-
-\begin{table}[!htb]
+\subsubsection{PBM parameters}
+The process parameters and physical constants used in the PBM simulation are listed in Table 
+\ref{table:mthds_pbm_parameters}.
+\begin{table}[H]
 \caption{Parameters for PBM}
 \label{table:mthds_pbm_parameters}
 \begin{center}
@@ -689,7 +683,6 @@ decomposition of the data into different CPUs and further into various threads i
 \centering
 \includegraphics[scale=0.5]{PBM_decomposition.pdf}
 \caption{The distribution of calculations using hybrid parallelisation (MPI + OMP).}
-%\caption{hello yuktesh}
 \label{fig:mthds_PBM_decompostion}
 \end{figure}
 
@@ -712,7 +705,7 @@ processes from 1 to 16 and the number of OMP threads from 1 to 8, thus, using a 
 %still.}   
 
 \begin{algorithm}[!h]
-\caption*{\bf{Algorithm: }Pseudo code}
+\caption{\bf{Algorithm: }Pseudo code}
 \begin{algorithmic}[*]
 \While{ $t<t_{final}$ }
 \par // the spatial domain is divided into equal chunks (with in 1 bin size)
@@ -889,7 +882,6 @@ hold-up of particles of about 6500.
 \centering
 \includegraphics[scale=0.5]{rslts_DEM_2mm_timing.pdf}
 \caption{The variation in the amount of time taken for the simulation as a function of \# of cores}
-%\caption{hello tesh}
 \label{fig:rslts_DEM_2mm_timing}
 \end{figure}	
 
@@ -939,7 +931,6 @@ computationally more expensive.
 \includegraphics[scale=0.7]{rslts_DEM_timing_plots.pdf}
 \caption{Time taken for a 10 second DEM simulation for diameters ranging from 0.63mm to 2mm and 
 a particle size distribution ranging from 1mm - 3mm}
-%\caption{hello tesh}
 \label{fig:rslts_DEM_timing_studies}
 \end{figure}
  The communication time in LIGGGHTS is indicated by the Modify time, which is the sum of the 
@@ -997,35 +988,35 @@ geometry for faster simulations with higher core counts.
 %\end{table}
 
 \subsubsection{PBM model validation with DEM data}
- The Population Balance Model implemented was considered to have an inlet flow of particles in the 
-first compartment at a constant mass flow rate of 15 kilograms per hour. The particles were introduced 
-in a log normal distribution with minimum diameter of the particles being about 12 $\mu$m and the 
-maximum of 2.1 mm. \\
+ The population balance model implemented was considered to have an inlet flow of particles in the 
+first compartment at a constant mass flow rate of 15 kilograms per hour. The particles were assumed 
+to have a log normal distribution with minimum diameter of the particles being about 12 $\mu$m and the 
+maximum of 2.1 mm with a mean of 0.453 mm and a standard deviation of about 0.62 mm. \\
 The PBM used in this study employs an aggregation kernel that takes in account the formation of a 
 larger particle from only two smaller particles. The ratio of the rate of formation and the rate of 
-depletion due to aggregation helps us monitor whether the PBM is running correctly. Since this PBM 
-takes into account only 2 particles at once, the ratio is expected to have a value of 0.5 during the 
-aggregation process. Figure \ref{fig:rslts_PBM_ratio_plot_2mm} illustrates this ratio to be 0.5 
-throughout the simulation, validating the stability of the PBM used.\\
+depletion due to aggregation helps us monitor whether the PBM satifies the conservation of mass. 
+Since this PBM takes into account the aggregation of only 2 particles at once, the ratio of the particles 
+is expected to have a value of 0.5 during the aggregation process. Figure \ref{fig:rslts_PBM_ratio_plot_2mm}
+ illustrates this ratio to be 0.5 throughout the simulation, validating the accuracy of the PBM used.\\
 \begin{figure}[H]
 \begin{center}
 \includegraphics[scale=0.5]{rslts_PBM_2mm_validation.pdf}
-\caption{The ratio of rate of formation to the rate of depletion due to aggraetion as a function of time. 
-The constant value of 0.5 shows that the PBM is stable through the simulation time}
+\caption{The ratio of rate of formation to the rate of depletion of particles due to aggregation as a function 
+of time.}
 \label{fig:rslts_PBM_ratio_plot_2mm}
 \end{center}
 \end{figure}
-Figure \ref{fig:rslts_PBM_d50_plots} shows four different particle size distribution (psd) plots at four 
-different time instants.Figure \ref{fig:rslts_PBM_d50_plots}(\subref{fig:30s}) shows the distribution of 
+Figure \ref{fig:rslts_PBM_d50_plots} shows four different particle size distribution plots at four 
+different time instants. Figure \ref{fig:rslts_PBM_d50_plots}(\subref{fig:30s}) shows the distribution of 
 the particles at 30 seconds, where we expect to have the highest number of the smaller particles. 
-Since the degree of aggregation that has occured is very low, thus there is a spike in the number of 
-particels of the smaller size. The particle size distributions at 2 intermediate times of 50 seconds and 
+Since the degree of aggregation that has occured is very low, thus there is a jump in the number of 
+particles of the smaller size. The particle size distributions at 2 intermediate times of 50 seconds and 
 75 seconds are plotted in Figures \ref{fig:rslts_PBM_d50_plots}(\subref{fig:50s}) and 
 \ref{fig:rslts_PBM_d50_plots}(\subref{fig:75s}) respectively. These illustrate that there is an increase in 
-the number of particles with higher diameter and a subsequent decrease in the number of particles for 
-lower diameter particles. Figure \ref{fig:rslts_PBM_d50_plots}(\subref{fig:100s}) shows the distribution 
+the number of larger particles  and a subsequent decrease in the number of smaller particles. 
+Figure \ref{fig:rslts_PBM_d50_plots}(\subref{fig:100s}) shows the distribution 
 of the particle size at the end of the granulation process. It can be seen that the number of particles in 
-the higher diameter bins increase for both the solids. 
+the higher diameter bins increase.
 
 \begin{figure}[H]
 \begin{subfigure}{.5\textwidth}
@@ -1051,7 +1042,7 @@ the higher diameter bins increase for both the solids.
 \caption{•}
 \label{fig:100s}
 \end{subfigure}
-\caption{The plots for the number of particles of solid 1 and solid 2 and with their respective d50 in 
+\caption{The number of particles inside all compartments with diameters less than 0.2 mm in 
 mm after (\subref{fig:30s}) 30s (\subref{fig:50s}) 50s (\subref{fig:75s}) 75s and (\subref{fig:100s}) 
 100s}
 \label{fig:rslts_PBM_d50_plots}
@@ -1074,7 +1065,6 @@ each. The scaling with the only MPI cores shows great increase in performance. \
 \includegraphics[scale=0.7]{rslts_PBM_Time_analysis.pdf}
 \caption{Average time taken to run the PBM simulation which consisted of 25 seconds of mixing time 
 and 75 seconds of granulation time at different core configurations}
-%\caption{hello tesh}
 \label{fig:rslts_PBM_timing_studies}
 \end{figure}
 
@@ -1194,7 +1184,7 @@ due to aggregation in Figure \ref{fig:rslts_RP_ratio_plot}
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{rslts_PBM_2mm_validation.pdf}
-\caption{The ratio of rate of formation to the rate of depletion due to aggraetion 
+\caption{The ratio of rate of formation to the rate of depletion due to aggregation 
 as a function of time. Since the ratio is 0.5 as expected, we can say the physics does not change. 
 (\textbf{Currently a placeholder})}
 \label{fig:rslts_RP_ratio_plot}

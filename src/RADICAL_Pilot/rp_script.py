@@ -133,7 +133,7 @@ if __name__ == '__main__':
     
         report.info('\n')
         collision = {'source': 'pilot:///collision%d.atom'%config['timesteps'],
-                     'target': 'unit:///sampledumpfiles/collision%d.%d_%f'%(config['timesteps'],config['cores'],config['diameter']),
+                     'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%(config['timesteps'],config['cores'],config['diameter']),
                      'action'  : rp.LINK}
 
         impact = {'source': 'pilot:///impact%d.atom'%config['timesteps'],

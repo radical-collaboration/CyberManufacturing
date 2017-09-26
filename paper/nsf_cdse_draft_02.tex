@@ -213,7 +213,7 @@ flow along the granulator.
 \subsubsection{Coupled DEM-PBMs}
  The use of multi-physics models has recently been adapted to understand the behaviour of 
 particle systems. These models help understand the physics of the system at various scales 
-\textit{i.e.} micro, meso and macro scale(\cite{sen2014}). Particle process dynamics have been 
+\textit{i.e.} micro, meso and macro scale~\citep{sen2014}. Particle process dynamics have been 
 inferred from coupling of various physics models \textit{viz.} CFD, 
 DEM and PBM. Earlier works from \cite{sen2014} and \cite{Barrasso2015cerd} have successfully 
 predicted process dynamics of the granulation process using such multi-physics models.
@@ -224,8 +224,7 @@ data is obtained from the DEM and then have been used in PBM. \cite{gantt2006} u
 to build mechanistic model for the PBM. \cite{Goldschmidt2003} solved a PBM using DEM by 
 replacing smaller particles as they successfully coalesce by larger particles. A mechanistic aggregation 
 model was developed for wet granulation by \cite{Reinhold2012}. A hybrid model for one-way coupling 
-has been reported for continuous mixing (\cite{sen2013} \& \cite{sen2013b}) and is discussed in later 
-sections.
+has been reported for continuous mixing (\cite{sen2013} \& \cite{sen2013b}) and is discussed in Section \ref{sec:pbm_model}.
  In this work, a coupling of DEM and PBM has been implemented. The PBM gives meso-scale 
 information while the DEM gives particle scale information. Combination of these two methods help 
 comprehend the process dynamics with more accuracy. The calculations involved due to the number 
@@ -365,16 +364,16 @@ configuration of the granulator is shown in Figure
 \label{fig:mthds_dem_feed_element}
 \end{subfigure}%
 \begin{subfigure}{.3\textwidth}
+	\centering
+	\includegraphics[scale=0.075]{exit_element.pdf}
+	\caption{Exit element}
+	\label{fig:mthds_dem_exit_element}
+\end{subfigure}
+\begin{subfigure}{.3\textwidth}
 \centering
 \includegraphics[scale=0.075]{shear_element.pdf}
 \caption{Shear element}
 \label{fig:mthds_dem_shear_element}
-\end{subfigure}
-\begin{subfigure}{.3\textwidth}
-\centering
-\includegraphics[scale=0.075]{exit_element.pdf}
-\caption{Exit element}
-\label{fig:mthds_dem_exit_element}
 \end{subfigure}
 \caption{Components (\subref{fig:mthds_dem_feed_element}) and (\subref{fig:mthds_dem_exit_element}) help in 
 movement of the particles while (\subref{fig:mthds_dem_shear_element}) aids to throw the partilces to the wall 
@@ -417,7 +416,7 @@ particles and the walls of the shell resulting in better size control of the gra
 simulations that were performed, one with mono-sized particles and second consisting of a distribution 
 of sizes. The particle radii chosen for mono-sized simulation varied 0.59mm - 2mm, consecutive 
 particles radii had volume twice of one before them. The radii range of the distributed size simulation 
-was 1mm - 3mm. The difference in the mechanics of these two simulations is discussed later in the Section \ref{sec:Results}. 
+was 1mm - 3mm. The difference in the mechanics of these two simulations is discussed in the Section \ref{sec:Results}. 
 The physical constants used for the simulations are given in Table 
 \ref{table:mthds_dem_input}.
  The simulation data was collected after ever 50,000 time steps (5$\times 10^{-3}$ sec) 
@@ -462,6 +461,7 @@ of the geometry with the particles as well as from particle particle overlap.
 
 
 \subsection{PBM}
+\label{sec:pbm_model}
 \subsubsection{Model development}
  The population balance equation used in this work is expressed below:
 \begin{align}

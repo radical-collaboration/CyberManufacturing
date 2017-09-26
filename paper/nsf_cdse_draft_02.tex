@@ -17,6 +17,42 @@
 
 \usepackage{float}
 
+\definecolor{listinggray}{gray}{0.95}
+\definecolor{darkgray}{gray}{0.7}
+\definecolor{commentgreen}{rgb}{0, 0.4, 0}
+\definecolor{darkblue}{rgb}{0, 0, 0.4}
+\definecolor{middleblue}{rgb}{0, 0, 0.7}
+\definecolor{darkred}{rgb}{0.4, 0, 0}
+\definecolor{brown}{rgb}{0.5, 0.5, 0}
+
+\usepackage[normalem]{ulem}
+\makeatletter
+\def\cyanuwave{\bgroup \markoverwith{\lower3.5\p@\hbox{\sixly \textcolor{cyan}{\char58}}}\ULon}
+\def\reduwave{\bgroup \markoverwith{\lower3.5\p@\hbox{\sixly \textcolor{red}{\char58}}}\ULon}
+\def\blueuwave{\bgroup \markoverwith{\lower3.5\p@\hbox{\sixly \textcolor{blue}{\char58}}}\ULon}
+\font\sixly=lasy6 % does not re-load if already loaded, so no memory problem.
+\makeatother
+
+\newif\ifdraft
+\drafttrue
+\ifdraft
+\usepackage{xcolor}
+\definecolor{ocolor}{rgb}{1,0,0.4}
+\newcommand{\terminology}[1]{ {\textcolor{red} {(Terminology used: \textbf{#1}) }}}
+\newcommand{\jwave}[1]{ {\reduwave{#1}}}
+\newcommand{\jhanote}[1]{ {\textcolor{red} { ***shantenu: #1 }}}
+\definecolor{orange}{rgb}{1,.5,0}
+\definecolor{dandelion}{cmyk}{0,0.29,0.84,0}
+\newcommand{\gpnote}[1]{{\textcolor{green} {***giannis: #1}}}
+\newcommand{\note}[1]{ {\textcolor{magenta} { ***Note: #1 }}}
+\else
+\newcommand{\terminology}[1]{}
+\newcommand{\jwave}[1]{#1}
+\newcommand{\jhanote}[1]{}
+\newcommand{\gpnote}[1]{}
+\newcommand{\note}[1]{}
+\fi
+
 \journal{Chemical Engineering Research and Design}
 \begin{document}
 \begin{frontmatter}

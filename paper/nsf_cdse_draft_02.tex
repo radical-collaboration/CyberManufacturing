@@ -696,11 +696,6 @@ the newer Stampede2 supercomputer. Each of the compute node of the cluster consi
 (\textquotedblleft Knights Landing\textquotedblright) which has 68 cores on a single socket clocked at 1.4 GHz, with 96 GB of DDR4 RAM. Each of 
 the cores consists of 4 hardware threads. The simulations were then run by varying the the number of MPI 
 processes from 1 to 16 and the number of OMP threads from 1 to 8, thus, using a maximum of 128 cores.
-%\textcolor{cyan}{ Did not include the liquid and gas PBMs in this but hoping they will be some what 
-%assumed? Also the Ragg omp distributed work is an a}
-%\textcolor{red}{what about private OMP vars specified that has impact on how model is solved etc. 
-%Should look into this. might change based on locking/blocking tests that need to be implemented 
-%still.}   
 
 \begin{algorithm}[!h]
 \caption*{\textbf{Pseudo Code}}

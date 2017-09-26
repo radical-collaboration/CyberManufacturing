@@ -74,7 +74,8 @@ determines the bulk behaviour of particulate system. Since DEM includes large am
 and force computations take a large amount of time to run. Thus another more computationally 
 efficient, but less accurate technique, used to model these particulate processes is population 
 balance model (PBM).
- PBM takes into account the changes in particle size and the property related mechanisms. This 
+
+PBM takes into account the changes in particle size and the property related mechanisms. This 
 model lacks sensitivity to process parameters and the equipment geometry. It is semi-mechanistic in 
 nature, meaning they use population averages and probability to capture bulk behaviour but still 
 seek to capture some of the micro-phenomena of particle-particle interactions using correlations or 
@@ -84,7 +85,8 @@ from being used as widely as they could be in academia and industries \citep{Bar
 populating averaging and their semi-mechanistic kernels, highly detailed PBMs still can have 
 difficulties in capturing the micro-scale phenomena that are crucial to predicting the dynamics of 
 particulate processes. 
- Thus, to complement the limitations of each of these modeling methods they are coupled to 
+
+Thus, to complement the limitations of each of these modeling methods they are coupled to 
 provide a more accurate model.  The typical work flow of such a PBM-DEM coupled model involves 
 using a short DEM simulation to capture the particle-particle level interactions of the system and 
 then this physics is fed into the PBM, so that the PBM can more accurately simulate bulk system 
@@ -95,7 +97,8 @@ long to solve. In the past parallel computing has been used to speed up computat
 problems such as Molecular Dynamics (MD), Computational Fluid Dynamics (CFD), but in recent 
 years  this technique has been applied to DEM and PBM simulations 
 \citep{Bettencourt2017}\citep{Prakash2013a}\citep{Gunawan2008}.
- In order to solve large computational problems parallel computing can be used to distribute the 
+
+In order to solve large computational problems parallel computing can be used to distribute the 
 problem across many CPUs which can work together to solve the problem more quickly. To solve 
 problems in parallel, computing clusters are often used and with drop  in the prices of hardware, 
 they are becoming popular. A cluster is essentially a collection of conventional computers 
@@ -104,7 +107,8 @@ implementing parallel computing to solve a computational problem is that it invo
 computer-computer communication and algorithm redesigning which needs to be done very 
 carefully to ensure numerical consistency and with consideration of the cluster the program will be 
 run on.
- High performance computing (HPC) is the utilization of supercomputers and parallel processing
+
+High performance computing (HPC) is the utilization of supercomputers and parallel processing
 techniques for solving complicated computational problems. Some of the potential benefits of using
 HPC in the pharmaceutical industry include really high accuracy for parameter estimation as detailed 
 particle-scale simulations can be performed quickly. On-line modeling of continuous processes as 
@@ -164,10 +168,11 @@ model is based on the Newton's laws of the motion and is expressed as in Equatio
 m_i\frac{dv_i}{dt} &= F_{i,net} \label{eqn:bkgd_dem_n2law} \\
 F_{i,net} &=  F_{i,coll} +  F_{i,ext} \label{eqn:bkgd_dem_forcebal}
 \end{align}
-  In the above equations $m_i$ represents the mass of the particle, $v_i$ represents the velocity of 
+In the above equations $m_i$ represents the mass of the particle, $v_i$ represents the velocity of 
 the particle, $F_{i,net}$  represents the net force on the particle, forces on the particle due to collisions 
 and other external forces are represented in $F_{i,coll}$ and $F_{i,ext}$ respectively.
- The distance between each particle calculated at every time step and if the distance between two 
+
+The distance between each particle calculated at every time step and if the distance between two 
 particles is less than the sum of the radii (for spherical particles)  a collision between the two particles 
 is recorded. The tolerance for overlap is low in the normal as well as the tangential direction. 
 Micro-scale DEM simulations are computationally demanding and simulations may take up to several 
@@ -175,6 +180,7 @@ days to replicate a few seconds of real time experiments. Many methods have been
 increase the speed of these simulations, such as scaling by increasing the size of the particles. These 
 approximations are good in understanding the physics of the system but are not directly applicable to 
 process-level simulations. 
+
 The particle-particle collisions are not always elastic, thus there is a need for models for the 
 contact forces. The earliest model was developed by \cite{hertz1882} was elastic in nature. This model was 
 extended by \cite{mindlin1953} by accounting for the  tangential forces during the collisions. The dampening
@@ -204,20 +210,21 @@ is the Hertz-Mindling contact model \citep{gantt2006}\citep{hassanpour2013}.
     \label{eqn:bkgd_pbm_general} 
     \end{align}
     
- In equation (\ref{eqn:bkgd_pbm_general}), $\textbf{v}$ is a vector of internal coordinates. For 
+In equation (\ref{eqn:bkgd_pbm_general}), $\textbf{v}$ is a vector of internal coordinates. For 
 modeling a granulation process $\textbf{v}$ is commonly used to describe the solid, liquid, and gas 
 content of each type of particle. The vector $\textbf{x}$ represents external coordinates, usually 
 spatial variance. For a granulation process this  account for spatial variance in the particles as they 
 flow along the granulator.
 
 \subsubsection{Coupled DEM-PBMs}
- The use of multi-physics models has recently been adapted to understand the behaviour of 
+The use of multi-physics models has recently been adapted to understand the behaviour of 
 particle systems. These models help understand the physics of the system at various scales 
 \textit{i.e.} micro, meso and macro scale~\citep{sen2014}. Particle process dynamics have been 
 inferred from coupling of various physics models \textit{viz.} CFD, 
 DEM and PBM. Earlier works from \cite{sen2014} and \cite{Barrasso2015cerd} have successfully 
 predicted process dynamics of the granulation process using such multi-physics models.
- Initially, \cite{ingram2005} coupled PBM and DEM using two different multi-scale frameworks and 
+
+Initially, \cite{ingram2005} coupled PBM and DEM using two different multi-scale frameworks and 
 focused on methods on integrating the two methods and information exchange required between the 
 two. Later efforts on coupling of PBM and DEM have been uni-directional in nature, where the collision 
 data is obtained from the DEM and then have been used in PBM. \cite{gantt2006} used the DEM data 
@@ -225,7 +232,8 @@ to build mechanistic model for the PBM. \cite{Goldschmidt2003} solved a PBM usin
 replacing smaller particles as they successfully coalesce by larger particles. A mechanistic aggregation 
 model was developed for wet granulation by \cite{Reinhold2012}. A hybrid model for one-way coupling 
 has been reported for continuous mixing (\cite{sen2013} \& \cite{sen2013b}) and is discussed in Section \ref{sec:pbm_model}.
- In this work, a coupling of DEM and PBM has been implemented. The PBM gives meso-scale 
+
+In this work, a coupling of DEM and PBM has been implemented. The PBM gives meso-scale 
 information while the DEM gives particle scale information. Combination of these two methods help 
 comprehend the process dynamics with more accuracy. The calculations involved due to the number 
 of particles involved in the DEM process as well as PBM become very computationally heavy. %The 
@@ -233,13 +241,12 @@ of particles involved in the DEM process as well as PBM become very computationa
 %sense to utilize them to make the simulations faster. Thus, implementation of various parallel 
 %computing techniques was employed in this work to help improve the simulation times. 
 
-
 \subsection{Parallel computing and computer architectures}
 %\subsubsection{Overview}
  The goal of parallel computing is to distribute large amounts of computation across many 
 compute cores to solve problems faster (\cite{wilkinson2005}).
 \subsubsection{Computer Architecture}
- High Performance Computing clusters are a collection of nodes interconnected by a high speed 
+High Performance Computing clusters are a collection of nodes interconnected by a high speed 
 communication network for message passing from one node to another. Analogous to a conventional 
 PC each node as one or more CPUs and RAM. Commonly nodes are manufactured with two CPUs, each CPU 
 is a multi-core meaning it has multiple compute cores that each can carry out calculations 
@@ -248,7 +255,8 @@ separately from one another. %CPUs also have built in memory called cache that i
 On a node memory is divided by CPU sockets, so each CPU has direct access to memory local to its own 
 socket, but accessing memory on another socket is much slower \cite{Jin2011}. For this reason data 
 that is needed for computation should be stored locally to the CPU that needs it.  
- There are two classes of computer architecture classified by memory locality features are 
+
+There are two classes of computer architecture classified by memory locality features are 
 distributed memory systems and shared memory systems. These two classes co-exist in a cluster, 
 thus providing the benefits of each. All the nodes exchange memory using explicit message passing 
 while each has its own independent memory. The cores on each node can access data from the 
@@ -258,7 +266,7 @@ parallel program all these aspects need to be considered for optimal performance
 
 
 \subsubsection{Parallel application programming interfaces}
- Message Passing Interface (MPI) is a common parallel computing application interface standard. 
+Message Passing Interface (MPI) is a common parallel computing application interface standard. 
 MPI is used for distributed memory parallel computing, this is because MPI will operate every MPI 
 process as a discrete unit that does not share memory with the other processes unless explicit 
 message passing is used. Even on shared a single node where the hardware is supports shared 
@@ -266,12 +274,14 @@ memory computing, MPI will still operate it in a distributed memory fashion \cit
 cores as distinct units also means they each need their own copy of all variables used for computation 
 which results in a large overall memory foot print compared to a same system if it was operated in 
 shared memory. 
- Open Multi-Processing (OMP) is another application program interface stand for parallel 
+
+Open Multi-Processing (OMP) is another application program interface stand for parallel 
 computing. OMP is used for shared memory and can take advantage of shared memory systems which 
 can result in much faster computation. It does not work well on distributed systems though. This 
 prevents it from being used to efficiently carry out computations across multiple nodes of a cluster 
 simultaneously \citep{Jin2011}. 
- Since MPI is preferred for distributed computing and OMP is better for shared computing many 
+
+Since MPI is preferred for distributed computing and OMP is better for shared computing many 
 individuals have studied the performance of MPI vs MPI+OMP methods and many studies have used 
 MPI+OMP for scientific computation for improved performance. Often times a trade of is made 
 between optimizing a program for performance and trying to make it flexible enough to run on many 
@@ -281,7 +291,7 @@ good performance.  It was also reported that only the external(spatial) coordina
 parallelized. In this current work external and internal(compositions) calculations are parallelized. 
 
 \subsubsection{Previous works on parrallel PBM and DEM}
-  The idea of parallelization to reduce the amount of time required has been employed by various 
+The idea of parallelization to reduce the amount of time required has been employed by various 
 researchers in the past. \cite{Gunawan2008} used high-resolution finite volumes solution methods for 
 the parallelization of their PBM. They performed load balancing effectively by 
 decomposing the internal coordinates of their PBM. They achieved speed improvements up to 100 
@@ -294,7 +304,8 @@ used the inbuilt Parallel Computation Toolbox (PCT) in Matlab \citep{pctMatlab} 
 of cores, but this faced the shortcomings of Matlab's internal processing and could not achieve the 
 speed improvements of parallelization of a program if it were written in a native programming language 
 like C/C++ or FORTRAN. 
-  LIGGGHTS is an open-source software used to perform DEM simulations. This package natively 
+
+LIGGGHTS is an open-source software used to perform DEM simulations. This package natively 
 supports MPI for parallelizing the simulation by static decomposition which partitions space such that 
 the area of communication between the the MPI processes is minimized. \cite{kacianauskas2010} used 
 load balancing methods similar to a static decomposition and observed that this works well for a 
@@ -404,7 +415,7 @@ simulation.
 %skewed elements. might be better for a letter paper though}
 
 \subsubsection{DEM input file settings}
- The DEM simulation in LIGGGHTS are setup using an input script which defines the physical 
+The DEM simulation in LIGGGHTS are setup using an input script which defines the physical 
 parameters of the particles, importing of the geometry, particle insertion commands, various physics 
 models to be used during the simulation as well as various compute and dump commands to help print 
 the data required for post-processing of the data. The particles were considered to be granular in 
@@ -419,7 +430,8 @@ particles radii had volume twice of one before them. The radii range of the dist
 was 1mm - 3mm. The difference in the mechanics of these two simulations is discussed in the Section \ref{sec:Results}. 
 The physical constants used for the simulations are given in Table 
 \ref{table:mthds_dem_input}.
- The simulation data was collected after ever 50,000 time steps (5$\times 10^{-3}$ sec) 
+
+The simulation data was collected after ever 50,000 time steps (5$\times 10^{-3}$ sec) 
 for the visualization of the particles inside the shell, further post processing . The collisions 
 between each of the particles and the collisions between of the particle and the geometry was 
 collected and used in the PBM. 
@@ -445,7 +457,7 @@ Density of the granules & $500$ & $kg.m^{-3}$\\
 \end{table}
 
 \subsubsection{DEM data post processing}
- The post processing of the data obtained from the DEM simulations was done using MATLAB. 
+The post processing of the data obtained from the DEM simulations was done using MATLAB. 
 The first test run on the output data was to determine if the simulation had reached steady-state. The 
 mass inside the granulator was found out by averaging it over 5 time steps and then compared to 
 mass inside the granulator after every 10000 time steps (about 5$\times 10^{-4}$ sec) with a 
@@ -650,10 +662,11 @@ Number of second solid bins & $ss$ & $16$ & $-$\\
 
 \subsection{PBM Parallel C++}
 \subsubsection{Discretization \& parallelizing PBM}
- The PBM was discretized by converting each of its coordinates in to discrete bins. For the spatial 
+The PBM was discretized by converting each of its coordinates in to discrete bins. For the spatial 
 coordinates a linear bin spacing was used. For the internal coordinates, solid, liquid and gas a 
 non-linear discretization was used.
- Once the PBM had been discretized, a finite differences method was 
+
+Once the PBM had been discretized, a finite differences method was 
 used which created a system of ordinary differential equations (ODEs) \citep{Barrasso2015cerd}. The 
 numerical integration technique used to evaluate the system of ODEs was first order Euler integration 
 as it is commonly used to solve these types of systems and author found an improvement in  speed while 
@@ -662,11 +675,13 @@ performance, when solving the PBM, work loads were distributed in a manner which
 the shared and distributed memory aspects of the clusters, the PBM was being run on. To 
 parallelize the model in a way which could take advantage of shared memory but still effectively run 
 across a distributed system both MPI and OMP were implemented. 
- One MPI process was used per CPU socket and one OMP thread was used per CPU core, as 
+
+One MPI process was used per CPU socket and one OMP thread was used per CPU core, as 
 authors (\cite{Bettencourt2017}) found it resulted in the best performance. MPI was used for message 
 passing from one node to another while OMP was used for calculations on each node that could be 
 efficiently solved using a shared memory system. 
- An algorithm in the form of pseudo code is presented below illustrating how the calculations are distributed and carried out 
+
+An algorithm in the form of pseudo code is presented below illustrating how the calculations are distributed and carried out 
 during the simulation. For each time step, the MPI processes are made responsible for a specific chunk 
 of the spatial compartments. Then each OMP thread, inside of each MPI process, is allocated to one of 
 the cores of multi-core CPU the MPI process is bound too. The OMP threads divide up and 
@@ -684,13 +699,14 @@ decomposition of the data into different CPUs and further into various threads i
 \label{fig:mthds_PBM_decompostion}
 \end{figure}
 
- A crucial feature of the PBM is that the current PSD ($F_{t,all}$) value is used to compute a new 
+A crucial feature of the PBM is that the current PSD ($F_{t,all}$) value is used to compute a new 
 time step size for the next iteration. This means all of the MPI processes need to have the same 
 dynamic time step size at each iteration for the calculations to be properly carried out in parallel. Since 
 the completely updated $F_{t,all}$ value is shared before calculating a new time step each process will 
 have the same $F_{t,all}$ value. As a result each process calculates the same size for the new time 
 step. 
- Since the PBM code developed used the Standard Template Library containers and their features available in C++ 11 and later. It requires intel v15.0.2 or
+
+Since the PBM code developed used the Standard Template Library containers and their features available in C++ 11 and later. It requires intel v15.0.2 or
 later for compilation. Since this module was not present on the Stampede, the execution of the PBM was done on
 the newer Stampede2 supercomputer. Each of the compute node of the cluster consists of Intel Xeon Phi 7250 
 (\textquotedblleft Knights Landing\textquotedblright) which has 68 cores on a single socket clocked at 1.4 GHz, with 96 GB of DDR4 RAM. Each of 
@@ -782,11 +798,11 @@ across different platforms.
 \label{sec:Results}
 \subsection{DEM}
 \subsubsection{DEM Spacial Decomposition Studies}
- LIGGGHTS as discussed above, statically decomposes the work space and each section is sent to 
+LIGGGHTS as discussed above, statically decomposes the work space and each section is sent to 
 a MPI process for calculations. Thus, the division of the space becomes an important criteria for the 
 simulation for efficient load balancing. The initial studies were undertaken for a mono-sized particle of 
 size 1 mm and the simulation was carried out for 0.5 second of granulation time. The initial timing studies
- for the decomposition were performed using 64 cores. The effect of the decomposition on the simulation 
+for the decomposition were performed using 64 cores. The effect of the decomposition on the simulation 
 time can be seen in Table \ref{table:rslts_dem_slicing_studies}. This indicates that dividing the 
 x-direction in more number of compartments help increase the speed of the simulation. This is easy to 
 comprehend since the granulator has its length parallel to the x-axis. These results also show that if 
@@ -817,7 +833,7 @@ $8$ & $2$ & $4$ & $7.96$\\
       
 \end{table}
 
- When MPI is used for parallelization of a task, load balancing becomes an important parameter 
+When MPI is used for parallelization of a task, load balancing becomes an important parameter 
 that needs to be considered. When the geometry is divided, the amount of computation done by one core
 should be in a similar to other processors. This helps in better utilization of the resources as well as
 make the simulations run faster. Following the results from the initial timing studies,the y 
@@ -851,7 +867,7 @@ $256$ & $16$ & $4$ & $4$ & $265.32$\\
 \end{center}
       
 \end{table}
- The simulation times illustrated in Table \ref{table:rslts_dem_128_256_decomp} shows that 
+The simulation times illustrated in Table \ref{table:rslts_dem_128_256_decomp} shows that 
 incorrectly slicing the geometry also affects the performance of the system. It can be noted that slicing 
 along y-axis is more favourable than slicing along the z-direction. The insertion of particles is hindered 
 when the geometry is cut along the z-axis as inlet is perpendicular to it. LIGGGHTS thus provisions 
@@ -861,7 +877,7 @@ final simulations consisted of the geometry having only 2 sections in the z-dire
 along the y-axis. 
 
 \subsubsection{DEM Performance}
- A test case was run for mono-sized particle of 2mm diameter for timing comparison studies. The 
+A test case was run for mono-sized particle of 2mm diameter for timing comparison studies. The 
 times are plotted in figure \ref{fig:rslts_DEM_2mm_timing} indicate that using lower number of cores is 
 not feasible for long simulations since the time taken while using 1 core is about $11$x times slower.
 Thus, the simulations were carried out in core configurations of 64, 128 and 256 cores. The studies 
@@ -901,15 +917,17 @@ a fractional value of the ideal speedup a program achieves with the increase in 
 \label{eqn:rslts_DEM_parallel_efficiency}
 \end{align}
 
-    
- The figure \ref{fig:rslts_DEM_timing_studies} indicates that there is not a significant amount of 
-speed improvement when 256 cores are used for the simulation over 128 cores. This speed decrease 
-can be accounted to the communication time between the MPI processes. When the particles move 
-from one section to another of the space, they are transfered as ghost particles from one process to 
-another process. Thus, there is large amount of communication which is required. One of the issues of 
-using a cluster with shared memory within the nodes but none in between nodes is that it has to rely 
-on the networking infrastructure of the cluster which bottlenecks the communications thus leading to 
-higher communication times. There are more sections present when 256 cores are used for the 
+The speedup of the DEM simulations using only MPI cores is shown in Figure \ref{fig:rslts_DEM_speedup}.
+There is a linear speed increase in the speedup upto 16 cores, after which the performance plateaus.
+Figure \ref{fig:rslts_DEM_speedup} indicates that there 
+is not a significant amount of speed improvement for the simulation when 256 cores are used for the 
+simulation over 128 cores. This speed decrease can be accounted to the communication time between 
+the MPI processes. When the particles move from one section to another of the space, they are 
+transfered as ghost particles from one process to another process. Thus, there is large amount of 
+communication which is required. One of the issues of using a cluster with shared memory within 
+the nodes but none in between nodes is that it has to rely on the networking infrastructure 
+of the cluster which bottlenecks the communications thus leading to higher communication times. 
+There are more sections present when 256 cores are used for the 
 simulation, thus there is more communication in this system when compared to 128 core simulation. 
 This excess communication makes the simulation slower though there is more processing power and 
 it requires lesser time for other calculations. Another observation that can be made from the Figure 
@@ -922,7 +940,14 @@ computationally more expensive.
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.7]{rslts_DEM_timing_plots.pdf}
+\includegraphics[scale=0.5]{rslts_DEM_speedup.pdf}
+\caption{The speedup achieved in the DEM simulations of 2 mm partilces.}
+\label{fig:rslts_DEM_speedup}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{rslts_DEM_timing_plots.pdf}
 \caption{Time taken for a 10 second DEM simulation for diameters ranging from 0.63mm to 2mm and 
 a particle size distribution ranging from 1mm - 3mm}
 \label{fig:rslts_DEM_timing_studies}

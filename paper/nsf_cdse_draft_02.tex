@@ -122,7 +122,7 @@ following:
 \item Developed a 4-Dimensional PBM that is parallelized using hybrid techniques (MPI + 
 OMP)  for optimal utilization of modern high performance computing equipment.
 \item Used LIGGGHTS to perform DEM simulations to  model the micro-mechanics of the 
-Lodige granulator. 
+L\"{o}dige CoriMix CM5 high shear granulator. 
 \item Uni-directionally coupled DEM to PBM using Radical Pilot, which is a framework developed in
 Python which provides task level parallelization, to help develop an accurate model which can be 
 run quickly on high performance computing systems
@@ -289,7 +289,7 @@ cores on one system size, but was not tested for models with more dimensions. Mo
 mentioned that the parallelization could be improved using shared memory processing. 
 \cite{Bettencourt2017} took a hybrid approach towards the parallelization of the PBM using both 
 MPI and OMP. The hybrid parallelization helped achieve 
-a speed up of about 98\% using 128 cores over the serial code. \cite{Prakash2013a} and \cite{Prakash2013b} 
+a speed improvement of about 98\% using 128 cores over the serial code. \cite{Prakash2013a} and \cite{Prakash2013b} 
 used the inbuilt Parallel Computation Toolbox (PCT) in Matlab \citep{pctMatlab} to parallelize their PBM on lower number 
 of cores, but this faced the shortcomings of Matlab's internal processing and could not achieve the 
 speed improvements of parallelization of a program if it were written in a native programming language 

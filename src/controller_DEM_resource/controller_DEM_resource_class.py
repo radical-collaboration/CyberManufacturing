@@ -34,9 +34,9 @@ class Controller_DEM_resource_reader(object):
         number_of_particles = self.raw_collision_data[3].split(' ')[0]
         temp_col = []
         temp_fields = self.fields
+        data_temp = self.collision_data_acc_types
 #print number_of_particles
         for x in xrange(0,int(number_of_particles)):
-            data_temp = self.collision_data_acc_types
             temp_fields['collision'] = []
             temp_fields['velocity'] = []
             temp_fields['diameter'] = []
@@ -47,18 +47,20 @@ class Controller_DEM_resource_reader(object):
             for i in xrange(1,17):
                 temp_col.append(int(raw_col_data[x+9].split(' ')[(i+13)]))
             temp_diam = float(raw_col_data[x+9].split(' ')[31])
-            #print (temp_fields)
             temp_fields['velocity'].append(temp_vel)
             temp_fields['collision'].append(temp_col)
             temp_fields['diameter'].append(temp_diam)
             data_temp[temp_type].append(temp_fields)
-            print(temp_fields['type'])
-            #self.collision_data_acc_types[temp_fields['type']].append(temp_fields)
+            #print(temp_fields['type'])
+            #print (temp_fields.copy())
+            self.collision_data_acc_types[temp_fields['type']].pop()
+            self.collision_data_acc_types[temp_fields['type']].append(temp_fields.copy())
             temp_diam = []
             temp_type = []
             temp_col = []
-            #temp_fields.clear()
-        print(self.collision_data_acc_types['5'])
+            temp_fields.clear()
+
+        print(self.collision_data_acc_types['6'])
 
 
 

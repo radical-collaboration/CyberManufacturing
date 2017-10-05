@@ -21,6 +21,10 @@ class controller_DEM_resource_interpretor(object):
         self.tot_part_each_type = np.zeros(self.type)
         self.avg_vel_array = np.zeros(self.type)
         self.collision_matrix = np.zeros((self.type, self.type))
+        self.init_impacts = 0
+        self.init_collision_matrix = np.zeros((self.type, self.type))
+        self.init_avg_vel = np.zeros(self.type)
+        self.init_num_particles = 0
 
 # method to average the velocity of the collision data
     def avg_all_data(self, ts): # here ts is the time step
@@ -48,37 +52,65 @@ class controller_DEM_resource_interpretor(object):
         self.avg_impacts = obj_data_reader.number_of_impacts
         print("Recalculated for timestep %d"%ts)
 
+# method to data of the initial time step
+    def init_data_calculations(self):
+        init_data_obj = DEMreader.Controller_DEM_resource_reader(self.init_timestep, self.type)
+        self.init_num_particles = init_data_obj.number_of_particles
+        i1 = self.avg_all_data(self.init_timestep)
+        self.init_impacts = init_data_obj.number_of_impacts
+        self.init_avg_vel = self.avg_vel_array
+        self.init_collision_matrix = self.collision_matrix
+        self.init_num_particles = self.num_of_particles
+        print("Intial data at timestep %d calculated"%self.init_timestep)
+
+# method to compare results
+    def liggghts_data_comparison(self, ts):
+        dem_timestep = 5e-7
+        min_time_diff = 0.2
+        flag = 0  # 0 keeps it running, 1 to change from DEM to PBM and 2 to reaches steady state and quit
+        dump_difference = 50000
+        min_timestep_diff = min_time_diff/dem_timestep
+        if(ts - self.init_timestep > min_timestep_diff):
+            vai = sum(self.init_avg_vel) / self.type
+            cai = sum(sum(self.init_collision_matrix))
+            iai = float(self.init_impacts)
+            a1 = self.avg_all_data(ts)
+            va1 = sum(self.avg_vel_array) / self.type
+            ca1 = sum(sum(self.collision_matrix))
+            ia1 = float(self.avg_impacts)
+            a2 = self.avg_all_data(ts + dump_difference)
+            va2 = sum(self.avg_vel_array) / self.type
+            ca2 = sum(sum(self.collision_matrix))
+            ia2 = float(self.avg_impacts)
+            a3 = self.avg_all_data(ts - dump_difference)
+            va3 = sum(self.avg_vel_array) / self.type
+            ca3 = sum(sum(self.collision_matrix))
+            ia3 = float(self.avg_impacts)
+            avg_vel = (va1 + va2 + va3) / 3
+            avg_coll = (ca1 + ca2 + ca3) / 3
+            avg_imp = (ia1 + ia2 + ia3) / 3
+            vel_comp = (avg_vel - vai) / vai
+            collision_comp = (avg_coll - cai) / cai
+            impact_comp = (avg_imp - iai) / iai
+            if(vel_comp > 0.1 or collision_comp > 0.1 or impact_comp > 0.1):
+                flag = 1
+            elif((ts - self.init_timestep) > (5 / dem_timestep)):
+                flag = 2
+            else:
+                flag = 0
+        return flag
+
+
+
+
+
 # ------------------------------------------------------------------------------------------------
-#
-#class controller_DEM_resource_data_init(object):
-#    def __init__(self, init_timestep, types):
-#        self.init_timestep = init_timestep
-#        self.init_impacts = 0
-#        self.type = types
-#        self.init_collision_matrix = np.zeros((self.type, self.type))
-#        self.init_avg_vel = np.zeros(self.type)
-#        self.init_num_particles = 0
-#
-## method to determine the data of the initial time step
-#    def init_data_calculations(self):
-#        init_data_obj = DEMreader.Controller_DEM_resource_reader(self.init_timestep, self.type)
-#        self.init_num_particles = init_data_obj.number_of_particles
-#        interpretor_obj = controller_DEM_resource_interpretor(self.init_timestep, self.type)
-#        i1 = interpretor_obj.avg_all_data(self.init_timestep)
-#        self.init_impacts = init_data_obj.number_of_impacts
-#        self.init_avg_vel = interpretor_obj.avg_vel_array
-#        self.init_collision_matrix = interpretor_obj.collision_matrix
-#        self.init_num_particles = interpretor_obj.num_of_particles
-#
 
-
-# ------------------------------------------------------------------------------------------------
-
-abcd = controller_DEM_resource_interpretor(500000, 16, 200000)
-a1 = abcd.avg_all_data(5000000)
-#np.set_printoptions(threshold='nan')
-print(abcd.collision_matrix)
-print(abcd.num_of_particles)
-a1 = abcd.avg_all_data(6000000)
-print(abcd.collision_matrix)
-print(abcd.num_of_particles)
+abcd = controller_DEM_resource_interpretor(500000, 16, 2000000)
+# a1 = abcd.avg_all_data(5000000)
+# print(abcd.num_of_particles)
+# abcd.init_data_calculations()
+# print(abcd.num_of_particles)
+# a1 = abcd.avg_all_data(6000000)
+# print(abcd.num_of_particles)
+print(abcd.liggghts_data_comparison(5000000))

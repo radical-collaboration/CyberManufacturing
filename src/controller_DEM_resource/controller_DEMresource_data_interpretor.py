@@ -9,7 +9,6 @@ Created on Mon Oct  2 15:32:29 2017
 import numpy as np
 import controller_DEMresource_data_reader as DEMreader
 
-
 class controller_DEM_resource_interpretor(object):
 
     def __init__(self, timestep, types, init_ts):
@@ -25,6 +24,8 @@ class controller_DEM_resource_interpretor(object):
         self.init_collision_matrix = np.zeros((self.type, self.type))
         self.init_avg_vel = np.zeros(self.type)
         self.init_num_particles = 0
+        self.dump_difference = 50000
+        self.init_data_calculations()
 
 # method to average the velocity of the collision data
     def avg_all_data(self, ts): # here ts is the time step
@@ -65,10 +66,10 @@ class controller_DEM_resource_interpretor(object):
 
 # method to compare results
     def liggghts_data_comparison(self, ts):
-        dem_timestep = 5e-7
-        min_time_diff = 0.2
+        dem_timestep = 5e-7 # time step taken for the DEM simulation
+        min_time_diff = 0.2 # waits for the DEM to execute for atleast 0.2 seconds of simulation time
         flag = 0  # 0 keeps it running, 1 to change from DEM to PBM and 2 to reaches steady state and quit
-        dump_difference = 50000
+        dump_difference = self.dump_difference
         min_timestep_diff = min_time_diff/dem_timestep
         if(ts - self.init_timestep > min_timestep_diff):
             vai = sum(self.init_avg_vel) / self.type
@@ -78,7 +79,7 @@ class controller_DEM_resource_interpretor(object):
             va1 = sum(self.avg_vel_array) / self.type
             ca1 = sum(sum(self.collision_matrix))
             ia1 = float(self.avg_impacts)
-            a2 = self.avg_all_data(ts + dump_difference)
+            a2 = self.avg_all_data(ts - (2 * dump_difference))
             va2 = sum(self.avg_vel_array) / self.type
             ca2 = sum(sum(self.collision_matrix))
             ia2 = float(self.avg_impacts)
@@ -105,12 +106,12 @@ class controller_DEM_resource_interpretor(object):
 
 
 # ------------------------------------------------------------------------------------------------
-
-abcd = controller_DEM_resource_interpretor(500000, 16, 2000000)
-# a1 = abcd.avg_all_data(5000000)
-# print(abcd.num_of_particles)
-# abcd.init_data_calculations()
-# print(abcd.num_of_particles)
-# a1 = abcd.avg_all_data(6000000)
-# print(abcd.num_of_particles)
-print(abcd.liggghts_data_comparison(5000000))
+#
+#abcd = controller_DEM_resource_interpretor(500000, 16, 2000000)
+## a1 = abcd.avg_all_data(5000000)
+## print(abcd.num_of_particles)
+## abcd.init_data_calculations()
+## print(abcd.num_of_particles)
+## a1 = abcd.avg_all_data(6000000)
+## print(abcd.num_of_particles)
+#print(abcd.liggghts_data_comparison(5000000))

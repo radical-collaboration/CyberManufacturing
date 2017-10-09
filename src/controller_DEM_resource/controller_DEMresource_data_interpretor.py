@@ -40,7 +40,7 @@ class controller_DEM_resource_interpretor(object):
         temp_coll_data = np.zeros_like(self.collision_matrix)
         self.num_of_particles = obj_data_reader.number_of_particles
         for x in xrange(0, self.type):
-            self.tot_part_each_type[x] = len(obj_data_reader.collision_data_acc_types[str(x+1)])
+            self.tot_part_each_type[x] = int(len(obj_data_reader.collision_data_acc_types[str(x+1)]))
             temp1 = self.tot_part_each_type[x]
             temp2 = obj_data_reader.collision_data_acc_types[str(x+1)]
             vx = 0.0

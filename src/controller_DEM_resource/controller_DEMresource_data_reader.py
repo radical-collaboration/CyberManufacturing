@@ -92,7 +92,7 @@ class Controller_DEM_resource_reader(object):
             temp_type = raw_col_data[x+9].split(' ')[1]
             temp_fields['type'] = temp_type
             temp_vel = [float(raw_col_data[x+9].split(' ')[8]),float(raw_col_data[x+9].split(' ')[9]),float(raw_col_data[x+9].split(' ')[10])]
-            for i in xrange(1,17):
+            for i in xrange(1,self.type+1):
                 temp_col.append(int(raw_col_data[x+9].split(' ')[(i+13)]))
             temp_diam = float(raw_col_data[x+9].split(' ')[31])
             temp_fields['velocity'].append(temp_vel)

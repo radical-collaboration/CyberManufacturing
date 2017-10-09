@@ -25,6 +25,7 @@ import os
 import time
 import controller_DEMresource_data_reader as DEMreader
 import controller_DEMresource_data_interpretor as DEMinter
+import json
 
 
 class controller_DEMresource_main(object):
@@ -39,6 +40,7 @@ class controller_DEMresource_main(object):
     	# This method executes the necessary commands to run the DEM controller and waits for the command from the interpertor to output certain files that the executioner will act upon.
         timestep = self.init_timestep + self.dump_difference
         flag = 0
+        dump_data = {}
         # opening the different files so as to write the calculated average / total data ovetime
         dump_avg_vel = open("velocity_average_overtime_starting_%d.txt"%self.init_timestep, "w") 
         dump_collisions = open("collisions_overtime_starting_%d.txt"%self.init_timestep, "w")
@@ -72,7 +74,28 @@ class controller_DEMresource_main(object):
         if (flag == 1):
         	# kill the DEM and start the PBM and also print the input file for the PBM executable
             print("Time to change to PBM and kill DEM")
-            input_PBM = open("PBM_input_%d.txt"%count, "w")
+            tot_part_each_type = np.zeros(16)
+            avg_vel_array = np.zeros_like(tot_part_each_type)
+            tot_part_each_type = obj_inter.tot_part_each_type
+            avg_vel_array = obj_inter.avg_vel_array
+            tot_part_each_type.astype(int)
+            avg_vel_array.astype(float)
+            dump_data['types'] = []
+            dump_data['types'].append(self.type)
+            dump_data['total number of particles'] = []
+            dump_data['total number of particles'].append(int(obj_inter.num_of_particles))
+            dump_data['number of particles of each type'] = []
+            dump_data['number of particles of each type'].append(list(tot_part_each_type))
+            dump_data['average velocity of each type'] = []
+            dump_data['average velocity of each type'].append(list(avg_vel_array))
+            dump_data['time step'] = []
+            dump_data['time step'].append(int(timestep))
+            #dump_data['collision_matrix'] = []
+            #dump_data['collision_matrix'].append(list(list(obj_inter.collision_matrix)))
+            #dump_data.update({'collision_matrix': obj_inter.collision_matrix})
+            print(dump_data)
+            with open('PBM_input.json' , 'w') as outfile:
+            	json.dump(dump_data, outfile)
         elif (flag == 2):
         	# kill the DEM since there has been no change in the number of collisions / impacts / velocity for 5 seconds.
             print("The system is at steady state")
@@ -80,6 +103,6 @@ class controller_DEMresource_main(object):
 
 # ------------------------------------------------------------------------------------------------
 
-#abcd = controller_DEMresource_main(11500000, 16)
-#abcd.main()
+abcd = controller_DEMresource_main(5000000, 16)
+abcd.main()
 

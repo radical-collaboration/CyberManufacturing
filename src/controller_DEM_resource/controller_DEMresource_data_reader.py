@@ -1,8 +1,18 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Oct  2 12:32:29 2017
+
+@author: Chaitanya Sampat
+"""
+
+'''
+This class extracts the data from the liggghts output file at a specified timestep and 
+stores the data into dictionaries that can be used for further calculations.
+'''
 import numpy as np
 import os
 from pathlib2 import Path
-
-# class to read the ligghts data file, process data and create PBM input file
 
 class Controller_DEM_resource_reader(object):
 # Class variables / global variables
@@ -130,12 +140,3 @@ class Controller_DEM_resource_reader(object):
         return self.number_of_impacts
 
 # ------------------------------------------------------------------------------
-
-#abcd = Controller_DEM_resource_reader(200000,16)
-#print(abcd.collision_data_acc_types)
-#a1 = abcd.liggghts_collision_raw_data()
-#a2 = abcd.liggghts_collision_data_store()
-#a3 = abcd.liggghts_impact_raw_data()
-#a4 = abcd.liggghts_impact_data_store()
-#print(abcd.collision_data_acc_types)
-###ad.read()

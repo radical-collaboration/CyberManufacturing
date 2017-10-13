@@ -90,47 +90,98 @@ if __name__ == '__main__':
 
         # create a new CU description, and fill it.
         # Here we don't use dict initialization.
-        cud = rp.ComputeUnitDescription()
-        cud.environment    = ['PATH='+config['pathtoLIGGHTS']+':$PATH']
-        cud.pre_exec       = ['mkdir CSVs','mkdir post','mkdir restart']
-        cud.executable     = 'lmp_micstam'
-        cud.arguments      = ['-in','in.*' ]
-        cud.input_staging  = [{'source': config['pathtoLIGGHTSinputs']+'in.final_%fmm'%config['diameter'],
-                               'target':'unit:///in.final_%fmm'%config['diameter'],
-                               'action'  :rp.LINK},
-                              {'source': config['pathtoLIGGHTSinputs']+'shell_closed.stl',
-                               'target':'unit:///shell_closed.stl',
-                               'action'  :rp.LINK},
-                              {'source': config['pathtoLIGGHTSinputs']+'shell',
-                               'target':'unit:///shell',
-                               'action'  :rp.LINK},
-                              {'source': config['pathtoLIGGHTSinputs']+'impeller',
-                               'target':'unit:///impeller',
-                               'action'  :rp.LINK},
-                              {'source': config['pathtoLIGGHTSinputs']+'impeller_coarse.stl',
-                               'target':'unit:///impeller_coarse.stl',
-                               'action'  :rp.LINK},
-                            ]
-        cud.output_staging = [{'source': 'unit:///post/collision%d.atom'%config['timesteps'],
-                               'target': 'pilot:///collision%d.atom'%config['timesteps'],
-                               'action'  : rp.LINK},
-                              {'source': 'unit:///post/impact%d.atom'%config['timesteps'],
-                               'target': 'pilot:///impact%d.atom'%config['timesteps'],
-                               'action'  : rp.LINK}]
-        cud.cores          = config['DEMcores']
-        cud.mpi            = True
-        report.progress()
-        report.ok('>>ok\n')
+        for i in range(10):
+            cud = rp.ComputeUnitDescription()
+            cud.environment    = ['PATH='+config['pathtoLIGGHTS']+':$PATH']
+            cud.pre_exec       = ['mkdir CSVs','mkdir post','mkdir restart']
+            cud.executable     = 'lmp_micstam'
+            cud.cores          = config['DEMcores']
+            cud.mpi            = True
+            
+            if i == 0:
+                cud.arguments      = ['-in','in.*' ]
+                cud.input_staging  = [{'source': config['pathtoLIGGHTSinputs']+'in.2_sim_new',
+                                       'target':'unit:///in.2_sim_new',
+                                       'action'  :rp.LINK},
+                                      {'source': config['pathtoLIGGHTSinputs']+'shell_closed.stl',
+                                       'target':'unit:///shell_closed.stl',
+                                       'action'  :rp.LINK},
+                                      {'source': config['pathtoLIGGHTSinputs']+'shell',
+                                       'target':'unit:///shell',
+                                       'action'  :rp.LINK},
+                                      {'source': config['pathtoLIGGHTSinputs']+'impeller',
+                                       'target':'unit:///impeller',
+                                       'action'  :rp.LINK},
+                                      {'source': config['pathtoLIGGHTSinputs']+'impeller_coarse.stl',
+                                       'target':'unit:///impeller_coarse.stl',
+                                       'action'  :rp.LINK},
+                                    ]
+                cud.output_staging = [{'source': 'unit:///restart/granulator.%d.restart'%((i+1)*2000000),
+                                   'target': 'pilot:///granulator.%d.restart'%((i+1)*2000000),
+                                   'action'  : rp.LINK}]
+            elif i>0 and i<9:
+                cud.arguments      = ['-in','restart/in.*' ]
+                cud.input_staging  = [{'source': 'pilot:///granulator.%d.restart'%((i+1)*2000000),
+                                       'target':'unit:///restart/granulator.%d.restart'%((i+1)*2000000),
+                                       'action'  :rp.LINK},
+                                       {'source': config['pathtoLIGGHTSinputs']+'in.restart_from_%d'%((i+1)*2000000),
+                                       'target':'unit:///in.restart_from_%d'%((i+1)*2000000),
+                                       'action'  :rp.LINK},
+                                      {'source': config['pathtoLIGGHTSinputs']+'shell_closed.stl',
+                                       'target':'unit:///shell_closed.stl',
+                                       'action'  :rp.LINK},
+                                      {'source': config['pathtoLIGGHTSinputs']+'shell',
+                                       'target':'unit:///shell',
+                                       'action'  :rp.LINK},
+                                      {'source': config['pathtoLIGGHTSinputs']+'impeller',
+                                       'target':'unit:///impeller',
+                                       'action'  :rp.LINK},
+                                      {'source': config['pathtoLIGGHTSinputs']+'impeller_coarse.stl',
+                                       'target':'unit:///impeller_coarse.stl',
+                                       'action'  :rp.LINK},
+                                    ]
+                cud.output_staging = [{'source': 'unit:///restart/granulator.%d.restart'%((i+1)*2000000),
+                                   'target': 'pilot:///granulator.%d.restart'%((i+1)*2000000),
+                                   'action'  : rp.LINK}]
+            else:
+                cud.arguments      = ['-in','restart/in.*' ]
+                cud.input_staging  = [{'source': 'pilot:///granulator.%d.restart'%((i+1)*2000000),
+                                       'target':'unit:///restart/granulator.%d.restart'%((i+1)*2000000),
+                                       'action'  :rp.LINK},
+                                       {'source': config['pathtoLIGGHTSinputs']+'in.restart_from_%d'%((i+1)*2000000),
+                                       'target':'unit:///in.restart_from_%d'%((i+1)*2000000),
+                                       'action'  :rp.LINK},
+                                      {'source': config['pathtoLIGGHTSinputs']+'shell_closed.stl',
+                                       'target':'unit:///shell_closed.stl',
+                                       'action'  :rp.LINK},
+                                      {'source': config['pathtoLIGGHTSinputs']+'shell',
+                                       'target':'unit:///shell',
+                                       'action'  :rp.LINK},
+                                      {'source': config['pathtoLIGGHTSinputs']+'impeller',
+                                       'target':'unit:///impeller',
+                                       'action'  :rp.LINK},
+                                      {'source': config['pathtoLIGGHTSinputs']+'impeller_coarse.stl',
+                                       'target':'unit:///impeller_coarse.stl',
+                                       'action'  :rp.LINK},
+                                    ]
+                cud.output_staging = [{'source': 'unit:///post/collision%d.atom'%config['timesteps'],
+                                       'target': 'pilot:///collision%d.atom'%config['timesteps'],
+                                       'action'  : rp.LINK},
+                                      {'source': 'unit:///post/impact%d.atom'%config['timesteps'],
+                                       'target': 'pilot:///impact%d.atom'%config['timesteps'],
+                                       'action'  : rp.LINK}]
+            report.progress()
+            report.ok('>>ok\n')
 
-        # Submit the previously created ComputeUnit descriptions to the
-        # PilotManager. This will trigger the selected scheduler to start
-        # assigning ComputeUnits to the ComputePilots.
-        units = umgr.submit_units(cud)
+            # Submit the previously created ComputeUnit descriptions to the
+            # PilotManager. This will trigger the selected scheduler to start
+            # assigning ComputeUnits to the ComputePilots.
+            units = umgr.submit_units(cud)
 
-        # Wait for all compute units to reach a final state (DONE, CANCELED or FAILED).
-        report.header('gather results')
-        umgr.wait_units()
-    
+            # Wait for all compute units to reach a final state (DONE, CANCELED or FAILED).
+            report.header('gather results')
+            umgr.wait_units()
+        
         report.info('\n')
         collision = {'source': 'pilot:///collision%d.atom'%config['timesteps'],
                      'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%(config['timesteps'],config['cores'],config['diameter']),

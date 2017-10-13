@@ -480,7 +480,7 @@ int main(int argc, char *argv[])
         int mpi_err = 0;
         MPI_Abort(MPI_COMM_WORLD, mpi_err);
     }
-    vector<double> velocity = lData->getFinalDEMVelocity();
+    vector<double> velocity = lData->getFinalDEMImpactVelocity();
     if (velocity.size() == 0)
     {
         cout << "My process id = " << mpi_id << endl;

@@ -30,7 +30,8 @@ class liggghtsData
     arrayOfDouble2D getFinalDEMCollisionData();
     std::vector<double> getFinalDEMImpactData();
     std::vector<double> getDEMParticleDiameters();
-    std::vector<double> getFinalDEMVelocity();
+    std::vector<double> getFinalDEMCollisionVelocity();
+    std::vector<double> getFinalDEMImpactVelocity();
     ~liggghtsData();
 };
 

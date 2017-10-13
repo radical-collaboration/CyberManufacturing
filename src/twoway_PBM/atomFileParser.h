@@ -10,6 +10,7 @@
 
 typedef struct
 {
+    long int particleId;
     std::array<double, 3> velocity;
     std::vector<int> c_ccVec;
     double f_fpacc;

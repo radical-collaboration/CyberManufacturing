@@ -41,6 +41,64 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
     //            for (int s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
     //                for (int ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
     //                    collisionEfficiency[s1][ss1][s2][ss2] = COLLISIONEFFICIENCYCONSTANT;
+    // Calculating critical velocity below which aggregation will occur
+
+    liggghtsData* lData = liggghtsData::getInstance();
+    vector<double> diaCol = lData->getDEMParticleDiameters();
+
+    if((diaCol).size() == 0)
+    {
+        cout << "Velocity data is missing in LIGGGHTS collision file" << endl;
+        return aggregationKernel;
+    }
+
+    vector<double> velocity = lData->getFinalDEMCollisionVelocity();
+    if ((velocity).size() == 0)
+    {
+        cout << "Velocity data is missing in LIGGGHTS collision file" << endl;
+        return aggregationKernel;
+    }
+    double inverseDiameterSum = 0.0;
+    double inverseMassSum = 0.0;
+    int sized = diaCol.size();
+
+    for (int i = 0; i < sized; i++)
+    {
+    	inverseDiameterSum += (1/diaCol[i]);
+    	inverseMassSum += (1 / (4 / 3) * M_PI * pow((diaCol[i] / 2),3) * SOLIDDENSITY);
+    }
+
+    double sum = 0.0;
+    int size1 = velocity.size();
+    double harmonic_diameter = sized / inverseDiameterSum;
+    double harmonic_mass = sized / inverseMassSum;
+    double Ucritical = (1 + (1/COEFFICIENTOFRESTITUTION)) * log((LIQUIDTHICKNESS / SURFACEASPERITIES)) * (3 * M_PI * pow(harmonic_diameter, 2) * BINDERVISCOSITY) / (8 * harmonic_mass);
+    for (int i = 0; i < size1; i++)
+    	sum += velocity[i];
+
+    double averageVelocity = sum / NUMBEROFDEMBINS;
+    double stdDevVelocity = 0.0;
+    double varianceVelocity = 0.0;
+    
+    for (int i = 0; i < size1; ++i)
+    {
+        varianceVelocity += pow((velocity[i] - averageVelocity), 2) / 10;
+    }
+    
+    stdDevVelocity = sqrt(varianceVelocity);
+    //double intVelocity = 0.0;
+    vector<double> probablityOfVelocity(size1, 0.0);
+    for (int i = 0; i < size1; i++)
+    {
+     	probablityOfVelocity[i] = (1 / (velocity[i] * sqrt(2 * M_PI) * stdDevVelocity)) * exp(-((log(velocity[i]) - averageVelocity) / (2 * pow(varianceVelocity, 2))));
+     	// cout << "Probability at " << velocity[i] << "is " << probablityOfVelocity[i] << endl;
+    }
+
+    /*for (int i = 0; i < size1 - 1; ++i)
+    {
+    	if( (velocity[i]) < Ucritical)
+     		intVelocity += ((probablityOfVelocity[i + 1] + probablityOfVelocity[i]) / 2) * (velocity[i + 1] - velocity[i]);
+    }*/
 
     // FROM Sen, Barrasso, Singh, Ramachandran. Processes 2014, 2, 89-111. (p. 96)
     // double collisionEfficiencyConstant=0.01;
@@ -52,8 +110,10 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
                 {
                     bool flag1 = (fAll[s1][ss1] >= 0.0) && (fAll[s2][ss2] >= 0.0);
                     bool flag2 = (externalLiquidContent[s1][ss1] >= criticalExternalLiquid) && (externalLiquidContent[s2][ss2] >= criticalExternalLiquid);
-                    if (flag1 && flag2)                        
-                        collisionEfficiency[s1][ss1][s2][ss2] = COLLISIONEFFICIENCYCONSTANT;
+                    bool flag3 = (velocity[ss2] < Ucritical);
+                    if (flag1 && flag2 && flag3)
+                        //collisionEfficiency[s1][ss1][s2][ss2] = COLLISIONEFFICIENCYCONSTANT;
+                        collisionEfficiency[s1][ss1][s2][ss2] = probablityOfVelocity[ss2];
                 }
     
     //Aggregation Kernel Calculation
@@ -94,7 +154,7 @@ arrayOfDouble4D DEMDependentBreakageKernel(CompartmentIn compartmentIn, Compartm
     double Ubreak = (2 * CRITICALSTOKESDEFNUMBER / SOLIDDENSITY) * (9 / 8.0) * (pow((1 - INITIALPOROSITY),2) / pow(INITIALPOROSITY,2)) * (9 / 16.0) * (BINDERVISCOSITY / compartmentIn.diameter[0][0]); 
     //cout << "Ubreak = " << Ubreak << endl;
     liggghtsData* lData = liggghtsData::getInstance();
-    vector<double> velocity = lData->getFinalDEMVelocity();
+    vector<double> velocity = lData->getFinalDEMImpactVelocity();
     if ((velocity).size() == 0)
     {
         cout << "Velocity data is missing in LIGGGHTS impact file" << endl;
@@ -116,22 +176,22 @@ arrayOfDouble4D DEMDependentBreakageKernel(CompartmentIn compartmentIn, Compartm
     }
     
     stdDevVelocity = sqrt(varianceVelocity);
-    double intVelocity = 0.0;
+    //double intVelocity = 0.0;
     // cout << "Std Dev. of Velocity = " << stdDevVelocity << endl;
 
     vector<double> probablityOfVelocity(size1, 0.0);
     for (int i = 0; i < size1; i++)
     {
-     	probablityOfVelocity[i] = (1 / (velocity[i] * sqrt(2 * M_PI) * stdDevVelocity)) * exp(-((log(velocity[i]) - averageVelocity) / (2 * varianceVelocity)));
+     	probablityOfVelocity[i] = (1 / (velocity[i] * sqrt(2 * M_PI) * stdDevVelocity)) * exp(-((log(velocity[i]) - averageVelocity) / (2 * pow(varianceVelocity, 2))));
      	// cout << "Probability at " << velocity[i] << "is " << probablityOfVelocity[i] << endl;
     }
 
-    for (int i = 0; i < size1 - 1; ++i)
+    /*for (int i = 0; i < size1 - 1; ++i)
     {
     	if( (velocity[i] / 100.0) > Ubreak)
      		intVelocity += ((probablityOfVelocity[i + 1] + probablityOfVelocity[i]) / 2) * (velocity[i + 1] - velocity[i]);
     
-    }
+    }*/
 
     //DUMP(impactFrequency);
     
@@ -140,7 +200,8 @@ arrayOfDouble4D DEMDependentBreakageKernel(CompartmentIn compartmentIn, Compartm
         for (int ss1 = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
             for (int s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
                 for (int ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
-                    breakageKernel[s1][ss1][s2][ss2] = impactFrequency[ss1] * intVelocity * BREAKAGEKERNELCONSTANT;
+                	if(velocity[ss2] > Ubreak)
+                		breakageKernel[s1][ss1][s2][ss2] = impactFrequency[ss1] * probablityOfVelocity[ss2] * BREAKAGEKERNELCONSTANT;
                     //breakageKernel[s1][ss1][s2][ss2] = impactFrequency[ss1] * BREAKAGEPROBABILITY * BREAKAGEKERNELCONSTANT;
                     //breakageKernel[s1][ss1][s2][ss2] = impactFrequency[s1][ss1] * BREAKAGEPROBABILITY;
 

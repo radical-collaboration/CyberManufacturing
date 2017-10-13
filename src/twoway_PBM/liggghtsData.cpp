@@ -306,7 +306,49 @@ vector<double> liggghtsData::getDEMParticleDiameters()
     return particleDiameters;
 }
 
-vector<double> liggghtsData::getFinalDEMVelocity()
+vector<double> liggghtsData::getFinalDEMCollisionVelocity()
+{
+	vector<double> velocityCollision;
+	vector<double> velocityIntCollision;
+
+	if (!instanceFlag)
+        return velocityCollision;
+
+    if (mapCollisionDataOverTime.empty())
+        return velocityCollision;
+
+    auto mapIt = mapCollisionDataOverTime.end();
+
+    for(int i = 0; i < 3; i++)
+    {
+	    mapCollisionData mapData = getMapCollisionData((--mapIt)->first);
+
+	    if(mapData.empty())
+	    	continue;
+
+	    array<double,3> aveColVel{{0.0}};
+	    velocityCollision.resize(NUMBEROFDEMBINS);
+	    velocityIntCollision.resize(NUMBEROFDEMBINS);
+
+	    for(auto itMapData = mapData.begin(); itMapData != mapData.end(); itMapData++)
+	    {
+	    	vector<collisionData> vecColData = get<1>(itMapData->second);
+	    	int row = itMapData->first;
+	    	for(auto vecData : vecColData)
+	    	{
+	    		aveColVel[0] += vecData.velocity[0];
+	    		aveColVel[1] += vecData.velocity[1];
+	    		aveColVel[2] += vecData.velocity[2];
+	    	}
+	    	velocityIntCollision[row - 1] = sqrt(pow(aveColVel[0],2) + pow(aveColVel[1],2) + pow(aveColVel[2],2));
+	    	velocityCollision[row -1] += velocityIntCollision[row -1] / 3;
+	    }
+	}
+    return velocityCollision;
+
+}
+
+vector<double> liggghtsData::getFinalDEMImpactVelocity()
 {
     vector<double> velocity;
     vector<double> velocityInt;
@@ -331,17 +373,17 @@ vector<double> liggghtsData::getFinalDEMVelocity()
 	    velocityInt.resize(NUMBEROFDEMBINS);
 
 	    for (auto itMapData = mapData.begin(); itMapData != mapData.end(); itMapData++)
-	        {
-                vector<impactData> vecImpData = itMapData->second;
-	            int row = itMapData->first;            
-	            for (auto impData : vecImpData)
-	            {
-	                aveVeloComp[0] += impData.velocity[3];
-	                aveVeloComp[1] += impData.velocity[4];
-	                aveVeloComp[2] += impData.velocity[5];
-	            }
-	            velocityInt[row - 1] = sqrt(pow(aveVeloComp[0], 2) + pow(aveVeloComp[1], 2) + pow(aveVeloComp[2], 2));
-	            velocity[row -1] += velocityInt[row -1] / 3; 
+	    {
+            vector<impactData> vecImpData = itMapData->second;
+            int row = itMapData->first;            
+            for (auto impData : vecImpData)
+            {
+                aveVeloComp[0] += impData.velocity[3];
+                aveVeloComp[1] += impData.velocity[4];
+                aveVeloComp[2] += impData.velocity[5];
+            }
+            velocityInt[row - 1] = sqrt(pow(aveVeloComp[0], 2) + pow(aveVeloComp[1], 2) + pow(aveVeloComp[2], 2));
+            velocity[row -1] += velocityInt[row -1] / 3; 
         }
     }
 

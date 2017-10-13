@@ -89,9 +89,10 @@ mapCollisionData collisionFileParser(string filePath, string collisionFileName, 
         lineData >> tmpStr >> tmpStr >> tmpStr; //read and ignore ix, iy & iz value;
 
         collisionData cData;
+        cData.particleId = particleId;
         lineData >> cData.velocity[0] >> cData.velocity[1] >> cData.velocity[2]; //read vx, vy & vz value;
         lineData >> tmpStr >> tmpStr >> tmpStr;//read and ignore fx, fy & fz value;
-                                          
+     
         //read collision data
         cData.c_ccVec.resize(c_ccCount);
         for (int i = 0; i < c_ccCount; i++)

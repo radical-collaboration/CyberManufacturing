@@ -26,7 +26,7 @@ lc = length(cores); ld = length(diameter);
             filena = strtok(filen,'.')
             title(filena)
             xlabel('Time (s)')
-            ylabel('d-50 (mm)')
+            ylabel('d-50 (\mum)')
             legend('C1','C2','C3','C4')
             print(filena,'-dpdf','-bestfit')
             close

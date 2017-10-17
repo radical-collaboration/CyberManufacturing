@@ -33,7 +33,7 @@
 #define IMPELLERSPEED 2000.0//1000.0   //2000.0 // RPM
 
 #define PREMIXINGTIME 5.0 //15.00//10.0//5.00//45.0                             //0.0 // seconds
-#define LIQUIDADDITIONTIME  25 //35.0//25.0//105.0//75.0//45.0
+#define LIQUIDADDITIONTIME  25.0 //35.0//25.0//105.0//75.0//45.0
 #define POSTMIXINGTIME 0.0//25.0                        // seconds
 #define FINALTIME (PREMIXINGTIME + LIQUIDADDITIONTIME + POSTMIXINGTIME) // seconds
 //#define TIMESTEP 1e-1 // seconds

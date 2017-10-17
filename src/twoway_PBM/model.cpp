@@ -545,6 +545,30 @@ int main(int argc, char *argv[])
     compartmentDEMIn.DEMCollisionData = DEMCollisionData;
     compartmentDEMIn.DEMImpactData = DEMImpactData;
 
+    //sieveGrid=[38, 63, 90, 125, 250, 355, 500, 710, 850, 1000, 1400, 2000, 2380, 4000]; %Sieve (in micron)
+    vector<int> sieveGrid;
+    sieveGrid.push_back(38);
+    sieveGrid.push_back(63);
+    sieveGrid.push_back(90);
+    sieveGrid.push_back(125);
+    sieveGrid.push_back(250);
+    sieveGrid.push_back(355);
+    sieveGrid.push_back(500);
+    sieveGrid.push_back(710);
+    sieveGrid.push_back(850);
+    sieveGrid.push_back(1000);
+    sieveGrid.push_back(1400);
+    sieveGrid.push_back(2000);
+    sieveGrid.push_back(2380);
+    sieveGrid.push_back(4000);
+    size_t nSieveGrid = sieveGrid.size();
+
+    arrayOfDouble2D d10OverTime;
+    arrayOfDouble2D d50OverTime;
+    arrayOfDouble2D d90OverTime;
+
+    double lastTime = 0.0;
+
     while (time <= FINALTIME)
     {
         if (time > PREMIXINGTIME + LIQUIDADDITIONTIME)
@@ -767,8 +791,8 @@ int main(int argc, char *argv[])
         {
             int mpi_err = 0;
             cout << endl;
-            DUMP3DCSV(dfdtAllCompartments);
-            DUMP3DCSV(fAllCompartments);
+            //DUMP3DCSV(dfdtAllCompartments);
+            //DUMP3DCSV(fAllCompartments);
             cout << "My process id = " << mpi_id << endl;
             cout << "minfAll" << minfAll << endl;
             cout << "******fAllCompartments has negative values********" << endl;
@@ -808,6 +832,81 @@ int main(int argc, char *argv[])
             externalVolumeBinsAllCompartments[c] = externalVolumeBins;
             internalVolumeBinsAllCompartments[c] = internalVolumeBins;
         }
+
+        MPI_Barrier(MPI_COMM_WORLD);
+        // Calculate d10, d50, d90
+        vector<double> d10OverCompartment(NUMBEROFCOMPARTMENTS, 0.0);
+        vector<double> d50OverCompartment(NUMBEROFCOMPARTMENTS, 0.0);
+        vector<double> d90OverCompartment(NUMBEROFCOMPARTMENTS, 0.0);
+
+        for (int c = 0; c < NUMBEROFCOMPARTMENTS; c++)
+        {
+            arrayOfDouble2D diameter = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+            for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
+                for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+                    diameter[s][ss] = cbrt((6 / M_PI) * externalVolumeBinsAllCompartments[c][s][ss]) * 1.0e6;
+
+            vector<double> totalVolumeGrid(nSieveGrid, 0.0);
+            for (size_t d = 0; d < nSieveGrid - 1; d++)
+                for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
+                    for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+                    {
+                        if (diameter[s][ss] < sieveGrid[d + 1] && diameter[s][ss] >= sieveGrid[d])
+                            totalVolumeGrid[d] += fAllCompartments[c][s][ss] * externalVolumeBinsAllCompartments[c][s][ss];
+                    }
+
+            double sum = 0.0;
+            for (size_t d = 0; d < nSieveGrid; d++)
+                sum += totalVolumeGrid[d];
+
+            vector<double> volumeDistribution(nSieveGrid, 0.0);
+            for (size_t d = 0; d < nSieveGrid; d++)
+                volumeDistribution[d] = totalVolumeGrid[d] / sum;
+
+            vector<double> cumulativeVolumeDistribution(nSieveGrid, 0.0);
+            sum = 0.0;
+            for (size_t d = 0; d < nSieveGrid; d++)
+            {
+                sum += volumeDistribution[d];
+                cumulativeVolumeDistribution[d] = sum;
+            }
+            double d10 = 0.1 * (sieveGrid[1] / cumulativeVolumeDistribution[0]);
+            double d50 = 0.5 * (sieveGrid[1] / cumulativeVolumeDistribution[0]);
+            double d90 = 0.9 * (sieveGrid[1] / cumulativeVolumeDistribution[0]);
+
+            for (size_t d = 1; d < nSieveGrid; d++)
+            {
+                double value1 = (sieveGrid[d] - sieveGrid[d - 1]) / (cumulativeVolumeDistribution[d] - cumulativeVolumeDistribution[d - 1]);
+                double value2 = sieveGrid[d - 1];
+                if (cumulativeVolumeDistribution[d - 1] < 0.5 && cumulativeVolumeDistribution[d] >= 0.5)
+                {
+                    double value = 0.5 - cumulativeVolumeDistribution[d - 1];
+                    d50 = value * value1 + value2;
+                }
+                if (cumulativeVolumeDistribution[d - 1] < 0.1 && cumulativeVolumeDistribution[d] >= 0.1)
+                {
+                    double value = 0.1 - cumulativeVolumeDistribution[d - 1];
+                    d10 = value * value1 + value2;
+                }
+                if (cumulativeVolumeDistribution[d - 1] < 0.1 && cumulativeVolumeDistribution[d] >= 0.1)
+                {
+                    double value = 0.9 - cumulativeVolumeDistribution[d - 1];
+                    d90 = value * value1 + value2;
+                }
+            }
+            
+            d10OverCompartment[c] = d10;
+            d50OverCompartment[c] = d50;
+            d10OverCompartment[c] = d90;
+        }
+        
+        //Saving d10, d50 & d90 over time
+        d10OverTime.push_back(d10OverCompartment);
+        d50OverTime.push_back(d50OverCompartment);
+        d90OverTime.push_back(d90OverCompartment);
+
+        // End of calculate d10, d50, d90
+
         //SAVING OVER TIME
         //cout << endl <<  "************Saving over time" << endl << endl;
         fAllCompartmentsOverTime.push_back(fAllCompartments);
@@ -822,6 +921,24 @@ int main(int argc, char *argv[])
             cout << "timeStep = " << timeStep << endl;
             cout << endl;
         }
+        
+
+        
+        if (mpi_id == MASTER)
+        {
+            if (time - lastTime >= 0.2)
+            {
+                //cout << "dumping d50 etc. & particles for time = " << time << endl;
+                string timeStr = moreSigs(time, 2);//to_string(floor(time * 100.00 + 0.5) / 100.00) + string("sec");
+                string appendFileName = string("_") + timeStr;
+                //dumpDiaCSV(Time, d10OverTime, string("d10") + appendFileName);
+                dumpDiaCSV(Time, d50OverTime, string("d50") + appendFileName);
+                //dumpDiaCSV(Time, d90OverTime, string("d90") + appendFileName);
+                dump3DCSV(fAllCompartments, string("particles") + appendFileName);
+                lastTime = time;
+            }            
+        }
+        
         Time.push_back(time);
         time += timeStep;
     }
@@ -846,9 +963,9 @@ int main(int argc, char *argv[])
 
     // D10, D50, D90
     //cout << "Begin computing D10, D50, D90" << endl;
-    arrayOfDouble2D d10OverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
-    arrayOfDouble2D d50OverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
-    arrayOfDouble2D d90OverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
+    // arrayOfDouble2D d10OverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
+    // arrayOfDouble2D d50OverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
+    // arrayOfDouble2D d90OverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
 
     arrayOfDouble2D totalVolumeAllCompartmentsOverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
     arrayOfDouble2D totalSolidVolumeAllCompartmentsOverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
@@ -856,23 +973,23 @@ int main(int argc, char *argv[])
     arrayOfDouble2D totalLiquidVolumeAllCompartmentsOverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
     arrayOfDouble2D totalGasVolumeAllCompartmentsOverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
 
-    //sieveGrid=[38, 63, 90, 125, 250, 355, 500, 710, 850, 1000, 1400, 2000, 2380, 4000]; %Sieve (in micron)
-    vector<int> sieveGrid;
-    sieveGrid.push_back(38);
-    sieveGrid.push_back(63);
-    sieveGrid.push_back(90);
-    sieveGrid.push_back(125);
-    sieveGrid.push_back(250);
-    sieveGrid.push_back(355);
-    sieveGrid.push_back(500);
-    sieveGrid.push_back(710);
-    sieveGrid.push_back(850);
-    sieveGrid.push_back(1000);
-    sieveGrid.push_back(1400);
-    sieveGrid.push_back(2000);
-    sieveGrid.push_back(2380);
-    sieveGrid.push_back(4000);
-    size_t nSieveGrid = sieveGrid.size();
+    // //sieveGrid=[38, 63, 90, 125, 250, 355, 500, 710, 850, 1000, 1400, 2000, 2380, 4000]; %Sieve (in micron)
+    // vector<int> sieveGrid;
+    // sieveGrid.push_back(38);
+    // sieveGrid.push_back(63);
+    // sieveGrid.push_back(90);
+    // sieveGrid.push_back(125);
+    // sieveGrid.push_back(250);
+    // sieveGrid.push_back(355);
+    // sieveGrid.push_back(500);
+    // sieveGrid.push_back(710);
+    // sieveGrid.push_back(850);
+    // sieveGrid.push_back(1000);
+    // sieveGrid.push_back(1400);
+    // sieveGrid.push_back(2000);
+    // sieveGrid.push_back(2380);
+    // sieveGrid.push_back(4000);
+    // size_t nSieveGrid = sieveGrid.size();
 
     arrayOfDouble3D cumulativeVolumeDistributionAllCompartmentsOverTime = getArrayOfDouble3D(nTimeSteps, NUMBEROFCOMPARTMENTS, nSieveGrid);
     arrayOfDouble3D totalVolumeGridAllCompartmentsOverTime = getArrayOfDouble3D(nTimeSteps, NUMBEROFCOMPARTMENTS, nSieveGrid);
@@ -921,84 +1038,84 @@ int main(int argc, char *argv[])
                     totalGasVolumeAllCompartmentsOverTime[n][c] += value2;
                 }
 
-            arrayOfDouble2D fAll = fAllCompartmentsOverTime[n][c];
-            externalVolumeBins = externalVolumeBinsAllCompartmentsOverTime[n][c];
-            arrayOfDouble2D diameter = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+        //     arrayOfDouble2D fAll = fAllCompartmentsOverTime[n][c];
+        //     externalVolumeBins = externalVolumeBinsAllCompartmentsOverTime[n][c];
+        //     arrayOfDouble2D diameter = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
 
-            for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-                for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
-                    diameter[s][ss] = cbrt((6 / M_PI) * externalVolumeBinsAllCompartmentsOverTime[n][c][s][ss]) * 1.0e6;
+        //     for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
+        //         for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+        //             diameter[s][ss] = cbrt((6 / M_PI) * externalVolumeBinsAllCompartmentsOverTime[n][c][s][ss]) * 1.0e6;
 
-            vector<double> totalVolumeGrid(nSieveGrid, 0.0);
-            for (size_t d = 0; d < nSieveGrid - 1; d++)
-                for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-                    for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
-                    {
-                        if (diameter[s][ss] < sieveGrid[d + 1] && diameter[s][ss] >= sieveGrid[d])
-                            totalVolumeGrid[d] += fAll[s][ss] * externalVolumeBinsAllCompartmentsOverTime[n][c][s][ss];
-                    }
+        //     vector<double> totalVolumeGrid(nSieveGrid, 0.0);
+        //     for (size_t d = 0; d < nSieveGrid - 1; d++)
+        //         for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
+        //             for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+        //             {
+        //                 if (diameter[s][ss] < sieveGrid[d + 1] && diameter[s][ss] >= sieveGrid[d])
+        //                     totalVolumeGrid[d] += fAll[s][ss] * externalVolumeBinsAllCompartmentsOverTime[n][c][s][ss];
+        //             }
 
-            totalVolumeGridAllCompartmentsOverTime[n][c] = totalVolumeGrid;
+        //     totalVolumeGridAllCompartmentsOverTime[n][c] = totalVolumeGrid;
 
-            double sum = 0.0;
-            for (size_t d = 0; d < nSieveGrid; d++)
-                sum += totalVolumeGrid[d];
+        //     double sum = 0.0;
+        //     for (size_t d = 0; d < nSieveGrid; d++)
+        //         sum += totalVolumeGrid[d];
 
-            vector<double> volumeDistribution(nSieveGrid, 0.0);
-            for (size_t d = 0; d < nSieveGrid; d++)
-                volumeDistribution[d] = totalVolumeGrid[d] / sum;
+        //     vector<double> volumeDistribution(nSieveGrid, 0.0);
+        //     for (size_t d = 0; d < nSieveGrid; d++)
+        //         volumeDistribution[d] = totalVolumeGrid[d] / sum;
 
-            vector<double> cumulativeVolumeDistribution(nSieveGrid, 0.0);
-            sum = 0.0;
-            for (size_t d = 0; d < nSieveGrid; d++)
-            {
-                sum += volumeDistribution[d];
-                cumulativeVolumeDistribution[d] = sum;
-            }
-            cumulativeVolumeDistributionAllCompartmentsOverTime[n][c] = cumulativeVolumeDistribution;
+        //     vector<double> cumulativeVolumeDistribution(nSieveGrid, 0.0);
+        //     sum = 0.0;
+        //     for (size_t d = 0; d < nSieveGrid; d++)
+        //     {
+        //         sum += volumeDistribution[d];
+        //         cumulativeVolumeDistribution[d] = sum;
+        //     }
+        //     cumulativeVolumeDistributionAllCompartmentsOverTime[n][c] = cumulativeVolumeDistribution;
 
-            double d10 = 0.1 * (sieveGrid[1] / cumulativeVolumeDistribution[0]);
-            double d50 = 0.5 * (sieveGrid[1] / cumulativeVolumeDistribution[0]);
-            double d90 = 0.9 * (sieveGrid[1] / cumulativeVolumeDistribution[0]);
+        //     double d10 = 0.1 * (sieveGrid[1] / cumulativeVolumeDistribution[0]);
+        //     double d50 = 0.5 * (sieveGrid[1] / cumulativeVolumeDistribution[0]);
+        //     double d90 = 0.9 * (sieveGrid[1] / cumulativeVolumeDistribution[0]);
 
-            for (size_t d = 1; d < nSieveGrid; d++)
-            {
-                double value1 = (sieveGrid[d] - sieveGrid[d - 1]) / (cumulativeVolumeDistribution[d] - cumulativeVolumeDistribution[d - 1]);
-                double value2 = sieveGrid[d - 1];
-                if (cumulativeVolumeDistribution[d - 1] < 0.5 && cumulativeVolumeDistribution[d] >= 0.5)
-                {
-                    double value = 0.5 - cumulativeVolumeDistribution[d - 1];
-                    d50 = value * value1 + value2;
-                }
-                if (cumulativeVolumeDistribution[d - 1] < 0.1 && cumulativeVolumeDistribution[d] >= 0.1)
-                {
-                    double value = 0.1 - cumulativeVolumeDistribution[d - 1];
-                    d10 = value * value1 + value2;
-                }
-                if (cumulativeVolumeDistribution[d - 1] < 0.1 && cumulativeVolumeDistribution[d] >= 0.1)
-                {
-                    double value = 0.9 - cumulativeVolumeDistribution[d - 1];
-                    d90 = value * value1 + value2;
-                }
-            }
-            d10OverTime[n][c] = d10;
-            d50OverTime[n][c] = d50;
-            d90OverTime[n][c] = d90;
-        }
+        //     for (size_t d = 1; d < nSieveGrid; d++)
+        //     {
+        //         double value1 = (sieveGrid[d] - sieveGrid[d - 1]) / (cumulativeVolumeDistribution[d] - cumulativeVolumeDistribution[d - 1]);
+        //         double value2 = sieveGrid[d - 1];
+        //         if (cumulativeVolumeDistribution[d - 1] < 0.5 && cumulativeVolumeDistribution[d] >= 0.5)
+        //         {
+        //             double value = 0.5 - cumulativeVolumeDistribution[d - 1];
+        //             d50 = value * value1 + value2;
+        //         }
+        //         if (cumulativeVolumeDistribution[d - 1] < 0.1 && cumulativeVolumeDistribution[d] >= 0.1)
+        //         {
+        //             double value = 0.1 - cumulativeVolumeDistribution[d - 1];
+        //             d10 = value * value1 + value2;
+        //         }
+        //         if (cumulativeVolumeDistribution[d - 1] < 0.1 && cumulativeVolumeDistribution[d] >= 0.1)
+        //         {
+        //             double value = 0.9 - cumulativeVolumeDistribution[d - 1];
+        //             d90 = value * value1 + value2;
+        //         }
+        //     }
+        //     d10OverTime[n][c] = d10;
+        //     d50OverTime[n][c] = d50;
+        //     d90OverTime[n][c] = d90;
+         }
     }
     //cout << "End computing D10, D50, D90" << endl;
-    if (mpi_id == 0)
-    {
-        string appendFileName = string("_") + coreVal + string("_") + diaVal;
+    // if (mpi_id == 0)
+    // {
+    //     string appendFileName = string("_") + coreVal + string("_") + diaVal;
         
 
-        dumpDiaCSV(Time, d10OverTime, string("d10") + appendFileName);
-        dumpDiaCSV(Time, d50OverTime, string("d50") + appendFileName);
-        dumpDiaCSV(Time, d90OverTime, string("d90") + appendFileName);
+    //     dumpDiaCSV(Time, d10OverTime, string("d10") + appendFileName);
+    //     dumpDiaCSV(Time, d50OverTime, string("d50") + appendFileName);
+    //     dumpDiaCSV(Time, d90OverTime, string("d90") + appendFileName);
 
-        arrayOfDouble3D dumpedLastValue = *(fAllCompartmentsOverTime.end() - 1);
-        DUMP3DCSV(dumpedLastValue);
-    }
+    //     arrayOfDouble3D dumpedLastValue = *(fAllCompartmentsOverTime.end() - 1);
+    //     DUMP3DCSV(dumpedLastValue);
+    // }
 
     MPI_Barrier(MPI_COMM_WORLD);
     cout << "Testing... my process id = " << mpi_id << endl;

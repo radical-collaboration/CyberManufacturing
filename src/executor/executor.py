@@ -265,3 +265,62 @@ class Executor(object):
             self._dem_unit = dem_unit
             self._dem_monitor_unit = dem_monitor_unit
 
+    def _start_pbm_units(self,,timesteps):
+
+        try:
+            # Get the path to the DEM folder. This will allow correct staging
+            # input for the PBMs
+            dem_path = ru.Url(self._dem_unit.sandbox).path
+
+            # Create a list of PBM units and insert every description in that list
+            pbm_cud_list = list()
+            for i in range(self._PBMs):
+                collision = {'source': dem_path+'/collision%d.atom'%timesteps,
+                     'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%(timesteps,self._DEMcores,self._diameter),
+                     'action'  : rp.LINK}
+
+                impact = {'source': 'pilot:///impact%d.atom'%timesteps,
+                  'target': 'unit:///sampledumpfiles/impact%d.%d_%f'%(timesteps,self._DEMcores,self._diameter),
+                  'action'  : rp.LINK}
+        
+                cud = rp.ComputeUnitDescription()
+                cud.environment    = ['PATH='+self._pathtoLIGGHTS+':$PATH']
+                cud.pre_exec       = ['mkdir csvDump','mkdir txtDumps']
+                cud.executable     = 'model.out'
+                cud.arguments      = [self._DEMcores,self._diameter]
+                cud.input_staging  = [collision,impact]
+                cud.output_staging = [{'source': 'unit:///csvDump.tar.gz',
+                                   'target': 'client:///csvDump.tar.gz',
+                                   'action'  : rp.TRANSFER}]
+
+                cud.cores          = self._PBMcores
+                cud.mpi            = True
+                pbm_cud_list.append(cud)
+
+            # Submit them to the agent and wait until all have a path
+            uids = self._umgr.submits_units(pbm_cud_list)
+            self._umgr.wait_units(uids=uids.uid,state=rp.states.AGENT_SCHEDULING_PENDING)
+
+            pbm_monitor_cud_list = list()
+            for i in range(self._PBMs):
+                collision = {'source': dem_path+'/collision%d.atom'%timesteps,
+                     'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%(timesteps,self._DEMcores,self._diameter),
+                     'action'  : rp.LINK}
+
+                impact = {'source': 'pilot:///impact%d.atom'%timesteps,
+                  'target': 'unit:///sampledumpfiles/impact%d.%d_%f'%(timesteps,self._DEMcores,self._diameter),
+                  'action'  : rp.LINK}
+        
+                cud = rp.ComputeUnitDescription()
+                cud.environment    = ['PATH='+self._pathtoLIGGHTS+':$PATH']
+                cud.pre_exec       = ['mkdir csvDump','mkdir txtDumps']
+                cud.executable     = 'model.out'
+                cud.arguments      = [self._DEMcores,self._diameter]
+                cud.input_staging  = [collision,impact]
+                cud.output_staging = [{'source': 'unit:///csvDump.tar.gz',
+                                   'target': 'client:///csvDump.tar.gz',
+                                   'action'  : rp.TRANSFER}]
+
+                cud.cores          = self._PBMcores
+                cud.mpi            = True
+                pbm_cud_list.append(cud)

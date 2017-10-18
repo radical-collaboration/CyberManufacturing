@@ -324,3 +324,27 @@ class Executor(object):
                 cud.cores          = self._PBMcores
                 cud.mpi            = True
                 pbm_cud_list.append(cud)
+
+    def _shutdown(self):
+        self._session.close()
+
+    def run(self):
+
+        self._start()
+        cont = True
+
+        while cont:
+            self._start_dem_units()
+
+            self._umgr.wait_units(uid=self._dem_monitor_unit.uid)
+
+            self._umgr.cancel_units(uid=self._dem_unit.uid)
+
+            self._start_pbm_units()
+
+            self._umgr.wait_units(uid=[cu.uid for cu in self._pbm_monitor_units])
+
+            self._umgr.cancel_units(uid=[cu.uid for cu in self._pbm_units])
+
+        self._shutdown()
+    

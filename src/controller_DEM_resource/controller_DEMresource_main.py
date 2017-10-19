@@ -95,7 +95,7 @@ class controller_DEMresource_main(object):
             #dump_data.update({'collision_matrix': obj_inter.collision_matrix})
             print(dump_data)
             with open('PBM_input.json' , 'w') as outfile:
-            	json.dump(dump_data, outfile)
+            	json.dump(dump_data, outfile, indent=4, separators=(',', ': '))
         elif (flag == 2):
         	# kill the DEM since there has been no change in the number of collisions / impacts / velocity for 5 seconds.
             print("The system is at steady state")

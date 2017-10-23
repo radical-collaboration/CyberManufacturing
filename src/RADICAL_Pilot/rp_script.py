@@ -65,14 +65,14 @@ if __name__ == '__main__':
         # Here we use a dict to initialize the description object
         pd_init = {
                 'resource'      : config['resource'],
-                'runtime'       : config['runtime'],  # pilot runtime (min)
+                'runtime'       : 2010,# config['runtime'],  # pilot runtime (min)
                 'exit_on_error' : True,
                 'project'       : config['project'],
                 'queue'         : config['queue'],
                 'cores'         : config['cores']
                 }
         pdesc = rp.ComputePilotDescription(pd_init)
-
+        pdesc.cleanup=False
         # Launch the pilot.
         pilot = pmgr.submit_pilots(pdesc)
 
@@ -93,12 +93,12 @@ if __name__ == '__main__':
         for i in range(10):
             cud = rp.ComputeUnitDescription()
             cud.environment    = ['PATH='+config['pathtoLIGGHTS']+':$PATH']
-            cud.pre_exec       = ['mkdir CSVs','mkdir post','mkdir restart']
             cud.executable     = 'lmp_micstam'
             cud.cores          = config['DEMcores']
             cud.mpi            = True
             
             if i == 0:
+                cud.pre_exec       = ['mkdir CSVs','mkdir post','mkdir restart']
                 cud.arguments      = ['-in','in.*' ]
                 cud.input_staging  = [{'source': config['pathtoLIGGHTSinputs']+'in.2_sim_new',
                                        'target':'unit:///in.2_sim_new',
@@ -120,12 +120,13 @@ if __name__ == '__main__':
                                    'target': 'pilot:///granulator.%d.restart'%((i+1)*2000000),
                                    'action'  : rp.LINK}]
             elif i>0 and i<9:
+                cud.pre_exec       = ['mkdir CSVs','mkdir post']
                 cud.arguments      = ['-in','restart/in.*' ]
-                cud.input_staging  = [{'source': 'pilot:///granulator.%d.restart'%((i+1)*2000000),
-                                       'target':'unit:///restart/granulator.%d.restart'%((i+1)*2000000),
+                cud.input_staging  = [{'source': 'pilot:///granulator.%d.restart'%(i*2000000),
+                                       'target':'unit:///restart/granulator.%d.restart'%(i*2000000),
                                        'action'  :rp.LINK},
-                                       {'source': config['pathtoLIGGHTSinputs']+'in.restart_from_%d'%((i+1)*2000000),
-                                       'target':'unit:///in.restart_from_%d'%((i+1)*2000000),
+                                       {'source': config['pathtoLIGGHTSinputs']+'in.restart_from_%d'%(i*2000000),
+                                       'target':'unit:///restart/in.restart_from_%d'%(i*2000000),
                                        'action'  :rp.LINK},
                                       {'source': config['pathtoLIGGHTSinputs']+'shell_closed.stl',
                                        'target':'unit:///shell_closed.stl',
@@ -144,12 +145,13 @@ if __name__ == '__main__':
                                    'target': 'pilot:///granulator.%d.restart'%((i+1)*2000000),
                                    'action'  : rp.LINK}]
             else:
+                cud.pre_exec       = ['mkdir CSVs','mkdir post']
                 cud.arguments      = ['-in','restart/in.*' ]
-                cud.input_staging  = [{'source': 'pilot:///granulator.%d.restart'%((i+1)*2000000),
-                                       'target':'unit:///restart/granulator.%d.restart'%((i+1)*2000000),
+                cud.input_staging  = [{'source': 'pilot:///granulator.%d.restart'%(i*2000000),
+                                       'target':'unit:///restart/granulator.%d.restart'%(i*2000000),
                                        'action'  :rp.LINK},
-                                       {'source': config['pathtoLIGGHTSinputs']+'in.restart_from_%d'%((i+1)*2000000),
-                                       'target':'unit:///in.restart_from_%d'%((i+1)*2000000),
+                                       {'source': config['pathtoLIGGHTSinputs']+'in.restart_from_%d'%(i*2000000),
+                                       'target':'unit:///restart/in.restart_from_%d'%(i*2000000),
                                        'action'  :rp.LINK},
                                       {'source': config['pathtoLIGGHTSinputs']+'shell_closed.stl',
                                        'target':'unit:///shell_closed.stl',
@@ -229,7 +231,7 @@ if __name__ == '__main__':
         # always clean up the session, no matter if we caught an exception or
         # not.  This will kill all remaining pilots.
         report.header('finalize')
-        session.close()
+        session.close(download=True,cleanup=False)
 
     report.header()
 

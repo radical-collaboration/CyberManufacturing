@@ -27,9 +27,9 @@ class controllerPBMDataReader(object):
         self.compartments= compartments # number of comparments inside the PBM
         self.bins1 = bins1 # number of segregations of bins of solid 1 in PBM
         self.bins2 = bins2 # number of segregations of bins of solid 2 in PBM
-        self.d50_overtime = np.array((1,compartments))
+        self.d50_overtime = np.zeros((1,compartments))
         self.last_timeindex = 2
-        self.particles_overtime = np.array((1,compartments * bins1 * bins2))
+        self.no_particles_overtime = np.zeros(1)
         self.PBM_output_path = PBM_out_path
 
 
@@ -74,56 +74,43 @@ class controllerPBMDataReader(object):
         return new_ts
 
     # method to extract data from the d50 csv file and save the data uptill a given time step
-    def data_d50_extractor(self, last_ts):
-        new_ts = self.nextfile_time_finder(last_ts)
-        filetoread_d50 = 'd50_' + str(new_ts) + '.csv'
+    def data_d50_extractor(self, curr_ts):
+#        new_ts = self.nextfile_time_finder(last_ts)
+        filetoread_d50 = 'd50_' + str(curr_ts) + '.csv'
         temp_d50 = np.zeros((1,self.compartments))
-        old_d50length = len(self.d50_overtime)
-        flag = 0
+#        old_d50length = len(self.d50_overtime)
+#        flag = 0
         with open(filetoread_d50, 'rb') as d50_current_file:
             read_d50 = pd.read_csv(d50_current_file, header = 0)
             ts_len = len(read_d50.Time)
-            for x in range(1, ts_len):
+            for x in range(0, ts_len):
                 for i in range(0,self.compartments):
-                    if np.isnan(read_d50.iloc[x][i]):
+                    if np.isnan(read_d50.iloc[x][i+2]):
                         temp_d50[i] = 0
                     else:
-                       temp_d50[i] = read_d50.iloc[x][i]
-                self.d50_overtime.append(temp_d50)
-                if ((abs(self.d50_overtime[(x + old_d50length)] - self.d50_overtime[old_d50length]) / self.d50_overtime[(x + old_d50length)]) > 0.15):
-                    flag = 1
-                    break
-                else:
-                    continue
-        return flag, self.d50_overtime[(x + old_d50length)]
+                       temp_d50[0][i] = read_d50.iloc[x][i+2]
+                self.d50_overtime = np.vstack([self.d50_overtime, temp_d50])
+        return temp_d50
 
 
     # method to extract data from the particles csv file and save the data uptill a given time step
-    def data_particles_extractor(self, last_ts):
-        new_ts = self.nextfile_time_finder(last_ts)
-        filetoread_particles = 'particles_' + str(new_ts) + '.csv'
-        temp_particles = np.zeros(1,self.compartments)
-        old_particleslength = len(particles_overtime)
-        flag = 0
+    def data_particles_extractor(self, curr_ts):
+#        new_ts = self.nextfile_time_finder(last_ts)
+        filetoread_particles = 'particles_' + str(curr_ts) + '.csv'
+        total_num_particles = 0
+#        old_particleslength = len(particles_overtime)
+#        flag = 0
         with open(filetoread_particles, 'rb') as particles_current_file:
             read_particles = pd.read_csv(particles_current_file, header = 0)
-            ts_len = len(read_particles.Time)
+            ts_len = len(read_particles.value)
             for x in range(1, ts_len):
-                for i in range(0,self.compartments):
-                    if np.isnan(read_particles.iloc[x][i]):
-                        temp_particles[i] = 0
-                    else:
-                       temp_particles[i] = read_particles.iloc[x][i]
-                self.particles_overtime.append(temp_particles)
-                if ((abs(self.particles_overtime[(x + old_particleslength)] - self.particles_overtime[old_particleslength]) / self.particles_overtime[(x + old_particleslength)]) > 0.15):
-                    flag = 1
-                    break
-                else:
-                    continue
-        return flag, self.particles_overtime[(x + old_particleslength)]
+                total_num_particles += read_particles.iloc[x][3]
+            self.no_particles_overtime = np.append(self.no_particles_overtime, total_num_particles)
+        return total_num_particles
+
+
 
 a = controllerPBMDataReader(10,4,16,16,'/home/chai/Documents/git/CyberManufacturing/src/twoway_PBM/csvDump')
 t = a.nextfile_time_finder(10.08)
-r = a.data_d50_extractor(10.08)
-
-
+r = a.data_d50_extractor(t)
+q = a.data_particles_extractor(t)

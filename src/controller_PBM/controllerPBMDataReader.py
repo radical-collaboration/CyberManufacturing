@@ -27,7 +27,7 @@ class controllerPBMDataReader(object):
         self.compartments= compartments # number of comparments inside the PBM
         self.bins1 = bins1 # number of segregations of bins of solid 1 in PBM
         self.bins2 = bins2 # number of segregations of bins of solid 2 in PBM
-        self.d50_overtime = np.zeros((1,compartments))
+        self.d50_overtime = np.zeros((1,compartments +1))
         self.last_timeindex = 2
         self.no_particles_overtime = np.zeros(1)
         self.PBM_output_path = PBM_out_path
@@ -70,25 +70,25 @@ class controllerPBMDataReader(object):
             if (file1 != file_list_d50[-1]):
                 continue
             else:
-                time.sleep(0.1)
+                time.sleep(0.05)
         return new_ts
 
     # method to extract data from the d50 csv file and save the data uptill a given time step
     def data_d50_extractor(self, curr_ts):
 #        new_ts = self.nextfile_time_finder(last_ts)
         filetoread_d50 = 'd50_' + str(curr_ts) + '.csv'
-        temp_d50 = np.zeros((1,self.compartments))
+        temp_d50 = np.zeros((1,self.compartments + 1))
 #        old_d50length = len(self.d50_overtime)
 #        flag = 0
         with open(filetoread_d50, 'rb') as d50_current_file:
             read_d50 = pd.read_csv(d50_current_file, header = 0)
             ts_len = len(read_d50.Time)
             for x in range(0, ts_len):
-                for i in range(0,self.compartments):
-                    if np.isnan(read_d50.iloc[x][i+2]):
+                for i in range(0,self.compartments + 1):
+                    if np.isnan(read_d50.iloc[x][i+1]):
                         temp_d50[i] = 0
                     else:
-                       temp_d50[0][i] = read_d50.iloc[x][i+2]
+                       temp_d50[0][i] = read_d50.iloc[x][i+1]
                 self.d50_overtime = np.vstack([self.d50_overtime, temp_d50])
         return temp_d50
 

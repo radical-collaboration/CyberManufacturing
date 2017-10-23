@@ -78,7 +78,7 @@ class Controller_DEM_resource_reader(object):
 
 # ------------------------------------------------------------------------------
 
-abcd = Controller_DEM_resource_reader(200000,16)
-ad = abcd.liggghts_raw_collision_data()
-ad = abcd.ligghts_data_store()
+# abcd = Controller_DEM_resource_reader(200000,16)
+# ad = abcd.liggghts_raw_collision_data()
+# ad = abcd.ligghts_data_store()
 #ad.read()

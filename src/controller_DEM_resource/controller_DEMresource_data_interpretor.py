@@ -107,11 +107,11 @@ class controller_DEM_resource_interpretor(object):
 
 # ------------------------------------------------------------------------------------------------
 
-abcd = controller_DEM_resource_interpretor(500000, 16, 2000000)
+# abcd = controller_DEM_resource_interpretor(500000, 16, 2000000)
 # a1 = abcd.avg_all_data(5000000)
 # print(abcd.num_of_particles)
 # abcd.init_data_calculations()
 # print(abcd.num_of_particles)
 # a1 = abcd.avg_all_data(6000000)
 # print(abcd.num_of_particles)
-print(abcd.liggghts_data_comparison(5000000))
+# print(abcd.liggghts_data_comparison(5000000))

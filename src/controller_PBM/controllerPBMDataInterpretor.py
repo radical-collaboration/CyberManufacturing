@@ -20,48 +20,70 @@ OUTPUT FLAG VALUE STATUS
 ==================================================================================================
 """
 import numpy as np
-import os
 import controllerPBMDataReader as PBM_reader
 
 class controllerPBMDataInterpretor(object):
 
     def __init__(self, init_ts, compartment, bins1, bins2, PBM_out_path):
-        self.intial_ts = init_ts
+        self.initial_ts = np.float(init_ts)
         self.bins1 = bins1
         self.bins2 = bins2
         self.compartments = compartment
         self.PBM_output_path = PBM_out_path
+        self.obj_PBM_reader = PBM_reader.controllerPBMDataReader(self.initial_ts, self.compartments, self.bins1, self.bins2, self.PBM_output_path)
         self.initial_d50 = np.array(self.compartments +1)
         self.initial_num_particles = 0.0
         self.init_data_storage(self.initial_ts)
         self.d50_store = np.zeros_like(self.initial_d50)
-        self.num_particles = np.zeros(1,2)
-        self.new_data_storage(self.init_ts)
+        self.num_particles = np.zeros((1,2))
+        self.new_data_storage(self.initial_ts)
         self.time_index = 0
 
 
     # method to calculate the initial d50 and number of particles.
-    def init_data_storing(self, init_ts):
+    def init_data_storage(self, init_ts):
         obj_PBM_reader = PBM_reader.controllerPBMDataReader(init_ts, self.compartments, self.bins1, self.bins2, self.PBM_output_path)
         self.initial_d50 = obj_PBM_reader.data_d50_extractor(init_ts)
         self.initial_num_particles = obj_PBM_reader.data_particles_extractor(init_ts)
 
     # method to store the new d50 and number of particles data from the files being printed
     def new_data_storage(self, init_ts):
-        obj_PBM_reader = PBM_reader.controllerPBMDataReader(init_ts, self.compartments, self.bins1, self.bins2, self.PBM_output_path)
-        new_ts = obj_PBM_reader.nextfile_time_finder(init_ts)
+        new_ts = np.float(self.obj_PBM_reader.nextfile_time_finder(init_ts))
 #        new_d50 = self.initial_d50
 #        new_num_particles = 0.0
         temp_new_d50 = np.zeros_like(self.initial_d50)
-        temp_new_d50 = obj_PBM_reader.data_d50_extractor(new_ts)
-        temp_new_num_particles = obj_PBM_reader.data_particles_extracto(new_ts)
+        temp_new_d50 = self.obj_PBM_reader.data_d50_extractor(new_ts)
+        temp_new_num_particles = self.obj_PBM_reader.data_particles_extractor(new_ts)
         self.d50_store = np.append(self.d50_store, temp_new_d50)
         self.num_particles = np.append(self.num_particles, [init_ts, temp_new_num_particles])
 
     # method to compare the data from the data and decide on the execution
     def data_comparison(self, ts):
         flag = 0
-        temp1 = self.d50_store[-1]
+        print(ts)
+        temp1 = self.obj_PBM_reader.data_d50_extractor(ts)
         temp2 = self.num_particles[-1]
-
-
+        particles_check = abs(self.initial_num_particles - temp2) / self.initial_num_particles
+        ss_check_time = 10
+        print("Now checking %f with initial time %f"%(ts, self.initial_ts))
+        if (ts > self.initial_ts and particles_check < 0.25):
+            for i in range(0,self.compartments):
+                d50_check = (abs(self.initial_d50[0][i] - temp1[0][i]) / self.initial_d50[0][i])
+#                print(d50_check)
+                if (int(d50_check) > 0.25):
+                    flag = 1
+                    break
+                else:
+                    continue
+        elif ((ts - self.initial_ts) > ss_check_time):
+            flag = 2
+        elif ((ts - self.initial_ts) < ss_check_time and particles_check > 0.15):
+            flag = 1
+        else:
+            flag = 0
+#        print(flag)
+        return flag
+#
+#a = controllerPBMDataInterpretor(10.08,4,16,16,'/home/chai/Documents/git/CyberManufacturing/src/twoway_PBM/csvDump')
+#r = a.new_data_storage(10.09)
+#q = a.data_comparison(10.09)

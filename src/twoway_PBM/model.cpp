@@ -929,7 +929,7 @@ int main(int argc, char *argv[])
             if (time - lastTime >= 0.2)
             {
                 //cout << "dumping d50 etc. & particles for time = " << time << endl;
-                string timeStr = moreSigs(time, 2);//to_string(floor(time * 100.00 + 0.5) / 100.00) + string("sec");
+                string timeStr = to_string(floorf(time * 100) / 100);// + string("sec"); //moreSigs(time, 2);
                 string appendFileName = string("_") + timeStr;
                 //dumpDiaCSV(Time, d10OverTime, string("d10") + appendFileName);
                 dumpDiaCSV(Time, d50OverTime, string("d50") + appendFileName);

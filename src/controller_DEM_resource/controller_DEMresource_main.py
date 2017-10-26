@@ -90,6 +90,14 @@ class controller_DEMresource_main(object):
             dump_data['average velocity of each type'].append(list(avg_vel_array))
             dump_data['time step'] = []
             dump_data['time step'].append(int(timestep))
+            dump_data['Aggregation Kernel Constant'] = []
+            dump_data['Aggregation Kernel Constant'].append(1e-9)
+            dump_data['Breakage Kernel Constant'] = []
+            dump_data['Breakage Kernel Constant'].append(1e-7)
+            dump_data['Mixing Time'] = []
+            dump_data['Mixing Time'].append(25)
+            dump_data['Liquid Addition Time'] = []
+            dump_data['Liquid Addition Time'].append(125)
             #dump_data['collision_matrix'] = []
             #dump_data['collision_matrix'].append(list(list(obj_inter.collision_matrix)))
             #dump_data.update({'collision_matrix': obj_inter.collision_matrix})

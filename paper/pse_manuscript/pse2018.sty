@@ -1,0 +1,131 @@
+% ---------------------------------------------------------------
+%    escape26.sty
+%    by Alexander Zinser, zinser@mpi-magdeburg.mpg.de
+% ---------------------------------------------------------------
+%    based on the escpe_25.sty template
+%    by Heinz.Preisig@chemeng.ntnu.no
+% ---------------------------------------------------------------
+% no guarantee is given that the format corresponds perfectly to
+% ESCAPE Proceedings, but most features should be ok.
+% ---------------------------------------------------------------
+
+\typeout{PSE 2018 proceedings style `pse2018.sty'.}
+
+% fonts
+\usepackage{mathptmx}
+%\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+\usepackage{authblk}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+ \setlength{\textheight}{219 mm}%{20.5cm}
+ \setlength{\textwidth}{13.7cm} %gives a width of 12.5 
+ \setlength{\hoffset}{1.15cm}
+ \setlength{\marginparwidth}{0mm}
+ \setlength{\voffset}{-1.00cm}
+ \setlength{\topmargin}{0in}
+ \setlength{\headheight}{7mm}
+ \setlength{\headsep}{8mm} %{0in}
+ \setlength{\parindent}{0in}
+ \setlength{\parskip}{1.5ex plus 0.3ex minus 0.2ex}
+ \setlength{\oddsidemargin}{0in}%{-0.1875in}
+ \setlength{\evensidemargin}{0in}
+
+
+\def\headerbox{%
+\begin{picture}(0,0)
+ \put(0,25){\vbox to 10mm{\small%
+   \EDITORS\ (Editor)\\
+   Proceedings of the \CONFERENCE \\
+   \DATE,\ \YEAR, \PLACE. \copyright\ \YEAR\ \PUBLISHER\ All rights reserved.}}
+\end{picture}}
+
+
+\renewcommand\Authands{ and }
+\renewcommand\Affilfont{\itshape\normalsize}
+
+%% title page -----------------------------------------------------------------
+\def\@maketitle
+   {%
+   \vbox to 0mm{\hfill} \vskip-2mm%
+   \headerbox%
+     %\vbox to 5mm{\hfill}
+      {\vskip-0mm\LARGE \bf \@title \vskip3mm}
+       %\vspace*{1mm}        			% additional two empty lines at the end of the title
+      {\vskip-1mm\large\lineskip .5em\@author}%
+      {\@affiliation} %
+      {\newline\normalsize\@email} %
+      \vspace*{6pt}				% additional empty line at the end of the title block
+   }
+
+\def\abstract
+   {\vspace*{6mm}%
+   \leftline{\large\bf Abstract}%
+   \vspace*{-2pt}%
+   }
+
+\def\endabstract
+   {
+     \vspace*{0pt}				% additional empty line at the end of the abstract
+   }
+
+\def\Keywords#1{\vskip 3mm\textbf{Keywords:} #1 \vskip12pt}
+
+\def\affiliation#1{\gdef\@affiliation{#1}} \gdef\@affiliation{}
+
+\def\email#1{\gdef\@email{\normalsize\textit{#1}}} \gdef\@email{}
+
+%correct heading spacing and type
+\renewcommand\section{\@startsection {section}{1}{\z@}
+   {10pt plus 1pt minus 1pt}{1mm plus 2pt minus 2pt} {\large\bf}}
+\renewcommand\subsection{\@startsection {subsection}{2}{\z@}
+   {8pt plus 0.1mm minus 3pt}{1pt} {\it}}
+\renewcommand\subsubsection{\@startsection {subsubsection}{3}{\z@}
+   {8mm plus 0.1mm minus 3pt}{1pt} {\it}}
+
+% add the period after section numbers
+\let\oldsection=\section
+\let\oldsubsection=\subsection
+\let\oldsubsubsection=\subsubsection
+\let\oldparagraph=\paragraph
+
+\renewcommand{\section}[1]{\oldsection{\hskip -1em.~#1}}
+\renewcommand{\subsection}[1]{\oldsubsection{\hskip -1em.~#1}}
+\renewcommand{\subsubsection}[1]{\oldsubsubsection{\hskip -1em.~#1}}
+\renewcommand{\paragraph}[1]{\par\hskip -0em{\it{#1:\ }}\ }
+
+\renewenvironment{thebibliography}[1]%
+{\stepcounter{section}%
+  \vspace*{1em}
+  \leftline{\large\bf ~References}%
+  \vspace*{2pt plus 2pt minus 2pt}%
+   \list{references}{\itemindent-\labelwidth\itemsep=0pt\parskip=0pt\footnotesize}%
+}%
+{\endlist\vskip 1em%
+}
+
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\def\HeaderTitle#1{\global\def\titlestr{\it#1}}
+\def\HeaderAuthor#1{\global\def\authorstr{\it#1}}
+
+\lhead[\hskip-14mm\thepage]{\titlestr}
+\rhead[even]{odd}
+\rhead[\authorstr]{\thepage}
+\rfoot{}
+\cfoot{}
+\lfoot{}
+
+%% Conference and editors %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\CONFERENCE{13\textsuperscript{th} International Symposium on Process Systems Engineering – PSE 2018}
+\def\EDITORS{Mario R. Eden, Marianthi Ierapetritou and Gavin P. Towler}
+\def\PUBLISHER{Elsevier B.V.}
+\def\DATE{July 1st - 5th}
+\def\YEAR{2018}
+\def\PLACE{San Diego, California, USA}
+
+% end of file  escape26.sty
+% ---------------------------------------------------------------

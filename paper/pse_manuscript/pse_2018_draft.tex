@@ -36,8 +36,8 @@
 \usepackage{lineno}
 \usepackage{placeins}
 \usepackage{subcaption}
-\usepackage[usenames,dvipsnames]{color}
-\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+%\usepackage[usenames,dvipsnames]{color}
+%\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{textcomp}
@@ -87,58 +87,54 @@ coupled DEM – PBM models on high performance computing systems.}
 
 \begin{abstract}
 A multiscale model combines the computational efficiency of a macro-scale model and the
-accuracy of a micro-scale model. It is preferred over a fully micro-scale model for its speed advantages while maintaining the physics of the problem. A less accurate way to perform such a simulation is touse data from a precomputed microscale model in a macroscale model. With the current cyberinfrastructure resources available, using more computationally intensive and concurrent multiscale models are morefeasible. This study proposes to use Discrete Element Method (DEM), a microscale model, and a Population Balance Model (PBM), a macroscale model, in a concurrent manner to model the granulation process of a pharmaceutical product inside a high shear granulator. The granulation between the components of a pharmaceutical blend is governed by the collision in between the particles. This leads to increase in their size, due to physical bonds in between them. The DEM provides the collision data while the PBM helps in
-predicting the macroscale phenomena like aggregation and breakage. This work attempts to couple these two models using a controller program, which triggers the DEM first, to give initial seed data to run the PBM. Then, the controller uses the data generated from the PBM continuously to determine the change in the physical properties and trigger the DEM from its last known state. The controller does the same with the DEM data to trigger the PBM. This occurs iteratively until a steady state is reached. A workflow diagram of the procedure followed is provided in Figure 1. The execution of each of the components is governed by a multilevel job scheduler which allocates resources rather than waiting for each simulation to run on a
-normal job scheduler on a cluster. The DEM is parallelized using Message Parsing Interface (MPI) while the PBM is parallelized using a faster hybrid approach which is a combination of both MPI and Open Multi-Processing (OMP). Since the DEM is computationally heavy, an algorithm is developed to utilize the idle cores during the PBM execution to run multiple instances of the PBM such that parameter estimation of the kernels of the PBM occurs on the fly as well. This method of using shorter bursts of each simulation led to faster simulation times as well as a more accurate model of the high shear granulator. The Quality by Design (QbD) approach is addressed using such a modelling framework and it also helps us understand the
+accuracy of a micro-scale model. It is preferred over a fully micro-scale model for its speed advantages while maintaining the physics 
+of the problem. A less accurate way to perform such a simulation is touse data from a precomputed microscale model in a macroscale 
+model. With the current cyberinfrastructure resources available, using more computationally intensive and concurrent multiscale models 
+are morefeasible. This study proposes to use Discrete Element Method (DEM), a microscale model, and a Population Balance Model (PBM), 
+a macroscale model, in a concurrent manner to model the granulation process of a pharmaceutical product inside a high shear 
+granulator. The granulation between the components of a pharmaceutical blend is governed by the collision in between the particles. 
+This leads to increase in their size, due to physical bonds in between them. The DEM provides the collision data while the PBM helps 
+in predicting the macroscale phenomena like aggregation and breakage. This work attempts to couple these two models using a controller 
+program, which triggers the DEM first, to give initial seed data to run the PBM. Then, the controller uses the data generated from the 
+PBM continuously to determine the change in the physical properties and trigger the DEM from its last known state. The controller does 
+the same with the DEM data to trigger the PBM. This occurs iteratively until a steady state is reached. A workflow diagram of the 
+procedure followed is provided in Figure 1. The execution of each of the components is governed by a multilevel job scheduler which 
+allocates resources rather than waiting for each simulation to run on a
+normal job scheduler on a cluster. The DEM is parallelized using Message Parsing Interface (MPI) while the PBM is parallelized using a 
+faster hybrid approach which is a combination of both MPI and Open Multi-Processing (OMP). Since the DEM is computationally heavy, an 
+algorithm is developed to utilize the idle cores during the PBM execution to run multiple instances of the PBM such that parameter 
+estimation of the kernels of the PBM occurs on the fly as well. This method of using shorter bursts of each simulation led to faster 
+simulation times as well as a more accurate model of the high shear granulator. The Quality by Design (QbD) approach is addressed 
+using such a modelling framework and it also helps us understand the
 granulation process in a quantitative as well as in a mechanistic manner.
 \end{abstract}
 \Keywords{keyword1, keyword2, keyword3}
 
 % ==================================== body  =====================================
 
-\section{Section title}
+\section{Introduction}
+Introduction
+Methods 
+DEM setup
+PBM parallelization 
+PBM setup
+Description of the controller
+Relevance of using a pilot job system (RP)
+Results
+Strong Scaling ( \# of cores v/s time )
+Improvements over one way coupling
+Conclusion
 
 This is a section
-
-\subsection{Sub-section}
-
-Equations come as normal, the included style file for the left equation notation of Elsevier is automatically included. So for example
-\begin{equation}
-  A = B + C
-\end{equation}
-or an aligned equations
-\begin{align}
-  \dot{x} &= A \, x + B \, u \\
-  y &= C \, x
-\end{align}
-But also the starred versions work:
-\begin{equation*}
-  A = B + C
-\end{equation*}
-or an aligned equations
-\begin{align*}
-  \dot{x} &= A \, x + B \, u \\
-  y &= C \, x
-\end{align*}
-
-
-The subsubsection then appears like:
-
-\subsubsection{Subsubsection}
-This gives all numbered titles. \cite{Reference2015}
-\paragraph{Paragraph}
-%\begin{wrapfigure}{r}{0.5\textwidth}
-%  \includegraphics[width=0.5\textwidth]{F_drop.eps}
-%  \caption{The world in a drop}
-%  \label{Fig:drop}
-%\end{wrapfigure}
-Figure \ref{Fig:drop} shows the word in a drop -- 
-
-\section{Starred section commands}
-The starred section commands, which do not show numbering, are not available.
-
-\section{More}
-
+\section{Methods}
+\subsection{Population Balance Model (PBM) development}
+\subsection{Discrete Element Model (DEM) setup}
+\subsection{PBM parallelization technique}
+\subsection{Model development}
+\section{Results}
+\subsection{Scaling results}
+\subsection{Improved results over one way coupling}
+\section{Conclusion}
 
 % ================================ references ===================================
 %% References 

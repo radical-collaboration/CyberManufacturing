@@ -511,19 +511,26 @@ of the geometry with the particles as well as from particle particle overlap.
 
 \subsection{PBM}
 \label{sec:pbm_model}
-\subsubsection{Model development}
+        For this work two PBMs were developed. The first model was developed as a stand alone model that only uses PBM kernels for modeling breakage and aggregation. The model was initially developed in C  and used static linear arrays. The details of this model will be discussed in the following sections. This model was validated, parallelized and its performance was studied before the second model was developed. The performance of this first model was studied on Stampede01 which was decommissioned before the second model was tested on it.
+
+        The second model was based on the first model. The second model was rebuilt in c++ and modified in several ways ( which will be explained in the following sections) so that it could be coupled with LIGGGHTS. To modify it many of the linear arrays were switched over to multiDim Vectors using the STD::vector c++ library. However after the model was built and coupled with LIGGGHTS it was found that using STD:vector lib with OpenMP would have poor parallel performance \textcolor{cyan}{Yukk Chai and Franklin lets breifly go over why this is so that we can concisely and competently explain it}. Since the DEM simulations will take far longer than the PBM they are coupled with the authors of this work did not rebuild / optimize the second PBM since it was not the rate limiting process in the coupled workflow.
+
+        The differences between the two PBMs will be discussed in more detail in the following methods sections. In the results section validatona and perforamnce will be shown for both PBM models. The first model will be referred two as the "stand alone" PBM and the second model will be the "coupled" PBM.
+
+
+\subsubsection{Stand Alone PBM Model development}
  The population balance equation used in this work is expressed below:
 \begin{align}
 \frac{d}{dt}F(s_1,s_2,x)=\Re_{agg}(s_1,s_2,x)+\Re_{break}(s_1,s_2,x)+\dot{F}_{in}(s_1,s_2,x)-\dot{F}_{out}(s_1,s_2,x)
 \label{eqn:mthds_pbm_overall} 
 \end{align}
-where, $F(s_1,s_2,x)$ is the number of particles with an active pharmaceutical ingredients (API) volume of $s_1$ and an excipient 
-volume of $s_2$ in the spatial compartment $x$. The rate of change of number of particles with time 
-in different size classes depend on the rate of aggregation $\Re_{agg}(s_1,s_2,x)$ and the rate of 
-breakage $\Re_{break}(s_1,s_2,x)$. Also, the rate of particles coming into, $\dot{F}_{in}(s_1,s_2,x)$ and 
-going out, $\dot{F}_{out}(s_1,s_2,x)$ of the spatial compartment due to particle transfer affect the number of 
-particles in different size classes. 
-The rate of change of liquid volume in each particle is calculated using the equation: 
+where, $F(s_1,s_2,x)$ is the number of particles with an active pharmaceutical ingredients (API) volume of $s_1$ and an excipient
+volume of $s_2$ in the spatial compartment $x$. The rate of change of number of particles with time
+in different size classes depend on the rate of aggregation $\Re_{agg}(s_1,s_2,x)$ and the rate of
+breakage $\Re_{break}(s_1,s_2,x)$. Also, the rate of particles coming into, $\dot{F}_{in}(s_1,s_2,x)$ and
+going out, $\dot{F}_{out}(s_1,s_2,x)$ of the spatial compartment due to particle transfer affect the number of
+particles in different size classes.
+The rate of change of liquid volume in each particle is calculated using the equation:
 
 \begin{align}
 \frac{d}{dt}F(s_1,s_2,x)l(s_1,s_2,x)&= 
@@ -532,14 +539,14 @@ The rate of change of liquid volume in each particle is calculated using the equ
 \label{eqn:mthds_pbm_rate} 
 \end{align}
 
-where, $l(s_1,s_2,x)$ is the amount of liquid volume in each particle with API volume of $s_1$ and 
-excipient volume of $s_2$ in the spatial compartment $x$. $\Re_{liq,agg}(s_1,s_2,x)$ and 
-$\Re_{liq,break}(s_1,s_2,x)$ are respectively the rates of liquid transferred between size classes due to 
-aggregation and breakage. $l_{in}(s_1,s_2,x)$ and $l_{out}(s_1,s_2,x)$ are respectively the liquid 
-volumes of the particles coming in and going out of the spatial compartment. $l_{add}(s_1,s_2,x)$ is 
-the volume of liquid acquired by each particle in the compartment at every time step due to external 
+where, $l(s_1,s_2,x)$ is the amount of liquid volume in each particle with API volume of $s_1$ and
+excipient volume of $s_2$ in the spatial compartment $x$. $\Re_{liq,agg}(s_1,s_2,x)$ and
+$\Re_{liq,break}(s_1,s_2,x)$ are respectively the rates of liquid transferred between size classes due to
+aggregation and breakage. $l_{in}(s_1,s_2,x)$ and $l_{out}(s_1,s_2,x)$ are respectively the liquid
+volumes of the particles coming in and going out of the spatial compartment. $l_{add}(s_1,s_2,x)$ is
+the volume of liquid acquired by each particle in the compartment at every time step due to external
 liquid addition.
-Similarly, the rate of change of gas volume is calculated using the following equation: 
+Similarly, the rate of change of gas volume is calculated using the following equation:
 
 \begin{align}
 \frac{d}{dt}F(s_1,s_2,x)g(s_1,s_2,x)&= 
@@ -548,13 +555,13 @@ Similarly, the rate of change of gas volume is calculated using the following eq
 \label{eqn:mthds_pbm_gas_agg} 
 \end{align}
 
-where, $g(s_1,s_2,x)$ is the gas volume of each particle with API volume of $s_1$ and excipient 
-volume of $s_2$ in the spatial compartment $x$. $\Re_{gas,agg}(s_1,s_2,x)$ and 
-$\Re_{gas,break}(s_1,s_2,x)$ are respectively the rates of gas transferred between size classes due to 
-aggregation and breakage. $g_{in}(s_1,s_2,x)$ and $g_{out}(s_1,s_2,x)$ are respectively the gas 
-volume of the particles entering and leaving the spatial compartment. $\dot{g}_{cons}(s_1,s_2,x)$ is the 
-volume of gas coming out of each particle at every time-step due to consolidation of the particles. 
-The rate of aggregation, $\Re_{agg}(s_1,s_2,x)$ in Equation \ref{eqn:mthds_pbm_overall} is 
+where, $g(s_1,s_2,x)$ is the gas volume of each particle with API volume of $s_1$ and excipient
+volume of $s_2$ in the spatial compartment $x$. $\Re_{gas,agg}(s_1,s_2,x)$ and
+$\Re_{gas,break}(s_1,s_2,x)$ are respectively the rates of gas transferred between size classes due to
+aggregation and breakage. $g_{in}(s_1,s_2,x)$ and $g_{out}(s_1,s_2,x)$ are respectively the gas
+volume of the particles entering and leaving the spatial compartment. $\dot{g}_{cons}(s_1,s_2,x)$ is the
+volume of gas coming out of each particle at every time-step due to consolidation of the particles.
+The rate of aggregation, $\Re_{agg}(s_1,s_2,x)$ in Equation \ref{eqn:mthds_pbm_overall} is
 calculated as: \citep{Chaturbedi2017}
 
 \begin{align}
@@ -562,12 +569,108 @@ calculated as: \citep{Chaturbedi2017}
 \beta(s_1',s_2',s_1-s_1',s_2-s_2',x)F(s_1',s_2',x)F(s_1-s_1',s_2-s_2',x)ds_1'ds_2'\notag\\ 
 &- F(s_1,s_2,x)\int _0^{s_{max_1}-s_1} \int_0^{s_{max_2}-s_2} 
 \beta(s_1,s_2,s_1',s_2',x)F(s_1',s_2',x)ds_1'ds_2'
+\label{eqn:mthds_r_agg}
 \end{align}
 
+\par where, the aggregation kernel, $\beta(s_1,s_2, s_1',s_2',x)$ is expressed as –
+\begin{align}
+\beta(s_1,s_2,s_1',s_2',x) = & \beta_o*(V(s_1,s_2,x)+V(s_1',s_2',x))^{\gamma}*(c(s_1,s_2,x)\notag\\
+&+c(s_1',s_2',x))^{\alpha}\left(1-\frac{(c(s_1,s_2,x)+c(s_1',s_2',x))^{\delta}}{2}\right)^{\alpha}\
+\label{eqn:mthds_sa_pbm_beta_kernal} 
+\end{align}
+\par \textcolor{red}{citation?}
 
-where, the aggregation kernel, $\beta(s_1,s_2, s_1',s_2',x)$ is expressed as a function of collision 
+\par where, $\beta_o$,  $\alpha$ , $\delta$ and $\gamma$ are aggregation rate constants, $V(s_1,s_2, x)$ and $V(s_1',s_2',x)$ are the volumes of the aggregating particles. $c(s_1,s_2, x)$ and $c(s_1',s_2',x)$ are the external liquid fraction of the aggregating particles.
+
+\begin{align}
+\Re_{break}(s_1,s_2,x) = \int_0^{s_{max_1}} \int_0^{s_{max_2}} K_{break}(s_1',s_2',x)F(s_1',s_2',x)ds_1'ds_2' - K_{break}(s_1,s_2,x)F(s_1,s_2,x)
+\end{align}
+\par \textcolor{red}{citation?}
+
+\par where, the breakage kernel $K_{break}(s_1,s_2,x)$ is formulated as –
+
+\begin{align}
+K_{break}(s_1,s_2,x)=\left(\frac{4}{15\pi}\right)^{(\frac{1}{2})}G_{shear}exp\left(-\frac{B}{R(s_1,s_2,x)}\right)
+\end{align}
+\par \textcolor{red}{citation?}
+
+\par where, $G_{shear}$ is the shear rate exerted by the impeller on the granules. $R(s_1,s_2,x)$ is the radius of the granule that breaks and $B$ is the breakage kernel constant. $G_shear$ is calculated as $\frac{\nu_{impeller}*D_{impeller}*PI}{60}$ where $\nu_{impeller}$ and $D_{impeller}$ are respectively the rotational speed and diameter of the impeller.
+
+The rate of increase of liquid volume of a particle, $\dot{l}_{add}(s_1,s_2,x)$ is expressed as:
+
+\begin{align}
+\dot{l}_{add}(s_1,s_2,x) = \frac{(s_1+s_2)(\dot{m}_{spray}(1-c_{binder})-\dot{m}_{evap})}{m_{solid}(x)}
+\label{eqn:mthds_rate_liq_vol_part}
+\end{align}
+
+where, $(s_1+s_2)$  is the total solid volume of the particle; $\dot{m}_spray$ is the rate of external
+liquid addition, $c_{binder}$ is the concentration of binder in the external liquid (which is assumed to
+be zero in this case); $\dot{m}_{evap}$ is the rate of evaporation of liquid from
+the system (which is also assumed to be zero in this case) and $m_{solid}$ is the total amount of solid
+present in the compartment.
+The rate of decrease in gas volume per particle due to consolidation is calculated using the
+following expression: \citep{Verkoeijen2002}
+
+\begin{align}
+\dot{g}_{cons}(s_1,s_2,x)=&c (\nu_{impeller})^{\omega}V(s_1,s_2,x)\frac{(1-\epsilon_{min})}{s} 
+\notag \\ 
+& \left[g(s_1,s_2,x)+l(s_1,s_2,x) -(s_1+s_2)\frac{\epsilon_{min}}{1-\epsilon_{min}}\right]
+\label{eqn:mthds_rate_gas_vol_part}
+\end{align}
+
+ where, $c$ and $\omega$ are the consolidation constants; $v_{impeller}$ is the impeller
+rotational speed; $V(s_1,s_2,x)$ is the volume of particle, $\epsilon_{min}$ is the minimum porosity;
+$g(s_1,s_2,x)$ and $l(s_1,s_2,x)$ are respectively the gas and liquid volumes of the particle.
+
+ Particle transfer rate, $\dot{F}_{out}(s_1,s_2,x)$ in Equation \ref{eqn:mthds_pbm_overall} is calculated
+as:
+
+\begin{align}
+\dot{F}_{out}(s_1,s_2,x) = \dot{F}(s_1,s_2,x)*\frac{\nu_{compartment}(x)*dt}{d_{compartment}}
+\label{eqn:mthds_f_out_dot_part_trans_rate}
+\end{align}
+
+where, $\nu_{compartment}(x)$ and $d_{compartment}$ are respectively the average velocity of
+particles in compartment $x$ and the distance between the mid-points of two adjacent compartment,
+which is the distance particles have to travel to move to the next spatial compartment. $dt$ is the
+time-step.
+
+\subsubsection{Stand Alone PBM parameters}
+The process parameters and physical constants used in the PBM simulation are listed in Table
+\ref{table:mthds_pbm_sa_parameters}.
+\begin{table}[H]
+\caption{Parameters for Stand Alone PBM}
+\label{table:mthds_pbm_sa_parameters}
+\begin{center}
+\begin{tabular}{l|c|c|c}
+\hline
+\bf{Parameter} &\bf{Symbol} &\bf{Value} &\bf{Units}\\
+\hline
+Time step & $\delta t$ & $0.5$ & $s$\\
+Total granulation time & $T$ & $45, 45$ & $s$\\
+Velocity in axial direction & $v_{axial}$ & $1$ & $ms^{-1}$\\
+Velocity in radial direction & $v_{radial}$ & $1$ & $ms^{-1}$\\
+Aggregation constant & $\beta_0$ & $1\times10^{-9}$ & $-$\\
+Initial particle diameter & $R$ & $150$ & $\mu m$\\
+Breakage kernel constant & $B$ & $0$ & $-$\\
+Diameter of impeller & $D$ & $0.114$ & $m$ \\
+Impeller rotation speed & $RPM$ & $2000$ & $rmp$\\
+Minimum granule porosity & $\epsilon_{min}$ & $0.2$ & $-$\\
+Consolidation rate & $C$ & $0$ & $-$\\
+Total starting particles in batch & $F_{initial}$ & $1 \times 10^{6}$ & $-$\\
+Liquid to solid ratio & $L/S$ & $0.35$ & $-$ \\
+Number of Compartments & $c$ & $4$ & $-$ \\
+Number of first solid bins & $s$ & $16$ & $-$\\
+Number of second solid bins & $ss$ & $16$ & $-$\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\subsubsection{Coupled Model development}
+ The coupled PBM follows the same overall lumped 4 dimensional approach as the stand alone PBM. The overall PBM formulation used is equation \ref{eqn:mthds_pbm_overall}. The lumped liquid and gas components are described by equations \ref{eqn:mthds_pbm_rate} and \ref{eqn:mthds_pbm_gas_agg} , the same as for the stand alone model. The aggregation rate of the coupled model is described by equation \ref{eqn:mthds_r_agg}. However the aggregation kernal, $\beta$ is different betweent the two PBMs. The aggregation kernel, $\beta(s_1,s_2, s_1',s_2',x)$ is expressed as a function of collision
 rate coefficient ($C$) and probability that collision results in agglomeration($\psi$) \citep{ingram2005}
-and is shown below: 
+and is shown below:
 
 \begin{align}
 \beta(s_1,s_2,s_1',s_2',x) = \beta_oC(s_1,s_2,s_1',s_2',x)\psi(s_1,s_2,s_1',s_2',x)
@@ -577,9 +680,9 @@ and is shown below:
 \end{align}
 
 where, $\beta_o$ is aggregation rate constant.\\
-Collision rate coefficient ($C$) is a function of particle sizes and is calculated by normalizing the 
-number of collisions between group of particles \citep{gantt2006} and is obtained from LIGGGHTS 
-DEM simulation. A recent study shows that collision frequency depends on PSD as well 
+Collision rate coefficient ($C$) is a function of particle sizes and is calculated by normalizing the
+number of collisions between group of particles \citep{gantt2006} and is obtained from LIGGGHTS
+DEM simulation. A recent study shows that collision frequency depends on PSD as well
 \citep{sen2014}. Collision rate coefficient can be expressed as:
 
 \begin{align}
@@ -587,88 +690,59 @@ C(s_1,s_2,s_1',s_2')=\frac{N_{coll}(s_1,s_2,s_1',s_2')}{N_p(s_1,s_2)N_p(s_1',s_2
 \label{eqn:collfreq}
 \end{align}
 
-In Equation \ref{eqn:collfreq}, $N_{coll}$ is the number of collision between two particles in 
-time interval $\Delta t$ \& $N_p$ is number of particle of particular size. The agglomeration 
+In Equation \ref{eqn:collfreq}, $N_{coll}$ is the number of collision between two particles in
+time interval $\Delta t$ \& $N_p$ is number of particle of particular size. The agglomeration
 ($\psi$) in equation (\ref{eqn:mthds_pbm_beta_kernal}) can be expressed as:
 
 \begin{align}
 \psi((s_1,s_2,s_1',s_2') = 
 \left\{\begin{matrix}
-\psi_0,\hspace{0.2cm} LC((s_1,s_2) \geq LC_{min}\hspace{0.2cm} and\hspace{0.2cm} LC((s_1',s_2') \geq LC_{min}	\\ 
+\psi_0,\hspace{0.2cm} LC((s_1,s_2) \geq LC_{min}\hspace{0.2cm} and\hspace{0.2cm} LC((s_1',s_2') \geq LC_{min}   \\ 
 0,\hspace{0.2cm} LC((s_1,s_2) < LC_{min}\hspace{0.2cm} or\hspace{0.2cm} LC((s_1',s_2') < LC_{min}
 \end{matrix}\right.
 \label{eqn:colleff}
 \end{align}
- In Equation \ref{eqn:colleff}, $LC$ is the liquid content of particles and $LC_{min}$ stands for minimum 
- liquid content required for coalescence of particles. 
 
+In Equation \ref{eqn:colleff}, $LC$ is the liquid content of particles and $LC_{min}$ stands for minimum
+ liquid content required for coalescence of particles.
+
+The breakage rate was set to zero for the coupled model to simplify the communication and coupling of the DEM and PBM. In later works breakage will be implemented in coupled models.
 %%%%% commented the breakage details as we aren't including in results
 
 
-%	     Similarly, the breakage rate is expressed as-
-%	
-%	    \begin{align}
-%	    \Re_{break}(s_1,s_2,x) = \int_0^{s_{max_1}} \int_0^{s_{max_2}} 
+%            Similarly, the breakage rate is expressed as-
+%       
+%           \begin{align}
+%           \Re_{break}(s_1,s_2,x) = \int_0^{s_{max_1}} \int_0^{s_{max_2}} 
 %K_{break}(s_1',s_2',x)F(s_1',s_2',x)ds_1'ds_2' - K_{break}(s_1,s_2,x)F(s_1,s_2,x)
-%	    \end{align}
-%%	     \textcolor{red}{citation?}
-%	    
-%	     where, the breakage kernel $K_{break}(s_1,s_2,x)$ is formulated as – 
-%	    
-%	    \begin{align}
-%	    K_{break}(s_1,s_2,x) = C_{impact}\int_{U_{break}}^{\infty}p(U)dU
-%	    
+%           \end{align}
+%%           \textcolor{red}{citation?}
+%           
+%            where, the breakage kernel $K_{break}(s_1,s_2,x)$ is formulated as – 
+%           
+%           \begin{align}
+%           K_{break}(s_1,s_2,x) = C_{impact}\int_{U_{break}}^{\infty}p(U)dU
+%           
 %K_{break}(s_1,s_2,x)=\left(\frac{4}{15\pi}\right)^{(\frac{1}{2})}G_{shear}exp\left(-\frac{B}{R(s_1,s_2,x)}\ri
 %ght)
-%	    \end{align}
-%	     \textcolor{red}{citation?}
+%           \end{align}
+%            \textcolor{red}{citation?}
 
 % where, $G_{shear}$ is the shear rate exerted by the impeller on the granules. $R(s_1,s_2,x)$ is 
 %the radius of the granule that breaks and $B$ is the breakage kernel constant. $G_shear$ is 
 %calculated as $\frac{\nu_{impeller}*D_{impeller}*PI}{60}$ where $\nu_{impeller}$ and $D_{impeller}$ 
 %are respectively the rotational speed and diameter of the impeller.
-The rate of increase of liquid volume of a particle, $\dot{l}_{add}(s_1,s_2,x)$ is expressed as:
 
-\begin{align}
-\dot{l}_{add}(s_1,s_2,x) = \frac{(s_1+s_2)(\dot{m}_{spray}(1-c_{binder})-\dot{m}_{evap})}{m_{solid}(x)}
-\end{align}
 
-where, $(s_1+s_2)$  is the total solid volume of the particle; $\dot{m}_spray$ is the rate of external 
-liquid addition, $c_{binder}$ is the concentration of binder in the external liquid (which is assumed to 
-be zero in this case); $\dot{m}_{evap}$ is the rate of evaporation of liquid from 
-the system (which is also assumed to be zero in this case) and $m_{solid}$ is the total amount of solid 
-present in the compartment.
-The rate of decrease in gas volume per particle due to consolidation is calculated using the 
-following expression: \citep{Verkoeijen2002} 
 
-\begin{align}
-\dot{g}_{cons}(s_1,s_2,x)=&c (\nu_{impeller})^{\omega}V(s_1,s_2,x)\frac{(1-\epsilon_{min})}{s} 
-\notag \\ 
-& \left[g(s_1,s_2,x)+l(s_1,s_2,x) -(s_1+s_2)\frac{\epsilon_{min}}{1-\epsilon_{min}}\right]
-\end{align}        
+The rate of increase of the liquid volume of particles, the rate decrease in the gas volume per particle, and the particle transfer rate are calcuated the same way as for the stand alone PBM. The rate of increase of liquid volume of a particle, $\dot{l}_{add}(s_1,s_2,x)$ is expressed as is calculated with equation \ref{eqn:mthds_rate_liq_vol_part}. The rate of decrease in gas volume per particle due to consolidation is calculated using equation \ref{eqn:mthds_rate_gas_vol_part}. Finally the particle transfer rate, $\dot{F}_{out}(s_1,s_2,x)$ is caluclated using equation \ref{eqn:mthds_f_out_dot_part_trans_rate}.
 
- where, $c$ and $\omega$ are the consolidation constants; $v_{impeller}$ is the impeller 
-rotational speed; $V(s_1,s_2,x)$ is the volume of particle, $\epsilon_{min}$ is the minimum porosity; 
-$g(s_1,s_2,x)$ and $l(s_1,s_2,x)$ are respectively the gas and liquid volumes of the particle.
-
- Particle transfer rate, $\dot{F}_{out}(s_1,s_2,x)$ in Equation \ref{eqn:mthds_pbm_overall} is calculated 
-as:
-
-\begin{align}
-\dot{F}_{out}(s_1,s_2,x) = \dot{F}(s_1,s_2,x)*\frac{\nu_{compartment}(x)*dt}{d_{compartment}}
-\end{align}
-
-where, $\nu_{compartment}(x)$ and $d_{compartment}$ are respectively the average velocity of 
-particles in compartment $x$ and the distance between the mid-points of two adjacent compartment, 
-which is the distance particles have to travel to move to the next spatial compartment. $dt$ is the 
-time-step.
+\subsubsection{Coupled PBM parameters}
 The values of various parameters used in the model are provided in Table 
 \ref{table:mthds_pbm_parameters}.
-\subsubsection{PBM parameters}
-The process parameters and physical constants used in the PBM simulation are listed in Table 
-\ref{table:mthds_pbm_parameters}.
+
 \begin{table}[H]
-\caption{Parameters for PBM}
+\caption{Parameters for Coupled PBM}
 \label{table:mthds_pbm_parameters}
 \begin{center}
 \begin{tabular}{l|c|c|c}
@@ -1010,6 +1084,111 @@ geometry for faster simulations with higher core counts.
 
 \subsection{PBM}
 
+\subsubsection{Stand Alone PBM model validation}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{rslts_anik_pbm_ratios}
+\caption{Ratio of formation-to-depletion through aggregation and breakage over time. Breakage ratio of 2 and aggregation ratio of 0.5 indicate mass conservation in the model. }
+%\caption{hello tesh}
+\label{fig:rslts_anik_pbm_ratios}
+\end{figure}
+
+\par The ratio between the number of particles formed due to aggregation and the number of particles depleted due to aggregation and the ratio of the number of particles formed due to breakage to the number of particles depleted due to breakage are plotted. In aggregation two particles agglomerate to form one particle and in breakage one particle breaks to form two particles. So, these ratios are expected to be 0.5 and 2 respectively. As can be seen from Figure \ref{fig:rslts_anik_pbm_ratios}, these ratios are accurate confirming that mass is conserved accurately in the model.
+
+\par The granulator was divided into 3 compartments spatially and the total volume, solid volume and pore volume and the median diameter $d_50$ in each compartment were plotted to study the granulation behaviour and are shown in Figure \ref{fig:rslts_anik_pbm_total_vol_solid_pore_d50}.
+
+\par It can be seen from Figure \ref{fig:rslts_anik_pbm_total_vol} that the total volume starts to increase first in compartment 1 followed by compartment 2 and then compartment 3. This happens as gradually particles entering compartment 1 moves to the other compartment due to particle transfer from compartment 1 to compartment 2 and then compartment 3. In Figure \ref{fig:rslts_anik_pbm_total_solid_vol} it is observed that the solid volume similar to the total volume increases first in compartment 1 and last in compartment 3. The solid volume becomes constant and equal in all the compartments at around 30-50 seconds and steady state is reached when the rate of particle volume being transported through the compartments and leaving the system is equal to the rate of particles entering the system. Although, as seen in Figure \ref{fig:rslts_anik_pbm_total_pore_vol} the pore volume which is the sum of the gas and the liquid volume is highest in compartment 3 and lowest in compartment 1. This happens due to the external liquid addition to the system. As the particles move from compartment 1 to compartment 3, they gradually acquire a higher amount liquid, thereby increasing the pore volume. In Figure \ref{fig:rslts_anik_pbm_d50}, the $D_50$ is seen to be increasing from compartment 1 to 3. This happens because of the size enlargement of large particles coming in from the previous compartment because of the external liquid added to each compartment and a longer residence time in the granulator.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{rslts_anik_pbm_total_vol}
+\caption{Total volume in all compartments}
+\label{fig:rslts_anik_pbm_total_vol}
+\end{subfigure}
+~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+%(or a blank line to force the subfigure onto a new line)
+\begin{subfigure}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{rslts_anik_pbm_total_solid_vol}
+\caption{Total solid volume in all compartments}
+\label{fig:rslts_anik_pbm_total_solid_vol}
+\end{subfigure}
+~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+%(or a blank line to force the subfigure onto a new line)
+
+\begin{subfigure}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{rslts_anik_pbm_total_pore_vol}
+\caption{Total pore volume in all compartments}
+\label{fig:rslts_anik_pbm_total_pore_vol}
+\end{subfigure}
+\begin{subfigure}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{rslts_anik_pbm_d50}
+\caption{D$_{50}$ in all compartments}
+\label{fig:rslts_anik_pbm_d50}
+\end{subfigure}
+
+\caption{Volume and D50 in all compartments over time. Volumes become constant as steady state is reached. Median diameter increases and then decreases as bigger particles leave the system and smaller particles occupy that volume.}\label{fig:rslts_anik_pbm_total_vol_solid_pore_d50}
+\end{figure}
+
+
+\subsubsection{Stand Alone PBM performance}
+The stand alone PBM was run on the Stampede01 Xsede cluster. It has \textcolor{cyan}{insert details about stampede01 architecture}. One MPI process was bound to each socket and each MPI process spawned 8 OpenMP threads ( one for each core). The model was scaled form one core to 128 cores.
+
+The parallel performance data for this model can be seen in Table
+\ref{table:rslts_sa_pbm_perf}. The wall time was reduced from 222 seconds on one core to 6 seconds on 128 cores. The granulation process being modeled would run for a total of 90 seconds which means that the simulation ran nearly 15 times faster than the real granulation process. This is especially notable since the model used in this work had a significant amount of detail uisng 4 dimensions.
+
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.5]{fig_rslts_sa_pbm_parallel_efficiency.png}
+\caption{Parallel efficiency of stand alone PBM using one to 128 cores on Stampede01. }
+\label{fig:rslts_sa_pbm_pll_effic}
+\end{center}
+\end{figure}
+
+
+The scaling of the model was good as well reaching 37 times speed up when using 128 cores. The parallel efficiency drops off more quickly at lower core counts before it stabalizes at 16 cores which is a full node on Stampede01. After the first 16 cores the parallel efficiency only slightly decreases and achieves a 28.9$\%$ efficiency at 128 cores.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{fig_rslts_sa_pbm_speed_up.png}
+\caption{Speed Up of stand alone PBM using one to 128 cores on Stampede01. }
+%\caption{hello tesh}
+\label{fig:rslts_sa_pbm_speedup}
+\end{figure}
+
+\begin{table}[H]
+\caption{Performance studies of the PBM without the DEM data}
+\label{table:rslts_performance_DEM_without_DEM}
+\begin{center}
+\begin{tabulary}{\linewidth}{C|C|C|C|C|C}
+\hline
+\bf{Total cores in parallel}&\bf{MPI processes}&\bf{OMP threads}& \bf{Wall Time (seconds}&
+\bf{SpeedUp}& \bf{Parallel efficiency}\\
+\hline
+$1$ & $1$ & $1$ & $222$ & $1.000$ & $1$\\
+$2$ & $1$ & $2$ & $147$ & $1.510$ & $0.755$\\
+$4$ & $1$ & $4$ & $109$ & $2.037$ & $0.509$\\
+$8$ & $1$ & $8$ & $103$ & $2.155$ & $0.269$\\
+$16$ & $2$ & $8$ & $41$ & $5.415$ & $0.338$\\
+$32$ & $4$ & $8$ & $21$ & $10.571$ & $0.330$\\
+$64$ & $8$ & $8$ & $10$ & $22.200$ & $0.347$\\
+$128$ & $16$ & $8$ & $6$ & $37.000$ & $0.289$\\
+\hline
+\end{tabulary}
+\end{center}
+\label{table:rslts_sa_pbm_perf}
+\end{table}
+
+
+
+The reason that the stand alone model was able to use OpenMP threading much more effectively than the coupled model was becuase the stand alone model used linear arrays which were statically allocated. The coupled model used STD:vectors which which requires pointers to call each row and column. When OpenMP threads attempt to interact with different cells that are in the same row they are forced to serialize the retreival of the information which causes bottlenecking. They are forced to serialize the retrieval of the information becuase \textcolor{cyan}{ what was the reason for this again guys?}.
+\textcolor{cyan}{I think this is about right but yuk, chai, and Giannis feel free to correct or add on etc}.
+
+
+
 %\subsection{PBM model validation without DEM data}
  
 %\subsection{PBM model performance without DEM data}
@@ -1076,25 +1255,25 @@ the higher diameter bins increase.
 
 \begin{figure}[H]
 \begin{subfigure}{.5\textwidth}
-\includegraphics[scale=0.45]{rslts:PBM_30s_psd.pdf}
+\includegraphics[scale=0.45]{rslts-PBM_30s_psd.pdf}
 \caption{•}	
 \label{fig:30s}
 \end{subfigure}\hfill
 \begin{subfigure}{.5\textwidth}
 
-\includegraphics[scale=0.6]{rslts:PBM_50s_psd.pdf}
+\includegraphics[scale=0.6]{rslts-PBM_50s_psd.pdf}
 \caption{•}
 \label{fig:50s}
 \end{subfigure}
 \begin{subfigure}{.5\textwidth}
 
-\includegraphics[scale=0.45]{rslts:PBM_75s_psd.pdf}
+\includegraphics[scale=0.45]{rslts-PBM_75s_psd.pdf}
 \caption{•}
 \label{fig:75s}
 \end{subfigure}\hfill
 \begin{subfigure}{.5\textwidth}
 
-\includegraphics[scale=0.45]{rslts:PBM_100s_psd.pdf}
+\includegraphics[scale=0.45]{rslts-PBM_100s_psd.pdf}
 \caption{•}
 \label{fig:100s}
 \end{subfigure}

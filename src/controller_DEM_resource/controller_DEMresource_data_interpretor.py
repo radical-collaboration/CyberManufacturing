@@ -37,6 +37,7 @@ class controller_DEM_resource_interpretor(object):
 
  # method to average the velocity of the collision data
     def avg_all_data(self, ts): # here ts is the time step
+    # this creates an object of the data reader class and uses the velocity stored in the data structure and calculates the average
         obj_data_reader = DEMreader.Controller_DEM_resource_reader(ts, self.type, self.liggghts_output_dir)
         temp_coll_data = np.zeros_like(self.collision_matrix)
         self.num_of_particles = obj_data_reader.number_of_particles

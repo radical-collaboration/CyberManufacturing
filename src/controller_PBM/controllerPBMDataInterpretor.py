@@ -65,11 +65,11 @@ class controllerPBMDataInterpretor(object):
         temp2 = self.num_particles[-1]
         particles_check = abs(self.initial_num_particles - temp2) / self.initial_num_particles
         ss_check_time = 10
-        print("Now checking %f with initial time %f"%(ts, self.initial_ts))
+        # print("Now checking %f with initial time %f"%(ts, self.initial_ts))
+        # This checks if the current timestep is greater than the older timestep and whether the properties have changed by 25% so that we kill PBM and start DEM.
         if (ts > self.initial_ts and particles_check < 0.25):
             for i in range(0,self.compartments):
                 d50_check = (abs(self.initial_d50[0][i] - temp1[0][i]) / self.initial_d50[0][i])
-#                print(d50_check)
                 if (int(d50_check) > 0.25):
                     flag = 1
                     break
@@ -81,9 +81,5 @@ class controllerPBMDataInterpretor(object):
             flag = 1
         else:
             flag = 0
-#        print(flag)
         return flag
-#
-#a = controllerPBMDataInterpretor(10.08,4,16,16,'/home/chai/Documents/git/CyberManufacturing/src/twoway_PBM/csvDump')
-#r = a.new_data_storage(10.09)
-#q = a.data_comparison(10.09)
+

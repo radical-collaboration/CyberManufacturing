@@ -26,26 +26,27 @@ import time
 import controller_DEMresource_data_reader as DEMreader
 import controller_DEMresource_data_interpretor as DEMinter
 import json
-
+import sys
 
 class controller_DEMresource_main(object):
-    def __init__(self, init_timestep, types):
+    def __init__(self, init_timestep, types, liggghts_output_path):
     	# initial timestep and type of partilces are taken as input
         self.init_timestep = init_timestep 
         self.type = types
         self.dump_difference = 50000 # this is the predefined interval after which LIGGGHTS ouputs a dump file. Has to be changed if changed in the LIGGGHTS input file
+        self.liggghts_output_dir = liggghts_output_path
 
 # ------------------------------------------------------------------------------------------------
     def main(self):
     	# This method executes the necessary commands to run the DEM controller and waits for the command from the interpertor to output certain files that the executioner will act upon.
-        timestep = self.init_timestep + self.dump_difference
+        timestep = int(self.init_timestep) + int(self.dump_difference)
         flag = 0
         dump_data = {}
         # opening the different files so as to write the calculated average / total data ovetime
         dump_avg_vel = open("velocity_average_overtime_starting_%d.txt"%self.init_timestep, "w") 
         dump_collisions = open("collisions_overtime_starting_%d.txt"%self.init_timestep, "w")
         dump_impacts = open("impacts_overtime_starting_%d.txt"%self.init_timestep, "w")
-        obj_inter = DEMinter.controller_DEM_resource_interpretor(timestep, self.type, self.init_timestep)
+        obj_inter = DEMinter.controller_DEM_resource_interpretor(timestep, self.type, self.init_timestep, self.liggghts_output_dir)
         # Keeps checking for the existence of the file till one of the criteria for a killing the DEM are not met
         while (flag == 0):
         	# defining the files and path of the files that it needs to search for.
@@ -80,6 +81,7 @@ class controller_DEMresource_main(object):
             avg_vel_array = obj_inter.avg_vel_array
             tot_part_each_type.astype(int)
             avg_vel_array.astype(float)
+            # Dump the data relevant for the PBM execution as well as the for the DEM restart (if required) into a json file
             dump_data['types'] = []
             dump_data['types'].append(self.type)
             dump_data['total number of particles'] = []
@@ -103,14 +105,23 @@ class controller_DEMresource_main(object):
             #dump_data.update({'collision_matrix': obj_inter.collision_matrix})
             print(dump_data)
             with open('PBM_input.json' , 'w') as outfile:
-            	json.dump(dump_data, outfile, indent=4, separators=(',', ': '))
+            	json.dump(dump_data, outfile)
+            # also printing a text file, whichever is easier for yuktesh to read, we can remove the json or this once decided
+            with open('PBM_input.txt', 'w') as ipt:
+            	ipt.write("types %d"%int(obj_inter.num_of_particles))
+            	ipt.writelines("total number of particles %f\n"%item for item in tot_part_each_type)
+            	ipt.writelines("average velocity of particles  %f\n"%item for item in avg_vel_array)
+            	ipt.write("\nlast timestep %d"%timestep)
+            	ipt.write("\naggregation Kernel Constant %f"%(1e-9))
+            	ipt.write("\nbreakage Kernel Constant %f"%(1e-7))
+            	ipt.write("\nmixing time %d"%(25))
+            	ipt.write("\nliquid addition time %d"%(125))
         elif (flag == 2):
-        	# kill the DEM since there has been no change in the number of collisions / impacts / velocity for 5 seconds.
+        	# kill the DEM since there has been no change in the number of collisions / impacts / velocity for 2 seconds.
             print("The system is at steady state")
 
 
 # ------------------------------------------------------------------------------------------------
 
-abcd = controller_DEMresource_main(5000000, 16)
+abcd = controller_DEMresource_main(int(sys.argv[1]), int(sys.argv[2]), sys.argv[3])
 abcd.main()
-

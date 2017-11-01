@@ -17,7 +17,7 @@ import controller_DEMresource_data_reader as DEMreader
 
 class controller_DEM_resource_interpretor(object):
 
-    def __init__(self, timestep, types, init_ts):
+    def __init__(self, timestep, types, init_ts, liggghts_output_path):
         self.timestep = timestep
         self.type = types
         self.init_timestep = init_ts
@@ -28,6 +28,7 @@ class controller_DEM_resource_interpretor(object):
         self.collision_matrix = np.zeros((self.type, self.type))
         self.init_impacts = 0
         self.init_collision_matrix = np.zeros((self.type, self.type))
+        self.liggghts_output_dir = liggghts_output_path
         self.init_avg_vel = np.zeros(self.type)
         self.init_num_particles = 0
         self.dump_difference = 50000
@@ -36,7 +37,7 @@ class controller_DEM_resource_interpretor(object):
 
  # method to average the velocity of the collision data
     def avg_all_data(self, ts): # here ts is the time step
-        obj_data_reader = DEMreader.Controller_DEM_resource_reader(ts, self.type)
+        obj_data_reader = DEMreader.Controller_DEM_resource_reader(ts, self.type, self.liggghts_output_dir)
         temp_coll_data = np.zeros_like(self.collision_matrix)
         self.num_of_particles = obj_data_reader.number_of_particles
         for x in xrange(0, self.type):
@@ -63,7 +64,7 @@ class controller_DEM_resource_interpretor(object):
 
  # method to data of the initial time step
     def init_data_calculations(self):
-        init_data_obj = DEMreader.Controller_DEM_resource_reader(self.init_timestep, self.type)
+        init_data_obj = DEMreader.Controller_DEM_resource_reader(self.init_timestep, self.type, self.liggghts_output_dir)
         self.init_num_particles = init_data_obj.number_of_particles
         i1 = self.avg_all_data(self.init_timestep)
         self.init_impacts = init_data_obj.number_of_impacts

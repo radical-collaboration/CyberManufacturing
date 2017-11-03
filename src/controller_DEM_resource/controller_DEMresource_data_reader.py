@@ -106,6 +106,30 @@ class Controller_DEM_resource_reader(object):
             temp_type = []
             temp_col = []
             temp_fields.clear()
+<<<<<<< HEAD
+
+        print(len(self.collision_data_acc_types['6']))
+
+
+
+
+        '''
+        for i in enumerate(file_open):
+            if i == 4:
+                number_of_particles = float(linecache.getline(path_collision_file, i))
+                number_of_particles = file_open.readlines()[i - 1]
+
+        print(number_of_particles)
+        '''
+
+
+# ------------------------------------------------------------------------------
+
+# abcd = Controller_DEM_resource_reader(200000,16)
+# ad = abcd.liggghts_raw_collision_data()
+# ad = abcd.ligghts_data_store()
+#ad.read()
+=======
         return self.collision_data_acc_types
 
 #function to store impact data into a dictionary
@@ -141,3 +165,4 @@ class Controller_DEM_resource_reader(object):
         return self.number_of_impacts
 
 # ------------------------------------------------------------------------------
+>>>>>>> devel

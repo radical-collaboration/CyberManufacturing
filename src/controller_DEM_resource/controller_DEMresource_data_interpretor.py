@@ -5,6 +5,8 @@ Created on Mon Oct  2 15:32:29 2017
 
 @author: Chaitanya Sampat
 """
+
+
 '''
 This class is the uses data stored by the reader class. It makes an object of the reader class 
 and stores the data for each time step which is taken as input. The inputs include the current 
@@ -28,6 +30,16 @@ class controller_DEM_resource_interpretor(object):
         self.collision_matrix = np.zeros((self.type, self.type))
         self.init_impacts = 0
         self.init_collision_matrix = np.zeros((self.type, self.type))
+        self.init_avg_vel = np.zeros(self.type)
+        self.init_num_particles = 0
+
+# method to average the velocity of the collision data
+    def avg_all_data(self, ts): # here ts is the time step
+        obj_data_reader = DEMreader.Controller_DEM_resource_reader(ts, self.type)
+        temp_coll_data = np.zeros_like(self.collision_matrix)
+        self.num_of_particles = obj_data_reader.number_of_particles
+        for x in xrange(0, self.type):
+            self.tot_part_each_type[x] = len(obj_data_reader.collision_data_acc_types[str(x+1)])
         self.liggghts_output_dir = liggghts_output_path
         self.init_avg_vel = np.zeros(self.type)
         self.init_num_particles = 0
@@ -90,7 +102,7 @@ class controller_DEM_resource_interpretor(object):
             va1 = sum(self.avg_vel_array) / self.type
             ca1 = sum(sum(self.collision_matrix))
             ia1 = float(self.avg_impacts)
-            a2 = self.avg_all_data(ts - (2 * dump_difference))
+            a2 = self.avg_all_data(ts + dump_difference)
             va2 = sum(self.avg_vel_array) / self.type
             ca2 = sum(sum(self.collision_matrix))
             ia2 = float(self.avg_impacts)
@@ -106,7 +118,7 @@ class controller_DEM_resource_interpretor(object):
             impact_comp = (avg_imp - iai) / iai
             if(vel_comp > 0.1 or collision_comp > 0.1 or impact_comp > 0.1):
                 flag = 1
-            elif((ts - self.init_timestep) > (5 / dem_timestep)):
+            elif((ts - self.init_timestep) > (2 / dem_timestep)):
                 flag = 2
             else:
                 flag = 0
@@ -116,4 +128,14 @@ class controller_DEM_resource_interpretor(object):
 
 
 
+# ------------------------------------------------------------------------------------------------
+
+# abcd = controller_DEM_resource_interpretor(500000, 16, 2000000)
+# a1 = abcd.avg_all_data(5000000)
+# print(abcd.num_of_particles)
+# abcd.init_data_calculations()
+# print(abcd.num_of_particles)
+# a1 = abcd.avg_all_data(6000000)
+# print(abcd.num_of_particles)
+# print(abcd.liggghts_data_comparison(5000000))
 # ------------------------------------------------------------------------------------------------

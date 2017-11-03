@@ -944,7 +944,7 @@ the simulation time. Particles with larger diameter reached steady state at a fa
 hold-up of particles of about 6500. 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.5]{rslts_DEM_2mm_timing.pdf}
+\includegraphics[scale=0.75]{rslsts_2mm_timing_mtlb.pdf}
 \caption{The variation in the amount of time taken for the DEM simulation of 2 mm particles as a function of number of cores. The speed increase on increasing the number of cores from 1 to 16 is higher than the speed improvements observed from increase of cores from 16 to 256.}
 \label{fig:rslts_DEM_2mm_timing}
 \end{figure}	
@@ -994,14 +994,14 @@ computationally more expensive.
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.5]{rslts_DEM_speedup.pdf}
+\includegraphics[scale=0.75]{rslsts_2mm_DEM_speedup_mtlb.pdf}
 \caption{The speedup achieved in the DEM simulations of 2 mm partilces. There is a linear increase upto 16 cores, then as the parallel efficiency decreases, plateauing of the speedip is observed.}
 \label{fig:rslts_DEM_speedup}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.6]{rslts_DEM_timing_plots.pdf}
+\includegraphics[scale=0.85]{rslsts_DEM_alldia_timing_mtlb.pdf}
 \caption{ Indicates the time taken for a 10 second DEM simulation for radii ranging from
  0.63mm to 2mm and a particle size distribution ranging from 1mm - 3mm. The speed improvements 
  for the smaller particles is higher as the core count is increased as compared to the larger particles.}
@@ -1020,7 +1020,7 @@ geometry for faster simulations with higher core counts.
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.5]{rslts_DEM_percent_plot.pdf}
+\includegraphics[scale=0.75]{rslsts_DEM_profle_mtlb.pdf}
 \caption{The distrbution of time taken by each component of the DEM simulation with varying number of cores for the 2mm particles. It can be observed that the percentage of time in communication between the processes is the highest due to the rotation of the impeller at high speeds.}
 \label{fig:rslts_DEM_percent_plot}
 \end{figure}
@@ -1095,25 +1095,25 @@ the higher diameter bins increase.
 
 \begin{figure}[H]
 \begin{subfigure}{.5\textwidth}
-\includegraphics[scale=0.45]{rslts:PBM_30s_psd.pdf}
+\includegraphics[scale=0.45]{rslts-PBM_30s_psd.pdf}
 \caption{•}	
 \label{fig:30s}
 \end{subfigure}\hfill
 \begin{subfigure}{.5\textwidth}
 
-\includegraphics[scale=0.6]{rslts:PBM_50s_psd.pdf}
+\includegraphics[scale=0.6]{rslts-PBM_50s_psd.pdf}
 \caption{•}
 \label{fig:50s}
 \end{subfigure}
 \begin{subfigure}{.5\textwidth}
 
-\includegraphics[scale=0.45]{rslts:PBM_75s_psd.pdf}
+\includegraphics[scale=0.45]{rslts-PBM_75s_psd.pdf}
 \caption{•}
 \label{fig:75s}
 \end{subfigure}\hfill
 \begin{subfigure}{.5\textwidth}
 
-\includegraphics[scale=0.45]{rslts:PBM_100s_psd.pdf}
+\includegraphics[scale=0.45]{rslts-PBM_100s_psd.pdf}
 \caption{•}
 \label{fig:100s}
 \end{subfigure}
@@ -1137,7 +1137,7 @@ of only MPI up till 16 cores after which 32, 64 and 128 core simulations employe
 each. The scaling with the only MPI cores shows great increase in performance. \\
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.7]{rslts_PBM_Time_analysis.pdf}
+\includegraphics[scale=1]{rslsts_PBM_timing.pdf}
 \caption{Average time taken to run the PBM simulation which consisted of 25 seconds of mixing time 
 and 75 seconds of granulation time at different core configurations. There is a steady decrease as 
 the number of MPI processes are increased, but the improvements on increasing the OMP threads are 
@@ -1162,7 +1162,7 @@ performance increase is achieved by using the OMP implementation. \\
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.7]{rslts_PBM_Speed_Up.pdf}
+\includegraphics[scale=1]{rslsts_PBM_speedup_logx.pdf}
 \caption{The speedup achieved by the hybrid parallel implementation of the PBM program. It can be 
 seen the inital speedup upto 16 cores as expected as from an ideal parallel program where as it 
 becomes almost constant from 32 cores to 128 cores}
@@ -1181,7 +1181,7 @@ especially where nested loops are present to decrease communication times.
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.7]{rslts_PBM_Efficiency.pdf}
+\includegraphics[scale=1]{rslsts_PBM_efficiency.pdf}
 \caption{The parallel efficiency for the hybrid (MPI + OMP) parallelized PBM code. The efficiency of the 
 code decreases as the number of cores are increased. The higher number of cores have very low 
 efficiency of about 11\% which depicts that there is large time being spent in communication in 

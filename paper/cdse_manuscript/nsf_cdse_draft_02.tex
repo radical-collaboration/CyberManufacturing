@@ -711,7 +711,10 @@ Once the PBM had been discretized, a finite differences method was
 used which created a system of ordinary differential equations (ODEs) \citep{Barrasso2015cerd}. The 
 numerical integration technique used to evaluate the system of ODEs was first order Euler integration 
 as it is commonly used to solve these types of systems and author found an improvement in  speed while 
-having minimal impact on accuracy \citep{Barrasso2013}. In order to avoid numerical instability due to the explicit nature of the Euler integration, Courant-Friedrichs-Lewis (CFL) condition must be satisfied~\citep{courant1967}. For our PBM model, time-step was calculated at each iteration such that, the number of particles leaving a particular bin at any time is less than the number of particles present at that time \citep{Ramachandran2010}. To obtain the most optimal parallel 
+having minimal impact on accuracy \citep{Barrasso2013}. In order to avoid numerical instability due to the explicit nature of the 
+Euler integration, Courant-Friedrichs-Lewis (CFL) condition must be satisfied~\citep{courant1967}. For our PBM model, time-step was 
+calculated at each iteration such that, the number of particles leaving a particular bin at any time is less than the number of 
+particles present at that time \citep{Ramachandran2010}. To obtain the most optimal parallel 
 performance, when solving the PBM, work loads were distributed in a manner which took into account 
 the shared and distributed memory aspects of the clusters, the PBM was being run on. To 
 parallelize the model in a way which could take advantage of shared memory but still effectively run 
@@ -746,11 +749,11 @@ the completely updated $F_{t,all}$ value is shared before calculating a new time
 have the same $F_{t,all}$ value. As a result each process calculates the same size for the new time 
 step. 
 
-Since the PBM code developed used the Standard Template Library containers and their features available in C++ 11 and later. It requires 
-intel v15.0.2 (gcc 5.3+)  or later for compilation. Since this module was not present on the Stampede, the execution of the PBM 
-was done on
-the newer Stampede2 supercomputer. Each of the compute node of the cluster consists of Intel Xeon Phi 7250 
-(\textquotedblleft Knights Landing\textquotedblright) which has 68 cores on a single socket clocked at 1.4 GHz, with 96 GB of DDR4 RAM.
+Since the PBM code developed used the Standard Template Library containers and their features available in C++ 11 and later. It 
+requires intel v15.0.2 (gcc 5.3+)  or later for compilation. Since this module was not present on the Stampede, the execution of the 
+PBM was done onthe newer Stampede2 supercomputer. Each of the compute node of the cluster consists of Intel Xeon Phi 7250 
+(\textquotedblleft Knights Landing\textquotedblright) which has 68 cores on a single socket clocked at 1.4 GHz, with 96 GB of DDR4 
+RAM.
  Each of the cores consists of 4 hardware threads. The simulations were then run by varying the the number of MPI 
 processes from 1 to 16 and the number of OMP threads from 1 to 8, thus, using a maximum of 128 cores.
 
@@ -769,7 +772,9 @@ processes from 1 to 16 and the number of OMP threads from 1 to 8, thus, using a 
 \begin{itemize}[noitemsep,nolistsep,itemindent=20pt]
 \item Each MPI process is further divided with OMP to take advantage of multi-core CPU
 \item Each OMP process is allocated to a single compute core
-\item $\Re$ integrates for each first solid bin as $(i1)$ $\int_{0}^{s_2(OMP 0)}$, $(i2)$ $\int_{s_2(OMP 0)}^{s_2(OMP 1)}$, $(i3)$ $\int_{s_2(OMP 1)}^{s_2(OMP 2)}$   and so on are divided into smaller integrals  $\int_{i_1low_n}^{i_1up_n}$, $\int_{i_2low_n}^{i_2up_n}$, $\int_{i_3low_n}^{i_3up_n}$ upto 16 bins 
+\item $\Re$ integrates for each first solid bin as $(i1)$ $\int_{0}^{s_2(OMP 0)}$, $(i2)$ $\int_{s_2(OMP 0)}^{s_2(OMP 1)}$, $(i3)$ 
+$\int_{s_2(OMP 1)}^{s_2(OMP 2)}$   and so on are divided into smaller integrals  $\int_{i_1low_n}^{i_1up_n}$, $\int_{i_2low_n}
+^{i_2up_n}$, $\int_{i_3low_n}^{i_3up_n}$ upto 16 bins 
 which are solved by the "n" OMP processes. Figure \ref{fig:mthds_OMP_distribution} depicts this distribution.
 \item Allocated to that MPI process (CPU)
 \end{itemize}
@@ -784,7 +789,8 @@ which are solved by the "n" OMP processes. Figure \ref{fig:mthds_OMP_distributio
 %\beta(s_1,s_2,s_1',s_2',c)F(s_1',s_2',c)ds_1'ds_2'\notag
 %\end{align}
 %\begin{align*}
-%\Re_{break}(s_1,s_2,c) = \int_{0}^{s_{max_1}} \int_{i_3low_n}^{i_3up_n} K_{break}(s_1',s_2',c)F(s_1',s_2',c)ds_1'ds_2' - K_{break}(s_1,s_2,c)F(s_1,s_2,c)
+%\Re_{break}(s_1,s_2,c) = \int_{0}^{s_{max_1}} \int_{i_3low_n}^{i_3up_n} K_{break}(s_1',s_2',c)F(s_1',s_2',c)ds_1'ds_2' - K_{break}
+(s_1,s_2,c)F(s_1,s_2,c)
 %\end{align*}
 \EndFor
 \begin{itemize}[noitemsep,nolistsep,itemindent=20pt]
@@ -792,7 +798,8 @@ which are solved by the "n" OMP processes. Figure \ref{fig:mthds_OMP_distributio
 \end{itemize}
 %\begin{align*}
 %F_{t,c} &= \frac{\Delta F(s_1,s_2,c)}{\Delta t}\Delta t  + F(s_1,s_2,c)_{t-1}\\
-%      &=   (\Re_{agg}(s_1,s_2,c)+\Re_{break}(s_1,s_2,c)+\dot{F}_{in}(s_1,s_2,c)-\dot{F}_{out}(s_1,s_2,c))\Delta t + F(s_1,s_2,c)_{t-1}
+%      &=   (\Re_{agg}(s_1,s_2,c)+\Re_{break}(s_1,s_2,c)+\dot{F}_{in}(s_1,s_2,c)-\dot{F}_{out}(s_1,s_2,c))\Delta t + 
+F(s_1,s_2,c)_{t-1}
 %\end{align*}
 
 \EndFor
@@ -811,7 +818,8 @@ which are solved by the "n" OMP processes. Figure \ref{fig:mthds_OMP_distributio
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{OMP_table.pdf}
-\caption{The integration of aggregation rate distribured among OMP processes. This figure indicates the use of 4 OMP processes, the configuration that gave us the best performance.}
+\caption{The integration of aggregation rate distribured among OMP processes. This figure indicates the use of 4 OMP processes, the 
+configuration that gave us the best performance. This technique has been implemented for each MPI process.}
 \label{fig:mthds_OMP_distribution}
 \end{figure}	
 
@@ -902,7 +910,8 @@ Thus, another set of timing studies were performed for the 128 and 256 core simu
 comparison of simulation times have been shown in table .
 
 \begin{table}[ht]
-\caption{Comparison of time taken for the DEM simulations using 128 and 256 core due to different spatial decomposition configurations.}
+\caption{Comparison of time taken for the DEM simulations using 128 and 256 core due to different spatial decomposition 
+configurations.}
 \label{table:rslts_dem_128_256_decomp}
 \begin{center}
 \begin{tabulary}{\linewidth}{C|C|C|C|C}
@@ -945,7 +954,9 @@ hold-up of particles of about 6500.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.75]{rslsts_2mm_timing_mtlb.pdf}
-\caption{The variation in the amount of time taken for the DEM simulation of 2 mm particles as a function of number of cores. The speed increase on increasing the number of cores from 1 to 16 is higher than the speed improvements observed from increase of cores from 16 to 256.}
+\caption{The variation in the amount of time taken for the DEM simulation of 2 mm particles as a function of number of cores. The 
+speed increase on increasing the number of cores from 1 to 16 is higher than the speed improvements observed from increase of cores 
+from 16 to 256.}
 \label{fig:rslts_DEM_2mm_timing}
 \end{figure}	
 
@@ -995,7 +1006,8 @@ computationally more expensive.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.75]{rslsts_2mm_DEM_speedup_mtlb.pdf}
-\caption{The speedup achieved in the DEM simulations of 2 mm partilces. There is a linear increase upto 16 cores, then as the parallel efficiency decreases, plateauing of the speedip is observed.}
+\caption{The speedup achieved in the DEM simulations of 2 mm partilces. There is a linear increase upto 16 cores, then as the parallel 
+efficiency decreases, plateauing of the speedip is observed.}
 \label{fig:rslts_DEM_speedup}
 \end{figure}
 
@@ -1021,7 +1033,9 @@ geometry for faster simulations with higher core counts.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.75]{rslsts_DEM_profle_mtlb.pdf}
-\caption{The distrbution of time taken by each component of the DEM simulation with varying number of cores for the 2mm particles. It can be observed that the percentage of time in communication between the processes is the highest due to the rotation of the impeller at high speeds.}
+\caption{The distrbution of time taken by each component of the DEM simulation with varying number of cores for the 2mm particles. It 
+can be observed that the percentage of time in communication between the processes is the highest due to the rotation of the impeller 
+at high speeds.}
 \label{fig:rslts_DEM_percent_plot}
 \end{figure}
 

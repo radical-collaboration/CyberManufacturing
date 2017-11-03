@@ -749,8 +749,19 @@ the completely updated $F_{t,all}$ value is shared before calculating a new time
 have the same $F_{t,all}$ value. As a result each process calculates the same size for the new time 
 step. 
 
-Since the PBM code developed used the Standard Template Library containers and their features available in C++ 11 and later. It 
-requires intel v15.0.2 (gcc 5.3+)  or later for compilation. Since this module was not present on the Stampede, the execution of the 
+The PBM code was initially developed using a non-informative kernel which did not take into account the DEM collision data.
+The code utilized static arrays, whose size was allocated on initiation and then the code was parallelized using the same
+technique as dicussed above. This code was compiled using the intel/15.0.2 and mvapich2/2.1 compilers. The code was tested on
+Stampede1 supercomputer for the configuration of the cores varying from the 1 to 128 cores. The speedup obtained for this simulation 
+was about 37, i.e. the parallel code run using 128 processes was 37 times faster than the simulation which ran just on 1 core.
+This was a good conformation for the hybrid parallel technique, thus being implemented in the coupled model. The results of these 
+prelimenary studies have been addressed in more detail in the supplemental information.
+
+
+Since the DEM informed PBM code required dynamic size increase for the data structure due to different number of particles being
+ present in the DEM simulation,
+the PBM code developed used the Standard Template Library containers and their features available in C++ 11 and later. It 
+requires intel v17.0.2 (gcc 5.3+)  or later for compilation. Since this module was not present on the Stampede, the execution of the 
 PBM was done onthe newer Stampede2 supercomputer. Each of the compute node of the cluster consists of Intel Xeon Phi 7250 
 (\textquotedblleft Knights Landing\textquotedblright) which has 68 cores on a single socket clocked at 1.4 GHz, with 96 GB of DDR4 
 RAM.
@@ -790,7 +801,7 @@ which are solved by the "n" OMP processes. Figure \ref{fig:mthds_OMP_distributio
 %\end{align}
 %\begin{align*}
 %\Re_{break}(s_1,s_2,c) = \int_{0}^{s_{max_1}} \int_{i_3low_n}^{i_3up_n} K_{break}(s_1',s_2',c)F(s_1',s_2',c)ds_1'ds_2' - K_{break}
-(s_1,s_2,c)F(s_1,s_2,c)
+%(s_1,s_2,c)F(s_1,s_2,c)
 %\end{align*}
 \EndFor
 \begin{itemize}[noitemsep,nolistsep,itemindent=20pt]
@@ -799,7 +810,7 @@ which are solved by the "n" OMP processes. Figure \ref{fig:mthds_OMP_distributio
 %\begin{align*}
 %F_{t,c} &= \frac{\Delta F(s_1,s_2,c)}{\Delta t}\Delta t  + F(s_1,s_2,c)_{t-1}\\
 %      &=   (\Re_{agg}(s_1,s_2,c)+\Re_{break}(s_1,s_2,c)+\dot{F}_{in}(s_1,s_2,c)-\dot{F}_{out}(s_1,s_2,c))\Delta t + 
-F(s_1,s_2,c)_{t-1}
+%F(s_1,s_2,c)_{t-1}
 %\end{align*}
 
 \EndFor

@@ -186,11 +186,11 @@ if __name__ == '__main__':
         
         report.info('\n')
         collision = {'source': 'pilot:///collision%d.atom'%config['timesteps'],
-                     'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%(config['timesteps'],config['cores'],config['diameter']),
+                     'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%(config['timesteps'],config['DEMcores'],config['diameter']),
                      'action'  : rp.LINK}
 
         impact = {'source': 'pilot:///impact%d.atom'%config['timesteps'],
-                  'target': 'unit:///sampledumpfiles/impact%d.%d_%d'%(config['timesteps'],config['cores'],config['diameter']),
+                  'target': 'unit:///sampledumpfiles/impact%d.%d_%d'%(config['timesteps'],config['DEMcores'],config['diameter']),
                   'action'  : rp.LINK}
         # create a new CU description, and fill it.
         # Here we don't use dict initialization.
@@ -198,7 +198,7 @@ if __name__ == '__main__':
         cud.environment    = ['PATH='+config['pathtoPBMexecutable']+':$PATH']
         cud.pre_exec       = ['mkdir csvDump','mkdir txtDumps']
         cud.executable     = 'model.out'
-        cud.arguments      = [config['cores'],config['diameter']]
+        cud.arguments      = [config['DEMcores'],config['diameter']]
         cud.input_staging  = [collision,impact]
         cud.post_exec      = ['tar cfz csvDump.tar.gz csvDump']
         cud.output_staging = [{'source': 'unit:///csvDump.tar.gz',

@@ -5,8 +5,6 @@ Created on Mon Oct  2 15:32:29 2017
 
 @author: Chaitanya Sampat
 """
-
-
 '''
 This class is the uses data stored by the reader class. It makes an object of the reader class 
 and stores the data for each time step which is taken as input. The inputs include the current 
@@ -40,8 +38,6 @@ class controller_DEM_resource_interpretor(object):
         self.num_of_particles = obj_data_reader.number_of_particles
         for x in xrange(0, self.type):
             self.tot_part_each_type[x] = len(obj_data_reader.collision_data_acc_types[str(x+1)])
-        self.liggghts_output_dir = liggghts_output_path
-        self.init_avg_vel = np.zeros(self.type)
         self.init_num_particles = 0
         self.dump_difference = 50000
         self.type_diameter = np.zeros_like(self.avg_vel_array)

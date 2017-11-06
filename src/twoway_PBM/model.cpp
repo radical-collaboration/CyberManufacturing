@@ -76,8 +76,6 @@ int main(int argc, char *argv[])
     }
 
     //**************** MPI load Array Start *******************
-    int print = 1;
-    int print_load = 1;
     vector<int> load(2 * num_mpi, 0);
     vector<int> load_rev(2 * num_mpi, 0);
 
@@ -568,6 +566,8 @@ int main(int argc, char *argv[])
     arrayOfDouble2D d90OverTime;
 
     double lastTime = 0.0;
+    int timeIdxCount = 0;
+    int lastTimeIdxCount = 0;
 
     while (time <= FINALTIME)
     {
@@ -923,24 +923,28 @@ int main(int argc, char *argv[])
         }
         
 
-        
+        Time.push_back(time);
         if (mpi_id == MASTER)
         {
             if (time - lastTime >= 0.2)
             {
                 //cout << "dumping d50 etc. & particles for time = " << time << endl;
                 string timeStr = to_string(floorf(time * 100) / 100);// + string("sec"); //moreSigs(time, 2);
+                size_t dumpVecSize = timeIdxCount - lastTimeIdxCount + 1;
+                arrayOfDouble2D d50ToDump (dumpVecSize);
+                vector<double> timeToDump (dumpVecSize);
+                copy(d50OverTime.begin()+lastTimeIdxCount, d50OverTime.end(), d50ToDump.begin());
+                copy(Time.begin()+lastTimeIdxCount, Time.end(), timeToDump.begin());
+                string timeStr = moreSigs(time, 2); //get time to 2 sig digits, traiing zero removed
                 string appendFileName = string("_") + timeStr;
-                //dumpDiaCSV(Time, d10OverTime, string("d10") + appendFileName);
-                dumpDiaCSV(Time, d50OverTime, string("d50") + appendFileName);
-                //dumpDiaCSV(Time, d90OverTime, string("d90") + appendFileName);
+                dumpDiaCSV(timeToDump, d50ToDump, string("d50") + appendFileName);
                 dump3DCSV(fAllCompartments, string("particles") + appendFileName);
                 lastTime = time;
+                lastTimeIdxCount = timeIdxCount;
             }            
-        }
-        
-        Time.push_back(time);
+        }  
         time += timeStep;
+        timeIdxCount++;
     }
 
     size_t nTimeSteps = Time.size();

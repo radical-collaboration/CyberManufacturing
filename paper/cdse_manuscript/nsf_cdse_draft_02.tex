@@ -1274,7 +1274,7 @@ found in Figure \ref{fig:rslts_PBM_2mm_d50}}
 \end{figure}
 
 
-\subsection{One-way coupled DEM+PBM using RADICAL-Pilot} 
+\subsection{One-way coupled DEM+PBM using RADICAL-Pilot and its performance} 
  The RADICAL pilot (RP) being a pilot job system it can bypass the need of waiting on the long scheduler
 queues on a cluster. With resources allocated to itself the pilot can execute multiple simulation runs 
 at once. The pilot job initiates the DEM simulation using the LIGGGHTS executable compiled for the DEM
@@ -1282,18 +1282,20 @@ studies and then creates a link between the collision data obtained, which is ut
 by the PBM executable. After the link is established, it also initiates the PBM. The timing profiles and
 results from both the simulations are then obtained. Since the executables and inputs files used in the 
 simulations and the RP job are the similar, we do not expect to see any changes in the physics of the 
-system, which is confirmed from the plots of the ratio of the rate of formation to the rate of depletion 
-due to aggregation in Figure \ref{fig:rslts_RP_ratio_plot}
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.5]{rslts_PBM_2mm_validation.pdf}
-\caption{The ratio of rate of formation to the rate of depletion due to aggregation 
-as a function of time. Since the ratio is 0.5 as expected, we can say the physics does not change. 
-(\textbf{Currently a placeholder})}
-\label{fig:rslts_RP_ratio_plot}
-\end{figure}
+system. A value of 0.5 was obtained for the ratio of the rate of formation to the rate of depletion due to aggregation
+due to aggregation.
+% which is confirmed from the plots of the ratio of the rate of formation to the rate of depletion 
+%due to aggregation in Figure \ref{fig:rslts_RP_ratio_plot}
+%\begin{figure}[H]
+%\centering
+%\includegraphics[scale=0.5]{rslts_PBM_2mm_validation.pdf}
+%\caption{The ratio of rate of formation to the rate of depletion due to aggregation 
+%as a function of time. Since the ratio is 0.5 as expected, we can say the physics does not change. 
+%(\textbf{Currently a placeholder})}
+%\label{fig:rslts_RP_ratio_plot}
+%\end{figure}
 
-\subsubsection{RADICAL-Pilot performance}
+%\subsubsection{RADICAL-Pilot performance}
  Since the platforms used for initial development and testing of the DEM and PBM respectively were different, 
 the DEM simulations were executed again on Stampede2 for a fair and accurate comparison. The need for re-running
 the simulations arises due to the clock speeds of the nodes and their configuration for the 2 platforms is different.

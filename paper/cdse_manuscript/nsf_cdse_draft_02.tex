@@ -204,7 +204,7 @@ particle-particle interaction at meso and micro-scale.
  Discrete Element Method is a simulation technique used to monitor the behavior of each particle 
 as a separate entity compared to other bulk continuum models. This method tracks the movement of 
 each particle within the space, records the collisions of each particle with the geometry as well 
-as with each other and it is also subject to other force fields like gravity (\cite{Barrasso2015cerd})  This 
+as with each other and it is also subject to other force fields like gravity (\cite{Barrasso2015cerd}). This 
 model is based on the Newton's laws of the motion and is expressed as in Equations 
 \ref{eqn:bkgd_dem_n2law} and  \ref{eqn:bkgd_dem_forcebal} : \\
 \begin{align}
@@ -783,8 +783,8 @@ processes from 1 to 16 and the number of OMP threads from 1 to 8, thus, using a 
 \begin{itemize}[noitemsep,nolistsep,itemindent=20pt]
 \item Each MPI process is further divided with OMP to take advantage of multi-core CPU
 \item Each OMP process is allocated to a single compute core
-\item $\Re$ integrates for each first solid bin as $(i1)$ $\int_{0}^{s_2(OMP 0)}$, $(i2)$ $\int_{s_2(OMP 0)}^{s_2(OMP 1)}$, $(i3)$ 
-$\int_{s_2(OMP 1)}^{s_2(OMP 2)}$   and so on are divided into smaller integrals  $\int_{i_1low_n}^{i_1up_n}$, $\int_{i_2low_n}
+\item $\Re$ integrates for each first solid bin as $(i_1)$ $\int_{0}^{s_{2(OMP_0)}}$, $(i_2)$ $\int_{s_{2(OMP_0)}}^{s_{2(OMP_1)}}$, $(i_3)$ 
+$\int_{s_{2(OMP_1)}}^{s_{2(OMP_2)}}$   and so on are divided into smaller integrals  $\int_{i_1low_n}^{i_1up_n}$, $\int_{i_2low_n}
 ^{i_2up_n}$, $\int_{i_3low_n}^{i_3up_n}$ upto 16 bins 
 which are solved by the "n" OMP processes. Figure \ref{fig:mthds_OMP_distribution} depicts this distribution.
 \item Allocated to that MPI process (CPU)

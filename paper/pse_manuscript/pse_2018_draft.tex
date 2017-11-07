@@ -1,0 +1,146 @@
+% ==============================================================================================
+% 2010-11-05 Preisig, H A       ; NTNU
+% 2011-12-15  ditto             ; adapted for PSE 11
+%                               ; put all the heading info into the style file
+% 2012-01-04  ditto             ; Reference section title fixed -- integrated into style file
+%                               ; changed sequence: first bibliography then pse style
+%                               ;  pse style redefines reference listing superseding natlib def
+%                               ;  and simplified by moving reference style loading into pse.sty
+% 2014-09-04  ditto             ; reverted to standard LaTeX fonts
+%                               ; issues - measures do not correspond with manual. 
+%                               ; There is a cm missing 13.5 textwidth gives 12.5 texwidth ???
+% 2015-10-14 Zinser, A          ; adapted to ESCAPE 26
+% ==============================================================================================
+
+\documentclass[fleqn,twoside,10pt]{article}
+
+%% bibliography must be before escape styles
+\usepackage{natbib}
+\bibliographystyle{elsart-harv}
+
+%% Escape/PSE styles
+\usepackage{left_eq}   % To get the equation left aligned, this is ugly but required :-)
+\usepackage{pse2018}  % Stylefile from Escape
+
+
+%%% >>>>>>>>>>>>>>> use your own GRAPHICS configuration <<<<<<<<<<<<<<<<<<<<<<<
+\usepackage{pstricks, pst-plot}	% pstricks
+\usepackage{graphicx} % enables import of various formats
+\usepackage{wrapfig}  % enables floating wrapped figures
+\usepackage[figuresright]{rotating}
+\usepackage{amsmath}
+\usepackage[font=sf, labelfont={sf,bf}, margin=0cm]{caption}
+\usepackage[inline]{enumitem}
+\usepackage{epstopdf}   
+\usepackage[margin=1in]{geometry}
+\usepackage{lineno}
+\usepackage{placeins}
+\usepackage{subcaption}
+%\usepackage[usenames,dvipsnames]{color}
+%\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{textcomp}
+\usepackage{graphicx}
+\usepackage{tabulary}
+
+%% math packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+%% >>>>>>>>>>>>>>>> user definitions BIBLIOGRAPHY & DEFS <<<<<<<<<<<<<<<<<<<<<<<<
+
+
+%% personal styles and definitions
+%\usepackage{mystyle}
+%\def\mydefs{defs}
+\usepackage[english]{babel}
+\usepackage{blindtext}
+
+
+% ================================================================================
+\title{Parallel, multi-scale, mechanistic model for high shear granulation using
+coupled DEM – PBM models on high performance computing systems.}
+%
+ \author[a]{Chaitanya Sampat}
+ \author[a]{Yukteshwar Baranwal}
+ \author[b]{Ioannis Paraskevakos}
+ \author[b]{Shantenu Jha}
+ \author[a]{Marianthi Ierapetritou}
+ \author[a,*]{Rohit Ramachandran}
+ \affil[a]{Department of Chemical and Biochemical Engineering, Rutgers University, Piscataway, NJ-08901, USA}
+ \affil[b]{Electric and Computer Engineering, Rutgers University, Piscataway, NJ-08901, USA}
+ \email{*rohitrr@soe.rutgers.edu}
+ 
+ \HeaderTitle{Parallel, multi-scale, mechanistic model for high shear granulation using
+coupled DEM – PBM models on high performance computing systems.}
+ \HeaderAuthor{C. Sampat et al.}
+
+% ==================================== title ====================================
+
+\begin{document}
+
+\maketitle             % make title page with abstract and keywords
+\thispagestyle{empty}  % first page has a different format
+
+% ================================================================================
+
+\begin{abstract}
+A multiscale model combines the computational efficiency of a macro-scale model and the
+accuracy of a micro-scale model. It is preferred over a fully micro-scale model for its speed advantages while maintaining the physics 
+of the problem. A less accurate way to perform such a simulation is touse data from a precomputed microscale model in a macroscale 
+model. With the current cyberinfrastructure resources available, using more computationally intensive and concurrent multiscale models 
+are morefeasible. This study proposes to use Discrete Element Method (DEM), a microscale model, and a Population Balance Model (PBM), 
+a macroscale model, in a concurrent manner to model the granulation process of a pharmaceutical product inside a high shear 
+granulator. The granulation between the components of a pharmaceutical blend is governed by the collision in between the particles. 
+This leads to increase in their size, due to physical bonds in between them. The DEM provides the collision data while the PBM helps 
+in predicting the macroscale phenomena like aggregation and breakage. This work attempts to couple these two models using a controller 
+program, which triggers the DEM first, to give initial seed data to run the PBM. Then, the controller uses the data generated from the 
+PBM continuously to determine the change in the physical properties and trigger the DEM from its last known state. The controller does 
+the same with the DEM data to trigger the PBM. This occurs iteratively until a steady state is reached. A workflow diagram of the 
+procedure followed is provided in Figure 1. The execution of each of the components is governed by a multilevel job scheduler which 
+allocates resources rather than waiting for each simulation to run on a
+normal job scheduler on a cluster. The DEM is parallelized using Message Parsing Interface (MPI) while the PBM is parallelized using a 
+faster hybrid approach which is a combination of both MPI and Open Multi-Processing (OMP). Since the DEM is computationally heavy, an 
+algorithm is developed to utilize the idle cores during the PBM execution to run multiple instances of the PBM such that parameter 
+estimation of the kernels of the PBM occurs on the fly as well. This method of using shorter bursts of each simulation led to faster 
+simulation times as well as a more accurate model of the high shear granulator. The Quality by Design (QbD) approach is addressed 
+using such a modelling framework and it also helps us understand the
+granulation process in a quantitative as well as in a mechanistic manner. \citep{Reference2015}
+\end{abstract}
+\Keywords{keyword1, keyword2, keyword3}
+
+% ==================================== body  =====================================
+
+\section{Introduction}
+\begin{itemize}
+\item Talk about pharmaceutical processes
+\item Talk about DEM and PBM
+\item Coupling and its importance
+\item Advantages of using HPC
+\end{itemize}
+
+\section{Methods}
+\subsection{Population Balance Model (PBM) development}
+\begin{itemize}
+\item Aggregation
+\item Breakage
+\end{itemize}
+\subsection{Discrete Element Model (DEM) setup}
+\subsection{PBM parallelization technique}
+\subsection{Controller development}
+Explain the controller configuration and how it works
+\section{Results}
+Discuss how many instances of the simulation of each occured
+\subsection{Scaling results}
+Cores used for DEM and PBM and how scaling occured
+\subsection{Improved results over one way coupling}
+Better d50 plots particle count
+\section{Conclusion}
+
+% ================================ references ===================================
+%% References 
+
+\bibliography{pse2018_psl}
+\end{document}
+% ================================== end =========================================

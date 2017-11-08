@@ -129,5 +129,6 @@ class controller_DEMresource_main(object):
 
 # ------------------------------------------------------------------------------------------------
 
-abcd = controller_DEMresource_main(int(sys.argv[1]), int(sys.argv[2]), sys.argv[3])
+#abcd = controller_DEMresource_main(int(sys.argv[1]), int(sys.argv[2]), sys.argv[3])
+abcd =controller_DEMresoruce_main(9000000, 16 ,'"/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy"')
 abcd.main()

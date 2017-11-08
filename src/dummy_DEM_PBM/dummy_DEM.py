@@ -54,5 +54,5 @@ def dummy_DEM(pasteTo_path, last_timestep_index, test_number):
             
     return x
 
-a = dummy_DEM(sys.argv[1], np.float(sys.argv[2]), int(sys.argv[3]))
-#dummy_DEM("/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy",9000000,1)
+#a = dummy_DEM(sys.argv[1], np.float(sys.argv[2]), int(sys.argv[3]))
+a = dummy_DEM("/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy",9000000,1)

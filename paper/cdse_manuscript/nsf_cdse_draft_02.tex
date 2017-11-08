@@ -80,7 +80,7 @@ modelling (DEM) simulation. The PBM code was developed on
 C++ and was run in parallel using MPI + OMP hybrid technique. The DEM simulations were performed on
 LIGGGHTS, which runs in parallel using MPI. Speedup of about 14 times was obtained for the PBM 
 simulations and around 12 for the DEM simulations. This coupling was performed using the radical 
-pilot for scaling studies from 1 processor to 128 for the PBM and upto 256 cores for the DEM. Using 
+pilot for scaling studies from 1 processor to 128 for the PBM and up to 256 cores for the DEM. Using 
 this developed framework, the granulation process has been modelled accurately much faster than
 established techniques currently being used.
 \end{abstract}
@@ -103,26 +103,26 @@ that rely on these processes, especially pharmaceutical, have to use expensive
 heuristic studies and inefficient operational protocols with high recycle ratios to meet strict 
 regulatory standards (\cite{Ramachandran2009}). This drives up the costs and delays the release of 
 new drugs. What makes these processes so challenging to design is that there are no governing 
-equations to accurately predict their behaviour \citep{sen2013}. The complex physics of such 
+equations to accurately predict their behavior \citep{sen2013}. The complex physics of such 
 processes do not have exact governing equations, thus the need of a precise model arises. There 
 has been active research in this area on how to accurately model the  physics of these processes.\\
 Particulate processes are defined by chaotic micro-scale phenomena that result from the many 
 particle-particle interactions inside these systems. These small scale phenomenon develop into 
-complex bulk behaviour of these processes. To successfully predict the bulk behaviour of these 
+complex bulk behavior of these processes. To successfully predict the bulk behavior of these 
 systems, a model needs to capture the particle-particle interactions and emergent meso-scale phenomena. 
 Discrete Element Method (DEM)\citep{Cundall1979} has proven to be an accurate way 
 to  model a bulk material properties of particulate systems using micro-scale particle level 
 interactions for pharmaceutical processes \citep{Hancock2011}. DEM uses Newton's equations of 
 motion to model the forces on each particle in the system and it's interactions with the system 
 geometry and other particles. This enables DEM to model the small scale phenomena that 
-determines the bulk behaviour of particulate system. Since DEM includes large amount of interaction 
+determines the bulk behavior of particulate system. Since DEM includes large amount of interaction 
 and force computations take a large amount of time to run. Thus another more computationally 
 efficient, but less accurate technique, used to model these particulate processes is population 
 balance model (PBM).
 
 PBM takes into account the changes in particle size and the property related mechanisms. This 
 model lacks sensitivity to process parameters and the equipment geometry. It is semi-mechanistic in 
-nature, meaning they use population averages and probability to capture bulk behaviour but still 
+nature, meaning they use population averages and probability to capture bulk behavior but still 
 seek to capture some of the micro-phenomena of particle-particle interactions using correlations or 
 empirically developed kernels to approximate those interactions. Even though PBM is much faster 
 than DEM, detailed PBM can still take a significant amount of time to solve which prevents them 
@@ -167,7 +167,7 @@ parallel so that it can take advantage of the computational capabilities of  mod
 clusters. Specific studies performed in this work include:
 \begin{itemize}
 \item Developed a 4-Dimensional, DEM informed PBM that is parallelized using hybrid techniques (MPI + 
-OMP)to model the bulk processes occuring during the granulation process.
+OMP)to model the bulk processes occurring during the granulation process.
 \item Perform DEM simulations on LIGGGHTS to  model the micro-mechanics of the L\"{o}dige CoriMix 
 CM5 high shear granulator. 
 \item Uni-directionally coupled DEM to PBM using Radical Pilot, which is a framework developed in
@@ -201,10 +201,10 @@ expensive when compared to a fluid systems since the particles are considered as
 rather than a continuum like in fluid systems. The models discussed ahead represent the 
 particle-particle interaction at meso and micro-scale.
 \subsubsection{Discrete Element Modeling (DEM)}
- Discrete Element Method is a simulation technique used to monitor the behaviour of each particle 
+ Discrete Element Method is a simulation technique used to monitor the behavior of each particle 
 as a separate entity compared to other bulk continuum models. This method tracks the movement of 
 each particle within the space, records the collisions of each particle with the geometry as well 
-as with each other and it is also subject to other force fields like gravity (\cite{Barrasso2015cerd})  This 
+as with each other and it is also subject to other force fields like gravity (\cite{Barrasso2015cerd}). This 
 model is based on the Newton's laws of the motion and is expressed as in Equations 
 \ref{eqn:bkgd_dem_n2law} and  \ref{eqn:bkgd_dem_forcebal} : \\
 \begin{align}
@@ -228,7 +228,7 @@ The particle-particle collisions are not always elastic, thus there is a need fo
 contact forces. The earliest model was developed by \cite{hertz1882} was elastic in nature. This model was 
 extended by \cite{mindlin1953} by accounting for the  tangential forces during the collisions. The dampening
 in the velocity during the plastic deformation in a collision was accounted by \cite{Cundall1979} and 
-\cite{walton1986}. \cite{tsuji1992} developed a more accurate model for predicting the behaviour of granular flow.
+\cite{walton1986}. \cite{tsuji1992} developed a more accurate model for predicting the behavior of granular flow.
 The most commonly used contact force model for modelling the flow of particles inside the granulation process 
 is the Hertz-Mindling contact model \citep{gantt2006}\citep{hassanpour2013}. 
  
@@ -260,7 +260,7 @@ spatial variance. For a granulation process this  account for spatial variance i
 flow along the granulator.
 
 \subsubsection{Coupled DEM-PBMs}
-The use of multi-physics models has recently been adapted to understand the behaviour of 
+The use of multi-physics models has recently been adapted to understand the behavior of 
 particle systems. These models help understand the physics of the system at various scales 
 \textit{i.e.} micro, meso and macro scale~\citep{sen2014}. Particle process dynamics have been 
 inferred from coupling of various physics models \textit{viz.} CFD, 
@@ -294,7 +294,7 @@ communication network for message passing from one node to another. Analogous to
 PC each node as one or more CPUs and RAM. Commonly nodes are manufactured with two CPUs, each CPU 
 is a multi-core meaning it has multiple compute cores that each can carry out calculations 
 separately from one another. %CPUs also have built in memory called cache that is much faster than 
-%RAM which is why for optimal performance cache utilization should be favoured over RAM when possible. 
+%RAM which is why for optimal performance cache utilization should be favored over RAM when possible. 
 On a node memory is divided by CPU sockets, so each CPU has direct access to memory local to its own 
 socket, but accessing memory on another socket is much slower \cite{Jin2011}. For this reason data 
 that is needed for computation should be stored locally to the CPU that needs it.  
@@ -333,7 +333,7 @@ that hybrid methods for PBMs allow the code flexibility for different architectu
 good performance.  It was also reported that only the external(spatial) coordinates of the PBM were 
 parallelized. In this current work external and internal(compositions) calculations are parallelized. 
 
-\subsubsection{Previous works on parrallel PBM and DEM}
+\subsubsection{Previous works on parallel PBM and DEM}
 The idea of parallelization to reduce the amount of time required has been employed by various 
 researchers in the past. \cite{Gunawan2008} used high-resolution finite volumes solution methods for 
 the parallelization of their PBM. They performed load balancing effectively by 
@@ -360,6 +360,8 @@ particle-particle interaction and the particle-wall interaction modules in LIGGG
 Zoltan library \citep{Boman2012} developed by Sandia National Laboratories for dynamic load 
 balancing. They achieved a speed improvement of about 44\% for simulations performed on higher 
 number of cores, but there was no significant speed improvement for smaller core counts. 
+
+
 
 
 \section{Methods}
@@ -406,7 +408,7 @@ configuration of the granulator is shown in Figure
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.2]{impeller_final_pic.pdf}
-\caption{This shows the isometric view of the impeller inisde the L\"{o}dige CoriMix CM5 continuous high shear granulator casing.}
+\caption{This shows the isometric view of the impeller inside the L\"{o}dige CoriMix CM5 continuous high shear granulator casing.}
 \label{fig:mthds_dem_charles_impeller}
 \end{figure}    
 
@@ -430,7 +432,7 @@ configuration of the granulator is shown in Figure
 \label{fig:mthds_dem_shear_element}
 \end{subfigure}
 \caption{Components (\subref{fig:mthds_dem_feed_element}) and (\subref{fig:mthds_dem_exit_element}) help in the forward 
-movement of the particles while (\subref{fig:mthds_dem_shear_element}) aids to direct the partilces to the wall 
+movement of the particles while (\subref{fig:mthds_dem_shear_element}) aids to direct the particles to the wall 
 inside the L\"{o}dige CoriMix CM5 continuous high shear granulator.}
 \label{fig:mthds_dem_charles_fig5pt3and4_blades_n_isometric}
 \end{figure}     
@@ -448,13 +450,13 @@ kilobytes. The shell had 1948 faces and 720 points and size was about 544 kiloby
 used on the STLs. 
  The meshes were then imported into LIGGGHTS using the write command in serial. This resulted 
 in 50 elements of the impeller file having "highly skewed elements", which have more than 5 
-neighbours per surface or have an angle less than 0.0181185 degree, that according to LIGGGHTS 
+neighbors per surface or have an angle less than 0.0181185 degree, that according to LIGGGHTS 
 would degrade parallel performance. The write exclusion list command in LIGGGHTS was used and 
 this exclusion list file as then used in the simulation to skip the highly skewed elements during the 
 simulation. 
 %The shell did not have any skewed elements \textcolor{cyan}{(FUTURE SOLUTION? - perhaps we 
-%can use the output from liggghts exclusion list to find exact elements of issue. then we can use 
-%meshlab to exclude those peices or remesh thos individual pieces into better shapes with less 
+%can use the output from LIGGGHTS exclusion list to find exact elements of issue. then we can use 
+%Meshlab to exclude those pieces or remesh those individual pieces into better shapes with less 
 %skewed elements. might be better for a letter paper though}
 
 \subsubsection{DEM input file settings}
@@ -507,7 +509,7 @@ mass inside the granulator after every 10000 time steps (about 5$\times 10^{-4}$
 tolerance of about 10\%. If the mass was found to be constant for most of the iterations, it was 
 considered to be at steady state. Another test to determine steady state was to monitor the number of 
 collision inside the granulator. The visualization of the simulation data was done by running the 
-LIGGHTS post processing (LPP) script over the dump files to convert them into STL files. These 
+LIGGGHTS post processing (LPP) script over the dump files to convert them into STL files. These 
 files were then loaded in to Paraview~\citep{henderson2004} for a graphical representation of the 
 simulation. It can be seen that the number of collision start to oscillate around a mean value. The 
 number of collisions were then plotted and steady state time was determined.
@@ -568,7 +570,6 @@ calculated as: \citep{Chaturbedi2017}
 \beta(s_1',s_2',s_1-s_1',s_2-s_2',x)F(s_1',s_2',x)F(s_1-s_1',s_2-s_2',x)ds_1'ds_2'\notag\\ 
 &- F(s_1,s_2,x)\int _0^{s_{max_1}-s_1} \int_0^{s_{max_2}-s_2} 
 \beta(s_1,s_2,s_1',s_2',x)F(s_1',s_2',x)ds_1'ds_2'
-\label{eqn:mthds_R_agg}
 \end{align}
 
 
@@ -670,7 +671,6 @@ particles in compartment $x$ and the distance between the mid-points of two adja
 which is the distance particles have to travel to move to the next spatial compartment. $dt$ is the 
 time-step.
 The process parameters and physical constants used in the PBM simulation are listed in Table 
-
 \ref{table:mthds_pbm_parameters}.
 \begin{table}[H]
 \caption{Parameters used in the PBM simulation}
@@ -924,7 +924,7 @@ This meant that the x-axis was divided into 32 and 64 compartments respectively.
 expensive communication between the processes, LIGGGHTS tries to insert the particles towards the 
 center of the compartment such that the number of ghost atoms are minimized. But, slicing in the 
 x-axis reduced the space available for the insertion of the particles thus, many of the particles were 
-inserted incorrectly. Another abnormal behaviour observed during these simulation was the particles 
+inserted incorrectly. Another abnormal behavior observed during these simulation was the particles 
 halted at certain compartment and no particle traveled beyond this compartment in the x-direction. 
 Thus, another set of timing studies were performed for the 128 and 256 core simulations. The 
 comparison of simulation times have been shown in table .
@@ -952,7 +952,7 @@ $256$ & $16$ & $4$ & $4$ & $265.32$\\
 \end{table}
 The simulation times illustrated in Table \ref{table:rslts_dem_128_256_decomp} shows that 
 incorrectly slicing the geometry also affects the performance of the system. It can be noted that slicing 
-along y-axis is more favourable than slicing along the z-direction. The insertion of particles is hindered 
+along y-axis is more favorable than slicing along the z-direction. The insertion of particles is hindered 
 when the geometry is cut along the z-axis as inlet is perpendicular to it. LIGGGHTS thus provisions 
 lesser space for the insertion of these particles, thus increasing the time of the simulation. Thus, just 
 slicing the geometry into 2 sections along the z-axis is preferred. So, the chosen configurations for the 
@@ -1008,7 +1008,7 @@ Figure \ref{fig:rslts_DEM_speedup} indicates that there
 is not a significant amount of speed improvement for the simulation when 256 cores are used for the 
 simulation over 128 cores. This speed decrease can be accounted to the communication time between 
 the MPI processes. When the particles move from one section to another of the space, they are 
-transfered as ghost particles from one process to another process. Thus, there is large amount of 
+transferred as ghost particles from one process to another process. Thus, there is large amount of 
 communication which is required. One of the issues of using a cluster with shared memory within 
 the nodes but none in between nodes is that it has to rely on the networking infrastructure 
 of the cluster which bottlenecks the communications thus leading to higher communication times. 
@@ -1026,8 +1026,8 @@ computationally more expensive.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.75]{rslsts_2mm_DEM_speedup_mtlb.pdf}
-\caption{The speedup achieved in the DEM simulations of 2 mm partilces. There is a linear increase upto 16 cores, then as the parallel 
-efficiency decreases, plateauing of the speedip is observed.}
+\caption{The speedup achieved in the DEM simulations of 2 mm particles. There is a linear increase upto 16 cores, then as the parallel 
+efficiency decreases, plateauing of the speedup is observed.}
 \label{fig:rslts_DEM_speedup}
 \end{figure}
 
@@ -1047,13 +1047,13 @@ the number of processes are increased the amount of time spent in transferring t
 increases. In the studies, the modify time as a percentage of the simulation increased from 82\% to 
 about 90\%, when the core count was increased from the 64 cores to 256 cores. But, the using the 
 higher number of cores reduces time taken to calculate particle-particle interaction as well as in 
-neighbour calculation. Thus, a better implementation for meshing as well as decomposition of the 
+neighbor calculation. Thus, a better implementation for meshing as well as decomposition of the 
 geometry for faster simulations with higher core counts.
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.75]{rslsts_DEM_profle_mtlb.pdf}
-\caption{The distrbution of time taken by each component of the DEM simulation with varying number of cores for the 2mm particles. It 
+\caption{The distribution of time taken by each component of the DEM simulation with varying number of cores for the 2mm particles. It 
 can be observed that the percentage of time in communication between the processes is the highest due to the rotation of the impeller 
 at high speeds.}
 \label{fig:rslts_DEM_percent_plot}
@@ -1264,11 +1264,11 @@ that there is not enough liquid content in the later sections of the granulator 
 formation of granules. Thus, the d\textsubscript{50} for compartments in the latter section of the 
 granulator is low. Figures \ref{fig:rslts_PBM_2mm_d50} and \ref{fig:rslts_PBM_psd_d50} show the 
 d\textsubscript{50} plots of the mono-sized and psd respectively. It can be seen that both these plots 
-have a similar behaviour when it comes to the nature of the increase of the d\textsubscript{50} during 
+have a similar behavior when it comes to the nature of the increase of the d\textsubscript{50} during 
 the granulation process. There is a difference of about 20\% difference in the final diameter of the 
 particles predicted, which at the of micrometers does not affect the final product quality. This slight 
 deviation is observed due to the sudden jump in the rate of the aggregation which increases when 
-particles from one compartment with higher d\textsubscript{50} get transfered to the next 
+particles from one compartment with higher d\textsubscript{50} get transferred to the next 
 compartment with a lower d\textsubscript{50}. But, the advantage of running the mono-sized 
 simulation compared to the psd simulation is the time taken to simulate the DEM. It can be seen from 
 Figure \ref{fig:rslts_DEM_timing_studies} that the 2mm mono-sized particle took about 1.6 times less 
@@ -1302,7 +1302,7 @@ found in Figure \ref{fig:rslts_PBM_2mm_d50}}
 \end{figure}
 
 
-\subsection{One-way coupled DEM+PBM using RADICAL-Pilot} 
+\subsection{One-way coupled DEM+PBM using RADICAL-Pilot and its performance} 
  The RADICAL pilot (RP) being a pilot job system it can bypass the need of waiting on the long scheduler
 queues on a cluster. With resources allocated to itself the pilot can execute multiple simulation runs 
 at once. The pilot job initiates the DEM simulation using the LIGGGHTS executable compiled for the DEM
@@ -1310,18 +1310,20 @@ studies and then creates a link between the collision data obtained, which is ut
 by the PBM executable. After the link is established, it also initiates the PBM. The timing profiles and
 results from both the simulations are then obtained. Since the executables and inputs files used in the 
 simulations and the RP job are the similar, we do not expect to see any changes in the physics of the 
-system, which is confirmed from the plots of the ratio of the rate of formation to the rate of depletion 
-due to aggregation in Figure \ref{fig:rslts_RP_ratio_plot}
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.5]{rslts_PBM_2mm_validation.pdf}
-\caption{The ratio of rate of formation to the rate of depletion due to aggregation 
-as a function of time. Since the ratio is 0.5 as expected, we can say the physics does not change. 
-(\textbf{Currently a placeholder})}
-\label{fig:rslts_RP_ratio_plot}
-\end{figure}
+system. A value of 0.5 was obtained for the ratio of the rate of formation to the rate of depletion due to aggregation
+due to aggregation.
+% which is confirmed from the plots of the ratio of the rate of formation to the rate of depletion 
+%due to aggregation in Figure \ref{fig:rslts_RP_ratio_plot}
+%\begin{figure}[H]
+%\centering
+%\includegraphics[scale=0.5]{rslts_PBM_2mm_validation.pdf}
+%\caption{The ratio of rate of formation to the rate of depletion due to aggregation 
+%as a function of time. Since the ratio is 0.5 as expected, we can say the physics does not change. 
+%(\textbf{Currently a placeholder})}
+%\label{fig:rslts_RP_ratio_plot}
+%\end{figure}
 
-\subsubsection{RADICAL-Pilot performance}
+%\subsubsection{RADICAL-Pilot performance}
  Since the platforms used for initial development and testing of the DEM and PBM respectively were different, 
 the DEM simulations were executed again on Stampede2 for a fair and accurate comparison. The need for re-running
 the simulations arises due to the clock speeds of the nodes and their configuration for the 2 platforms is different.
@@ -1345,7 +1347,7 @@ decreasing the wait times even further.
 \includegraphics[scale=0.5]{rslts_RP_fake_plot.pdf}
 \caption{A comparison of times taken by 2 individual simulations (DEM + PBM) (without adding queue time) to the  time taken by 
 Radical-Pilot to complete the same set of simulation. A minimal increase in the time is observed, proving that using RP is 
-a more convinient method to perform simulations which have large number of different submissions are required.
+a more convenient method to perform simulations which have large number of different submissions are required.
 (\textbf{Currently a placeholder})}
 \label{fig:rslts_RP_time_plot}
 \end{figure}
@@ -1366,7 +1368,6 @@ as the communication required would increase and it would help reduce total time
 \section*{References} 
 \bibliographystyle{elsarticle-harv}
 \bibliography{Bibli}
-
 
 \input{supp_nsf_cdse_draft02.tex}
 

@@ -60,11 +60,11 @@ class controllerPBMDataInterpretor(object):
     # method to compare the data from the data and decide on the execution
     def data_comparison(self, ts):
         flag = 0
-        print(ts)
+        # print(ts)
         temp1 = self.obj_PBM_reader.data_d50_extractor(ts)
         temp2 = self.num_particles[-1]
         particles_check = abs(self.initial_num_particles - temp2) / self.initial_num_particles
-        ss_check_time = 10
+        ss_check_time = 2
         # print("Now checking %f with initial time %f"%(ts, self.initial_ts))
         # This checks if the current timestep is greater than the older timestep and whether the properties have changed by 25% so that we kill PBM and start DEM.
         if (ts > self.initial_ts and particles_check < 0.25):
@@ -77,7 +77,7 @@ class controllerPBMDataInterpretor(object):
                     continue
         elif ((ts - self.initial_ts) > ss_check_time):
             flag = 2
-        elif ((ts - self.initial_ts) < ss_check_time and particles_check > 0.15):
+        elif ((ts - self.initial_ts) < ss_check_time and particles_check > 0.015):
             flag = 1
         else:
             flag = 0

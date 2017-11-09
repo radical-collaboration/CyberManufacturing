@@ -20,8 +20,10 @@ import shutil
 import re
 
 def dummy_PBM(pasteTo_path, last_timestep_index, test_number):
-    d50_file_list = glob.glob(os.getcwd() + '/test_%d/d50_*.csv'%test_number)
-    particles_file_list = glob.glob(os.getcwd() + '/test_%d/particles_*.csv'%test_number)
+    d50_file_list = glob.glob(os.getcwd() + '/dummy_DEM_PBM' + '/test_%d/d50_*.csv'%test_number)
+    particles_file_list = glob.glob(os.getcwd() + '/dummy_DEM_PBM' + '/test_%d/particles_*.csv'%test_number)
+    # print(d50_file_list)
+    # print(particles_file_list)
     num_start_d50 = re.search("d50_",d50_file_list[0]).end()
     num_start_particles = re.search("particles_",particles_file_list[0]).end()
     num_end_d50 = re.search(".csv",d50_file_list[0]).start()
@@ -53,5 +55,5 @@ def dummy_PBM(pasteTo_path, last_timestep_index, test_number):
     return x
 
 
-dummy_PBM(sys.argv[1], np.float(sys.argv[2]), int(sys.argv[3]))
-#dummy_PBM("/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy",20,1)
+#dummy_PBM(sys.argv[1], np.float(sys.argv[2]), int(sys.argv[3]))
+a = dummy_PBM('/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy',2,1)

@@ -19,7 +19,6 @@ The stand alone PBM was developed using using equation \ref{eqn:mthds_pbm_overal
 equation, the same as the coupled model. The liquid and gas parameters were modeled using equations \ref{eqn:mthds_pbm_rate} and \ref{eqn:mthds_pbm_gas_agg} respectively, also the same as for the coupled model. The rate of aggregation for
 the stand alone model was calculated using equation \ref{eqn:mthds_R_agg} but used a different breakage kernel ($\beta$) than the coupled model since the stand alone PBM did not use DEM input data.  
 
-\textcolor{cyan}{test ref follows htis stament} \ref{eqn:mthds_rate_liq_vol_part}
 
 The aggregation kernal used for development was as follows:
 \begin{align}
@@ -52,12 +51,11 @@ $\beta_o$,  $\alpha$ , $\delta$ and $\gamma$ are aggregation rate constants, $V(
 
 
 The rates of increase of the liquid volume of a particle, $\dot{l}_{add}(s_1,s_2,x)$ was calculated in the same 
-way as the coupled model, using equation \ref{eqn:mthds_rate_liq_vol_part}. The rate of decrease in gas volume 
+way as the coupled model, using equation \ref{eqn:mthds_liq_addn_rate}. The rate of decrease in gas volume 
 per particle due to consolidation was also calculated in the same way as in the coupled model, using equation 
 \ref{eqn:mthds_rate_gas_vol_part}. The bin to bin particle transfer rate was also calculated in the same way 
 for both the stand alone model and the coupled model, using equation \ref{eqn:mthds_f_out_dot_part_trans_rate}.
 
-\textcolor{cyan}{test color follows this statment} \ref{eqn:mthds_R_agg}
 
 \subsubsection{Stand Alone PBM parameters}
 The process parameters and physical constants used in the stand alone PBM simulation are listed in Table \ref{table:mthds_pbm_sa_parameters}.
@@ -76,6 +74,9 @@ Granulation time & $T$ & $45$ & $s$\\
 Velocity in axial direction & $v_{axial}$ & $1$ & $ms^{-1}$\\
 Velocity in radial direction & $v_{radial}$ & $1$ & $ms^{-1}$\\
 Aggregation constant & $\beta_0$ & 24 & $-$\\
+Aggregation constant & $\alpha$ & 0.9473 & $-$\\
+Aggregation constant & $\delta$ & 0.5 & $-$\\
+Aggregation constant & $\gamma$ & 1 & $-$\\
 Initial particle diameter & $R$ & $150$ & $\mu m$\\
 %Breakage kernel constant & $B$ & $0$ & $-$\\
 Diameter of impeller & $D$ & $0.114$ & $m$ \\

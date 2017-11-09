@@ -570,6 +570,7 @@ calculated as: \citep{Chaturbedi2017}
 \beta(s_1',s_2',s_1-s_1',s_2-s_2',x)F(s_1',s_2',x)F(s_1-s_1',s_2-s_2',x)ds_1'ds_2'\notag\\ 
 &- F(s_1,s_2,x)\int _0^{s_{max_1}-s_1} \int_0^{s_{max_2}-s_2} 
 \beta(s_1,s_2,s_1',s_2',x)F(s_1',s_2',x)ds_1'ds_2'
+\label{eqn:mthds_R_agg}
 \end{align}
 
 
@@ -639,6 +640,7 @@ The rate of increase of liquid volume of a particle, $\dot{l}_{add}(s_1,s_2,x)$ 
 
 \begin{align}
 \dot{l}_{add}(s_1,s_2,x) = \frac{(s_1+s_2)(\dot{m}_{spray}(1-c_{binder})-\dot{m}_{evap})}{m_{solid}(x)}
+\label{eqn:mthds_liq_addn_rate}
 \end{align}
 
 where, $(s_1+s_2)$  is the total solid volume of the particle; $\dot{m}_spray$ is the rate of external 
@@ -653,6 +655,7 @@ following expression: \citep{Verkoeijen2002}
 \dot{g}_{cons}(s_1,s_2,x)=&c (\nu_{impeller})^{\omega}V(s_1,s_2,x)\frac{(1-\epsilon_{min})}{s} 
 \notag \\ 
 & \left[g(s_1,s_2,x)+l(s_1,s_2,x) -(s_1+s_2)\frac{\epsilon_{min}}{1-\epsilon_{min}}\right]
+\label{eqn:mthds_rate_gas_vol_part}
 \end{align}        
 
  where, $c$ and $\omega$ are the consolidation constants; $v_{impeller}$ is the impeller 
@@ -664,6 +667,7 @@ as:
 
 \begin{align}
 \dot{F}_{out}(s_1,s_2,x) = \dot{F}(s_1,s_2,x)\frac{\nu_{compartment}(x)*dt}{d_{compartment}}
+\label{eqn:mthds_f_out_dot_part_trans_rate}
 \end{align}
 
 where, $\nu_{compartment}(x)$ and $d_{compartment}$ are respectively the average velocity of 

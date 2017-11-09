@@ -195,13 +195,15 @@ class Executor(object):
             # reason).
             warnings.warn('exit requested\n',UserWarning)
 
-    def _start_dem_units(self,timestep=0,type=0):
+    def _start_dem_units(self,timestep=0,type=0,restart=False):
         """
         This method creates DEM units, their monitors and submits them for execution. 
         It also returns the unit objects so that they can be monitored. This method takes
         two arguments, timestep and type
         timestep : the timestep DEM monitoring should start
         type     : 
+        restrt   : defines if the unit that will be created is restarting the DEM simulation
+                   or not.
         """
 
         for i in range(self._DEMs):
@@ -256,7 +258,10 @@ class Executor(object):
                                   'action': rp.TRANSFER}]
             cud2.output_staging = [{'source': 'unit:///PBM_input.json',
                                    'target': 'pilot:///PBM_input.json',
-                                   'action'  : rp.LINK}]
+                                   'action'  : rp.LINK},
+                                   {'source': 'unit:///DEM_status.json',
+                                   'target': 'file:///DEM_status.json',
+                                   'action'  : rp.TRANSFER}]
 
             # Submit the monitor unit and return
             dem_monitor_unit = self._umgr.submits_units(cud2)
@@ -264,6 +269,73 @@ class Executor(object):
 
             self._dem_unit = dem_unit
             self._dem_monitor_unit = dem_monitor_unit
+
+    def _check_DEM_status(self,status_file):
+        """
+        This method checks the state of the DEM execution and based on the status code
+        reports whether or not the simulation should continue with  starting PBM or 
+        stop everything.
+
+        Inputs:
+        status_file: The name of a json file that contains the status and other entries
+                     necessary for the PBM execution
+
+        Returns:
+        cont: A boolean value that shows if the simulation should continue or not
+        arguments: A list that contains the necessary arguments for the PBM execution.
+        """
+
+        status_fid = open(status_file)
+        status_dict = json.load(status_fid)
+
+        if status_dict['status'] == 1 or status_dict['status'] == 2:
+            cont = True
+        else:
+            cont = False
+        
+        status_dict.pop('status')
+
+        arguments=str()
+
+        # The rest are going to be arguments for setting up the PBM execution.
+        for key,value in status_dict.iteritems():
+            arguments += '--'+key+' '+str(value)
+
+        return cont,arguments
+
+    def _check_PBM_status(self,status_file):
+        """
+        This method checks the state of the DEM execution and based on the status code
+        reports whether or not the simulation should continue with  starting PBM or 
+        stop everything.
+
+        Inputs:
+        status_file: The name of a json file that contains the status and other entries
+                     necessary for the PBM execution
+
+        Returns:
+        cont: A boolean value that shows if the simulation should continue or not
+        arguments: A list that contains the necessary arguments for the PBM execution.
+        """
+
+        status_fid = open(status_file)
+        status_dict = json.load(status_fid)
+
+        if status_dict['status'] == 1 or status_dict['status'] == 2:
+            cont = True
+        else:
+            cont = False
+        
+        status_dict.pop('status')
+
+        arguments=str()
+
+        # The rest are going to be arguments for setting up the PBM execution.
+        for key,value in status_dict.iteritems():
+            arguments += '--'+key+' '+str(value)
+
+        return cont,arguments
+
 
     def _start_pbm_units(self,,timesteps):
 
@@ -332,19 +404,25 @@ class Executor(object):
 
         self._start()
         cont = True
-
+        restart =False
         while cont:
-            self._start_dem_units()
+            self._start_dem_units(restart=restart)
 
             self._umgr.wait_units(uid=self._dem_monitor_unit.uid)
 
-            self._umgr.cancel_units(uid=self._dem_unit.uid)
+            cont, args = self._check_DEM_status('DEM_status.json')
 
-            self._start_pbm_units()
+            if self._dem_unit.state() != rp.FINAL:
+                self._umgr.cancel_units(uid=self._dem_unit.uid)
 
-            self._umgr.wait_units(uid=[cu.uid for cu in self._pbm_monitor_units])
+            if cont != 0:
+                self._start_pbm_units()
 
-            self._umgr.cancel_units(uid=[cu.uid for cu in self._pbm_units])
+                self._umgr.wait_units(uid=[cu.uid for cu in self._pbm_monitor_units])
+
+                self._umgr.cancel_units(uid=[cu.uid for cu in self._pbm_units])
+            if cont != 0:
+                restart = True
 
         self._shutdown()
     

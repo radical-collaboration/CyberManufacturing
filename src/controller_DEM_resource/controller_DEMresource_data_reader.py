@@ -46,8 +46,8 @@ class Controller_DEM_resource_reader(object):
     def liggghts_collision_raw_data(self):
         # check if both impact and the collision files exist
         liggghts_output_files_path = self.liggghts_output_dir
-        timestep_collision_file = "collision%d.atom"% self.timestep
-        timestep_impact_file = 'impact%d.atom'% self.timestep
+        timestep_collision_file = "/collision%d.atom"% self.timestep
+        timestep_impact_file = '/impact%d.atom'% self.timestep
         path_collision_file = liggghts_output_files_path + str(timestep_collision_file)
         path_impact_file = liggghts_output_files_path + str(timestep_impact_file)
         temp1 = Path(path_collision_file)
@@ -69,7 +69,7 @@ class Controller_DEM_resource_reader(object):
 # function to read the certain liggghts present in the folder and return liggghts collision data
     def liggghts_impact_raw_data(self):
         liggghts_output_files_path = self.liggghts_output_dir
-        timestep_impact_file = 'impact%d.atom'% self.timestep
+        timestep_impact_file = '/impact%d.atom'% self.timestep
         path_impact_file = liggghts_output_files_path + str(timestep_impact_file)
         impact_file_open = open(path_impact_file, "r")
         self.raw_impact_data = impact_file_open.readlines()
@@ -92,6 +92,7 @@ class Controller_DEM_resource_reader(object):
             temp_fields['type'] = []
             temp_type = raw_col_data[x+9].split(' ')[1]
             temp_fields['type'] = temp_type
+            #print(raw_col_data[x+9].split(' ')[8])
             temp_vel = [float(raw_col_data[x+9].split(' ')[8]),float(raw_col_data[x+9].split(' ')[9]),float(raw_col_data[x+9].split(' ')[10])]
             for i in xrange(1,self.type+1):
                 temp_col.append(int(raw_col_data[x+9].split(' ')[(i+13)]))
@@ -106,7 +107,7 @@ class Controller_DEM_resource_reader(object):
             temp_type = []
             temp_col = []
             temp_fields.clear()
-        print(len(self.collision_data_acc_types['6']))
+        #print(len(self.collision_data_acc_types['6']))
         return self.collision_data_acc_types
 
 #function to store impact data into a dictionary

@@ -30,7 +30,7 @@ import sys
 
 class controller_DEMresource_main(object):
     def __init__(self, init_timestep, types, liggghts_output_path):
-    	# initial timestep and type of partilces are taken as input
+        # initial timestep and type of partilces are taken as input
         self.init_timestep = init_timestep 
         self.type = types
         self.dump_difference = 50000 # this is the predefined interval after which LIGGGHTS ouputs a dump file. Has to be changed if changed in the LIGGGHTS input file
@@ -38,7 +38,7 @@ class controller_DEMresource_main(object):
 
 # ------------------------------------------------------------------------------------------------
     def main(self):
-    	# This method executes the necessary commands to run the DEM controller and waits for the command from the interpertor to output certain files that the executioner will act upon.
+        # This method executes the necessary commands to run the DEM controller and waits for the command from the interpertor to output certain files that the executioner will act upon.
         timestep = int(self.init_timestep) + int(self.dump_difference)
         flag = 0
         dump_data = {}
@@ -49,15 +49,17 @@ class controller_DEMresource_main(object):
         obj_inter = DEMinter.controller_DEM_resource_interpretor(timestep, self.type, self.init_timestep, self.liggghts_output_dir)
         # Keeps checking for the existence of the file till one of the criteria for a killing the DEM are not met
         while (flag == 0):
-        	# defining the files and path of the files that it needs to search for.
-            liggghts_output_files_path = os.getcwd() + '/liggghts_output_files/'
-            timestep_collision_file = "collision%d.atom"%timestep
-            timestep_impact_file = 'impact%d.atom'%timestep
-            collision_file = liggghts_output_files_path + str(timestep_collision_file)
-            impact_file = liggghts_output_files_path + str(timestep_impact_file)
+            # defining the files and path of the files that it needs to search for.
+            #liggghts_output_files_path = os.getcwd() + '/liggghts_output_files/'
+
+            timestep_collision_file = "/collision%d.atom"%timestep
+            timestep_impact_file = '/impact%d.atom'%timestep
+            collision_file = self.liggghts_output_dir + str(timestep_collision_file)
+            impact_file = self.liggghts_output_dir + str(timestep_impact_file)
+            print(impact_file)
             # the execution waits for a seconds everytime it enters the loop till the file do not exist
             while not(os.path.exists(collision_file) and os.path.exists(impact_file)):
-                time.sleep(1)
+                time.sleep(2)
                 print("Waiting for file to be printed")
             #once the files are found the it performs the comparison to the initial data files using the interpretor class
             if (os.path.isfile(collision_file) and os.path.isfile(impact_file)):
@@ -69,13 +71,14 @@ class controller_DEMresource_main(object):
                 timestep = timestep + self.dump_difference
             else :
                 continue
-            with open('DEM_status.dat' , 'w') as demsf:
-      			demsf.write(str(flag))
+            status = {'status':str(flag)}
+            with open('DEM_status.json' , 'w') as demsf:
+                json.dump(status, demsf)
         dump_avg_vel.close()
         dump_collisions.close()
         dump_impacts.close()
         if (flag == 1):
-        	# kill the DEM and start the PBM and also print the input file for the PBM executable
+            # kill the DEM and start the PBM and also print the input file for the PBM executable
             print("Time to change to PBM and kill DEM")
             tot_part_each_type = np.zeros(16)
             avg_vel_array = np.zeros_like(tot_part_each_type)
@@ -110,29 +113,29 @@ class controller_DEMresource_main(object):
             with open('DEM_status.json' , 'w') as demsf:
                 json.dump(status, demsf)
             with open('PBM_input.json' , 'w') as outfile:
-            	json.dump(dump_data, outfile)
+                json.dump(dump_data, outfile)
             # also printing a text file, whichever is easier for yuktesh to read, we can remove the json or this once decided
             with open('PBM_input.txt', 'w') as ipt:
-            	ipt.write("types %d"%int(obj_inter.num_of_particles))
-            	ipt.writelines("total number of particles %f\n"%item for item in tot_part_each_type)
-            	ipt.writelines("average velocity of particles  %f\n"%item for item in avg_vel_array)
-            	ipt.write("\nlast timestep %d"%timestep)
-            	ipt.write("\naggregation Kernel Constant %f"%(1e-9))
-            	ipt.write("\nbreakage Kernel Constant %f"%(1e-7))
-            	ipt.write("\nmixing time %d"%(25))
-            	ipt.write("\nliquid addition time %d"%(125))
+                ipt.write("types %d"%int(obj_inter.num_of_particles))
+                ipt.writelines("total number of particles %f\n"%item for item in tot_part_each_type)
+                ipt.writelines("average velocity of particles  %f\n"%item for item in avg_vel_array)
+                ipt.write("\nlast timestep %d"%timestep)
+                ipt.write("\naggregation Kernel Constant %f"%(1e-9))
+                ipt.write("\nbreakage Kernel Constant %f"%(1e-7))
+                ipt.write("\nmixing time %d"%(25))
+                ipt.write("\nliquid addition time %d"%(125))
         elif (flag == 2):
-        	# kill the DEM since there has been no change in the number of collisions / impacts / velocity for 2 seconds.
-        	status = {'status':str(flag)}
+            # kill the DEM since there has been no change in the number of collisions / impacts / velocity for 2 seconds.
+            status = {'status':str(flag)}
             with open('DEM_status.json' , 'w') as demsf:
                 json.dump(status, demsf)
-      		# with open('DEM_status.dat' , 'w') as demsf:
-      		# 	demsf.write(str(flag))
-      		print("The system is at steady state")
+            # with open('DEM_status.dat' , 'w') as demsf:
+            #   demsf.write(str(flag))
+            print("The system is at steady state")
 
 
 # ------------------------------------------------------------------------------------------------
 
 #abcd = controller_DEMresource_main(int(sys.argv[1]), int(sys.argv[2]), sys.argv[3])
-abcd =controller_DEMresource_main(9000000, 16 ,'"/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy"')
+abcd =controller_DEMresource_main(9000000, 16 ,'/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy')
 abcd.main()

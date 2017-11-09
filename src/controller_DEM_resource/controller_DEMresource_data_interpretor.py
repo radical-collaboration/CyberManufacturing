@@ -112,9 +112,9 @@ class controller_DEM_resource_interpretor(object):
             vel_comp = (avg_vel - vai) / vai
             collision_comp = (avg_coll - cai) / cai
             impact_comp = (avg_imp - iai) / iai
-            if(vel_comp > 0.1 or collision_comp > 0.1 or impact_comp > 0.1):
+            if(vel_comp > 0.1 or collision_comp > 0.05 or impact_comp > 0.051):
                 flag = 1
-            elif((ts - self.init_timestep) > (2 / dem_timestep)):
+            elif((ts - self.init_timestep) > (0.5 / dem_timestep)):
                 flag = 2
             else:
                 flag = 0

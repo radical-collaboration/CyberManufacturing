@@ -21,13 +21,13 @@ import re
 
 
 def dummy_DEM(pasteTo_path, last_timestep_index, test_number):
-    collision_file_list = glob.glob(os.getcwd() + '/test_%d/collision*.atom'%test_number)
-    impact_file_list = glob.glob(os.getcwd() + '/test_%d/impact*.atom'%test_number)
+    collision_file_list = glob.glob('/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM' + '/test_%d/collision*.atom'%test_number)
+    impact_file_list = glob.glob('/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM' + '/test_%d/impact*.atom'%test_number)
     num_start_collision = re.search("collision",collision_file_list[0]).end()
     num_start_impact = re.search("impact",impact_file_list[0]).end()
     num_end_collision = re.search(".atom",collision_file_list[0]).start()
     num_end_impact = re.search(".atom",impact_file_list[0]).start()
-    print(impact_file_list)
+    a = 0
     if((num_end_collision - num_start_collision) == 7):
         collision_file_list = sorted(collision_file_list, key=lambda x: float(x[(num_start_collision):(num_end_collision + 1)]))
     else:
@@ -36,8 +36,9 @@ def dummy_DEM(pasteTo_path, last_timestep_index, test_number):
         impact_file_list = sorted(impact_file_list, key=lambda x: float(x[(num_start_impact):(num_end_impact + 1)]))
     else:
         impact_file_list = sorted(impact_file_list, key=lambda x: float(x[(num_start_impact):(num_end_impact)]))
+    #print(collision_file_list)
     for x in range(last_timestep_index,len(collision_file_list)):
-        rand_num =  random.randint(20, 150)
+        rand_num =  random.randint(2, 15)
         print(x)
         collision_nextfile = collision_file_list[x]
         impact_nextfile = impact_file_list[x]
@@ -50,9 +51,10 @@ def dummy_DEM(pasteTo_path, last_timestep_index, test_number):
             time.sleep(rand_num)
         else:
             time.sleep(rand_num)
-            print("Next file")
-            
-    return x
+            print("Next file")            
+        a = x
+    return a
 
 #a = dummy_DEM(sys.argv[1], np.float(sys.argv[2]), int(sys.argv[3]))
-a = dummy_DEM("/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy",9000000,1)
+a = dummy_DEM("/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy", 0, 1)
+print(a)

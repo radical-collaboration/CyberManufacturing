@@ -77,14 +77,16 @@ class controllerPBMresourceMain(object):
         dump_particles.close()
         if (flag == 1):
             print("Kill PBM and execute DEM")
-            with open('PBM_status.dat', 'w') as pbmsf:
-                pbmsf.write(str(flag))
+            status = {'status':str(flag)}
+            with open('DEM_status.json' , 'w') as pbmsf:
+                json.dump(status, pbmsf)
             with open('PBM_output.txt', 'w') as pbmsf:
                 pbmsf.write(str(new_timestep))
         elif (flag == 2):
             print("Kill both DEM and PBM")
-            with open('PBM_status.dat', 'w') as pbmsf:
-                pbmsf.write(str(flag))
+            status = {'status':str(flag)}
+            with open('DEM_status.json' , 'w') as pbmsf:
+                json.dump(status, pbmsf)
             with open('PBM_output.txt', 'w') as pbmsf:
                 pbmsf.write(str(new_timestep))
             

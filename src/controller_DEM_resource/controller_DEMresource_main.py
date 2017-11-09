@@ -106,8 +106,9 @@ class controller_DEMresource_main(object):
             #dump_data['collision_matrix'].append(list(list(obj_inter.collision_matrix)))
             #dump_data.update({'collision_matrix': obj_inter.collision_matrix})
             # print(dump_data)
-            with open('DEM_status.dat' , 'w') as demsf:
-            	demsf.write(str(flag))
+            status = {'status':str(flag)}
+            with open('DEM_status.json' , 'w') as demsf:
+                json.dump(status, demsf)
             with open('PBM_input.json' , 'w') as outfile:
             	json.dump(dump_data, outfile)
             # also printing a text file, whichever is easier for yuktesh to read, we can remove the json or this once decided
@@ -122,13 +123,16 @@ class controller_DEMresource_main(object):
             	ipt.write("\nliquid addition time %d"%(125))
         elif (flag == 2):
         	# kill the DEM since there has been no change in the number of collisions / impacts / velocity for 2 seconds.
-      		with open('DEM_status.dat' , 'w') as demsf:
-      			demsf.write(str(flag))
+        	status = {'status':str(flag)}
+            with open('DEM_status.json' , 'w') as demsf:
+                json.dump(status, demsf)
+      		# with open('DEM_status.dat' , 'w') as demsf:
+      		# 	demsf.write(str(flag))
       		print("The system is at steady state")
 
 
 # ------------------------------------------------------------------------------------------------
 
 #abcd = controller_DEMresource_main(int(sys.argv[1]), int(sys.argv[2]), sys.argv[3])
-abcd =controller_DEMresoruce_main(9000000, 16 ,'"/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy"')
+abcd =controller_DEMresource_main(9000000, 16 ,'"/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy"')
 abcd.main()

@@ -1,0 +1,51 @@
+Executing the scripts:
+1. ```python liggghts_input_python.py init_timestep final_timestep min_dia max_dia types_of_particles total_flow_rate solid_density```
+2. ```python liggghts_input_restart_python.py init_timestep final_timestep min_dia max_dia types_of_particles total_flow_rate solid_density```
+3. ```python controllerPBMresourceMain.py init_ts bins1 bins2 pbm_out_path mixingtime```
+4. ```python controller_DEMresource_main.py init_timestep types liggghts_output_path```
+5. ```python dummy_DEM.py pasteTo_path last_timestep_index test_number```
+6. ```python dummy_PBM.py pasteTo_path last_timestep_index test_number```
+
+Executing the DEM and PBM simulations.
+1. ```ibrun -n #mpicores -o 0 tacc_affinity (can be not used) $PathToLIGGGHTSexecutable -in in.file > output_liggghts.out```
+2. ```ibrun -n #mpicores -o 0 tacc_affinity (can be not used) $PathToPBMexecutable inFile > output_PBM.out```
+**1. LIGGGHTS input file generator inputs:**
+```init_timestep``` is the initial timestep of the simulation. Here it has to be 1 always since we have another restart file generator.
+```final_timestep``` is the final timestep till which the DEM simulation should run.
+```min_dia``` is the minimum diameter of the particles for the DEM sim.
+```max_dia``` is the maximum diameter of the particles for the DEM sim.
+```types_of_particles``` is the # of types of particles in the DEM sim.
+```total_flow_rate``` is the total solid flow rate in kg/hr.
+```solid_density``` is the density of the solid particles in the DEM sim.
+
+**2. LIGGGHTS restart file generator:**
+all the arguments are the same as the input generator, except - 
+```init_timestep``` -  this is the timestep from which the simulation needs to be restarted.
+```final_timestep``` is the final timestep till which the DEM simulation should run.
+```min_dia``` is the minimum diameter of the particles for the DEM sim.
+```max_dia``` is the maximum diameter of the particles for the DEM sim.
+```types_of_particles``` is the # of types of particles in the DEM sim.
+```total_flow_rate``` is the total solid flow rate in kg/hr.
+```solid_density``` is the density of the solid particles in the DEM sim.
+
+**3. Controller PBM resource:**
+```init_ts`` it is the time (in seconds) from which it will start monitoring the PBM simulation.
+```compartments``` is the number of compartments used in the simulation.
+```bins1, bins2``` are the number of solid bins used in the PBM sim.
+```pbm_out_path``` is the path to the output directory where the pbm files are printed during the sim.
+```mixingtime``` is the amount of time given in the PBM as input, the controller will monitor but not ask to kill the simulation till mixing time is not over.
+
+**4. Controller DEM resource:**
+```init_timestep``` is the DEM timestep (will be a multiple of 50000 for our sims, can be changed in the LIGGGHTS input and restart files) foom which the controller will start to monitor the DEM sim.
+```types``` is the number of types of particles being used in the DEM simulation. 
+```liggghts_output_path``` is the path to output directory of the DEM sims.
+
+**5. dummy DEM**
+```pasteTo_path``` path to where the test files need to be copied, should be the same path for the DEM controller.
+```last_timestep_index``` is the last timestep index inside the generated file list. It is returned as a value from the program.
+```test_number``` points to the test number being executed.
+
+**6.dummy PBM**
+```pasteTo_path``` path to where the test files need to be copied, should be the same path for the PBM controller.
+```last_timestep_index``` is the last timestep index inside the generated file list. It is returned as a value from the program.
+```test_number``` points to the test number being executed.

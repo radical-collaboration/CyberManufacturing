@@ -36,17 +36,18 @@ class controllerPBMDataReader(object):
 
     # function to look for the next file in the PBM output folder after the PBM time step
     def nextfile_time_finder(self, last_ts):
-        particles_file_list = glob.glob(self.PBM_output_path + "particles_*.csv")
+        particles_file_list = glob.glob(self.PBM_output_path + "/particles_*.csv")
         num_start_particles = re.search("particles_",particles_file_list[0]).end()
-        num_end_particles = re.search("0.csv",particles_file_list[0]).start()
+        num_end_particles = re.search(".csv",particles_file_list[0]).start()
         # the generated file list is sorted by extracting the time step from the file name and then sorted according to the time step
         if (num_end_particles - num_start_particles == 8):
             particles_file_list = sorted(particles_file_list, key=lambda x: float(x[num_start_particles:num_end_particles]))
         else:
             particles_file_list = sorted(particles_file_list, key=lambda x: float(x[num_start_particles:(num_end_particles - 1)]))
-        d50_file_list = glob.glob(self.PBM_output_path + "d50_*.csv")
+        d50_file_list = glob.glob(self.PBM_output_path + "/d50_*.csv")
         # file_list_d50 = sorted(file_list_d50, key=lambda x: float(x[-13:-5]))
-        num_end_d50 = re.search("0.csv",d50_file_list[0]).start()
+        # print(d50_file_list)
+        num_end_d50 = re.search(".csv",d50_file_list[0]).start()
         num_start_d50 = re.search("d50_",d50_file_list[0]).end()
         if (num_end_d50 - num_start_d50 == 8):
             d50_file_list = sorted(d50_file_list, key=lambda x: float(x[num_start_d50:num_end_d50]))
@@ -58,26 +59,26 @@ class controllerPBMDataReader(object):
 #        file_list_d50.sort()
         new_ts = 0
         for x,file1 in enumerate(d50_file_list):
-            d50_nextfile_timestamp = re.search(self.PBM_output_path + 'd50_(.+?).csv', file1).group(1)
+            d50_nextfile_timestamp = re.search(self.PBM_output_path + '/d50_(.+?).csv', file1).group(1)
             # print(d50_nextfile_timestamp)
-            particles_nextfile = self.PBM_output_path + 'particles_' + d50_nextfile_timestamp + '.csv'
-            d50_nextfile = self.PBM_output_path + 'd50_' + d50_nextfile_timestamp + '.csv'
+            particles_nextfile = self.PBM_output_path + '/particles_' + d50_nextfile_timestamp + '.csv'
+            d50_nextfile = self.PBM_output_path + '/d50_' + d50_nextfile_timestamp + '.csv'
             if (os.path.isfile(particles_nextfile) and os.path.isfile(d50_nextfile) and np.float(d50_nextfile_timestamp) > last_ts):
                 new_ts = np.float(d50_nextfile_timestamp)
                 break
             elif (file1 == d50_file_list[-1]):
                 # once the iteration reaches the end of the list the program waits for half a second and then looks for newer generated files inside the folder and generates a new list
                 print("Waiting for the file to be printed")
-                time.sleep(0.6)
+                time.sleep(2)
                 d50_file_list = []
-                d50_file_list = glob.glob(self.PBM_output_path + "d50_*.csv")
+                # d50_file_list = glob.glob(self.PBM_output_path + "/d50_*.csv")
                 # file_list_d50 = sorted(file_list_d50, key=lambda x: float(x[-13:-5]))
-                num_end_d50 = re.search("0.csv",d50_file_list[0]).start()
-                num_start_d50 = re.search("d50_",d50_file_list[0]).end()
-                if (num_end_d50 - num_start_d50 == 8):
-                    d50_file_list = sorted(d50_file_list, key=lambda x: float(x[num_start_d50:num_end_d50]))
-                else:
-                    d50_file_list = sorted(d50_file_list, key=lambda x: float(x[num_start_d50:(num_end_d50 - 1)]))
+                # num_end_d50 = re.search(".csv",d50_file_list[0]).start()
+                # num_start_d50 = re.search("d50_",d50_file_list[0]).end()
+                # if (num_end_d50 - num_start_d50 == 8):
+                #     d50_file_list = sorted(d50_file_list, key=lambda x: float(x[num_start_d50:num_end_d50]))
+                # else:
+                #     d50_file_list = sorted(d50_file_list, key=lambda x: float(x[num_start_d50:(num_end_d50 - 1)]))
             else:
                 continue                
         return new_ts
@@ -87,7 +88,7 @@ class controllerPBMDataReader(object):
         while(curr_ts == 0):
             curr_ts = self.nextfile_time_finder(curr_ts)
         curr_ts = "%f" %curr_ts
-        filetoread_d50 = self.PBM_output_path + 'd50_' + curr_ts + '.csv'
+        filetoread_d50 = self.PBM_output_path + '/d50_' + curr_ts + '.csv'
         temp_d50 = np.zeros((1,self.compartments + 1))
 
         with open(filetoread_d50, 'rb') as d50_current_file:
@@ -108,7 +109,7 @@ class controllerPBMDataReader(object):
         if(curr_ts == 0):
             curr_ts = self.nextfile_time_finder(curr_ts)
         curr_ts = "%f" %curr_ts
-        filetoread_particles = self.PBM_output_path + 'particles_' + curr_ts + '.csv'
+        filetoread_particles = self.PBM_output_path + '/particles_' + curr_ts + '.csv'
         total_num_particles = 0
         with open(filetoread_particles, 'rb') as particles_current_file:
             read_particles = pd.read_csv(particles_current_file, header = 0)

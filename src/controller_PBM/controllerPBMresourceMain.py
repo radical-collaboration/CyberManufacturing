@@ -26,6 +26,8 @@ import numpy as np
 import controllerPBMDataInterpretor as PBMinter
 import controllerPBMDataReader as PBMreader
 import os
+import json
+import time
 
 class controllerPBMresourceMain(object):
 # class variables
@@ -39,6 +41,10 @@ class controllerPBMresourceMain(object):
 
     def main(self):
     # This method executes all the necessary function calls to monitor the PBM execution and decides on the status of the simulation
+        if os.path.isfile(self.pbm_output_path + '/d50_' + str(self.initial_timestep) + '.csv'):
+            obj_reader = PBMreader.controllerPBMDataReader(self.initial_timestep, self.compartments, self.bins1, self.bins2, self.pbm_output_path)
+        else:
+            time.sleep(2)
         obj_reader = PBMreader.controllerPBMDataReader(self.initial_timestep, self.compartments, self.bins1, self.bins2, self.pbm_output_path)
         obj_inter = PBMinter.controllerPBMDataInterpretor(self.initial_timestep, self.compartments, self.bins1, self.bins2, self.pbm_output_path)
         new_timestep = obj_reader.nextfile_time_finder(self.initial_timestep)
@@ -55,8 +61,8 @@ class controllerPBMresourceMain(object):
         while (flag1):
 #            print(count)
             new_timestep = obj_reader.nextfile_time_finder(new_timestep)
-            next_d50_filename = "d50_%.2f.csv"%new_timestep
-            next_particles_filename = "particles_%.2f.csv"%new_timestep
+            next_d50_filename = "/d50_%.2f.csv"%new_timestep
+            next_particles_filename = "/particles_%.2f.csv"%new_timestep
             d50_filecheck = self.pbm_output_path + str(next_d50_filename)
             particles_filecheck = self.pbm_output_path + str(next_particles_filename)
 #                if (os.path.isfile(d50_filecheck) and os.path.isfile(particles_filecheck)):
@@ -77,19 +83,21 @@ class controllerPBMresourceMain(object):
         dump_particles.close()
         if (flag == 1):
             print("Kill PBM and execute DEM")
-            with open('PBM_status.dat', 'w') as pbmsf:
-                pbmsf.write(str(flag))
+            status = {'status':str(flag)}
+            with open('PBM_status.json' , 'w') as pbmsf:
+                json.dump(status, pbmsf)
             with open('PBM_output.txt', 'w') as pbmsf:
                 pbmsf.write(str(new_timestep))
         elif (flag == 2):
             print("Kill both DEM and PBM")
-            with open('PBM_status.dat', 'w') as pbmsf:
-                pbmsf.write(str(flag))
+            status = {'status':str(flag)}
+            with open('PBM_status.json' , 'w') as pbmsf:
+                json.dump(status, pbmsf)
             with open('PBM_output.txt', 'w') as pbmsf:
                 pbmsf.write(str(new_timestep))
             
 
-abcd = controllerPBMresourceMain(14.22,4,16,16,'/home/chai/Documents/git/CyberManufacturing/src/twoway_PBM/csvDump/',5)
+abcd = controllerPBMresourceMain(7,4,16,16,'/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy',5)
 abcd.main()
 
 

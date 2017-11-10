@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cmath>
 
-#include "parameters.h"
+#include "parameterData.h"
 #include "utility.h"
 #include "kernel.h"
 #include "compartment.h"
@@ -48,94 +48,98 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
     arrayOfDouble2D fgComingIn = prevCompIn.fgComingIn;
     arrayOfDouble2D fgPreviousCompartment = prevCompIn.fgPreviousCompartment;
 
+    parameterData *pData = parameterData::getInstance();
+    int nFirstSolidBins = pData->nFirstSolidBins;
+    int nSecondSolidBins = pData->nSecondSolidBins;
+
     //Declaration of arrays required initially for OMP implementation
-    arrayOfDouble2D internalLiquid = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D externalLiquid = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D externalLiquidContent = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D externalVolumeBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D volumeBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble4D aggregationRate = getArrayOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS,
-                                                         NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D depletionOfGasThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D depletionOfLiquidThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D firstSolidBirthThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D secondSolidBirthThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D liquidBirthThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D gasBirthThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D firstSolidVolumeThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D secondSolidVolumeThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggLowLow = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggHighHigh = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggLowHigh = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggHighLow = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggLowLowLiq = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggHighHighLiq = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggLowHighLiq = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggHighLowLiq = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D internalLiquid = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D externalLiquid = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D externalLiquidContent = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D externalVolumeBins = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D volumeBins = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble4D aggregationRate = getArrayOfDouble4D(nFirstSolidBins, nSecondSolidBins,
+                                                         nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D depletionOfGasThroughAggregation = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D depletionOfLiquidThroughAggregation = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D birthThroughAggregation = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D firstSolidBirthThroughAggregation = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D secondSolidBirthThroughAggregation = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D liquidBirthThroughAggregation = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D gasBirthThroughAggregation = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D firstSolidVolumeThroughAggregation = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D secondSolidVolumeThroughAggregation = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D birthAggLowLow = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D birthAggHighHigh = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D birthAggLowHigh = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D birthAggHighLow = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D birthAggLowLowLiq = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D birthAggHighHighLiq = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D birthAggLowHighLiq = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D birthAggHighLowLiq = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
 
-    arrayOfDouble2D birthAggLowLowGas = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggHighHighGas = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggLowHighGas = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthAggHighLowGas = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D formationThroughAggregationCA = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D formationOfLiquidThroughAggregationCA = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D formationOfGasThroughAggregationCA = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble4D breakageRate = getArrayOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS,
-                                                      NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D birthAggLowLowGas = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D birthAggHighHighGas = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D birthAggLowHighGas = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D birthAggHighLowGas = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D formationThroughAggregationCA = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D formationOfLiquidThroughAggregationCA = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D formationOfGasThroughAggregationCA = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble4D breakageRate = getArrayOfDouble4D(nFirstSolidBins, nSecondSolidBins,
+                                                      nFirstSolidBins, nSecondSolidBins);
 
-    arrayOfDouble2D depletionThroughAggregation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D depletionThroughBreakage = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D depletionOfGasThroughBreakage = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D depletionOfLiquidthroughBreakage = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D depletionThroughAggregation = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D depletionThroughBreakage = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D depletionOfGasThroughBreakage = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D depletionOfLiquidthroughBreakage = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
 
-    arrayOfDouble2D birthThroughBreakage1 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D birthThroughBreakage2 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D birthThroughBreakage1 = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D birthThroughBreakage2 = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
 
-    arrayOfDouble2D firstSolidBirthThroughBreakage = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D secondSolidBirthThroughBreakage = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D firstSolidBirthThroughBreakage = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D secondSolidBirthThroughBreakage = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
 
-    arrayOfDouble2D liquidBirthThroughBreakage1 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D gasBirthThroughBreakage1 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D liquidBirthThroughBreakage1 = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D gasBirthThroughBreakage1 = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
 
-    arrayOfDouble2D liquidBirthThroughBreakage2 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D gasBirthThroughBreakage2 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D liquidBirthThroughBreakage2 = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D gasBirthThroughBreakage2 = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
 
-    arrayOfDouble2D firstSolidVolumeThroughBreakage = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D secondSolidVolumeThroughBreakage = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D fractionBreakage00 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D fractionBreakage01 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D fractionBreakage10 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D fractionBreakage11 = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D formationThroughBreakageCA = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D formationOfLiquidThroughBreakageCA = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D formationOfGasThroughBreakageCA = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D transferThroughLiquidAddition = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D transferThroughConsolidation = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D firstSolidVolumeThroughBreakage = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D secondSolidVolumeThroughBreakage = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D fractionBreakage00 = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D fractionBreakage01 = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D fractionBreakage10 = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D fractionBreakage11 = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D formationThroughBreakageCA = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D formationOfLiquidThroughBreakageCA = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D formationOfGasThroughBreakageCA = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D transferThroughLiquidAddition = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D transferThroughConsolidation = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
 
-    arrayOfDouble2D particleMovement = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D liquidMovement = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D gasMovement = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D particleMovement = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D liquidMovement = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D gasMovement = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
 
     //Calculation of liquid and gas bins
     //cout << "Begin liquidBins & gasBins" << endl;
-    arrayOfDouble2D liquidBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D gasBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D internalVolumeBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D liquidBins = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D gasBins = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D internalVolumeBins = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
 
-    arrayOfDouble2D dfAlldt = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D dfLiquiddt = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D dfGasdt = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D dfAlldt = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D dfLiquiddt = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D dfGasdt = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
 
     arrayOfDouble4D aggregationKernel;
     arrayOfDouble4D breakageKernel;
 
     int s, ss, s1, ss1, s2, ss2, a, b = 0;
 
-    for (s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-        for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+    for (s = 0; s < nFirstSolidBins; s++)
+        for (ss = 0; ss < nSecondSolidBins; ss++)
         {
-            if (fabs(fAll[s][ss]) > EPSILON) //If there are particles in the bin...
+            if (fabs(fAll[s][ss]) > 1.0e-16) //If there are particles in the bin...
             {
                 //New liquid bins are calculated as total amount liquid in that size class divided by
                 //the number of particle in that size class
@@ -156,10 +160,11 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
     //Internal and external liquid demarcation
     //cout << "Begin Internal & External liquid" << endl;
 
-    for (s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-        for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+    double granSatFactor = pData->granSatFactor;
+    for (s = 0; s < nFirstSolidBins; s++)
+        for (ss = 0; ss < nSecondSolidBins; ss++)
         {
-            internalLiquid[s][ss] = min(GRANULESATURATIONFACTOR * gasBins[s][ss], liquidBins[s][ss]);
+            internalLiquid[s][ss] = min(granSatFactor * gasBins[s][ss], liquidBins[s][ss]);
             externalLiquid[s][ss] = max(0.0, liquidBins[s][ss] - internalLiquid[s][ss]);
             externalLiquidContent[s][ss] = externalLiquid[s][ss] / liquidBins[s][ss];
         }
@@ -168,9 +173,9 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
 
     //cout << "Begin Internal, External & Volume Bins" << endl;
 
-    //compartmentOut.internalVolumeBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    for (s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-        for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+    //compartmentOut.internalVolumeBins = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    for (s = 0; s < nFirstSolidBins; s++)
+        for (ss = 0; ss < nSecondSolidBins; ss++)
         {
             internalVolumeBins[s][ss] = sMeshXY[s][ss] + ssMeshXY[s][ss];
             internalVolumeBins[s][ss] += internalLiquid[s][ss] + gasBins[s][ss];
@@ -184,12 +189,12 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
     //cout << "End Internal, External & Volume Bins" << endl;
 
     //cout << "Begin Aggregation Kernel" << endl;
-    //    compartmentOut.aggregationKernel = getArrayOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS,
-    //                                       NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    //    for (int s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
-    //        for (int ss1  = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
-    //            for (int s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
-    //                for (int ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
+    //    compartmentOut.aggregationKernel = getArrayOfDouble4D(nFirstSolidBins, nSecondSolidBins,
+    //                                       nFirstSolidBins, nSecondSolidBins);
+    //    for (int s1 = 0; s1 < nFirstSolidBins; s1++)
+    //        for (int ss1  = 0; ss1 < nSecondSolidBins; ss1++)
+    //            for (int s2 = 0; s2 < nFirstSolidBins; s2++)
+    //                for (int ss2 = 0; ss2 < nSecondSolidBins; ss2++)
     //                {
     //                    double expr1 = externalVolumeBins[s1][ss1]+externalVolumeBins[s2][ss2]-externalLiquid[s1][ss1]-externalLiquid[s2][ss2];
     //                    expr1 = pow(expr1, AGGREGATIONKERNELCONSTANTGAMMA);
@@ -211,19 +216,19 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
     //AGGREGATION
     //cout << "Begin aggregationRate" << endl;
 
-    for (s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
-        for (ss1 = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
-            for (s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
-                for (ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
+    for (s1 = 0; s1 < nFirstSolidBins; s1++)
+        for (ss1 = 0; ss1 < nSecondSolidBins; ss1++)
+            for (s2 = 0; s2 < nFirstSolidBins; s2++)
+                for (ss2 = 0; ss2 < nSecondSolidBins; ss2++)
                     aggregationRate[s1][ss1][s2][ss2] = sAggregationCheck[s1][ss1] * ssAggregationCheck[s2][ss2] * aggregationKernel[s1][ss1][s2][ss2] * fAll[s1][ss1] * fAll[s2][ss2];
 
     //cout << "End aggregationRate" << endl;
 
     //cout << "Begin depletionThroughAggregation" << endl;
-    for (s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
-        for (ss1 = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
-            for (s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
-                for (ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
+    for (s1 = 0; s1 < nFirstSolidBins; s1++)
+        for (ss1 = 0; ss1 < nSecondSolidBins; ss1++)
+            for (s2 = 0; s2 < nFirstSolidBins; s2++)
+                for (ss2 = 0; ss2 < nSecondSolidBins; ss2++)
                 {
                     depletionThroughAggregation[s1][ss1] += aggregationRate[s1][ss1][s2][ss2];
                     depletionThroughAggregation[s2][ss2] += aggregationRate[s1][ss1][s2][ss2];
@@ -233,8 +238,8 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
 
     //cout << "Begin depletionOfGasThroughAggregation & depletionOfLiquidThroughAggregation" << endl;
 
-    for (s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-        for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+    for (s = 0; s < nFirstSolidBins; s++)
+        for (ss = 0; ss < nSecondSolidBins; ss++)
         {
             depletionOfGasThroughAggregation[s][ss] = depletionThroughAggregation[s][ss] * gasBins[s][ss];
             depletionOfLiquidThroughAggregation[s][ss] = depletionThroughAggregation[s][ss] * liquidBins[s][ss];
@@ -244,14 +249,14 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
     //cout << "Begin birthThroughAggregation, firstSolidBirthThroughAggregation, secondSolidBirthThroughAggregation, ";
     //cout << "liquidBirthThroughAggregation & gasBirthThroughAggregation" << endl;
 
-    for (s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
-        for (ss1 = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
-            for (s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
-                for (ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
+    for (s1 = 0; s1 < nFirstSolidBins; s1++)
+        for (ss1 = 0; ss1 < nSecondSolidBins; ss1++)
+            for (s2 = 0; s2 < nFirstSolidBins; s2++)
+                for (ss2 = 0; ss2 < nSecondSolidBins; ss2++)
                 {
-                    for (a = 0; a < NUMBEROFFIRSTSOLIDBINS; a++)
+                    for (a = 0; a < nFirstSolidBins; a++)
                     {
-                        for (b = 0; b < NUMBEROFSECONDSOLIDBINS; b++)
+                        for (b = 0; b < nSecondSolidBins; b++)
                         {
                             if (sInd[s1][s2] == (a + 1) && ssInd[ss1][ss2] == (b + 1))
                             {
@@ -270,10 +275,10 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
 
     //cout << "Begin firstSolidVolumeThroughAggregation & secondSolidVolumeThroughAggregation" << endl;
 
-    for (s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-        for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+    for (s = 0; s < nFirstSolidBins; s++)
+        for (ss = 0; ss < nSecondSolidBins; ss++)
         {
-            if (fabs(birthThroughAggregation[s][ss]) > EPSILON)
+            if (fabs(birthThroughAggregation[s][ss]) > 1.0e-16)
             {
                 firstSolidVolumeThroughAggregation[s][ss] = firstSolidBirthThroughAggregation[s][ss] / birthThroughAggregation[s][ss];
                 secondSolidVolumeThroughAggregation[s][ss] = secondSolidBirthThroughAggregation[s][ss] / birthThroughAggregation[s][ss];
@@ -288,8 +293,8 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
 
     //cout << "Begin birth_agg_low_low, birth_agg_high_high, birth_agg_low_high & birth_agg_high_low" << endl;
 
-    for (s = 0; s < NUMBEROFFIRSTSOLIDBINS - 1; s++)
-        for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS - 1; ss++)
+    for (s = 0; s < nFirstSolidBins - 1; s++)
+        for (ss = 0; ss < nSecondSolidBins - 1; ss++)
         {
             birthAggLowLow[s][ss] = (vs[s + 1] - firstSolidVolumeThroughAggregation[s][ss]) / (vs[s + 1] - vs[s]);
             birthAggLowLow[s][ss] *= (vss[ss + 1] - secondSolidVolumeThroughAggregation[s][ss]) / (vss[ss + 1] - vss[ss]);
@@ -312,8 +317,8 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
 
     //cout << "Begin birth_agg_low_low_liq, birth_agg_high_high_liq, birth_agg_low_high_liq & birth_agg_high_low_liq" << endl;
 
-    for (s = 0; s < NUMBEROFFIRSTSOLIDBINS - 1; s++)
-        for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS - 1; ss++)
+    for (s = 0; s < nFirstSolidBins - 1; s++)
+        for (ss = 0; ss < nSecondSolidBins - 1; ss++)
         {
             birthAggLowLowLiq[s][ss] = (vs[s + 1] - firstSolidVolumeThroughAggregation[s][ss]) / (vs[s + 1] - vs[s]);
             birthAggLowLowLiq[s][ss] *= (vss[ss + 1] - secondSolidVolumeThroughAggregation[s][ss]) / (vss[ss + 1] - vss[ss]);
@@ -335,8 +340,8 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
 
     //cout << "Begin birth_agg_low_low_gas, birth_agg_high_high_gas, birth_agg_low_high_gas & birth_agg_high_low_gas" << endl;
 
-    for (s = 0; s < NUMBEROFFIRSTSOLIDBINS - 1; s++)
-        for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS - 1; ss++)
+    for (s = 0; s < nFirstSolidBins - 1; s++)
+        for (ss = 0; ss < nSecondSolidBins - 1; ss++)
         {
             birthAggLowLowGas[s][ss] = (vs[s + 1] - firstSolidVolumeThroughAggregation[s][ss]) / (vs[s + 1] - vs[s]);
             birthAggLowLowGas[s][ss] *= (vss[ss + 1] - secondSolidVolumeThroughAggregation[s][ss]) / (vss[ss + 1] - vss[ss]);
@@ -358,8 +363,8 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
 
     //cout << "Begin formationThroughAggregationCA, formationOfLiquidThroughAggregationCA & formationOfGasThroughAggregationCA" << endl;
 
-    for (s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-        for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+    for (s = 0; s < nFirstSolidBins; s++)
+        for (ss = 0; ss < nSecondSolidBins; ss++)
         {
             formationThroughAggregationCA[s][ss] = birthAggLowLow[s][ss] + birthAggHighHigh[s][ss] + birthAggLowHigh[s][ss] + birthAggHighLow[s][ss];
             formationOfLiquidThroughAggregationCA[s][ss] = birthAggLowLowLiq[s][ss] + birthAggHighHighLiq[s][ss] + birthAggLowHighLiq[s][ss] + birthAggHighLowLiq[s][ss];
@@ -372,10 +377,10 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
     //BREAKAGE
     //Breakage kernel Calculation inside time loop becasue gas and liquid bins change with time
     //cout << "Begin Breakage Kernel" << endl;
-    //compartmentOut.breakageKernel = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);//, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    //compartmentOut.breakageKernel = getArrayOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    //    for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-    //        for (int ss  = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+    //compartmentOut.breakageKernel = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);//, nFirstSolidBins, nSecondSolidBins);
+    //compartmentOut.breakageKernel = getArrayOfDouble4D(nFirstSolidBins, nSecondSolidBins, nFirstSolidBins, nSecondSolidBins);
+    //    for (int s = 0; s < nFirstSolidBins; s++)
+    //        for (int ss  = 0; ss < nSecondSolidBins; ss++)
     //        {
     //            double expr1 = sqrt(4/(15*M_PI));
     //            double expr2 = pow(SHEARRATE, 2)* cbrt(3*externalVolumeBins[s][ss]/(4*M_PI));
@@ -383,22 +388,22 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
     //            //compartmentOut.breakageKernel[s][ss] = DEMBREAKAGEKERNELCONST * DEMBREAKAGEKERNELVALUE;
     //        }
     //    //reset to zero values
-    //    compartmentOut.breakageKernel = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    //    compartmentOut.breakageKernel = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
     //compartmentOut.breakageKernel = DEMDependentBreakageKernel(compartmentIn, compartmentDEMIn, timeStep);
     if (INCLUDEBREAKAGE)
         breakageKernel = DEMDependentBreakageKernel(compartmentIn, compartmentDEMIn, timeStep);
     else
-        breakageKernel = getArrayOfDouble4D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+        breakageKernel = getArrayOfDouble4D(nFirstSolidBins, nSecondSolidBins, nFirstSolidBins, nSecondSolidBins);
 
     //cout << "End Breakage Kernel" << endl;
 
     //cout << "Begin breakageRate, depletionThroughBreakage, depletionOfLiquidthroughBreakage & depletionOfGasThroughBreakage" << endl;
     if (INCLUDEBREAKAGE)
     {
-        for (s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
-            for (ss1 = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
-                for (s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
-                    for (ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
+        for (s1 = 0; s1 < nFirstSolidBins; s1++)
+            for (ss1 = 0; ss1 < nSecondSolidBins; ss1++)
+                for (s2 = 0; s2 < nFirstSolidBins; s2++)
+                    for (ss2 = 0; ss2 < nSecondSolidBins; ss2++)
                     {
                         breakageRate[s1][ss1][s2][ss2] = sCheckB[s1][s2] * ssCheckB[ss1][ss2];
                         breakageRate[s1][ss1][s2][ss2] *= breakageKernel[s1][ss1][s2][ss2] * fAll[s1][ss1];
@@ -416,13 +421,13 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
     //cout << "gasBirthThroughBreakage2, firstSolidVolumeThroughBreakage & secondSolidVolumeThroughBreakage" << endl;
     if (INCLUDEBREAKAGE)
     {
-        for (s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
-            for (ss1 = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
-                for (s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
-                    for (ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
+        for (s1 = 0; s1 < nFirstSolidBins; s1++)
+            for (ss1 = 0; ss1 < nSecondSolidBins; ss1++)
+                for (s2 = 0; s2 < nFirstSolidBins; s2++)
+                    for (ss2 = 0; ss2 < nSecondSolidBins; ss2++)
                     {
-                        for (a = 0; a < NUMBEROFFIRSTSOLIDBINS; a++)
-                            for (b = 0; b < NUMBEROFSECONDSOLIDBINS; b++)
+                        for (a = 0; a < nFirstSolidBins; a++)
+                            for (b = 0; b < nSecondSolidBins; b++)
                             {
                                 if (sIndB[s1][s2] == (a + 1) && ssIndB[ss1][ss2] == (b + 1))
                                 {
@@ -452,11 +457,11 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
 
     if (INCLUDEBREAKAGE)
     {
-        for (s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
+        for (s = 0; s < nFirstSolidBins; s++)
         {
             double value1 = 0.0;
             double value2 = 0.0;
-            for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+            for (ss = 0; ss < nSecondSolidBins; ss++)
             {
                 value1 = fabs(sLow[s][ss] - firstSolidVolumeThroughBreakage[s][ss]);
                 value1 = sHigh[s][ss] - sLow[s][ss] - value1;
@@ -489,8 +494,8 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
     //cout << "Begin formationThroughBreakageCA, formationOfLiquidThroughBreakageCA & formationOfGasThroughBreakageCA" << endl;
     if (INCLUDEBREAKAGE)
     {
-        for (s = 0; s < NUMBEROFFIRSTSOLIDBINS - 1; s++)
-            for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS - 1; ss++)
+        for (s = 0; s < nFirstSolidBins - 1; s++)
+            for (ss = 0; ss < nSecondSolidBins - 1; ss++)
             {
                 formationThroughBreakageCA[s][ss] += birthThroughBreakage2[s][ss] * fractionBreakage00[s][ss];
                 formationThroughBreakageCA[s][ss + 1] += birthThroughBreakage2[s][ss] * fractionBreakage01[s][ss];
@@ -514,15 +519,21 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
 
     //cout << "Begin Particle Transfer" << endl;
     //cout << "Finding Max of s_meshxy+ss_meshxy " << endl;
-    arrayOfDouble2D meshXYSum = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    for (s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-        for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+    arrayOfDouble2D meshXYSum = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    for (s = 0; s < nFirstSolidBins; s++)
+        for (ss = 0; ss < nSecondSolidBins; ss++)
             meshXYSum[s][ss] = sMeshXY[s][ss] + ssMeshXY[s][ss];
 
     double maxMeshXY = getMaximumOf2DArray(meshXYSum);
-    double value = PARTICLEAVERAGEVELOCITY * timeStep / DISTANCEBETWEENCOMPARTMENTS;
-    for (s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-        for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+
+    double granulatorLength = pData->granulatorLength;
+    double partticleResTime = pData->partticleResTime;
+    double particleAverageVelocity = granulatorLength /  partticleResTime;
+    int nCompartments = pData->nCompartments;
+    double distanceBetweenCompartments = granulatorLength / nCompartments;
+    double value = particleAverageVelocity * timeStep / distanceBetweenCompartments;
+    for (s = 0; s < nFirstSolidBins; s++)
+        for (ss = 0; ss < nSecondSolidBins; ss++)
         {
             double valueMeshXY = 1 - (sMeshXY[s][ss] + ssMeshXY[s][ss]) / maxMeshXY;
 
@@ -540,28 +551,33 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
     //cout << "End Particle Transfer" << endl;
 
     //cout << "Begin rate calculations" << endl << endl;
-    if (time >= PREMIXINGTIME && time <= PREMIXINGTIME + LIQUIDADDITIONTIME)
+    double premixTime = pData->premixTime;
+    double liqAddTime = pData->liqAddTime;
+    if (time >= premixTime && time <= premixTime + liqAddTime)
         liquidAdditionRate *= timeStep;
     else
         liquidAdditionRate = 0.0;
 
     double totalSolidVolume = 0.0;
-    for (s = 0; s < NUMBEROFFIRSTSOLIDBINS - 1; s++)
-        for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS - 1; ss++)
+    for (s = 0; s < nFirstSolidBins - 1; s++)
+        for (ss = 0; ss < nSecondSolidBins - 1; ss++)
             totalSolidVolume += fAll[s][ss] * (vs[s] + vss[ss]);
 
-    //compartmentOut.dfAlldt = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    //compartmentOut.dfLiquiddt = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    //compartmentOut.dfGasdt = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    //compartmentOut.dfAlldt = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    //compartmentOut.dfLiquiddt = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    //compartmentOut.dfGasdt = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
 
-    for (s = 0; s < NUMBEROFFIRSTSOLIDBINS - 1; s++)
-        for (ss = 0; ss < NUMBEROFSECONDSOLIDBINS - 1; ss++)
+    double consConst = pData->consConst;
+    double minPorosity = pData->minPorosity;
+
+    for (s = 0; s < nFirstSolidBins - 1; s++)
+        for (ss = 0; ss < nSecondSolidBins - 1; ss++)
         {
             dfAlldt[s][ss] = particleMovement[s][ss];
             dfAlldt[s][ss] += formationThroughAggregationCA[s][ss] - depletionThroughAggregation[s][ss];
             dfAlldt[s][ss] += birthThroughBreakage1[s][ss] + formationThroughBreakageCA[s][ss] - depletionThroughBreakage[s][ss];
 
-            if (totalSolidVolume > EPSILON)
+            if (totalSolidVolume > 1.0e-16)
             {
                 double value = (vs[s] + vss[ss]) / totalSolidVolume;
                 transferThroughLiquidAddition[s][ss] = liquidAdditionRate * value;
@@ -573,9 +589,9 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
             dfLiquiddt[s][ss] += liquidBirthThroughBreakage1[s][ss] + formationOfLiquidThroughBreakageCA[s][ss];
             dfLiquiddt[s][ss] -= depletionOfLiquidthroughBreakage[s][ss];
             
-            if(fGas[s][ss] > EPSILON)
+            if(fGas[s][ss] > 1.0e-16)
             {
-                transferThroughConsolidation[s][ss] = CONSOLIDATIONCONSTANT * internalVolumeBins[s][ss] * ((1 - MINIMUMPOROSITY) / (vs[s] + vss[ss])) * (gasBins[s][ss] - (MINIMUMPOROSITY/(1 - MINIMUMPOROSITY)) * (vs[s] + vss[ss]) + internalLiquid[s][ss]);
+                transferThroughConsolidation[s][ss] = consConst * internalVolumeBins[s][ss] * ((1 - minPorosity) / (vs[s] + vss[ss])) * (gasBins[s][ss] - (minPorosity/(1 - minPorosity)) * (vs[s] + vss[ss]) + internalLiquid[s][ss]);
             }
             dfGasdt[s][ss] = gasMovement[s][ss];
             dfGasdt[s][ss] += fAll[s][ss] * transferThroughConsolidation[s][ss];

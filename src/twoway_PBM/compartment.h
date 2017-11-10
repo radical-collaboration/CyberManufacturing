@@ -3,7 +3,6 @@
 
 #include <vector>
 #include "utility.h"
-#include "parameters.h"
 
 typedef struct
 {

@@ -1,9 +1,10 @@
 #include <iostream>
 #include <algorithm>
 #include <cstring>
+#include <cmath>
 
 #include "liggghtsData.h"
-#include "parameters.h"
+#include "parameterData.h"
 
 #define ATOMFILEPATH "./sampledumpfiles/"
 using namespace std;
@@ -225,8 +226,11 @@ vector<double> liggghtsData::getFinalDEMImpactData()
 
     if (mapData.empty())
     return nImpacts;
-
-    nImpacts.resize(NUMBEROFDEMBINS);
+    
+    parameterData *pData = parameterData::getInstance();
+    unsigned int nDEMBins = pData->nDEMBins;
+    
+    nImpacts.resize(nDEMBins);
 
     for (auto itMapData = mapData.begin(); itMapData != mapData.end(); itMapData++)
         {
@@ -254,7 +258,10 @@ arrayOfDouble2D liggghtsData::getFinalDEMCollisionData()
     if (mapData.empty())
         return nCollisions;
 
-    nCollisions = getArrayOfDouble2D(NUMBEROFDEMBINS, NUMBEROFDEMBINS);
+    parameterData *pData = parameterData::getInstance();
+    unsigned int nDEMBins = pData->nDEMBins;
+    
+    nCollisions = getArrayOfDouble2D(nDEMBins, nDEMBins);
     
     vector<size_t> particleTypeCount;
     for (auto itMapData = mapData.begin(); itMapData != mapData.end(); itMapData++)
@@ -327,8 +334,12 @@ vector<double> liggghtsData::getFinalDEMCollisionVelocity()
 	    	continue;
 
 	    array<double,3> aveColVel{{0.0}};
-	    velocityCollision.resize(NUMBEROFDEMBINS);
-	    velocityIntCollision.resize(NUMBEROFDEMBINS);
+        
+        parameterData *pData = parameterData::getInstance();
+        unsigned int nDEMBins = pData->nDEMBins;
+	    
+        velocityCollision.resize(nDEMBins);
+	    velocityIntCollision.resize(nDEMBins);
 
 	    for(auto itMapData = mapData.begin(); itMapData != mapData.end(); itMapData++)
 	    {
@@ -369,8 +380,12 @@ vector<double> liggghtsData::getFinalDEMImpactVelocity()
 	    //return velocity;
 	    	continue;
         array<double, 3> aveVeloComp{{0.0}};
-	    velocity.resize(NUMBEROFDEMBINS);
-	    velocityInt.resize(NUMBEROFDEMBINS);
+
+        parameterData *pData = parameterData::getInstance();
+        unsigned int nDEMBins = pData->nDEMBins;
+	    
+        velocity.resize(nDEMBins);
+	    velocityInt.resize(nDEMBins);
 
 	    for (auto itMapData = mapData.begin(); itMapData != mapData.end(); itMapData++)
 	    {

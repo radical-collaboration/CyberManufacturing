@@ -5,11 +5,11 @@
 #include <string>
 #include <memory>
 
-#include "parameters.h"
 #include "utility.h"
 #include "compartment.h"
 #include "liggghtsData.h"
 #include "timeStamp.h"
+#include "parameterData.h"
 
 #include <mpi.h>
 
@@ -38,6 +38,7 @@ int main(int argc, char *argv[])
     string startTimeStr;
     double startTime = 0.0;
     liggghtsData *lData = nullptr;
+    parameterData *pData = nullptr;
 
     string coreVal;
     string diaVal;
@@ -69,9 +70,13 @@ int main(int argc, char *argv[])
     //MPI HELLO World Test!
     //cout << "Hello, I am mpi process # = " << mpi_id << endl;
 
+    pData = parameterData::getInstance();
+    pData->readPBMInputFile();
+
+    int nCompartments = pData->nCompartments;
     if (mpi_id == MASTER)
     {
-        cout << "Number of Compartments = " << NUMBEROFCOMPARTMENTS << endl;
+        cout << "Number of Compartments = " << nCompartments << endl;
         cout << "Number of Processes = " << num_mpi << endl;
     }
 
@@ -86,7 +91,7 @@ int main(int argc, char *argv[])
     //if (print == 1 && mpi_id == MASTER)
     //   cout << "Start to fill load with values..." << endl;
 
-    for (int i = 0; i < NUMBEROFCOMPARTMENTS; i++)
+    for (int i = 0; i < nCompartments; i++)
     {
         load[load_xi] += 1;
 
@@ -151,27 +156,32 @@ int main(int argc, char *argv[])
     CompartmentDEMIn compartmentDEMIn;
     CompartmentOut compartmentOut; //Output for compartment call
 
-    vector<double> vs(NUMBEROFFIRSTSOLIDBINS, 0.0);
-    vector<double> vss(NUMBEROFSECONDSOLIDBINS, 0.0);
+    unsigned int nFirstSolidBins = pData->nFirstSolidBins;
+    unsigned int nSecondSolidBins = pData->nSecondSolidBins;
+
+    vector<double> vs(nFirstSolidBins, 0.0);
+    vector<double> vss(nSecondSolidBins, 0.0);
 
     //Bin initialization
     //cout << "Begin assign value to vsArray" << endl;
-
-    for (size_t i = 0; i < NUMBEROFFIRSTSOLIDBINS; i++)
-        vs[i] = SCOEF * pow(SBASE, i); // m^3
+    double fsVolCoeff = pData->fsVolCoeff;
+    double fsVolBase = pData->fsVolBase;
+    for (size_t i = 0; i < nFirstSolidBins; i++)
+        vs[i] = fsVolCoeff * pow(fsVolBase, i); // m^3
 
     //cout << "End assign value to vsArray" << endl << endl;
 
     ////cout << "Begin assign value to vssArray" << endl;
-
-    for (size_t i = 0; i < NUMBEROFSECONDSOLIDBINS; i++)
-        vss[i] = SSCOEF * pow(SSBASE, i); // m^3
+    double ssVolCoeff = pData->ssVolCoeff;
+    double ssVolBase = pData->ssVolBase;
+    for (size_t i = 0; i < nSecondSolidBins; i++)
+        vss[i] = ssVolCoeff * pow(ssVolBase, i); // m^3
 
     //cout << "End assign value to vssArray" << endl << endl;
 
-    arrayOfDouble2D diameter = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    for (size_t s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-        for (size_t ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+    arrayOfDouble2D diameter = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    for (size_t s = 0; s < nFirstSolidBins; s++)
+        for (size_t ss = 0; ss < nSecondSolidBins; ss++)
             diameter[s][ss] = cbrt((6 / M_PI) * (vs[s] + vss[ss]));
 
     vector<double> particleIn;
@@ -186,7 +196,7 @@ int main(int argc, char *argv[])
     particleIn.push_back(149.0);
 
     //cout << "Creating fIn and assigning zeros" << endl << endl;
-    arrayOfDouble2D fIn = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D fIn = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
     //cout << "Begin initialize hard coded values to fIn" << endl;
     // for (size_t i = 0; i < particleIn.size(); i++)
     //    for (size_t j = 0; j < particleIn.size(); j++)
@@ -198,12 +208,12 @@ int main(int argc, char *argv[])
 
     //MATLAB ndgrid
     //cout << "Creating sMeshXY & ssMeshXY and assigning zeros" << endl;
-    arrayOfDouble2D sMeshXY = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D ssMeshXY = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D sMeshXY = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D ssMeshXY = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
 
     //cout << "Begin initializing values to sMeshXY & ssMeshXY (MATLAB ndgrid)" << endl;
-    for (size_t i = 0; i < NUMBEROFFIRSTSOLIDBINS; i++)
-        for (size_t j = 0; j < NUMBEROFSECONDSOLIDBINS; j++)
+    for (size_t i = 0; i < nFirstSolidBins; i++)
+        for (size_t j = 0; j < nSecondSolidBins; j++)
         {
             sMeshXY[i][j] = vs[i];
             ssMeshXY[i][j] = vss[j];
@@ -213,101 +223,101 @@ int main(int argc, char *argv[])
 
     //bsxfun @plus for sAgg & ssAgg
     //cout << "Creating sAgg & ssAgg and assigning zeros" << endl;
-    arrayOfDouble2D sAgg = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFFIRSTSOLIDBINS);
-    arrayOfDouble2D ssAgg = getArrayOfDouble2D(NUMBEROFSECONDSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D sAgg = getArrayOfDouble2D(nFirstSolidBins, nFirstSolidBins);
+    arrayOfDouble2D ssAgg = getArrayOfDouble2D(nSecondSolidBins, nSecondSolidBins);
 
     //cout << "Begin initializing values to sAgg (MATLAB bsxfun @plus)" << endl;
-    for (size_t i = 0; i < NUMBEROFFIRSTSOLIDBINS; i++)
-        for (size_t j = 0; j < NUMBEROFFIRSTSOLIDBINS; j++)
+    for (size_t i = 0; i < nFirstSolidBins; i++)
+        for (size_t j = 0; j < nFirstSolidBins; j++)
             sAgg[i][j] = vs[j] + vs[i];
     //cout << "End initializing values to sAgg (MATLAB bsxfun @plus)" << endl << endl;
 
     //cout << "Begin initializing values to ssAgg (MATLAB bsxfun @plus)" << endl;
-    for (size_t i = 0; i < NUMBEROFSECONDSOLIDBINS; i++)
-        for (size_t j = 0; j < NUMBEROFSECONDSOLIDBINS; j++)
+    for (size_t i = 0; i < nSecondSolidBins; i++)
+        for (size_t j = 0; j < nSecondSolidBins; j++)
             ssAgg[i][j] = vss[j] + vss[i];
     //cout << "End initializing values to ssAgg (MATLAB bsxfun @plus)" << endl << endl;
 
     //repmat for  sAggregationCheck & ssAggregationCheck
     //cout << "Creating sAggregationCheck & ssAggregationCheck and assigning zeros" << endl;
-    arrayOfInt2D sAggregationCheck = getArrayOfInt2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFFIRSTSOLIDBINS);
-    arrayOfInt2D ssAggregationCheck = getArrayOfInt2D(NUMBEROFSECONDSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfInt2D sAggregationCheck = getArrayOfInt2D(nFirstSolidBins, nFirstSolidBins);
+    arrayOfInt2D ssAggregationCheck = getArrayOfInt2D(nSecondSolidBins, nSecondSolidBins);
 
     //cout << "Begin initializing values to sAggregationCheck" << endl;
-    for (size_t s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
-        for (size_t s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
-            sAggregationCheck[s1][s2] = sAgg[s1][s2] <= vs[NUMBEROFFIRSTSOLIDBINS - 1] ? 1 : 0;
+    for (size_t s1 = 0; s1 < nFirstSolidBins; s1++)
+        for (size_t s2 = 0; s2 < nFirstSolidBins; s2++)
+            sAggregationCheck[s1][s2] = sAgg[s1][s2] <= vs[nFirstSolidBins - 1] ? 1 : 0;
     //cout << "End initializing values to sAggregationCheck" << endl;
 
     //cout << "Begin initializing values to ssAggregationCheck" << endl;
-    for (size_t ss1 = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
-        for (size_t ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
-            ssAggregationCheck[ss1][ss2] = ssAgg[ss1][ss2] <= vss[NUMBEROFSECONDSOLIDBINS - 1] ? 1 : 0;
+    for (size_t ss1 = 0; ss1 < nSecondSolidBins; ss1++)
+        for (size_t ss2 = 0; ss2 < nSecondSolidBins; ss2++)
+            ssAggregationCheck[ss1][ss2] = ssAgg[ss1][ss2] <= vss[nSecondSolidBins - 1] ? 1 : 0;
     //cout << "End initializing values to sAggregationCheck" << endl;
 
     // end of repmat for  sAggregationCheck & ssAggregationCheck
 
     arrayOfDouble2D sLow = sMeshXY;
-    arrayOfDouble2D sHigh = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    for (size_t i = 0; i < NUMBEROFSECONDSOLIDBINS - 1; i++)
-        for (size_t j = 0; j < NUMBEROFSECONDSOLIDBINS; j++)
+    arrayOfDouble2D sHigh = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    for (size_t i = 0; i < nSecondSolidBins - 1; i++)
+        for (size_t j = 0; j < nSecondSolidBins; j++)
             sHigh[i][j] = sMeshXY[i + 1][j];
 
-    for (size_t j = 0; j < NUMBEROFSECONDSOLIDBINS; j++)
-        sHigh[NUMBEROFFIRSTSOLIDBINS - 1][j] = 0.0;
+    for (size_t j = 0; j < nSecondSolidBins; j++)
+        sHigh[nFirstSolidBins - 1][j] = 0.0;
 
     arrayOfDouble2D ssLow = ssMeshXY;
-    arrayOfDouble2D ssHigh = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    for (size_t i = 0; i < NUMBEROFSECONDSOLIDBINS; i++)
-        for (size_t j = 0; j < NUMBEROFSECONDSOLIDBINS - 1; j++)
+    arrayOfDouble2D ssHigh = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    for (size_t i = 0; i < nSecondSolidBins; i++)
+        for (size_t j = 0; j < nSecondSolidBins - 1; j++)
             ssHigh[i][j] = ssMeshXY[i][j + 1];
-    for (size_t i = 0; i < NUMBEROFSECONDSOLIDBINS; i++)
-        ssHigh[i][NUMBEROFSECONDSOLIDBINS - 1] = 0.0;
+    for (size_t i = 0; i < nSecondSolidBins; i++)
+        ssHigh[i][nSecondSolidBins - 1] = 0.0;
 
     //cout << "Creating sLoc & ssLoc and assigning zeros" << endl;
-    arrayOfInt2D sLoc = getArrayOfInt2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFFIRSTSOLIDBINS);
-    arrayOfInt2D ssLoc = getArrayOfInt2D(NUMBEROFSECONDSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfInt2D sLoc = getArrayOfInt2D(nFirstSolidBins, nFirstSolidBins);
+    arrayOfInt2D ssLoc = getArrayOfInt2D(nSecondSolidBins, nSecondSolidBins);
 
     //cout << "Begin initializing values to sLoc" << endl;
-    for (size_t i = 0; i < NUMBEROFFIRSTSOLIDBINS; i++)
-        for (size_t j = 0; j < NUMBEROFFIRSTSOLIDBINS; j++)
-            sLoc[i][j] = floor(log(sAgg[i][j] / SCOEF) / log(SBASE) + 1);
+    for (size_t i = 0; i < nFirstSolidBins; i++)
+        for (size_t j = 0; j < nFirstSolidBins; j++)
+            sLoc[i][j] = floor(log(sAgg[i][j] / fsVolCoeff) / log(fsVolBase) + 1);
 
     //cout << "End initializing values to sLoc" << endl;
 
     //cout << "Begin initializing values to ssLoc" << endl;
-    for (size_t i = 0; i < NUMBEROFSECONDSOLIDBINS; i++)
-        for (size_t j = 0; j < NUMBEROFSECONDSOLIDBINS; j++)
-            ssLoc[i][j] = floor(log(ssAgg[i][j] / SSCOEF) / log(SSBASE) + 1);
+    for (size_t i = 0; i < nSecondSolidBins; i++)
+        for (size_t j = 0; j < nSecondSolidBins; j++)
+            ssLoc[i][j] = floor(log(ssAgg[i][j] / ssVolCoeff) / log(ssVolBase) + 1);
 
     //cout << "End initializing values to ssLoc" << endl;
 
     //repmat/reshape for sInd & ssInd
     //cout << "Creating sInd & ssInd and assigning zeros" << endl;
-    arrayOfInt2D sInd = getArrayOfInt2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFFIRSTSOLIDBINS);
-    arrayOfInt2D ssInd = getArrayOfInt2D(NUMBEROFSECONDSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfInt2D sInd = getArrayOfInt2D(nFirstSolidBins, nFirstSolidBins);
+    arrayOfInt2D ssInd = getArrayOfInt2D(nSecondSolidBins, nSecondSolidBins);
     //cout << "Begin initializing values to sInd" << endl;
-    for (size_t i = 0; i < NUMBEROFFIRSTSOLIDBINS; i++)
-        for (size_t j = 0; j < NUMBEROFFIRSTSOLIDBINS; j++)
+    for (size_t i = 0; i < nFirstSolidBins; i++)
+        for (size_t j = 0; j < nFirstSolidBins; j++)
             sInd[i][j] = (j <= i) ? (i + 1) : (j + 1);
 
     //cout << "End initializing values to sInd" << endl;
 
     //cout << "Begin initializing values to ssInd" << endl;
-    for (size_t i = 0; i < NUMBEROFSECONDSOLIDBINS; i++)
-        for (size_t j = 0; j < NUMBEROFSECONDSOLIDBINS; j++)
+    for (size_t i = 0; i < nSecondSolidBins; i++)
+        for (size_t j = 0; j < nSecondSolidBins; j++)
             ssInd[i][j] = (j <= i) ? (i + 1) : (j + 1);
 
     //cout << "End initializing values to ssInd" << endl;
 
     //bsxfun @minus for sBreak & ssBreak
     //cout << "Creating sBreak & ssBreak and assigning zeros" << endl;
-    arrayOfDouble2D sBreak = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFFIRSTSOLIDBINS);
-    arrayOfDouble2D ssBreak = getArrayOfDouble2D(NUMBEROFSECONDSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D sBreak = getArrayOfDouble2D(nFirstSolidBins, nFirstSolidBins);
+    arrayOfDouble2D ssBreak = getArrayOfDouble2D(nSecondSolidBins, nSecondSolidBins);
 
     //cout << "Begin initializing values to sBreak (MATLAB bsxfun @minus)" << endl;
-    for (size_t i = 0; i < NUMBEROFFIRSTSOLIDBINS; i++)
-        for (size_t j = 0; j < NUMBEROFFIRSTSOLIDBINS; j++)
+    for (size_t i = 0; i < nFirstSolidBins; i++)
+        for (size_t j = 0; j < nFirstSolidBins; j++)
         {
             double value = vs[j] - vs[i];
             sBreak[i][j] = value < 0.0 ? 0.0 : value;
@@ -316,8 +326,8 @@ int main(int argc, char *argv[])
     //cout << "End initializing values to sBreak (MATLAB bsxfun @minus)" << endl << endl;
 
     //cout << "Begin initializing values to ssBreak (MATLAB bsxfun @minus)" << endl;
-    for (size_t i = 0; i < NUMBEROFSECONDSOLIDBINS; i++)
-        for (size_t j = 0; j < NUMBEROFSECONDSOLIDBINS; j++)
+    for (size_t i = 0; i < nSecondSolidBins; i++)
+        for (size_t j = 0; j < nSecondSolidBins; j++)
         {
             double value = vss[j] - vss[i];
             ssBreak[i][j] = value < 0.0 ? 0.0 : value;
@@ -327,38 +337,38 @@ int main(int argc, char *argv[])
     // end of bsxfun @minus for sBreak & ssBreak
 
     //cout << "Creating sLocBreak & ssLocBreak and assigning zeros" << endl;
-    arrayOfInt2D sLocBreak = getArrayOfInt2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFFIRSTSOLIDBINS);
-    arrayOfInt2D ssLocBreak = getArrayOfInt2D(NUMBEROFSECONDSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfInt2D sLocBreak = getArrayOfInt2D(nFirstSolidBins, nFirstSolidBins);
+    arrayOfInt2D ssLocBreak = getArrayOfInt2D(nSecondSolidBins, nSecondSolidBins);
 
     //cout << "Begin initializing values to sLocBreak" << endl;
-    for (size_t i = 0; i < NUMBEROFFIRSTSOLIDBINS; i++)
-        for (size_t j = 0; j < NUMBEROFFIRSTSOLIDBINS; j++)
-            sLocBreak[i][j] = (sBreak[j][i] == 0) ? 0 : (floor(log(sBreak[j][i] / SCOEF) / log(SBASE) + 1));
+    for (size_t i = 0; i < nFirstSolidBins; i++)
+        for (size_t j = 0; j < nFirstSolidBins; j++)
+            sLocBreak[i][j] = (sBreak[j][i] == 0) ? 0 : (floor(log(sBreak[j][i] / fsVolCoeff) / log(fsVolBase) + 1));
 
     //cout << "End initializing values to sLocBreak" << endl;
 
     //cout << "Begin initializing values to ssLocBreak" << endl;
-    for (size_t i = 0; i < NUMBEROFSECONDSOLIDBINS; i++)
-        for (size_t j = 0; j < NUMBEROFSECONDSOLIDBINS; j++)
-            ssLocBreak[i][j] = (ssBreak[j][i] == 0) ? 0 : (floor(log(ssBreak[j][i] / SSCOEF) / log(SSBASE) + 1));
+    for (size_t i = 0; i < nSecondSolidBins; i++)
+        for (size_t j = 0; j < nSecondSolidBins; j++)
+            ssLocBreak[i][j] = (ssBreak[j][i] == 0) ? 0 : (floor(log(ssBreak[j][i] / ssVolCoeff) / log(ssVolBase) + 1));
 
     //cout << "End initializing values to ssLocBreak" << endl;
 
     // repmat for  sCheckB & ssCheckB
     //cout << "Creating sCheckB & ssCheckB and assigning zeros" << endl;
-    arrayOfInt2D sCheckB = getArrayOfInt2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFFIRSTSOLIDBINS);
-    arrayOfInt2D ssCheckB = getArrayOfInt2D(NUMBEROFSECONDSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfInt2D sCheckB = getArrayOfInt2D(nFirstSolidBins, nFirstSolidBins);
+    arrayOfInt2D ssCheckB = getArrayOfInt2D(nSecondSolidBins, nSecondSolidBins);
 
     //cout << "Begin initializing values to sCheckB" << endl;
-    for (size_t s1 = 0; s1 < NUMBEROFFIRSTSOLIDBINS; s1++)
-        for (size_t s2 = 0; s2 < NUMBEROFFIRSTSOLIDBINS; s2++)
+    for (size_t s1 = 0; s1 < nFirstSolidBins; s1++)
+        for (size_t s2 = 0; s2 < nFirstSolidBins; s2++)
             sCheckB[s1][s2] = sLocBreak[s1][s2] >= 1 ? 1 : 0;
 
     //cout << "End initializing values to sCheckB" << endl;
 
     //cout << "Begin initializing values to ssCheckB" << endl;
-    for (size_t ss1 = 0; ss1 < NUMBEROFSECONDSOLIDBINS; ss1++)
-        for (size_t ss2 = 0; ss2 < NUMBEROFSECONDSOLIDBINS; ss2++)
+    for (size_t ss1 = 0; ss1 < nSecondSolidBins; ss1++)
+        for (size_t ss2 = 0; ss2 < nSecondSolidBins; ss2++)
             ssCheckB[ss1][ss2] = ssLocBreak[ss1][ss2] >= 1 ? 1 : 0;
     ;
     //cout << "End initializing values to ssCheckB" << endl;
@@ -369,21 +379,21 @@ int main(int argc, char *argv[])
     arrayOfInt2D ssIndB = ssLocBreak;
 
     //cout << "Begin initializing values to sIndB" << endl;
-    for (size_t i = 0; i < NUMBEROFFIRSTSOLIDBINS; i++)
-        for (size_t j = 0; j < NUMBEROFFIRSTSOLIDBINS; j++)
+    for (size_t i = 0; i < nFirstSolidBins; i++)
+        for (size_t j = 0; j < nFirstSolidBins; j++)
         {
             if (sIndB[i][j] < 1) // = i+1;
-                sIndB[i][j] = NUMBEROFFIRSTSOLIDBINS + 1;
+                sIndB[i][j] = nFirstSolidBins + 1;
         }
 
     //cout << "End initializing values to sIndB" << endl;
 
     //cout << "Begin initializing values to ssIndB" << endl;
-    for (size_t i = 0; i < NUMBEROFSECONDSOLIDBINS; i++)
-        for (size_t j = 0; j < NUMBEROFSECONDSOLIDBINS; j++)
+    for (size_t i = 0; i < nSecondSolidBins; i++)
+        for (size_t j = 0; j < nSecondSolidBins; j++)
         {
             if (ssIndB[i][j] < 1) // = i+1;
-                ssIndB[i][j] = NUMBEROFSECONDSOLIDBINS + 1;
+                ssIndB[i][j] = nSecondSolidBins + 1;
         }
 
     //cout << "End initializing values to ssIndB" << endl;
@@ -397,25 +407,25 @@ int main(int argc, char *argv[])
     //cout<< "Time Loop" << endl;
     //cout << "Initializations..." << endl;
 
-    arrayOfDouble3D fAllCompartments = getArrayOfDouble3D(NUMBEROFCOMPARTMENTS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble3D flAllCompartments = getArrayOfDouble3D(NUMBEROFCOMPARTMENTS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble3D fgAllCompartments = getArrayOfDouble3D(NUMBEROFCOMPARTMENTS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble3D fAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble3D flAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble3D fgAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
 
-    arrayOfDouble3D dfdtAllCompartments = getArrayOfDouble3D(NUMBEROFCOMPARTMENTS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble3D dfldtAllCompartments = getArrayOfDouble3D(NUMBEROFCOMPARTMENTS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble3D dfgdtAllCompartments = getArrayOfDouble3D(NUMBEROFCOMPARTMENTS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble3D dfdtAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble3D dfldtAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble3D dfgdtAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
 
-    arrayOfDouble3D externalVolumeBinsAllCompartments = getArrayOfDouble3D(NUMBEROFCOMPARTMENTS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble3D internalVolumeBinsAllCompartments = getArrayOfDouble3D(NUMBEROFCOMPARTMENTS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble3D liquidBinsAllCompartments = getArrayOfDouble3D(NUMBEROFCOMPARTMENTS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble3D gasBinsAllCompartments = getArrayOfDouble3D(NUMBEROFCOMPARTMENTS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble3D totalVolumeBinsAllCompartments = getArrayOfDouble3D(NUMBEROFCOMPARTMENTS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble3D externalVolumeBinsAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble3D internalVolumeBinsAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble3D liquidBinsAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble3D gasBinsAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble3D totalVolumeBinsAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
 
-    arrayOfDouble3D internalLiquidAllCompartments = getArrayOfDouble3D(NUMBEROFCOMPARTMENTS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble3D externalLiquidAllCompartments = getArrayOfDouble3D(NUMBEROFCOMPARTMENTS, NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble3D internalLiquidAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble3D externalLiquidAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
 
-    arrayOfDouble2D internalVolumeBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-    arrayOfDouble2D externalVolumeBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+    arrayOfDouble2D internalVolumeBins = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble2D externalVolumeBins = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
 
     // **************** snythetic liggghts data ******************************
     //**** uncommetn this section to use make snythetic dem data
@@ -498,8 +508,12 @@ int main(int argc, char *argv[])
         DUMP(velocity);
     }
 
-    vector<double> liquidAdditionRateAllCompartments(NUMBEROFCOMPARTMENTS, 0.0);
-    liquidAdditionRateAllCompartments[0] = LIQUIDADDITIONRATE;
+    vector<double> liquidAdditionRateAllCompartments(nCompartments, 0.0);
+    double liqSolidRatio = pData->liqSolidRatio;
+    double throughput = pData->throughput;
+    double liqDensity = pData->liqDensity;
+    double liquidAddRate = (liqSolidRatio * throughput) / (liqDensity * 3600);
+    liquidAdditionRateAllCompartments[0] = liquidAddRate;
     double time = 0.0;
     double timeStep = 0.5; //1.0e-1;
     vector<double> Time;
@@ -508,7 +522,11 @@ int main(int argc, char *argv[])
     arrayOfDouble4D internalVolumeBinsAllCompartmentsOverTime;
     arrayOfDouble4D liquidBinsAllCompartmentsOverTime;
     arrayOfDouble4D gasBinsAllCompartmentsOverTime;
-    vector<double> particleAverageVelocity(NUMBEROFCOMPARTMENTS, PARTICLEAVERAGEVELOCITY);
+
+    double granulatorLength = pData->granulatorLength;
+    double partticleResTime = pData->partticleResTime;
+    double particleAveVelo = granulatorLength /  partticleResTime;
+    vector<double> particleAverageVelocity(nCompartments, particleAveVelo);
 
     //Initialize input data for compartment
 
@@ -569,13 +587,17 @@ int main(int argc, char *argv[])
     int timeIdxCount = 0;
     int lastTimeIdxCount = 0;
 
-    while (time <= FINALTIME)
+    double premixTime = pData->premixTime;
+    double liqAddTime = pData->liqAddTime;
+    double postMixTime = pData->postMixTime;
+    double finalTime = premixTime + liqAddTime + postMixTime;
+    double initPorosity = pData->initPorosity;
+    while (time <= finalTime)
     {
-        if (time > PREMIXINGTIME + LIQUIDADDITIONTIME)
-            fIn = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-        for (int c = core_low; c < core_up; c++) //for (int c = 0; c < NUMBEROFCOMPARTMENTS; c++)
+        if (time > premixTime + liqAddTime)
+            fIn = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+        for (int c = core_low; c < core_up; c++) //for (int c = 0; c < nCompartments; c++)
         {
-
             compartmentIn.fAll = fAllCompartments[c];
             compartmentIn.fLiquid = flAllCompartments[c];
             compartmentIn.fGas = fgAllCompartments[c];
@@ -583,14 +605,14 @@ int main(int argc, char *argv[])
 
             if (c == 0)
             {
-                prevCompInData.fAllPreviousCompartment = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-                prevCompInData.flPreviousCompartment = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-                prevCompInData.fgPreviousCompartment = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+                prevCompInData.fAllPreviousCompartment = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+                prevCompInData.flPreviousCompartment = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+                prevCompInData.fgPreviousCompartment = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
                 prevCompInData.fAllComingIn = fIn;
-                prevCompInData.fgComingIn = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-                double value = INITIALPOROSITY * timeStep;
-                for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-                    for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+                prevCompInData.fgComingIn = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+                double value = initPorosity * timeStep;
+                for (size_t s = 0; s < nFirstSolidBins; s++)
+                    for (size_t ss = 0; ss < nSecondSolidBins; ss++)
                         prevCompInData.fgComingIn[s][ss] = fIn[s][ss] * (compartmentIn.vs[ss] + compartmentIn.vss[ss]) * value;
             }
 
@@ -599,8 +621,8 @@ int main(int argc, char *argv[])
                 prevCompInData.fAllPreviousCompartment = fAllCompartments[c - 1];
                 prevCompInData.flPreviousCompartment = flAllCompartments[c - 1];
                 prevCompInData.fgPreviousCompartment = fgAllCompartments[c - 1];
-                prevCompInData.fAllComingIn = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-                prevCompInData.fgComingIn = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+                prevCompInData.fAllComingIn = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+                prevCompInData.fgComingIn = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
             }
 
             compartmentOut = performCompartmentCalculations(prevCompInData, compartmentIn, compartmentDEMIn, time, timeStep);
@@ -617,7 +639,7 @@ int main(int argc, char *argv[])
         //************** START MPI Send Recv ***************************
         // *************************************************************
         MPI_Status status;
-        vector<double> buff_sr(NUMBEROFCOMPARTMENTS * NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS, 0.0);
+        vector<double> buff_sr(nCompartments * nFirstSolidBins * nSecondSolidBins, 0.0);
 
         MPI_Barrier(MPI_COMM_WORLD);
 
@@ -641,9 +663,9 @@ int main(int argc, char *argv[])
                 MPI_Recv(buff_sr.data(), static_cast<int>(buff_sr.size()), MPI_DOUBLE, i, i, MPI_COMM_WORLD, &status);
 
                 for (int c = load[i]; c < load[i + 1]; c++)
-                    for (int i0 = 0; i0 < NUMBEROFFIRSTSOLIDBINS; i0++)
-                        for (int ix = 0; ix < NUMBEROFSECONDSOLIDBINS; ix++)
-                            dfdtAllCompartments[c][i0][ix] = buff_sr[c * NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS + i0 * NUMBEROFSECONDSOLIDBINS + ix];
+                    for (size_t i0 = 0; i0 < nFirstSolidBins; i0++)
+                        for (size_t ix = 0; ix < nSecondSolidBins; ix++)
+                            dfdtAllCompartments[c][i0][ix] = buff_sr[c * nFirstSolidBins * nSecondSolidBins + i0 * nSecondSolidBins + ix];
             }
         }
 
@@ -662,9 +684,9 @@ int main(int argc, char *argv[])
                 MPI_Recv(buff_sr.data(), static_cast<int>(buff_sr.size()), MPI_DOUBLE, i, i, MPI_COMM_WORLD, &status);
 
                 for (int c = load[i]; c < load[i + 1]; c++)
-                    for (int i0 = 0; i0 < NUMBEROFFIRSTSOLIDBINS; i0++)
-                        for (int ix = 0; ix < NUMBEROFSECONDSOLIDBINS; ix++)
-                            dfldtAllCompartments[c][i0][ix] = buff_sr[c * NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS + i0 * NUMBEROFSECONDSOLIDBINS + ix];
+                    for (size_t i0 = 0; i0 < nFirstSolidBins; i0++)
+                        for (size_t ix = 0; ix < nSecondSolidBins; ix++)
+                            dfldtAllCompartments[c][i0][ix] = buff_sr[c * nFirstSolidBins * nSecondSolidBins + i0 * nSecondSolidBins + ix];
             }
         }
 
@@ -683,9 +705,9 @@ int main(int argc, char *argv[])
                 MPI_Recv(buff_sr.data(), static_cast<int>(buff_sr.size()), MPI_DOUBLE, i, i, MPI_COMM_WORLD, &status);
 
                 for (int c = load[i]; c < load[i + 1]; c++)
-                    for (int i0 = 0; i0 < NUMBEROFFIRSTSOLIDBINS; i0++)
-                        for (int ix = 0; ix < NUMBEROFSECONDSOLIDBINS; ix++)
-                            dfgdtAllCompartments[c][i0][ix] = buff_sr[c * NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS + i0 * NUMBEROFSECONDSOLIDBINS + ix];
+                    for (size_t i0 = 0; i0 < nFirstSolidBins; i0++)
+                        for (size_t ix = 0; ix < nSecondSolidBins; ix++)
+                            dfgdtAllCompartments[c][i0][ix] = buff_sr[c * nFirstSolidBins * nSecondSolidBins + i0 * nSecondSolidBins + ix];
             }
         }
 
@@ -710,13 +732,13 @@ int main(int argc, char *argv[])
 
         if (mpi_id != MASTER)
         {
-            for (int c = 0; c < NUMBEROFCOMPARTMENTS; c++)
-                for (int i0 = 0; i0 < NUMBEROFFIRSTSOLIDBINS; i0++)
-                    for (int ix = 0; ix < NUMBEROFSECONDSOLIDBINS; ix++)
+            for (int c = 0; c < nCompartments; c++)
+                for (size_t i0 = 0; i0 < nFirstSolidBins; i0++)
+                    for (size_t ix = 0; ix < nSecondSolidBins; ix++)
                     {
-                        dfdtAllCompartments[c][i0][ix] = buff_dfdt[c * NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS + i0 * NUMBEROFSECONDSOLIDBINS + ix];
-                        dfldtAllCompartments[c][i0][ix] = buff_dfldt[c * NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS + i0 * NUMBEROFSECONDSOLIDBINS + ix];
-                        dfgdtAllCompartments[c][i0][ix] = buff_dfgdt[c * NUMBEROFFIRSTSOLIDBINS * NUMBEROFSECONDSOLIDBINS + i0 * NUMBEROFSECONDSOLIDBINS + ix];
+                        dfdtAllCompartments[c][i0][ix] = buff_dfdt[c * nFirstSolidBins * nSecondSolidBins + i0 * nSecondSolidBins + ix];
+                        dfldtAllCompartments[c][i0][ix] = buff_dfldt[c * nFirstSolidBins * nSecondSolidBins + i0 * nSecondSolidBins + ix];
+                        dfgdtAllCompartments[c][i0][ix] = buff_dfgdt[c * nFirstSolidBins * nSecondSolidBins + i0 * nSecondSolidBins + ix];
                     }
         }
 
@@ -732,15 +754,15 @@ int main(int argc, char *argv[])
         double maxLiquid = -DBL_MAX;
         double maxGas = -DBL_MAX;
 
-        for (int c = 0; c < NUMBEROFCOMPARTMENTS; c++)
-            for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-                for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+        for (int c = 0; c < nCompartments; c++)
+            for (size_t s = 0; s < nFirstSolidBins; s++)
+                for (size_t ss = 0; ss < nSecondSolidBins; ss++)
                 {
-                    if (fabs(fAllCompartments[c][s][ss]) > EPSILON)
+                    if (fabs(fAllCompartments[c][s][ss]) > 1.0e-16)
                         maxAll = max(maxAll, -dfdtAllCompartments[c][s][ss] / fAllCompartments[c][s][ss]);
-                    if (fabs(flAllCompartments[c][s][ss]) > EPSILON)
+                    if (fabs(flAllCompartments[c][s][ss]) > 1.0e-16)
                         maxLiquid = max(maxLiquid, -dfldtAllCompartments[c][s][ss] / flAllCompartments[c][s][ss]);
-                    if (fabs(fgAllCompartments[c][s][ss]) > EPSILON)
+                    if (fabs(fgAllCompartments[c][s][ss]) > 1.0e-16)
                         maxGas = max(maxGas, -dfgdtAllCompartments[c][s][ss] / fgAllCompartments[c][s][ss]);
                     maxofthree = max(maxofthree, max(maxAll, max(maxLiquid, maxGas)));
                 }
@@ -760,9 +782,9 @@ int main(int argc, char *argv[])
 
         int nanCount = 0;
         double minfAll = -DBL_MAX;
-        for (int c = 0; c < NUMBEROFCOMPARTMENTS; c++)
-            for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-                for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+        for (int c = 0; c < nCompartments; c++)
+            for (size_t s = 0; s < nFirstSolidBins; s++)
+                for (size_t ss = 0; ss < nSecondSolidBins; ss++)
                 {
                     double value = 0.0;
                     fAllCompartments[c][s][ss] += dfdtAllCompartments[c][s][ss] * timeStep;
@@ -806,21 +828,22 @@ int main(int argc, char *argv[])
         //BIN RECALCULATION
         //cout << "********Begin bin recalculation***********" << endl;
 
-        for (int c = 0; c < NUMBEROFCOMPARTMENTS; c++)
+        double granSatFactor = pData->granSatFactor;
+        for (int c = 0; c < nCompartments; c++)
         {
-            arrayOfDouble2D liquidBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-            arrayOfDouble2D gasBins = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-            arrayOfDouble2D internalLiquid = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-            arrayOfDouble2D externalLiquid = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-            for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-                for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+            arrayOfDouble2D liquidBins = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+            arrayOfDouble2D gasBins = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+            arrayOfDouble2D internalLiquid = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+            arrayOfDouble2D externalLiquid = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+            for (size_t s = 0; s < nFirstSolidBins; s++)
+                for (size_t ss = 0; ss < nSecondSolidBins; ss++)
                 {
-                    if (fabs(fAllCompartments[c][s][ss]) > EPSILON)
+                    if (fabs(fAllCompartments[c][s][ss]) > 1.0e-16)
                     {
                         liquidBins[s][ss] = flAllCompartments[c][s][ss] / fAllCompartments[c][s][ss];
                         gasBins[s][ss] = fgAllCompartments[c][s][ss] / fAllCompartments[c][s][ss];
                     }
-                    internalLiquid[s][ss] = min(GRANULESATURATIONFACTOR * gasBins[s][ss], liquidBins[s][ss]);
+                    internalLiquid[s][ss] = min(granSatFactor * gasBins[s][ss], liquidBins[s][ss]);
                     externalLiquid[s][ss] = max(0.0, liquidBins[s][ss] - internalLiquid[s][ss]);
 
                     double value = compartmentIn.sMeshXY[s][ss] + compartmentIn.ssMeshXY[s][ss] + gasBins[s][ss];
@@ -835,21 +858,21 @@ int main(int argc, char *argv[])
 
         MPI_Barrier(MPI_COMM_WORLD);
         // Calculate d10, d50, d90
-        vector<double> d10OverCompartment(NUMBEROFCOMPARTMENTS, 0.0);
-        vector<double> d50OverCompartment(NUMBEROFCOMPARTMENTS, 0.0);
-        vector<double> d90OverCompartment(NUMBEROFCOMPARTMENTS, 0.0);
+        vector<double> d10OverCompartment(nCompartments, 0.0);
+        vector<double> d50OverCompartment(nCompartments, 0.0);
+        vector<double> d90OverCompartment(nCompartments, 0.0);
 
-        for (int c = 0; c < NUMBEROFCOMPARTMENTS; c++)
+        for (int c = 0; c < nCompartments; c++)
         {
-            arrayOfDouble2D diameter = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
-            for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-                for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+            arrayOfDouble2D diameter = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+            for (size_t s = 0; s < nFirstSolidBins; s++)
+                for (size_t ss = 0; ss < nSecondSolidBins; ss++)
                     diameter[s][ss] = cbrt((6 / M_PI) * externalVolumeBinsAllCompartments[c][s][ss]) * 1.0e6;
 
             vector<double> totalVolumeGrid(nSieveGrid, 0.0);
             for (size_t d = 0; d < nSieveGrid - 1; d++)
-                for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-                    for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+                for (size_t s = 0; s < nFirstSolidBins; s++)
+                    for (size_t ss = 0; ss < nSecondSolidBins; ss++)
                     {
                         if (diameter[s][ss] < sieveGrid[d + 1] && diameter[s][ss] >= sieveGrid[d])
                             totalVolumeGrid[d] += fAllCompartments[c][s][ss] * externalVolumeBinsAllCompartments[c][s][ss];
@@ -929,13 +952,13 @@ int main(int argc, char *argv[])
             if (time - lastTime >= 0.2)
             {
                 //cout << "dumping d50 etc. & particles for time = " << time << endl;
-                string timeStr = to_string(floorf(time * 100) / 100);// + string("sec"); //moreSigs(time, 2);
+                string timeStr = to_string(floorf(time * 1.0e6) / 1.0e6);// + string("sec"); //moreSigs(time, 2);
                 size_t dumpVecSize = timeIdxCount - lastTimeIdxCount + 1;
                 arrayOfDouble2D d50ToDump (dumpVecSize);
                 vector<double> timeToDump (dumpVecSize);
                 copy(d50OverTime.begin()+lastTimeIdxCount, d50OverTime.end(), d50ToDump.begin());
                 copy(Time.begin()+lastTimeIdxCount, Time.end(), timeToDump.begin());
-                string timeStr = moreSigs(time, 2); //get time to 2 sig digits, traiing zero removed
+                //string timeStr = moreSigs(time, 6); //get time to 2 sig digits, traiing zero removed
                 string appendFileName = string("_") + timeStr;
                 dumpDiaCSV(timeToDump, d50ToDump, string("d50") + appendFileName);
                 dump3DCSV(fAllCompartments, string("particles") + appendFileName);
@@ -967,15 +990,15 @@ int main(int argc, char *argv[])
 
     // D10, D50, D90
     //cout << "Begin computing D10, D50, D90" << endl;
-    // arrayOfDouble2D d10OverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
-    // arrayOfDouble2D d50OverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
-    // arrayOfDouble2D d90OverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
+    // arrayOfDouble2D d10OverTime = getArrayOfDouble2D(nTimeSteps, nCompartments);
+    // arrayOfDouble2D d50OverTime = getArrayOfDouble2D(nTimeSteps, nCompartments);
+    // arrayOfDouble2D d90OverTime = getArrayOfDouble2D(nTimeSteps, nCompartments);
 
-    arrayOfDouble2D totalVolumeAllCompartmentsOverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
-    arrayOfDouble2D totalSolidVolumeAllCompartmentsOverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
-    arrayOfDouble2D totalPoreVolumeAllCompartmentsOverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
-    arrayOfDouble2D totalLiquidVolumeAllCompartmentsOverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
-    arrayOfDouble2D totalGasVolumeAllCompartmentsOverTime = getArrayOfDouble2D(nTimeSteps, NUMBEROFCOMPARTMENTS);
+    arrayOfDouble2D totalVolumeAllCompartmentsOverTime = getArrayOfDouble2D(nTimeSteps, nCompartments);
+    arrayOfDouble2D totalSolidVolumeAllCompartmentsOverTime = getArrayOfDouble2D(nTimeSteps, nCompartments);
+    arrayOfDouble2D totalPoreVolumeAllCompartmentsOverTime = getArrayOfDouble2D(nTimeSteps, nCompartments);
+    arrayOfDouble2D totalLiquidVolumeAllCompartmentsOverTime = getArrayOfDouble2D(nTimeSteps, nCompartments);
+    arrayOfDouble2D totalGasVolumeAllCompartmentsOverTime = getArrayOfDouble2D(nTimeSteps, nCompartments);
 
     // //sieveGrid=[38, 63, 90, 125, 250, 355, 500, 710, 850, 1000, 1400, 2000, 2380, 4000]; %Sieve (in micron)
     // vector<int> sieveGrid;
@@ -995,38 +1018,39 @@ int main(int argc, char *argv[])
     // sieveGrid.push_back(4000);
     // size_t nSieveGrid = sieveGrid.size();
 
-    arrayOfDouble3D cumulativeVolumeDistributionAllCompartmentsOverTime = getArrayOfDouble3D(nTimeSteps, NUMBEROFCOMPARTMENTS, nSieveGrid);
-    arrayOfDouble3D totalVolumeGridAllCompartmentsOverTime = getArrayOfDouble3D(nTimeSteps, NUMBEROFCOMPARTMENTS, nSieveGrid);
+    arrayOfDouble3D cumulativeVolumeDistributionAllCompartmentsOverTime = getArrayOfDouble3D(nTimeSteps, nCompartments, nSieveGrid);
+    arrayOfDouble3D totalVolumeGridAllCompartmentsOverTime = getArrayOfDouble3D(nTimeSteps, nCompartments, nSieveGrid);
 
     vector<double> totalStuffLeavingOverTime(nTimeSteps, 0.0);
     vector<double> totalSolidLeavingOverTime(nTimeSteps, 0.0);
     vector<double> totalLiquidLeavingOverTime(nTimeSteps, 0.0);
 
+    double distanceBetweenCompartments = granulatorLength / nCompartments;
     for (size_t n = 1; n < nTimeSteps; n++)
     {
-        for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-            for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+        for (size_t s = 0; s < nFirstSolidBins; s++)
+            for (size_t ss = 0; ss < nSecondSolidBins; ss++)
             {
                 timeStep = Time[n] - Time[n - 1];
-                double value1 = fAllCompartmentsOverTime[n][NUMBEROFCOMPARTMENTS - 1][s][ss];
-                value1 *= (particleAverageVelocity[NUMBEROFCOMPARTMENTS - 1] / DISTANCEBETWEENCOMPARTMENTS) * timeStep;
-                double value2 = value1 * externalVolumeBinsAllCompartmentsOverTime[n][NUMBEROFCOMPARTMENTS - 1][s][ss];
+                double value1 = fAllCompartmentsOverTime[n][nCompartments - 1][s][ss];
+                value1 *= (particleAverageVelocity[nCompartments - 1] / distanceBetweenCompartments) * timeStep;
+                double value2 = value1 * externalVolumeBinsAllCompartmentsOverTime[n][nCompartments - 1][s][ss];
                 totalStuffLeavingOverTime[n] += value2;
 
                 value2 = value1 * (vs[s] + vss[ss]);
                 totalSolidLeavingOverTime[n] += value2;
 
-                value2 = value1 * (externalVolumeBinsAllCompartmentsOverTime[n][NUMBEROFCOMPARTMENTS - 1][s][ss] - vs[s] - vss[ss]);
+                value2 = value1 * (externalVolumeBinsAllCompartmentsOverTime[n][nCompartments - 1][s][ss] - vs[s] - vss[ss]);
                 totalLiquidLeavingOverTime[n] += value2;
             }
 
-        for (int c = 0; c < NUMBEROFCOMPARTMENTS; c++)
+        for (int c = 0; c < nCompartments; c++)
         {
-            for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-                for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+            for (size_t s = 0; s < nFirstSolidBins; s++)
+                for (size_t ss = 0; ss < nSecondSolidBins; ss++)
                 {
                     double value1 = fAllCompartmentsOverTime[n][c][s][ss];
-                    double value2 = value1 * externalVolumeBinsAllCompartmentsOverTime[n][NUMBEROFCOMPARTMENTS - 1][s][ss];
+                    double value2 = value1 * externalVolumeBinsAllCompartmentsOverTime[n][nCompartments - 1][s][ss];
                     totalVolumeAllCompartmentsOverTime[n][c] += value2;
 
                     value2 = value1 * (vs[s] + vss[ss]);
@@ -1044,16 +1068,16 @@ int main(int argc, char *argv[])
 
         //     arrayOfDouble2D fAll = fAllCompartmentsOverTime[n][c];
         //     externalVolumeBins = externalVolumeBinsAllCompartmentsOverTime[n][c];
-        //     arrayOfDouble2D diameter = getArrayOfDouble2D(NUMBEROFFIRSTSOLIDBINS, NUMBEROFSECONDSOLIDBINS);
+        //     arrayOfDouble2D diameter = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
 
-        //     for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-        //         for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+        //     for (int s = 0; s < nFirstSolidBins; s++)
+        //         for (int ss = 0; ss < nSecondSolidBins; ss++)
         //             diameter[s][ss] = cbrt((6 / M_PI) * externalVolumeBinsAllCompartmentsOverTime[n][c][s][ss]) * 1.0e6;
 
         //     vector<double> totalVolumeGrid(nSieveGrid, 0.0);
         //     for (size_t d = 0; d < nSieveGrid - 1; d++)
-        //         for (int s = 0; s < NUMBEROFFIRSTSOLIDBINS; s++)
-        //             for (int ss = 0; ss < NUMBEROFSECONDSOLIDBINS; ss++)
+        //         for (int s = 0; s < nFirstSolidBins; s++)
+        //             for (int ss = 0; ss < nSecondSolidBins; ss++)
         //             {
         //                 if (diameter[s][ss] < sieveGrid[d + 1] && diameter[s][ss] >= sieveGrid[d])
         //                     totalVolumeGrid[d] += fAll[s][ss] * externalVolumeBinsAllCompartmentsOverTime[n][c][s][ss];

@@ -7,19 +7,19 @@ CC=mpic++ -std=c++11 -O3 -fPIC
 
 all: model.out
 
-model.out: model.o compartment.o kernel.o utility.o timeStamp.o liggghtsData.o atomFileParser.o
-	$(CC) model.o compartment.o kernel.o utility.o timeStamp.o liggghtsData.o atomFileParser.o -o model.out
+model.out: model.o compartment.o kernel.o utility.o timeStamp.o liggghtsData.o atomFileParser.o parameterData.o
+	$(CC) model.o compartment.o kernel.o utility.o timeStamp.o liggghtsData.o atomFileParser.o parameterData.o -o model.out
 
-model.o: model.cpp liggghtsData.h compartment.h utility.h timeStamp.h parameters.h
+model.o: model.cpp liggghtsData.h compartment.h utility.h timeStamp.h parameterData.h
 	$(CC) -Wall -c model.cpp
 
-compartment.o: compartment.cpp compartment.h liggghtsData.h utility.h parameters.h
+compartment.o: compartment.cpp compartment.h liggghtsData.h utility.h parameterData.h
 	$(CC) -Wall -c compartment.cpp
 
-kernel.o: kernel.cpp kernel.h compartment.h liggghtsData.h
+kernel.o: kernel.cpp kernel.h compartment.h liggghtsData.h parameterData.h
 	$(CC) -Wall -c kernel.cpp
 
-liggghtsData.o: liggghtsData.cpp liggghtsData.h atomFileParser.h utility.h parameters.h
+liggghtsData.o: liggghtsData.cpp liggghtsData.h atomFileParser.h utility.h parameterData.h
 	$(CC) -Wall -c liggghtsData.cpp
 
 atomFileParser.o: atomFileParser.cpp atomFileParser.h
@@ -30,6 +30,9 @@ utility.o: utility.cpp utility.h
 
 timeStamp.o: timeStamp.cpp timeStamp.h
 	$(CC) -Wall -c timeStamp.cpp
+
+parameterData.o: parameterData.cpp parameterData.h parameters.h
+	$(CC) -Wall -c parameterData.cpp
 
 clean:
 	rm -f *.o *.out

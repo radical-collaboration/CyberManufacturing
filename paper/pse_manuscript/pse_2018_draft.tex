@@ -32,7 +32,7 @@
 \usepackage[font=sf, labelfont={sf,bf}, margin=0cm]{caption}
 \usepackage[inline]{enumitem}
 \usepackage{epstopdf}   
-\usepackage[margin=1in]{geometry}
+%\usepackage[margin=1in]{geometry}
 \usepackage{lineno}
 \usepackage{placeins}
 \usepackage{subcaption}
@@ -60,7 +60,7 @@
 
 % ================================================================================
 \title{Parallel, multi-scale, mechanistic model for high shear granulation using
-coupled DEM – PBM models on high performance computing systems.}
+coupled DEM-PBM models on high performance computing systems.}
 %
  \author[a]{Chaitanya Sampat}
  \author[a]{Yukteshwar Baranwal}
@@ -113,23 +113,63 @@ granulation process in a quantitative as well as in a mechanistic manner.
 % ==================================== body  =====================================
 
 \section{Introduction}
-The domain for tradional chemical engineering process modelling spans for a broad range of
-time and length scales \cite{ingram2004apjce} . Characteristic lengths and time scales of 
-atomistic simulation are commonly used are in the order of $10^{-12}$ $m$ and $10^{-9}$ $s$ 
-respectively. These scales extend to thousands of kilometers ($10^{9}$ $m$) and years 
-($10^9$ $s$) for life-cycle analysis and environmental simulations. Most of the processes
-are inherently connected, but with the limitations of older computation resources they have
-only been studied in isolation to each other.  But with the current
-\begin{itemize}
+%The domain for tradional chemical engineering process modelling spans for a broad range of
+%time and length scales \cite{ingram2004apjce} . Characteristic lengths and time scales of 
+%atomistic simulation are commonly used are in the order of $10^{-12}$ $m$ and $10^{-9}$ $s$ 
+%respectively. These scales extend to thousands of kilometers ($10^{9}$ $m$) and years 
+%($10^9$ $s$) for life-cycle analysis and environmental simulations. Most of the processes
+%are inherently connected, but with the limitations of older computation resources they have
+%only been studied in isolation to each other.  But with the current
 
-\item Talk about pharmaceutical processes
-\item Talk about DEM and PBM
-\item Coupling and its importance
-\item Advantages of using HPC
-\end{itemize}
+Particulate materials are products or intermidiates of around $60\%$ of the chemical industry\citep{ingram2005}.
+The modelling of these particulate processes pose a challenge when compared to modelling if uniform liquid
+systems. These solid systems usually comprise of solids which co-exist with various sizes and shape configuration,
+which have a large effect on the final composition and the performance of the product. This variation in the 
+configuration of the product is unaccepatable by the pharmaceutical industry. It could lead to differences in the 
+dissolution rates and bioavailability of the product thus, affecting the quality of the product. The unit process 
+that helps control the size of a granule of the powder in the pharmaceutical product is granulation. During this 
+unit operation, fine powders are converted to the  larger particles by the process of aggregation. This occurs
+due to addition of a liquid binder, making the particles agglomerate into larger granules. This process is also 
+referred to as wet granulation as a liquid binder is added. Due to high restrictions set by the Food and Drug 
+Administration (FDA) these products undergo various batch rejections or have high recycle ratios\citep{sen2014}. 
+One of the major aims of the industry currently is to reduce this waste, thus creating a need for better 
+modelling of this process.
+
+The most popular way to model the granulation process is to use a population balance model (PBM). This model 
+tracks the number of particles with certain set of charactersitics such as size, porosity and liquid content. 
+It also takes into account the changes that may occur in these properties due to growth, breakage, consolidation, 
+and other phenomena. This model is discussed in more detail in section \ref{sec_mthds_PBM}. PBM fails to account 
+for the particle level data, thus being inaccurate at times. This particle level data needed to improve the PBM 
+can be obtained from discrete element methods (DEM). DEM help obtain the velocity of each particle and the 
+number of times it collides with other particles by solving the Newton's laws of motion. This information 
+is vital to the PBM as it helps develop a more accurate model with a higher physical significance. As these 
+methods are complementary to each other, they are usually coupled whille building a model for the granulation 
+process. These processes can be coupled serially like in \textbf{(cite current paper here)} or in parallel as 
+discussed in this work. DEM is always executed at initiation and the particle level data is then transferred to 
+the PBM. The DEM simulation is computationally very high as it needs to solve large amounts of simultaneous 
+equations at every time step. The parallel execution of this type of coupling requires various instances 
+of simulation of each of these models to be initiated, requiring high computational power. The most efficient way 
+to make these simulations run faster is to take advantage of large number of CPU cores present on modern day 
+high-performance computing systems (HPCs / supercomputers).
+
+This work focusses on the building of physically accurate model for a high shear granulator. Section \ref{methods} 
+discusses the model equation used and the method of parallelization implemented on the PBM and DEM to enable them to 
+run on various cores of HPCs. The resulting particle properties from the coupling and the speed improvements 
+achieved when the number of cores used for the simulation are changed, is discussed in section \ref{results}.
+
+%\begin{itemize}
+%\item Talk about pharmaceutical processes
+%\item Talk about DEM and PBM
+%\item Coupling and its importance
+%\item Advantages of using HPC
+%\end{itemize}
 
 \section{Methods}
+\label{methods}
+
 \subsection{Population Balance Model (PBM) development}
+\label{sec_mthds_PBM}
+
 \begin{itemize}
 \item Aggregation
 \item Breakage
@@ -139,6 +179,7 @@ only been studied in isolation to each other.  But with the current
 \subsection{Controller development}
 Explain the controller configuration and how it works
 \section{Results}
+\label{results}
 Discuss how many instances of the simulation of each occured
 \subsection{Scaling results}
 Cores used for DEM and PBM and how scaling occured

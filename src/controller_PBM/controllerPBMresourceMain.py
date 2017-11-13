@@ -84,17 +84,20 @@ class controllerPBMresourceMain(object):
         if (flag == 1):
             print("Kill PBM and execute DEM")
             status = {'status':str(flag)}
+            out_data = {'last timestep': str(new_timestep)}
             with open('PBM_status.json' , 'w') as pbmsf:
                 json.dump(status, pbmsf)
-            with open('PBM_output.txt', 'w') as pbmsf:
-                pbmsf.write(str(new_timestep))
+            with open('PBM_output.json', 'w') as pbmsf:
+                json.dump(out_data, pbmsf)
+                #pbmsf.write(str(new_timestep))
         elif (flag == 2):
             print("Kill both DEM and PBM")
             status = {'status':str(flag)}
             with open('PBM_status.json' , 'w') as pbmsf:
                 json.dump(status, pbmsf)
-            with open('PBM_output.txt', 'w') as pbmsf:
-                pbmsf.write(str(new_timestep))
+            with open('PBM_output.json', 'w') as pbmsf:
+                json.dump(out_data, pbmsf)
+                # pbmsf.write(str(new_timestep))
             
 
 abcd = controllerPBMresourceMain(7,4,16,16,'/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy',5)

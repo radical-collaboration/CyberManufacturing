@@ -127,6 +127,8 @@ class controller_DEMresource_main(object):
         elif (flag == 2):
             # kill the DEM since there has been no change in the number of collisions / impacts / velocity for 2 seconds.
             status = {'status':str(flag)}
+            status['time step'] = []
+            status['time step'].append(int(timestep))
             with open('DEM_status.json' , 'w') as demsf:
                 json.dump(status, demsf)
             # with open('DEM_status.dat' , 'w') as demsf:

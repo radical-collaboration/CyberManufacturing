@@ -93,6 +93,7 @@ class controllerPBMresourceMain(object):
         elif (flag == 2):
             print("Kill both DEM and PBM")
             status = {'status':str(flag)}
+            out_data = {'last timestep': str(new_timestep)}
             with open('PBM_status.json' , 'w') as pbmsf:
                 json.dump(status, pbmsf)
             with open('PBM_output.json', 'w') as pbmsf:

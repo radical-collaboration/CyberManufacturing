@@ -131,8 +131,6 @@ class controller_DEMresource_main(object):
             status['time step'].append(int(timestep))
             with open('DEM_status.json' , 'w') as demsf:
                 json.dump(status, demsf)
-            # with open('DEM_status.dat' , 'w') as demsf:
-            #   demsf.write(str(flag))
             print("The system is at steady state")
 
 

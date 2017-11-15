@@ -397,9 +397,15 @@ class Executor(object):
 
     def run(self):
 
+
+        # Start the RP session and setup the selected resource.
         self._start()
+
+
         cont = True
-        restart =False
+        #Does DEM restart or not
+        restart = False
+        #Timestep input for DEM.
         ts=0
         while cont:
             self._start_dem_units(timestep=ts,restart=restart)

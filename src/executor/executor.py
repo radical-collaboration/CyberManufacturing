@@ -195,7 +195,7 @@ class Executor(object):
             # reason).
             warnings.warn('exit requested\n',UserWarning)
 
-    def _start_dem_units(self,timestep=0,type=0,restart=False):
+    def _start_dem_units(self,timestep=0,types=0,restart=False):
         """
         This method creates DEM units, their monitors and submits them for execution. 
         It also returns the unit objects so that they can be monitored. This method takes
@@ -246,7 +246,7 @@ class Executor(object):
             #Now that we have a path we can continue
             cud2 = rp.ComputeUnitDescription()
             cud2.executable = 'python'
-            cud2.arguments = ['controller_DEMresource_main.py',ru.Url(dem_unit.sandbox).path,timestep,type]
+            cud2.arguments = ['controller_DEMresource_main.py',timestep,types,ru.Url(dem_unit.sandbox).path]
             cud2.input_staging = [{'source':'file:///controller_DEMresource_main.py'
                                   'target':'unit:///controller_DEMresource_main.py'
                                   'action': rp.TRANSFER},
@@ -257,8 +257,8 @@ class Executor(object):
                                   'target':'unit:///controller_DEMresource_data_interpretor.py'
                                   'action': rp.TRANSFER}]
             cud2.output_staging = [{'source': 'unit:///PBM_input.json',
-                                   'target': 'pilot:///PBM_input.json',
-                                   'action'  : rp.LINK},
+                                   'target': 'file:///PBM_input.json',
+                                   'action'  : rp.TRANSFER},
                                    {'source': 'unit:///DEM_status.json',
                                    'target': 'file:///DEM_status.json',
                                    'action'  : rp.TRANSFER}]
@@ -288,20 +288,14 @@ class Executor(object):
         status_fid = open(status_file)
         status_dict = json.load(status_fid)
 
-        if status_dict['status'] == 1 or status_dict['status'] == 2:
+        if status_dict['status'] == 1:
             cont = True
         else:
             cont = False
         
-        status_dict.pop('status')
+        pbm_timestep = status_dict['time step']
 
-        arguments=str()
-
-        # The rest are going to be arguments for setting up the PBM execution.
-        for key,value in status_dict.iteritems():
-            arguments += '--'+key+' '+str(value)
-
-        return cont,arguments
+        return cont,pbm_timestep
 
     def _check_PBM_status(self,status_file):
         """

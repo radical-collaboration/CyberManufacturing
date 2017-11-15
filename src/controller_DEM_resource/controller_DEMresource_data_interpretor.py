@@ -17,7 +17,7 @@ import controller_DEMresource_data_reader as DEMreader
 
 class controller_DEM_resource_interpretor(object):
 
-    def __init__(self, timestep, types, init_ts):
+    def __init__(self, timestep, types, init_ts, liggghts_output_path):
         self.timestep = timestep
         self.type = types
         self.init_timestep = init_ts
@@ -31,12 +31,14 @@ class controller_DEM_resource_interpretor(object):
         self.init_avg_vel = np.zeros(self.type)
         self.init_num_particles = 0
         self.dump_difference = 50000
+        self.liggghts_output_dir = liggghts_output_path
         self.type_diameter = np.zeros_like(self.avg_vel_array)
         self.init_data_calculations()
 
  # method to average the velocity of the collision data
     def avg_all_data(self, ts): # here ts is the time step
-        obj_data_reader = DEMreader.Controller_DEM_resource_reader(ts, self.type)
+    # this creates an object of the data reader class and uses the velocity stored in the data structure and calculates the average
+        obj_data_reader = DEMreader.Controller_DEM_resource_reader(ts, self.type, self.liggghts_output_dir)
         temp_coll_data = np.zeros_like(self.collision_matrix)
         self.num_of_particles = obj_data_reader.number_of_particles
         for x in xrange(0, self.type):
@@ -63,7 +65,7 @@ class controller_DEM_resource_interpretor(object):
 
  # method to data of the initial time step
     def init_data_calculations(self):
-        init_data_obj = DEMreader.Controller_DEM_resource_reader(self.init_timestep, self.type)
+        init_data_obj = DEMreader.Controller_DEM_resource_reader(self.init_timestep, self.type, self.liggghts_output_dir)
         self.init_num_particles = init_data_obj.number_of_particles
         i1 = self.avg_all_data(self.init_timestep)
         self.init_impacts = init_data_obj.number_of_impacts
@@ -88,7 +90,7 @@ class controller_DEM_resource_interpretor(object):
             va1 = sum(self.avg_vel_array) / self.type
             ca1 = sum(sum(self.collision_matrix))
             ia1 = float(self.avg_impacts)
-            a2 = self.avg_all_data(ts - (2 * dump_difference))
+            a2 = self.avg_all_data(ts - (2*dump_difference))
             va2 = sum(self.avg_vel_array) / self.type
             ca2 = sum(sum(self.collision_matrix))
             ia2 = float(self.avg_impacts)
@@ -102,9 +104,9 @@ class controller_DEM_resource_interpretor(object):
             vel_comp = (avg_vel - vai) / vai
             collision_comp = (avg_coll - cai) / cai
             impact_comp = (avg_imp - iai) / iai
-            if(vel_comp > 0.1 or collision_comp > 0.1 or impact_comp > 0.1):
+            if(vel_comp > 0.1 or collision_comp > 0.05 or impact_comp > 0.05):
                 flag = 1
-            elif((ts - self.init_timestep) > (5 / dem_timestep)):
+            elif((int(ts) - self.init_timestep) > (0.5 / dem_timestep)):
                 flag = 2
             else:
                 flag = 0
@@ -114,4 +116,14 @@ class controller_DEM_resource_interpretor(object):
 
 
 
+# ------------------------------------------------------------------------------------------------
+
+# abcd = controller_DEM_resource_interpretor(500000, 16, 2000000)
+# a1 = abcd.avg_all_data(5000000)
+# print(abcd.num_of_particles)
+# abcd.init_data_calculations()
+# print(abcd.num_of_particles)
+# a1 = abcd.avg_all_data(6000000)
+# print(abcd.num_of_particles)
+# print(abcd.liggghts_data_comparison(5000000))
 # ------------------------------------------------------------------------------------------------

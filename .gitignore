@@ -251,6 +251,13 @@ TSWLatexianTemp*
 *.out
 *.app
 
+#Dumped output data file
+output_test.txt
+
+# Excluded folders
+src/twoway_PBM/csvDump
+src/twoway_PBM/txtDump
+
 # CodeBlocks files excluding project
 *.layout
 *.depend
@@ -275,3 +282,6 @@ octave-workspace
 # Simulink autosave extension
 .autosave
 paper/rslts
+paper/pse_manuscript/pse_2018_draft.pdf
+src/controller_DEM_resource/controller_DEMresource_data_interpretor.py.rej
+paper/cdse_manuscript/supp_nsf_cdse_draft02.pdf

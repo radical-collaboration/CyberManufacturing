@@ -40,6 +40,7 @@ class liggghts_input_creator(object):
         top = self.types_of_particles
         in_ts = self.init_timestep
         fin_ts = self.final_timestep
+        if (top > 0 and min_d > 0 and max_d >= min_d and fin_ts > in_ts):
         in_file = ''
         if (top > 0 and min_d > 0 and max_d > min_d and fin_ts > in_ts):
             radS1 = np.linspace(min_d, max_d, num=top)
@@ -49,13 +50,12 @@ class liggghts_input_creator(object):
             totflowrate = self.flow_rate
             radS11, radS22 = np.meshgrid(radS1, radS2);
             mode = len(radS1)
-
-            if in_ts == 0:
-                in_file = open("in.%d_sim_new"%min_d, "w")
-                in_file.write("# This is the initial input file for the DEM LIGGGHTS simulation\n\n\n\n\n")
-            else:
-                in_file = open("in.restart_from_%d"%in_ts, "w")
-                in_file.write(" This the restart input fiel for the DEM LIGGGHTS simulation\n\n\n\n\n")
+            #if in_ts == 0:
+            in_file = open("in.2_sim_new", "w")
+            in_file.write("# This is the initial input file for the DEM LIGGGHTS simulation\n\n\n\n\n")
+            #else:
+            #in_file = open("in.restart_from_%d"%in_ts, "w")
+            #in_file.write(" This the restart input fiel for the DEM LIGGGHTS simulation\n\n\n\n\n")
             in_file.write("modify_timing      on\n")
             in_file.write("atom_style         granular\n")
             in_file.write("atom_modify        map array\n")
@@ -63,11 +63,16 @@ class liggghts_input_creator(object):
             in_file.write("newton             off\n")
             in_file.write("communicate        single vel yes\n")
             in_file.write("units              si\n")
-            if in_ts == 0:
-                in_file.write("processors         * * *\n")
-                in_file.write("create_box         %d reg\n"%mode)
-            else:
-                in_file.write("read_restart   restart/granulator.%d.restart\n"%in_ts)
+            in_file.write("region             reg block -0.01 0.450 -0.150 0.150 -0.080 0.100\n")
+            #if in_ts == 0:
+            in_file.write("processors         * * *\n")
+            in_file.write("create_box         %d reg\n"%(mode+1))
+            #else:
+            #    in_file.write("read_restart   restart/granulator.%d.restart\n"%in_ts)
+            in_file.write("neighbor           0.0005 bin\n")
+            in_file.write("neigh_modify       delay 0 check yes page 10000000 one 30000\n")
+            in_file.write("processors         * * *\n")
+            in_file.write("create_box         %d reg\n"%mode)
             in_file.write("region             reg block -0.01 0.450 -0.150 0.150 -0.080 0.100\n")
             in_file.write("neighbor           0.0005 bin\n")
             in_file.write("neigh_modify       delay 0 check yes page 100000 one 30000\n")
@@ -85,7 +90,7 @@ class liggghts_input_creator(object):
                 in_file.write("%f "%item)
             in_file.write("\n")
 
-            poissonsRatio = np.linspace(0.2, 0, num=mode+1)
+            poissonsRatio = np.linspace(0.2, 0.2, num=mode+1)
             in_file.write("fix                m2 all property/global poissonsRatio peratomtype ")
             for item in poissonsRatio:
                 in_file.write("%f "%item)
@@ -140,7 +145,7 @@ class liggghts_input_creator(object):
 
             wt = [(j / sum(y)) for j in y]
             in_file.write("\n#Partcle Distribution for insertion\n")
-            massflowrateinseconds = totflowrate / 3600
+            massflowrateinseconds = totflowrate / 3600.0
             st = ''
             for x in xrange(0,mode):
                 st = st + 'pts%d'%(x+1) + ' ' + str(wt[x]) + ' '
@@ -150,7 +155,6 @@ class liggghts_input_creator(object):
             n = random.choice([i for i in cached_primes if minPrime<i<maxPrime])
             in_file.write("# Particle insertion\n")
             in_file.write("fix                ins1 all insert/rate/region seed %d distributiontemplate pdd1 nparticles INF massrate %d insert_every 10000 overlapcheck yes vel constant 0.0 -1.0 -0.0001 region factory1 ntry_mc 1000\n\n\n\n"%(n,massflowrateinseconds))
-
             in_file.write("# Calculating particle wall collisions\n")
             in_file.write("compute            pwc all wall/gran/local id vel force contactArea delta # Calculate particle wall collision\n")
             in_file.write("compute            ppc all pair/gran/local id vel force contactArea delta # Calculate particle-particle collision\n")
@@ -165,20 +169,21 @@ class liggghts_input_creator(object):
                 in_file.write("compute            cc_%d type%d_ contact/atom\n"%(x+1,x+1))
             in_file.write("\n\n\n\n# Dump files configurationn\n")
             in_file.write("run                %d\n"%in_ts)
+            in_file.write("run                %d\n"%in_ts)
             in_file.write("dump               myDump  all custom 50000 post/dump*.atom id type x y z ix iy iz vx vy vz fx fy fz c_cc_1 c_cc_2 c_cc_3 c_cc_4 c_cc_5 c_cc_6 c_cc_7 c_cc_8 c_cc_9 c_cc_10 c_cc_11 c_cc_12 c_cc_13 c_cc_14 c_cc_15 c_cc_16 f_fppacc radius\n")
             in_file.write("dump               myDump2 all local 50000 post/coll*.atom c_pwc[1] c_pwc[2] c_pwc[3]\n")
             in_file.write("dump               myDump3 all local 50000 post/pcoll*.atom c_ppc[1] c_ppc[2] c_ppc[3] c_ppc[4]\n")
             in_file.write("dump               dumpstl1 all mesh/stl 50000 post/dump*.stl\n")
             in_file.write("restart            50000 restart/granulator.*.restart\n\n\n\n\n")
             in_file.write("\n# End run\n")
-            in_file.write("run                %d upto\n"%fin_ts)
+            in_file.write("run                %d upto\n"%(fin_ts + 1))
             in_file.write("\n# Unfixing data points to facilitate restart\n")
             in_file.write("unfix              ins1\n")
             for x in xrange(1,mode):
                 in_file.write("unfix              pts%d\n"%(x+1))
-        in_file.close()
+            in_file.close()
 # -------------------------------------------------------------------------------------------------
 
-a = liggghts_input_creator(0,1000000,1,2,16,15,500)
+#a = liggghts_input_creator(0,2000000,0.002,0.002,16,15,500)
 #in_file.write("\n")
-
+# -------------------------------------------------------------------------------------------------

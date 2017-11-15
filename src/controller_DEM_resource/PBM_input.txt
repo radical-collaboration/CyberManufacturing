@@ -1,0 +1,38 @@
+types 13541total number of particles 2128.000000
+total number of particles 2046.000000
+total number of particles 1953.000000
+total number of particles 1670.000000
+total number of particles 1498.000000
+total number of particles 1192.000000
+total number of particles 934.000000
+total number of particles 691.000000
+total number of particles 532.000000
+total number of particles 340.000000
+total number of particles 224.000000
+total number of particles 154.000000
+total number of particles 91.000000
+total number of particles 55.000000
+total number of particles 25.000000
+total number of particles 8.000000
+average velocity of particles  2.057075
+average velocity of particles  1.197009
+average velocity of particles  1.191512
+average velocity of particles  1.739084
+average velocity of particles  1.421746
+average velocity of particles  1.979205
+average velocity of particles  1.981510
+average velocity of particles  2.782423
+average velocity of particles  1.552195
+average velocity of particles  2.443452
+average velocity of particles  1.447824
+average velocity of particles  3.372819
+average velocity of particles  1.640118
+average velocity of particles  1.396494
+average velocity of particles  2.950553
+average velocity of particles  2.896881
+
+last timestep 7500000
+aggregation Kernel Constant 0.000000
+breakage Kernel Constant 0.000000
+mixing time 25
+liquid addition time 125

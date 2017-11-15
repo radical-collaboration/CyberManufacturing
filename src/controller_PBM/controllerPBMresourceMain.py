@@ -25,13 +25,15 @@ OUTPUT FLAG VALUE STATUS
 import numpy as np
 import controllerPBMDataInterpretor as PBMinter
 import controllerPBMDataReader as PBMreader
+import liggghts_restart
 import os
 import json
 import time
+import sys
 
 class controllerPBMresourceMain(object):
 # class variables
-    def __init__(self, init_ts, compartments, bins1, bins2, pbm_out_path, mixingtime):
+    def __init__(self, init_ts, compartments, bins1, bins2, pbm_out_path, mixingtime, init_timestep, final_timestep, min_dia, max_dia, types_of_particles, total_flow_rate, solid_density):
         self.initial_timestep = init_ts
         self.compartments = compartments
         self.bins1 = bins1
@@ -83,11 +85,12 @@ class controllerPBMresourceMain(object):
         dump_particles.close()
         if (flag == 1):
             print("Kill PBM and execute DEM")
-            status = {'status':str(flag)}
-            out_data = {'last timestep': str(new_timestep)}
+            liggghts_restart_file = liggghts_restart.liggghts_input_creator(self.init_timestep, self.final_timestep, \
+                                    self.min_dia, self.max_dia, self.types_of_particles, self.total_flow_rate, self.solid_density)
+            status = {'status':str(flag),'last timestep': str(new_timestep)}
+            # out_data = {'last timestep': str(new_timestep)}
             with open('PBM_status.json' , 'w') as pbmsf:
                 json.dump(status, pbmsf)
-            with open('PBM_output.json', 'w') as pbmsf:
                 json.dump(out_data, pbmsf)
                 #pbmsf.write(str(new_timestep))
         elif (flag == 2):
@@ -101,7 +104,9 @@ class controllerPBMresourceMain(object):
                 # pbmsf.write(str(new_timestep))
             
 
-abcd = controllerPBMresourceMain(7,4,16,16,'/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy',5)
+# abcd = controllerPBMresourceMain(7,4,16,16,'/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy',5)
+abcd = controllerPBMresourceMain(float(sys.argv[1]), float(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]), sys.argv[5], float(sys.argv[6]),int(sys.argv[7]), \
+                                 int(sys.argv[8]), float(sys.argv[9]), float(sys.argv[10]), int(sys.argv[11]), float(sys.argv[12]), int(sys.argv[13]))
 abcd.main()
 
 

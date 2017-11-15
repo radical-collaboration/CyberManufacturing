@@ -40,6 +40,13 @@ class controllerPBMresourceMain(object):
         self.bins2 = bins2
         self.pbm_output_path = pbm_out_path
         self.mixing_time = mixingtime
+        self.init_timestep = init_timestep
+        self.final_timestep = final_timestep
+        self.min_dia = min_dia
+        self.max_dia = max_dia
+        self.types_of_particles = types_of_particles
+        self.total_flow_rate = total_flow_rate
+        self.solid_density = solid_density
 
     def main(self):
     # This method executes all the necessary function calls to monitor the PBM execution and decides on the status of the simulation

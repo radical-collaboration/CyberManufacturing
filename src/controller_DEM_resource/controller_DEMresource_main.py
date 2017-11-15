@@ -95,8 +95,8 @@ class controller_DEMresource_main(object):
             dump_data['number of particles of each type'].append(list(tot_part_each_type))
             dump_data['average velocity of each type'] = []
             dump_data['average velocity of each type'].append(list(avg_vel_array))
-            dump_data['time step'] = []
-            dump_data['time step'].append(int(timestep))
+            dump_data['DEM_time_step'] = []
+            dump_data['DEM_time_step'].append(int(timestep))
             dump_data['Aggregation Kernel Constant'] = []
             dump_data['Aggregation Kernel Constant'].append(1e-9)
             dump_data['Breakage Kernel Constant'] = []
@@ -109,12 +109,14 @@ class controller_DEMresource_main(object):
             #dump_data['collision_matrix'].append(list(list(obj_inter.collision_matrix)))
             #dump_data.update({'collision_matrix': obj_inter.collision_matrix})
             # print(dump_data)
-            status = {'status':str(flag)}
+            # status = {'status':str(flag)}
+            dump_data['status'] = []
+            dump_data['status'].append(str(flag))
             with open('DEM_status.json' , 'w') as demsf:
-                json.dump(status, demsf)
-            with open('PBM_input.json' , 'w') as outfile:
-                json.dump(dump_data, outfile)
-            # also printing a text file, whichever is easier for yuktesh to read, we can remove the json or this once decided
+                json.dump(dump_data, demsf)
+            # with open('PBM_input.json' , 'w') as outfile:
+            #     json.dump(dump_data, outfile)
+            # # also printing a text file, whichever is easier for yuktesh to read, we can remove the json or this once decided
             with open('PBM_input.txt', 'w') as ipt:
                 ipt.write("types %d"%int(obj_inter.num_of_particles))
                 ipt.writelines("total number of particles %f\n"%item for item in tot_part_each_type)

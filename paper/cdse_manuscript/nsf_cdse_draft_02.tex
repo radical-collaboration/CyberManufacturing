@@ -14,9 +14,17 @@
 \usepackage{textcomp}
 \usepackage{graphicx}
 \usepackage{tabulary}
-
 \usepackage{float}
-
+\usepackage[utf8]{inputenc}
+\usepackage{nomencl}
+\usepackage[font=sf, labelfont={sf,bf}, margin=0cm]{caption}  % Margin similar to Anik
+\usepackage{placeins}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage[english]{babel} 
+\usepackage{multirow}
+\usepackage{nomencl}
+\makenomenclature
 \definecolor{listinggray}{gray}{0.95}
 \definecolor{darkgray}{gray}{0.7}
 \definecolor{commentgreen}{rgb}{0, 0.4, 0}
@@ -58,16 +66,26 @@
 \journal{Chemical Engineering Research and Design}
 \begin{document}
 \begin{frontmatter}
-\title{Parallel uni-directional coupled DEM-PBM model for high performance computing systems}
-\author{A1 }
-\author{A2 }
-\author{A3 }
-\author{A4 }
-\author{A5\corref{cor1}} 
-\ead{A5}
-\cortext[cor1]{Corresponding author}
-\address{Department of Chemical and Biochemical Engineering, Rutgers, The State University of New
-Jersey, Piscataway, NJ, USA 08854}
+\title{A parallel unidirectional coupled DEM-PBM model for the efficient solution and simulation of 
+computationally  intensive systems.}
+\author[add1]{Chaitanya Sampat\corref{cor1}}
+\author[add1]{Franklin Bettencourt\corref{cor1}}
+%\thanks{These two authors has equal contribution.}
+\author[add1]{Yukteshwar Baranwal}
+\author[add2]{Ioannis Paraskevakos}
+\author[add1]{Anik Chaturbedi}
+\author[add1]{Subhodh Karkala}
+\author[add2]{Shantenu Jha}
+\author[add1]{Rohit Ramachandran}
+\author[add1]{Marianthi Ierapetritou\corref{cor2}}
+\address[add1]{Department of Chemical and Biochemical Engineering, Rutgers, The State University of New
+Jersey, Piscataway, NJ, USA-08854}
+\address[add2]{Electrical and Computer Engineering, Rutgers, The State University of New Jersey, 
+Piscataway, NJ, USA-08854}
+\cortext[cor1]{Equal contribution by C. Sampat and F. Bettencourt}
+\cortext[cor2]{Corresponding author}
+\ead{marianth@soe.rutgers,edu}
+
 \begin{abstract}
 Particulate processes are prevalent in the pharmaceutical industry but, the physics underlying 
 these processes are complicated and difficult to predict. Modelling such processes using particle-
@@ -92,43 +110,42 @@ Population balance model \sep Granulation \sep Discrete element methods  \sep MP
 \linenumbers
 
 \section{Introduction \& Objectives} 
-Half of all industrial chemical production is carried out using particulate processes 
+Half of all industrial chemical production is typicall performed via the processing of particulate systems
 (\cite{seville1997}). These processes account for about 70\% of the products 
 of industries like detergents, aerosols, fertilizers, and pharmaceuticals\citep{Litster2016}. 
 These processes are widely popular as these particulate products have great advantages over 
-counterpart liquid formulations like better chemical and physical stability and reduced 
+liquid formulations such as better chemical and physical stability and reduced 
 transportation cost. Despite the prevalence of these particulate processes, the underlying 
-physics of these processes is poorly understood \citep{Rogers2013}. As a results industries 
-that rely on these processes, especially pharmaceutical, have to use expensive 
+physics of these processes is poorly understood \citep{Rogers2013}. As a result industries 
+that rely on these processes, especially pharmaceuticals, have to use expensive 
 heuristic studies and inefficient operational protocols with high recycle ratios to meet strict 
-regulatory standards (\cite{Ramachandran2009}). This drives up the costs and delays the release of 
-new drugs. What makes these processes so challenging to design is that there are no governing 
-equations to accurately predict their behavior \citep{sen2013}. The complex physics of such 
-processes do not have exact governing equations, thus the need of a precise model arises. There 
-has been active research in this area on how to accurately model the  physics of these processes.\\
+regulatory standards (\cite{Ramachandran2009}). This can drive up the costs and delay the release of 
+new products. What makes these processes so challenging to design is that there are none or few governing 
+equations to accurately predict their behavior \citep{sen2013}.
+
 Particulate processes are defined by chaotic micro-scale phenomena that result from the many 
 particle-particle interactions inside these systems. These small scale phenomenon develop into 
 complex bulk behavior of these processes. To successfully predict the bulk behavior of these 
 systems, a model needs to capture the particle-particle interactions and emergent meso-scale phenomena. 
-Discrete Element Method (DEM)\citep{Cundall1979} has proven to be an accurate way 
+The discrete Element Method (DEM)\citep{Cundall1979} has proven to be an accurate way 
 to  model a bulk material properties of particulate systems using micro-scale particle level 
-interactions for pharmaceutical processes \citep{Hancock2011}. DEM uses Newton's equations of 
+interactions for instance pharmaceutical processes \citep{Hancock2011}. DEM uses Newton's equations of 
 motion to model the forces on each particle in the system and it's interactions with the system 
 geometry and other particles. This enables DEM to model the small scale phenomena that 
-determines the bulk behavior of particulate system. Since DEM includes large amount of interaction 
-and force computations take a large amount of time to run. Thus another more computationally 
-efficient, but less accurate technique, used to model these particulate processes is population 
-balance model (PBM).
+determines the bulk behavior of particulate system. Since DEM includes large amount of interactions
+and force computations, it usually takes a large amount of time to run. Thus another more computationally 
+efficient, but potentially less accurate technique, used to model these particulate processes is population 
+balance model (PBM) \textbf{need to cite 1-2 papers}.
 
-PBM takes into account the changes in particle size and the property related mechanisms. This 
-model lacks sensitivity to process parameters and the equipment geometry. It is semi-mechanistic in 
+PBM takes into account the changes in internal or spatial particle porperties. This 
+model lacks sensitivity to design parameters such as equipment geometry. It is semi-mechanistic in 
 nature, meaning they use population averages and probability to capture bulk behavior but still 
 seek to capture some of the micro-phenomena of particle-particle interactions using correlations or 
 empirically developed kernels to approximate those interactions. Even though PBM is much faster 
-than DEM, detailed PBM can still take a significant amount of time to solve which prevents them 
+than DEM, a detailed PBM can still take a significant amount of time to solve which prevents them 
 from being used as widely as they could be in academia and industries \citep{Barrasso2013}. Due to the 
 populating averaging and their semi-mechanistic kernels, highly detailed PBMs still can have 
-difficulties in capturing the micro-scale phenomena that are crucial to predicting the dynamics of 
+difficulties in capturing the micro-scale phenomena that are crucial to predicting accurate dynamics of 
 particulate processes. 
 
 Thus, to complement the limitations of each of these modeling methods they are coupled to 
@@ -143,7 +160,7 @@ problems such as Molecular Dynamics (MD), Computational Fluid Dynamics (CFD), bu
 years  this technique has been applied to DEM and PBM simulations 
 \citep{Bettencourt2017}\citep{Prakash2013a}\citep{Gunawan2008}.
 
-In order to solve large computational problems parallel computing can be used to distribute the 
+In order to solve large computational problems, parallel computing can be used to distribute the 
 problem across many CPUs which can work together to solve the problem more quickly. To solve 
 problems in parallel, computing clusters are often used and with drop  in the prices of hardware, 
 they are becoming popular. A cluster is essentially a collection of conventional computers 
@@ -157,44 +174,45 @@ High performance computing (HPC) is the utilization of supercomputers and parall
 techniques for solving complicated computational problems. Some of the potential benefits of using
 HPC in the pharmaceutical industry include really high accuracy for parameter estimation as detailed 
 particle-scale simulations can be performed quickly. On-line modeling of continuous processes as 
-discussed by \citep{Bettencourt2017}, as they performed the simulations more than two times faster 
-than the actual granulation time. Such quick simulations can also help improve control of 
-continuous pharmaceutical processes. Modeling these processes also abides to the 
+discussed by \citep{Bettencourt2017}, as their computational time of the simulations was less than 
+half of the actual granulation time. Such quick simulations can also help improve control of 
+continuous pharmaceutical processes. Modeling these processes also abides by 
 Quality-by-Design(QbD) approach being employed by the industry. This work showcases the speed 
-improvements that can be achieved using HPCs and how they can help improve process design.\\
-The main objective of this work is to develop a uni-directional DEM-PBM model that runs well in 
+improvements that can be achieved using HPCs and how they can help improve process design.
+
+The main objective of this work is to develop a uni-directional DEM-PBM model that runs efficinetly in 
 parallel so that it can take advantage of the computational capabilities of  modern computing 
 clusters. Specific studies performed in this work include:
 \begin{itemize}
-\item Developed a 4-Dimensional, DEM informed PBM that is parallelized using hybrid techniques (MPI + 
-OMP)to model the bulk processes occurring during the granulation process.
+\item Development of 4-Dimensional, reduced order DEM informed PBM that is parallelized using hybrid 
+techniques (MPI + OMP)to model the bulk processes occurring during the granulation process.
 \item Perform DEM simulations on LIGGGHTS to  model the micro-mechanics of the L\"{o}dige CoriMix 
 CM5 high shear granulator. 
-\item Uni-directionally coupled DEM to PBM using Radical Pilot, which is a framework developed in
+\item Unidirectionally couple DEM to PBM using Radical Pilot, which is a framework developed in
 Python which provides task level parallelization, to help develop an accurate model which can be 
 run quickly on high performance computing systems
 \end{itemize}
 
-\section{Background \& motivation}
+\section{Background \& Motivation}
 
 \subsection{Particulate processes}
-   Particulate processes are ones in which a system of discrete species exist, such as granules 
-  or catalyst pellets, that undergo changes in average composition, size, or other pertinent 
-  properties. These processes are especially prevalent in the pharmaceutical industry, one of the 
-  most important is granulation. Granulation is a key process in the manufacturing of tablets, 
-  where fine powders are converted to larger granules using a liquid binder. The three processes 
-  influencing granulation are wetting and nucleation, consolidation and aggregation and attrition and 
-  breakage\citep{Iveson2001}\citep{Cameron2005}. As the liquid is added to the fine powder, it 
-  forms a porous nuclei that can coalesce, deform and break\citep{Barrasso2015ces}. There is an 
-  alteration in the properties of these nuclei as they can take up additional liquid or finer powder.
-   To understand how a granulation processes will behave with different parameter settings and 
-  chemical mixtures, experimental studies of the process parameter space are performed which is a 
-  method referred to as Quality-by-Testing (QbT). This methodology is time consuming and 
-  expensive. Thus, newer research is focused on the QbD concept i.e, 
-  theoretically modeling the process for better quality of the product and its cost benefits. 
+Particulate processes are ones in which a system of discrete species exist, such as granules 
+or catalyst pellets, that undergo changes in average composition, size, or other pertinent 
+properties. These processes are especially prevalent in the pharmaceutical industry and one of the 
+most important is granulation. 
+Fine powders are converted to larger granules using a liquid binder. The three processes 
+influencing granulation are wetting and nucleation, consolidation and aggregation and attrition and 
+breakage\citep{Iveson2001}\citep{Cameron2005}. As the liquid is added to the fine powder, it 
+forms a porous nuclei that can coalesce, deform and break\citep{Barrasso2015ces}. There is an 
+alteration in the properties of these nuclei as they can take up additional liquid or finer powder.
+To understand how a granulation processes will behave with different parameter settings and 
+chemical mixtures, experimental studies of the process parameter space are performed which is a 
+method referred to as Quality-by-Testing (QbT). This methodology is time consuming and 
+expensive. Thus, newer research is focused on the QbD concept i.e, 
+mathematically modeling the process to better understand the dynamics of such processes.
 
 \subsection{Modeling}
- The paradigm shift of the pharmaceutical industry towards continuous manufacturing, 
+The paradigm shift of the pharmaceutical industry ofr instance towards continuous manufacturing, 
 emphasizes the need for a more accurate model. This further helps develop better control strategies 
 for the process. The modeling of particulate processes is more time consuming and computationally 
 expensive when compared to a fluid systems since the particles are considered as individual entities 
@@ -268,18 +286,21 @@ DEM and PBM. Earlier works from \cite{sen2014} and \cite{Barrasso2015cerd} have 
 predicted process dynamics of the granulation process using such multi-physics models.
 
 Initially, \cite{ingram2005} coupled PBM and DEM using two different multi-scale frameworks and 
-focused on methods on integrating the two methods and information exchange required between the 
-two. Later efforts on coupling of PBM and DEM have been uni-directional in nature, where the collision 
-data is obtained from the DEM and then have been used in PBM. \cite{gantt2006} used the DEM data 
-to build mechanistic model for the PBM. \cite{Goldschmidt2003} solved a PBM using DEM by 
-replacing smaller particles as they successfully coalesce by larger particles. A mechanistic aggregation 
-model was developed for wet granulation by \cite{Reinhold2012}. A hybrid model for one-way coupling 
-has been reported for continuous mixing (\cite{sen2013} \& \cite{sen2013b}) and is discussed in Section \ref{sec:pbm_model}.
+focused on methods of integrating the two methods and information exchange required between the 
+two. Later efforts on coupling of PBM and DEM were unidirectional in nature, where the collision 
+data was obtained from the DEM and then used in PBM. \cite{gantt2006} used the DEM data 
+to build a mechanistic model for the PBM. \cite{Goldschmidt2003} solved a PBM using DEM by 
+replacing smaller particles as they successfully coalesce with larger particles. A mechanistic aggregation 
+model was developed for wet granulation by \cite{Reinhold2012}\textbf{need to improve this sentence}. 
+A hybrid model for one-way coupling has been reported for continuous mixing (\cite{sen2013} \&
+\cite{sen2013b}) and is discussed in Section \ref{sec:pbm_model}.
 
-In this work, a coupling of DEM and PBM has been implemented. The PBM gives meso-scale 
-information while the DEM gives particle scale information. Combination of these two methods help 
-comprehend the process dynamics with more accuracy. The calculations involved due to the number 
-of particles involved in the DEM process as well as PBM become very computationally heavy. %The 
+In this work, a coupledof DEM and PBM model has been implemented. The PBM gives meso-scale 
+information while the DEM gives particle scale information. The combination of these two methods helps 
+describe the process dynamics with more accuracy. However, calculations involved due to the number 
+of particles involved in the DEM process as well as PBM become very computationally heavy, hence the
+motivation and need for . 
+%The 
 %recent development in the design of CPUs and increasing number of cores in the CPU, it makes 
 %sense to utilize them to make the simulations faster. Thus, implementation of various parallel 
 %computing techniques was employed in this work to help improve the simulation times. 

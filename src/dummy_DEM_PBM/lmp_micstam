@@ -18,11 +18,12 @@ import os
 import glob
 import shutil
 import re
+import argparse
 
 
-def dummy_DEM(pasteTo_path, last_timestep_index, test_number):
-    collision_file_list = glob.glob('/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM' + '/test_%d/collision*.atom'%test_number)
-    impact_file_list = glob.glob('/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM' + '/test_%d/impact*.atom'%test_number)
+def dummy_DEM(last_timestep_index, copyPath):
+    collision_file_list = glob.glob(copyPath+'/collision*.atom'%test_number)
+    impact_file_list = glob.glob(copyPath+'/impact*.atom'%test_number)
     num_start_collision = re.search("collision",collision_file_list[0]).end()
     num_start_impact = re.search("impact",impact_file_list[0]).end()
     num_end_collision = re.search(".atom",collision_file_list[0]).start()
@@ -45,8 +46,8 @@ def dummy_DEM(pasteTo_path, last_timestep_index, test_number):
         print(collision_nextfile)
         print(impact_nextfile)
         if (os.path.isfile(collision_nextfile) and os.path.isfile(impact_nextfile)):
-            shutil.copy2(collision_nextfile, pasteTo_path)
-            shutil.copy2(impact_nextfile, pasteTo_path)
+            shutil.copy2(collision_nextfile, os.getcwd())
+            shutil.copy2(impact_nextfile, os.getcwd())
             print("Waiting")
             time.sleep(rand_num)
         else:
@@ -55,6 +56,10 @@ def dummy_DEM(pasteTo_path, last_timestep_index, test_number):
         a = x
     return a
 
-#a = dummy_DEM(sys.argv[1], np.float(sys.argv[2]), int(sys.argv[3]))
-a = dummy_DEM("/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy", 0, 1)
-print(a)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-in')
+    args = parser.parse_args()
+    a = dummy_DEM(0, os.environ['COPY_PATH'])
+#a = dummy_DEM("/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy", 0, 1)
+#print(a)

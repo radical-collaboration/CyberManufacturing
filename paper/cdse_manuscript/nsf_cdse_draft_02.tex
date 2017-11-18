@@ -407,23 +407,30 @@ run, it stalls fairly soon waiting for the other simulation to make it through
 the queue.  On the other hand MPI capabilities can used to  execute both
 simulations as part of a single multi-node job.  Thus whereas the former
 method suffers from unpredictable queue time for each job, the latter is
-suitable to execute tasks that are homogeneous and have no dependencies, and
-relies on the fault tolerance of MPI which are inadequate.
+suitable to execute tasks that are homogeneous and have no dependencies.
 
 
-The Pilot abstraction~\cite{review_pilotreview} solves these issues:  The
-pilot abstraction, (i) uses a container-job as a placeholder to acquire
-resources via the local resource management system (LRMS) and,  (ii) to
-decouple the initial resource acquisition from task-to-resource assignment.
-Once the pilot (container-job) is scheduled via the LRMS, it can then directly
-be populated with the computational tasks. This functionality allows all the
-computational tasks to be executed directly on the resources, without being
-queued at the LRMS individually. This approach thus supports the requirements
-of task-level parallelism and high-throughput as needed by science drivers.
+The Pilot abstraction~\cite{pstar12} solves these issues:  The Pilot abstraction 
+(i) uses a container-job as a placeholder to acquire resources, and (ii) decouples 
+the initial resource acquisition from task-to-resource assignment. Once the 
+Pilot (container-job) is has acquired the resources, it can be populated with 
+computational tasks. This functionality allows all tasks to be executed directly 
+on the resources, without being queued individually. Thus, this approach supports 
+the requirements of task-level parallelism and high-throughput as needed by 
+science drivers.
 
-RADICAL-Pilot is an implementation of the pilot abstraction, engineered to
-support scalable and efficient launching of heterogeneous tasks
-across different platforms.
+%The Pilot abstraction~\cite{review_pilotreview} solves these issues:  The
+%pilot abstraction, (i) uses a container-job as a placeholder to acquire
+%resources via the local resource management system (LRMS) and,  (ii) to
+%decouple the initial resource acquisition from task-to-resource assignment.
+%Once the pilot (container-job) is scheduled via the LRMS, it can then directly
+%be populated with the computational tasks. This functionality allows all the
+%computational tasks to be executed directly on the resources, without being
+%queued at the LRMS individually. This approach thus supports the requirements
+%of task-level parallelism and high-throughput as needed by science drivers.
+
+RADICAL-Pilot is an implementation of the Pilot abstraction in Python, engineered to
+support scalable and efficient launching of heterogeneous tasks across different platforms.
 \section{Methods}
 
 \subsection{Discrete Element Modeling (DEM)}
@@ -833,7 +840,7 @@ RAM.
 processes from 1 to 16 and the number of OMP threads from 1 to 8, thus, using a maximum of 128 cores.
 
 \begin{algorithm}
-\caption*{\textbf{Pseudo Code}}
+\caption*{\textbf{Pseudo Code}\gpnote{There are still }}
 \label{alg:MyAlgorithm}
 \begin{algorithmic}[*]
 
@@ -899,7 +906,23 @@ configuration that gave us the best performance. This technique has been impleme
 \end{figure}	
 
 \subsection{Radical Pilot (RP) \& PBM+DEM communication}
-\textbf{Giannis you need to add the paragraph on RP set up here!}
+RADICAL-Pilot defines a number of abstractions to describe ressources, and computational 
+tasks. The Pilot Desciption is the abstraction that describes resources by defining the 
+number of cores that will be used, the used HPC resource and the total time that the 
+resources are needed, and the queue that will be used. The abstraction that defines the 
+execution of a computational task is the Compute Unit (CU). A CU defines the executable, 
+the necessary environment that is needed during execution, execution arguments, and any 
+file dependencies the executable may have. RP also defines two managing components, the
+Pilot Manager, and Unit Manager. The Pilot Manager is responsible to submit a Pilot to the
+selected resources. The Unit Manager is responsible to place CUs to active Pilots. As soon as
+a unit is placed in a pilot it starts executing on the acquired resources.
+
+RADICAL-Pilot was utilized to execute and monitor DEM and PBM simulations. Initially, a pilot
+description is created to use several cores of a resource and submitted to the pilot manager. A
+CU description is created for the DEM simulation and submitted to the Unit Manager. As soon as the
+pilot is active the DEM simulation start executing. When finished a CU that describes a PBM 
+simulation is submitted at the Unit Manager and start executing. Any data dependency is satisfied 
+by doing the necessary file linking through the CU description. 
 
 
 

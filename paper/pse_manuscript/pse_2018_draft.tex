@@ -284,17 +284,27 @@ by the printing of files required to restart DEM with new diameters and data for
 if needed after the DEM simulation.  
 
 \subsection{RADICAL-Pilot (RP)}
-A major challenge faced while running large number of simulations was the communication between 
-various componenets of the system. Since each of these simulations were run on a high-performance 
-computing (HPC) resource, each component has to be submitted as an individual job and sually leading 
-to a mismatch in the sequence of execution of the jobs. This leads to each job halting before 
-completion until other componenets finish execution. This communication and job scheduling can be 
-overcome using pilot job abstraction. RP is a pilot job abstraction container developed at Rutgers' 
-electrical and computer engineering department, which supports scalable and efficient launching of 
-heterogeneous tasks across different platforms. RP helped create a link between each of these 
-components. The pilot also handled halting of the executions of the components when indicated by the 
-controller as well as the restart of the DEM and PBM whenever required. This also helped bypass the 
-waiting in multiple job-queues that would have been required to run multiple instances of these simulations.
+Running several simulations that are dependent on High Performance Computing (HPC) resources can 
+be extremely time consuming, since each simulation must be submitted in the resource independently.
+This can lead to varying queuing times. RADICAL-Pilot (RP) is a framework that implements the Pilot 
+abstraction \cite{pstar12}, where a container job is submitted to the HPC resource, the Pilot,
+and once the necessary computing resources are being acquired they can be used to execute multiple
+simulations by reusing the same resources. By utilizing RADICAL-Pilot, we implemented an execution
+framework that allows to utilize the components described above. In addition, RP provides the necessary
+instructions to terminate or restart the execution of DEM or PBM simulations based on decisions
+made from the various controlling components.
+
+%A major challenge faced while running large number of simulations was the communication between 
+%various componenets of the system. Since each of these simulations were run on a high-performance 
+%computing (HPC) resource, each component has to be submitted as an individual job and sually leading 
+%to a mismatch in the sequence of execution of the jobs. This leads to each job halting before 
+%completion until other componenets finish execution. This communication and job scheduling can be 
+%overcome using pilot job abstraction. RP is a pilot job abstraction container developed at Rutgers' 
+%electrical and computer engineering department, which supports scalable and efficient launching of 
+%heterogeneous tasks across different platforms. RP helped create a link between each of these 
+%components. The pilot also handled halting of the executions of the components when indicated by the 
+%controller as well as the restart of the DEM and PBM whenever required. This also helped bypass the 
+%waiting in multiple job-queues that would have been required to run multiple instances of these simulations.
 
 \section{Results}
 \label{results}

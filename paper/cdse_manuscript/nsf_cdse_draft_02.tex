@@ -922,7 +922,13 @@ description is created to use several cores of a resource and submitted to the p
 CU description is created for the DEM simulation and submitted to the Unit Manager. As soon as the
 pilot is active the DEM simulation start executing. When finished a CU that describes a PBM 
 simulation is submitted at the Unit Manager and start executing. Any data dependency is satisfied 
-by doing the necessary file linking through the CU description. 
+by doing the necessary file linking through the CU description.
+
+In more detail, the DEM and PBM executables are preplaced in the resource along with any initial 
+information for the DEM simulation. The DEM unit first creates links for the data files that will 
+be needed for the DEM simulation and call the executable. When the execution finishes, new links 
+with the output are created in a shared space. The PBM unit uses those links to read the necessary 
+data to execute the simulation. When both have finished RP downloads the PBM results.
 
 
 

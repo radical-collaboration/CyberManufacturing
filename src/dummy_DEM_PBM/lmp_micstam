@@ -22,8 +22,8 @@ import argparse
 
 
 def dummy_DEM(last_timestep_index, copyPath):
-    collision_file_list = glob.glob(copyPath+'/collision*.atom'%test_number)
-    impact_file_list = glob.glob(copyPath+'/impact*.atom'%test_number)
+    collision_file_list = glob.glob(copyPath+'/collision*.atom')
+    impact_file_list = glob.glob(copyPath+'/impact*.atom')
     num_start_collision = re.search("collision",collision_file_list[0]).end()
     num_start_impact = re.search("impact",impact_file_list[0]).end()
     num_end_collision = re.search(".atom",collision_file_list[0]).start()

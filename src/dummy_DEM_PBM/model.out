@@ -20,8 +20,8 @@ import shutil
 import re
 
 def dummy_PBM(last_timestep_index, copypath):
-    d50_file_list = glob.glob(copypath + '/d50_*.csv'%test_number)
-    particles_file_list = glob.glob(copypath + '/particles_*.csv'%test_number)
+    d50_file_list = glob.glob(copypath + '/d50_*.csv')
+    particles_file_list = glob.glob(copypath + '/particles_*.csv')
     # print(d50_file_list)
     # print(particles_file_list)
     num_start_d50 = re.search("d50_",d50_file_list[0]).end()

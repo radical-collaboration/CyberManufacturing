@@ -141,7 +141,7 @@ geometry and other particles. This enables DEM to model the small scale phenomen
 determines the bulk behavior of particulate system. Since DEM includes large amount of interactions
 and force computations, it usually takes a large amount of time to run. Thus another more computationally 
 efficient, but potentially less accurate technique, used to model these particulate processes is population 
-balance model (PBM) \textbf{need to cite 1-2 papers}.
+balance model (PBM). % \textbf{need to cite 1-2 papers}.
 
 PBM takes into account the changes in internal or spatial particle properties 
 This 
@@ -298,13 +298,12 @@ predicted process dynamics of the granulation process using such multi-physics m
 Initially, \cite{ingram2005} coupled PBM and DEM using two different multi-scale frameworks and 
 focused on methods of integrating the two methods and information exchange required between the 
 two. Later efforts on coupling of PBM and DEM were unidirectional in nature, where the collision 
-data was obtained from the DEM and then used it in PBM. \cite{gantt2006} used 
-the DEM data 
+data was obtained from the DEM and then used it in PBM. \cite{gantt2006} used the DEM data 
 to build a mechanistic model for the PBM. \cite{Goldschmidt2003} solved a PBM using DEM by 
-replacing smaller particles as they successfully coalesce with larger particles. A mechanistic aggregation 
-model was developed for wet granulation by \cite{Reinhold2012}\textbf{need to improve this sentence}. 
-A hybrid model for one-way coupling has been reported for continuous mixing (\cite{sen2013} \&
-\cite{sen2013b}) and is discussed in Section \ref{sec:pbm_model}.
+replacing smaller particles as they successfully coalesce with larger particles. 
+\cite{Reinhold2012} tried to replace a mechanistic aggregation kernel with an empirical kernel 
+in order to prove that, in certain cases DEM simulations may not be necessary for the 
+development of kernels. A hybrid model for one-way coupling has been reported for continuous mixing (\cite{sen2013} \&  \cite{sen2013b}) and is discussed in Section \ref{sec:pbm_model}.
 
 In this work, a coupled DEM and PBM model has been implemented. The PBM gives 
 meso-scale 
@@ -840,72 +839,6 @@ RAM.
  Each of the cores consists of 4 hardware threads. The simulations were then run by varying the the number of MPI 
 processes from 1 to 16 and the number of OMP threads from 1 to 8, thus, using a maximum of 128 cores.
 
-\begin{algorithm}
-\caption*{\textbf{Pseudo Code}\gpnote{There are still }}
-\label{alg:MyAlgorithm}
-\begin{algorithmic}[*]
-
-\While{ $t<t_{final}$ }
-\begin{itemize}[noitemsep,nolistsep,itemindent=10pt]
-\item The spatial domain is divided into equal chunks)
-\item Each MPI process is assigned on chunk of spatial domain shown as $c_{low}$ to $c_{up}$ 
-\item Sum all $c_{low_i}$ to $c_{up_i}$ is = to [0,number of Compartments]
-\end{itemize}
-\For{each MPI processes} $c = c_{low_i}$ to $c_{up_i}$
-\begin{itemize}[noitemsep,nolistsep,itemindent=20pt]
-\item Each MPI process is further divided with OMP to take advantage of multi-core CPU
-\item Each OMP process is allocated to a single compute core
-\item $\Re$ integrates for each first solid bin as $(i_1)$ $\int_{0}^{s_{2(OMP_0)}}$, $(i_2)$ $\int_{s_{2(OMP_0)}}^{s_{2(OMP_1)}}$, $(i_3)$ 
-$\int_{s_{2(OMP_1)}}^{s_{2(OMP_2)}}$   and so on are divided into smaller integrals  $\int_{i_1low_n}^{i_1up_n}$, $\int_{i_2low_n}
-^{i_2up_n}$, $\int_{i_3low_n}^{i_3up_n}$ upto 16 bins 
-which are solved by the "n" OMP processes. Figure \ref{fig:mthds_OMP_distribution} depicts this distribution.
-\item Allocated to that MPI process (CPU)
-\end{itemize}
-\For{ each OMP process}
-\begin{itemize}[noitemsep,nolistsep,itemindent=30pt]
-\item Calculate the Aggregation Constant $\Re_{agg}(s_1,s_2,c)$
-\end{itemize}
-%\begin{align}
-%\Re_{agg}(s_1,s_2,c)=& \frac{1}{2}\int_{0}^{s_{1}} \int_{i_1low_n}^{i_1up_n} 
-%\beta(s_1',s_2',s_1-s_1',s_2-s_2',c)F(s_1',s_2',c)F(s_1-s_1',s_2-s_2',c)ds_1'ds_2'\notag\\ 
-%&- F(s_1,s_2,c)\int _{0}^{s_{max_1}-s_1} \int_{i_2low_n}^{i_2up_n} 
-%\beta(s_1,s_2,s_1',s_2',c)F(s_1',s_2',c)ds_1'ds_2'\notag
-%\end{align}
-%\begin{align*}
-%\Re_{break}(s_1,s_2,c) = \int_{0}^{s_{max_1}} \int_{i_3low_n}^{i_3up_n} K_{break}(s_1',s_2',c)F(s_1',s_2',c)ds_1'ds_2' - K_{break}
-%(s_1,s_2,c)F(s_1,s_2,c)
-%\end{align*}
-\EndFor
-\begin{itemize}[noitemsep,nolistsep,itemindent=20pt]
-\item  Calculate total number of particles using Euler's rule. 
-\end{itemize}
-%\begin{align*}
-%F_{t,c} &= \frac{\Delta F(s_1,s_2,c)}{\Delta t}\Delta t  + F(s_1,s_2,c)_{t-1}\\
-%      &=   (\Re_{agg}(s_1,s_2,c)+\Re_{break}(s_1,s_2,c)+\dot{F}_{in}(s_1,s_2,c)-\dot{F}_{out}(s_1,s_2,c))\Delta t + 
-%F(s_1,s_2,c)_{t-1}
-%\end{align*}
-
-\EndFor
-\begin{itemize}[noitemsep,nolistsep,itemindent=10pt]
-\item MPI Send $F_{t,c}$ to Master MPI process
-\item MPI Recv $F_{t,c}$ from MPI all slave processes
-\item Master consolidate all $F_{t,c}$ chunks into a complete $F_{t,all}$
-\item Master does inter-bin particle transfers (updates $F_{t,all}$)
-\item MPI Bcast $F_{t,all}$ to all slave processes
-\item $t_{new} = t + timestep$
-\end{itemize}
-\EndWhile   
-
-\end{algorithmic}
-\end{algorithm}   
-\begin{figure}
-\centering
-\includegraphics[scale=0.5]{OMP_table.pdf}
-\caption{The integration of aggregation rate distributed among OMP processes. This figure indicates the use of 4 OMP processes, the 
-configuration that gave us the best performance. This technique has been implemented for each MPI process.}
-\label{fig:mthds_OMP_distribution}
-\end{figure}	
-
 \subsection{Radical Pilot (RP) \& PBM+DEM communication}
 RADICAL-Pilot defines a number of abstractions to describe ressources, and computational 
 tasks. The Pilot Desciption is the abstraction that describes resources by defining the 
@@ -1416,6 +1349,82 @@ as the communication required would increase and it would help reduce total time
 The authors would like to acknowledge National Science Foundation (NSF) for 
 funding this project
 through the grant number: 1547171.
+\section*{Appendix}
+
+\begin{algorithm}[H]
+\caption*{\textbf{Pseudo Code}\gpnote{There are still }}\csnote{the integral signs have been removed}
+\label{alg:MyAlgorithm}
+\begin{algorithmic}[*]
+
+\While{ $t<t_{final}$ }
+\begin{itemize}[noitemsep,nolistsep,itemindent=10pt]
+\item The spatial domain is divided into equal chunks)
+\item Each MPI process is assigned on chunk of spatial domain shown as $c_{low}$ to $c_{up}$ 
+\item Sum all $c_{low_i}$ to $c_{up_i}$ is = to [0,number of Compartments]
+\end{itemize}
+\For{each MPI processes} $c = c_{low_i}$ to $c_{up_i}$
+\begin{itemize}[noitemsep,nolistsep,itemindent=20pt]
+\item Each MPI process is further divided with OMP to take advantage of multi-core CPU
+\item Each OMP process is allocated to a single compute core
+\item $\Re$ integrates for each first solid bin as the second solid bins is 
+divided across the OMP threads, thus 
+%$(i_1)$ $\int_{0}^{s_{2(OMP_0)}}$, $(i_2)$ $\int_{s_{2(OMP_0)}}^{s_{2(OMP_1)}}$, $(i_3)$ 
+%$\int_{s_{2(OMP_1)}}^{s_{2(OMP_2)}}$ and so on 
+divided into smaller integrals 
+%by MPI  
+%$\int_{i_1low_n}^{i_1up_n}$, $\int_{i_2low_n}
+%^{i_2up_n}$, $\int_{i_3low_n}^{i_3up_n}$ 
+%upto 16 compartments
+%which are solved by the "n" OMP processes. 
+Figure \ref{fig:mthds_OMP_distribution} depicts this distribution.
+\item Allocated to that MPI process (CPU)
+\end{itemize}
+\For{ each OMP process}
+\begin{itemize}[noitemsep,nolistsep,itemindent=30pt]
+\item Calculate the Aggregation Constant $\Re_{agg}(s_1,s_2,c)$
+\end{itemize}
+%\begin{align}
+%\Re_{agg}(s_1,s_2,c)=& \frac{1}{2}\int_{0}^{s_{1}} \int_{i_1low_n}^{i_1up_n} 
+%\beta(s_1',s_2',s_1-s_1',s_2-s_2',c)F(s_1',s_2',c)F(s_1-s_1',s_2-s_2',c)ds_1'ds_2'\notag\\ 
+%&- F(s_1,s_2,c)\int _{0}^{s_{max_1}-s_1} \int_{i_2low_n}^{i_2up_n} 
+%\beta(s_1,s_2,s_1',s_2',c)F(s_1',s_2',c)ds_1'ds_2'\notag
+%\end{align}
+%\begin{align*}
+%\Re_{break}(s_1,s_2,c) = \int_{0}^{s_{max_1}} \int_{i_3low_n}^{i_3up_n} K_{break}(s_1',s_2',c)F(s_1',s_2',c)ds_1'ds_2' - K_{break}
+%(s_1,s_2,c)F(s_1,s_2,c)
+%\end{align*}
+\EndFor
+\begin{itemize}[noitemsep,nolistsep,itemindent=20pt]
+\item  Calculate total number of particles using Euler's rule. 
+\end{itemize}
+%\begin{align*}
+%F_{t,c} &= \frac{\Delta F(s_1,s_2,c)}{\Delta t}\Delta t  + F(s_1,s_2,c)_{t-1}\\
+%      &=   (\Re_{agg}(s_1,s_2,c)+\Re_{break}(s_1,s_2,c)+\dot{F}_{in}(s_1,s_2,c)-\dot{F}_{out}(s_1,s_2,c))\Delta t + 
+%F(s_1,s_2,c)_{t-1}
+%\end{align*}
+
+\EndFor
+\begin{itemize}[noitemsep,nolistsep,itemindent=10pt]
+\item MPI Send $F_{t,c}$ to Master MPI process
+\item MPI Recv $F_{t,c}$ from MPI all slave processes
+\item Master consolidate all $F_{t,c}$ chunks into a complete $F_{t,all}$
+\item Master does inter-bin particle transfers (updates $F_{t,all}$)
+\item MPI Bcast $F_{t,all}$ to all slave processes
+\item $t_{new} = t + timestep$
+\end{itemize}
+\EndWhile   
+
+\end{algorithmic}
+\end{algorithm}  
+ 
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{OMP_table.pdf}
+\caption{The integration of aggregation rate distributed among OMP processes. This figure indicates the use of 4 OMP processes, the 
+configuration that gave us the best performance. This technique has been implemented for each MPI process.}
+\label{fig:mthds_OMP_distribution}
+\end{figure}	
+
 \section*{References} 
 \bibliographystyle{elsarticle-harv}
 \bibliography{Bibli}

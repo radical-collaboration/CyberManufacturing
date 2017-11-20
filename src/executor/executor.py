@@ -33,6 +33,7 @@ class Executor(object):
         # Attribute _resource            : The resource that will be used for the execution
         # Attribute _cores               : The number of cores that will be used
         # Attribute _queue               : The queue that will be used 
+        # Attribute _runtime             : The time resources are requested
         # Attribute _project             : The value of the project that will be charged
         # Attribute _pathtoLIGGHTSinputs : Absolute path to the input file for LIGGGHTS
         # Attribute _pathtoLIGGHTS       : Absolute path to LIGGGHTS executable to resource
@@ -52,6 +53,7 @@ class Executor(object):
             self._resource            = None
             self._cores               = None
             self._queue               = None
+            self._runtime             = None
             self._project             = None
             self._pathtoLIGGHTSinputs = None
             self._pathtoLIGGHTS       = None
@@ -67,18 +69,19 @@ class Executor(object):
             # Get the values of the attributes based on the config file
             try:
                 conf = ru.read_json(config)
-                self._session_name        = config['session']
-                self._resource            = config['resource']
-                self._cores               = config['cores']
-                self._queue               = config['queue']
-                self._project             = config['project']
-                self._pathtoLIGGHTSinputs = config['pathtoLIGGHTSinputs']
-                self._pathtoLIGGHTS       = config['pathtoLIGGHTS']
-                self._pathtoPBMexecutable = config['pathtoPBMexecutable']
-                self._DEMcores            = config['DEMcores']
-                self._PBMcores            = config['PBMcores']
-                self._timesteps           = config['timesteps']
-                self._diameter            = config['diameter']
+                self._session_name        = conf['session']
+                self._resource            = conf['resource']
+                self._cores               = conf['cores']
+                self._queue               = conf['queue']
+                self._runtime             = conf['runtime']
+                self._project             = conf['project']
+                self._pathtoLIGGHTSinputs = conf['pathtoLIGGHTSinputs']
+                self._pathtoLIGGHTS       = conf['pathtoLIGGHTS']
+                self._pathtoPBMexecutable = conf['pathtoPBMexecutable']
+                self._DEMcores            = conf['DEMcores']
+                self._PBMcores            = conf['PBMcores']
+                self._timesteps           = conf['timesteps']
+                self._diameter            = conf['diameter']
             except IOError as e:
                 raise RuntimeError('%s is not a valid configuration file'%config)
             except KeyError as e:
@@ -86,12 +89,12 @@ class Executor(object):
 
             # If there is a key named PBMnumber use the assigned value, else spawn
             # as many as possible in the cores that DEM used.
-            self._PBMs                = config['PBMnumber'] if conf.has_key('PBMnumber') else self._DEMcores/self._PBMcores
+            self._PBMs                = conf['PBMnumber'] if conf.has_key('PBMnumber') else self._DEMcores/self._PBMcores
             self._DEMs                = 1
-            self._types               = config['types'] if conf.has_key('types') else 16
-            self._bins1               = config['bins1'] if conf.has_key('bins1') else 16
-            self._bins2               = config['bins2'] if conf.has_key('bins2') else 16
-            self._diff_DEM            = config['diff_DEM'] if conf.has_key('diff_DEM') else 50000
+            self._types               = conf['types'] if conf.has_key('types') else 16
+            self._bins1               = conf['bins1'] if conf.has_key('bins1') else 16
+            self._bins2               = conf['bins2'] if conf.has_key('bins2') else 16
+            self._diff_DEM            = conf['diff_DEM'] if conf.has_key('diff_DEM') else 50000
 
         # Initialize the Pilot Manager, Unit Manager and Session to None, until those objects are 
         # being created.
@@ -108,6 +111,7 @@ class Executor(object):
             'session'             : The name of the RADICAL-Pilot Session
             'resource'            : The resource that will be used for the execution
             'cores'               : The number of cores that will be used
+            'runtime'             : The time resources are requested
             'queue'               : The queue that will be used 
             'project'             : The value of the project that will be charged
             'pathtoLIGGHTSinputs' : Absolute path to the input file for LIGGGHTS
@@ -129,18 +133,19 @@ class Executor(object):
 
         try:
             conf = ru.read_json(config)
-            self._session_name        = config['session']
-            self._resource            = config['resource']
-            self._cores               = config['cores']
-            self._queue               = config['queue']
-            self._project             = config['project']
-            self._pathtoLIGGHTSinputs = config['pathtoLIGGHTSinputs']
-            self._pathtoLIGGHTS       = config['pathtoLIGGHTS']
-            self._pathtoPBMexecutable = config['pathtoPBMexecutable']
-            self._DEMcores            = config['DEMcores']
-            self._PBMcores            = config['PBMcores']
-            self._timesteps           = config['timesteps']
-            self._diameter            = config['diameter']
+            self._session_name        = conf['session']
+            self._resource            = conf['resource']
+            self._cores               = conf['cores']
+            self._queue               = conf['queue']
+            self._runtime             = conf['runtime']
+            self._project             = conf['project']
+            self._pathtoLIGGHTSinputs = conf['pathtoLIGGHTSinputs']
+            self._pathtoLIGGHTS       = conf['pathtoLIGGHTS']
+            self._pathtoPBMexecutable = conf['pathtoPBMexecutable']
+            self._DEMcores            = conf['DEMcores']
+            self._PBMcores            = conf['PBMcores']
+            self._timesteps           = conf['timesteps']
+            self._diameter            = conf['diameter']
         except IOError as e:
             raise RuntimeError('%s is not a valid configuration file'%config)
         except KeyError as e:
@@ -149,12 +154,12 @@ class Executor(object):
 
         # If there is a key named PBMnumber use the assigned value, else spawn
         # as many as possible in the cores that DEM used.
-        self._PBMs                = config['PBMnumber'] if conf.has_key('PBMnumber') else self._DEMcores/self._PBMcores
+        self._PBMs                = conf['PBMnumber'] if conf.has_key('PBMnumber') else self._DEMcores/self._PBMcores
         self._DEMs                = 1
-        self._types               = config['types'] if conf.has_key('types') else 16
-        self._bins1               = config['bins1'] if conf.has_key('bins1') else 16
-        self._bins2               = config['bins2'] if conf.has_key('bins2') else 16
-        self._diff_DEM            = config['diff_DEM'] if conf.has_key('diff_DEM') else 50000
+        self._types               = conf['types'] if conf.has_key('types') else 16
+        self._bins1               = conf['bins1'] if conf.has_key('bins1') else 16
+        self._bins2               = conf['bins2'] if conf.has_key('bins2') else 16
+        self._diff_DEM            = conf['diff_DEM'] if conf.has_key('diff_DEM') else 50000
 
     def _start(self):
         """
@@ -179,21 +184,22 @@ class Executor(object):
             pd_desc = {
                         'resource'      : self._resource,
                         'runtime'       : self._runtime,  # pilot runtime (min)
-                        'exit_on_error' : True            # In case of an error, the pilot exits
+                        'exit_on_error' : True,            # In case of an error, the pilot exits
                         'project'       : self._project,
                         'queue'         : self._queue,
                         'cores'         : self._cores
                       }
 
-            pdesc = rp.ComputePilotDescription(pd_init)
+            pdesc = rp.ComputePilotDescription(pd_desc)
 
             # Launch the pilot.
-            self._pmgr.submit_pilots(pdesc)
+            pilot = self._pmgr.submit_pilots(pdesc)
             # Register the ComputePilot in a UnitManager object.
             self._umgr.add_pilots(pilot)
 
-            return 0
+
         except Exception as e:
+            self._session.close()
             # Something unexpected happened in the pilot code above
             raise RuntimeError('caught Exception %s\n'%e)
 
@@ -202,6 +208,7 @@ class Executor(object):
             # corresponding KeyboardInterrupt exception for shutdown.  We also catch
             # SystemExit (which gets raised if the main threads exits for some other
             # reason).
+            self._session.close()
             warnings.warn('exit requested\n',UserWarning)
 
     def _start_dem_units(self,timestep=0,types=0,restart=False):
@@ -262,7 +269,7 @@ class Executor(object):
 
             # Submit the first unit and wait until it staged its input files. Waiting is
             # needed so that we can get the path of the unit and pass it to the DEM monitor.
-            dem_unit = self._umgr.submits_units(cud)
+            dem_unit = self._umgr.submit_units(cud)
             # This line blocks the execution until the DEM unit has a path.
             self._umgr.wait_units(uids=dem_unit.uid,state=rp.states.AGENT_SCHEDULING_PENDING)
 
@@ -270,21 +277,21 @@ class Executor(object):
             cud2 = rp.ComputeUnitDescription()
             cud2.executable = 'python'
             cud2.arguments = ['controller_DEMresource_main.py',timestep,self._types,ru.Url(dem_unit.sandbox).path]
-            cud2.input_staging = [{'source':'file:///controller_DEMresource_main.py'
-                                  'target':'unit:///controller_DEMresource_main.py'
+            cud2.input_staging = [{'source':'file:///controller_DEMresource_main.py',
+                                  'target':'unit:///controller_DEMresource_main.py',
                                   'action': rp.TRANSFER},
-                                  {'source':'file:///controller_DEMresource_data_reader.py'
-                                  'target':'unit:///controller_DEMresource_data_reader.py'
+                                  {'source':'file:///controller_DEMresource_data_reader.py',
+                                  'target':'unit:///controller_DEMresource_data_reader.py',
                                   'action': rp.TRANSFER},
-                                  {'source':'file:///controller_DEMresource_data_interpretor.py'
-                                  'target':'unit:///controller_DEMresource_data_interpretor.py'
+                                  {'source':'file:///controller_DEMresource_data_interpretor.py',
+                                  'target':'unit:///controller_DEMresource_data_interpretor.py',
                                   'action': rp.TRANSFER}]
             cud2.output_staging = [{'source': 'unit:///DEM_status.json',
                                     'target': 'file:///DEM_status.json',
                                     'action'  : rp.TRANSFER}]
 
             # Submit the monitor unit and return
-            dem_monitor_unit = self._umgr.submits_units(cud2)
+            dem_monitor_unit = self._umgr.submit_units(cud2)
 
 
             self._dem_unit = dem_unit
@@ -390,7 +397,7 @@ class Executor(object):
                                  'target' : 'unit:///sampledumpfiles/impact%d.%d_%f'%(timesteps-2*self._diff_DEM,self._DEMcores,self._diameter),
                                  'action' : rp.LINK},
                                 {'source' : ru.Url(self._pbm_unit[i]).path+'csvDump/particles_%f.csv'%init_timestep,
-                                 'target' : 'unit:///csvDump/particles_%f.csv'%init_timestep
+                                 'target' : 'unit:///csvDump/particles_%f.csv'%init_timestep,
                                  'action' : rp.LINK}]
                 else:
                     cud.pre_exec       = ['mkdir csvDump','mkdir txtDumps']
@@ -416,20 +423,20 @@ class Executor(object):
                 pbm_cud_list.append(cud)
 
             # Submit them to the agent and wait until all have a path
-            pbm_uids = self._umgr.submits_units(pbm_cud_list)
+            pbm_uids = self._umgr.submit_units(pbm_cud_list)
             self._umgr.wait_units(uids=pbm_uids.uid,state=rp.states.AGENT_SCHEDULING_PENDING)
 
             pbm_monitor_cud_list = list()
             for i in range(self._PBMs):
                 cud = rp.ComputeUnitDescription()
-                cud.input_staging = [{'source':'file:///controllerPBMresourceMain.py'
-                                       'target':'unit:///controllerPBMresourceMain.py'
+                cud.input_staging = [{'source':'file:///controllerPBMresourceMain.py',
+                                       'target':'unit:///controllerPBMresourceMain.py',
                                        'action': rp.TRANSFER},
-                                      {'source':'file:///controllerPBMresourceDataReader.py'
-                                       'target':'unit:///controllerPBMresourceDataReader.py'
+                                      {'source':'file:///controllerPBMresourceDataReader.py',
+                                       'target':'unit:///controllerPBMresourceDataReader.py',
                                        'action': rp.TRANSFER},
-                                      {'source':'file:///controllerPBMresourceDataInterpretor.py'
-                                       'target':'unit:///controllerPBMresourceDataInterpretor.py'
+                                      {'source':'file:///controllerPBMresourceDataInterpretor.py',
+                                       'target':'unit:///controllerPBMresourceDataInterpretor.py',
                                        'action': rp.TRANSFER}]
                 cud.output_staging = [{'source': 'unit:///PBM_status.json',
                                        'target': 'file:///PBM_status.json',
@@ -446,20 +453,21 @@ class Executor(object):
                 pbm_cud_list.append(cud)
 
             # Submit the monitor unit and return
-            pbm_monitor_unit = self._umgr.submits_units(cud2)
+            pbm_monitor_unit = self._umgr.submit_units(cud2)
 
             self._pbm_unit = pbm_uids
             self._pbm_monitor_unit = pbm_monitor_unit
+        except:
+            # Something unexpected happened in the pilot code above
+            raise RuntimeError('caught Exception %s\n'%e)
 
     def _shutdown(self):
         self._session.close()
 
     def run(self):
 
-
         # Start the RP session and setup the selected resource.
         self._start()
-
 
         cont = True
         #Does DEM restart or not
@@ -472,14 +480,14 @@ class Executor(object):
 
             self._start_dem_units(timestep=dem_timestep,restart=restart)
 
-            self._umgr.wait_units(uid=self._dem_monitor_unit.uid)
+            self._umgr.wait_units(uids=self._dem_monitor_unit.uid)
 
             # Check DEM status returns whether the execution should continue
             # or not. It also returns the timestep PBM should start.
             cont, dem_timestep, pbm_init_timestep, pbm_mixing_time = self._check_DEM_status('DEM_status.json')
 
             if self._dem_unit.state() != rp.FINAL:
-                self._umgr.cancel_units(uid=self._dem_unit.uid)
+                self._umgr.cancel_units(uids=self._dem_unit.uid)
 
             if cont == True:
                 self._start_pbm_units(timestep=pbm_timestep, init_timestep=pbm_init_timestep,\
@@ -487,9 +495,9 @@ class Executor(object):
 
                 # Waits for all the PBM units to finish. Should wait only for the
                 # first
-                self._umgr.wait_units(uid=[cu.uid for cu in self._pbm_monitor_units])
+                self._umgr.wait_units(uids=[cu.uid for cu in self._pbm_monitor_units])
 
-                self._umgr.cancel_units(uid=[cu.uid for cu in self._pbm_units])
+                self._umgr.cancel_units(uids=[cu.uid for cu in self._pbm_units])
 
                 cont, pbm_timestep = self._check_PBM_status('PBM_status.json')
 

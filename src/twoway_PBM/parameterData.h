@@ -1,6 +1,7 @@
 #ifndef PARAMETERDATA_H
 #define PARAMETERDATA_H
 
+#include "utility.h"
 
 // Class to provide input parameters to initiating PBM
 // Parameters are assigned either by reading PBM input files or values from parameters.h
@@ -66,7 +67,11 @@ public:
     ~parameterData();
 
     void readPBMInputFile (/*parameter to specify iteration specific file */);
-
+    
+    //Function to read csv file of particles, liquid or gas
+    // Specify content as particles/liquid/gas
+    arrayOfDouble3D readCompartmentInputFile (double time, std::string content);
+    
 };
 
 

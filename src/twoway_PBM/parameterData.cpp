@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <algorithm>
 
 #include "parameters.h"
 #include "parameterData.h"
@@ -295,4 +296,49 @@ void parameterData::readPBMInputFile (/*parameter to specify iteration specific 
     lineData = move(stringstream(line));
     lineData >> tmpStr;
     lineData >> nDEMBins;    
+}
+
+arrayOfDouble3D parameterData::readCompartmentInputFile (double time, string content)
+{
+    arrayOfDouble3D f;
+
+    string filePath = string("./csvDump");
+    string fileName = content + string("_") + to_string(time) + string(".csv");
+    ifstream csvInputFile;
+    csvInputFile.open((filePath + fileName).c_str(), ifstream::in);
+
+    if (!csvInputFile.is_open())
+    {
+        std::cout << "No " << content << " file with " << time << " time stamp " << endl;
+        return f;
+    }
+    
+    f = getArrayOfDouble3D (nCompartments, nFirstSolidBins, nSecondSolidBins);
+
+    string line;
+    string tmpStr;
+    stringstream lineData;
+
+    getline(csvInputFile, line); // read and ignore first header line
+
+    size_t compartment = 0;
+    size_t firstSolid = 0;
+    size_t secondSolid = 0;
+    double value = 0.0;
+
+    while(getline(csvInputFile, line))
+    {
+        replace( line.begin(), line.end(), ',', ' ' );
+        lineData = move(stringstream(line));
+        lineData >> compartment;
+        lineData >> firstSolid;
+        lineData >> secondSolid;
+        lineData >> value;
+
+        if(compartment > nCompartments || firstSolid > nFirstSolidBins || secondSolid > nSecondSolidBins)
+            break;
+
+        f[compartment][firstSolid][secondSolid] = value;        
+    }
+    return f;
 }

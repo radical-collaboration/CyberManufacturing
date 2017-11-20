@@ -962,6 +962,8 @@ int main(int argc, char *argv[])
                 string appendFileName = string("_") + timeStr;
                 dumpDiaCSV(timeToDump, d50ToDump, string("d50") + appendFileName);
                 dump3DCSV(fAllCompartments, string("particles") + appendFileName);
+                dump3DCSV(flAllCompartments, string("liquid") + appendFileName);
+                dump3DCSV(fgAllCompartments, string("gas") + appendFileName);
                 lastTime = time;
                 lastTimeIdxCount = timeIdxCount;
             }            

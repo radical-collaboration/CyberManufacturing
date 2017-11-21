@@ -270,24 +270,27 @@ class Executor(object):
             # Submit the first unit and wait until it staged its input files. Waiting is
             # needed so that we can get the path of the unit and pass it to the DEM monitor.
             dem_unit = self._umgr.submit_units(cud)
+            print "Waiting for DEM"
             # This line blocks the execution until the DEM unit has a path.
-            self._umgr.wait_units(uids=dem_unit.uid,state=rp.states.AGENT_SCHEDULING_PENDING)
+            self._umgr.wait_units(uids=[dem_unit.uid],state=[rp.AGENT_SCHEDULING_PENDING])
+            print "creating Monitor"
 
             #Now that we have a path we can continue
             cud2 = rp.ComputeUnitDescription()
             cud2.executable = 'python'
             cud2.arguments = ['controller_DEMresource_main.py',timestep,self._types,ru.Url(dem_unit.sandbox).path]
-            cud2.input_staging = [{'source':'file:///controller_DEMresource_main.py',
-                                  'target':'unit:///controller_DEMresource_main.py',
-                                  'action': rp.TRANSFER},
-                                  {'source':'file:///controller_DEMresource_data_reader.py',
-                                  'target':'unit:///controller_DEMresource_data_reader.py',
-                                  'action': rp.TRANSFER},
-                                  {'source':'file:///controller_DEMresource_data_interpretor.py',
-                                  'target':'unit:///controller_DEMresource_data_interpretor.py',
-                                  'action': rp.TRANSFER}]
+            print cud2.arguments
+            cud2.input_staging = [{'source':'client:///controller_DEMresource_main.py',
+                                   'target':'unit:///controller_DEMresource_main.py',
+                                   'action': rp.TRANSFER},
+                                  {'source':'client:///controller_DEMresource_data_reader.py',
+                                   'target':'unit:///controller_DEMresource_data_reader.py',
+                                   'action': rp.TRANSFER},
+                                  {'source':'client:///controller_DEMresource_data_interpretor.py',
+                                   'target':'unit:///controller_DEMresource_data_interpretor.py',
+                                   'action': rp.TRANSFER}]
             cud2.output_staging = [{'source': 'unit:///DEM_status.json',
-                                    'target': 'file:///DEM_status.json',
+                                    'target': 'client:///DEM_status.json',
                                     'action'  : rp.TRANSFER}]
 
             # Submit the monitor unit and return
@@ -424,22 +427,22 @@ class Executor(object):
 
             # Submit them to the agent and wait until all have a path
             pbm_uids = self._umgr.submit_units(pbm_cud_list)
-            self._umgr.wait_units(uids=pbm_uids.uid,state=rp.states.AGENT_SCHEDULING_PENDING)
+            self._umgr.wait_units(uids=pbm_uids.uid,state=rp.AGENT_SCHEDULING_PENDING)
 
             pbm_monitor_cud_list = list()
             for i in range(self._PBMs):
                 cud = rp.ComputeUnitDescription()
-                cud.input_staging = [{'source':'file:///controllerPBMresourceMain.py',
+                cud.input_staging = [{'source':'client:///controllerPBMresourceMain.py',
                                        'target':'unit:///controllerPBMresourceMain.py',
                                        'action': rp.TRANSFER},
-                                      {'source':'file:///controllerPBMresourceDataReader.py',
+                                      {'source':'client:///controllerPBMresourceDataReader.py',
                                        'target':'unit:///controllerPBMresourceDataReader.py',
                                        'action': rp.TRANSFER},
-                                      {'source':'file:///controllerPBMresourceDataInterpretor.py',
+                                      {'source':'client:///controllerPBMresourceDataInterpretor.py',
                                        'target':'unit:///controllerPBMresourceDataInterpretor.py',
                                        'action': rp.TRANSFER}]
                 cud.output_staging = [{'source': 'unit:///PBM_status.json',
-                                       'target': 'file:///PBM_status.json',
+                                       'target': 'client:///PBM_status.json',
                                        'action'  : rp.TRANSFER},
                                       {'source': 'unit:///in.restart_from_%d'%timestep,
                                        'target':'pilot:///in.restart_from_%d'%timestep,
@@ -480,6 +483,7 @@ class Executor(object):
 
             self._start_dem_units(timestep=dem_timestep,restart=restart)
 
+            print 'Units submitted'
             self._umgr.wait_units(uids=self._dem_monitor_unit.uid)
 
             # Check DEM status returns whether the execution should continue

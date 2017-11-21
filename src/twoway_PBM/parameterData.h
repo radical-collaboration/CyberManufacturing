@@ -70,7 +70,7 @@ public:
     
     //Function to read csv file of particles, liquid or gas
     // Specify content as particles/liquid/gas
-    arrayOfDouble3D readCompartmentInputFile (double time, std::string content);
+    arrayOfDouble3D readCompartmentInputFile (std::string timeStr, std::string content);
     
 };
 

@@ -15,6 +15,7 @@
 
 using namespace std;
 
+#define TWOWAYCOUPLE false
 #define MASTER 0
 
 //MACROS
@@ -407,9 +408,30 @@ int main(int argc, char *argv[])
     //cout<< "Time Loop" << endl;
     //cout << "Initializations..." << endl;
 
-    arrayOfDouble3D fAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
-    arrayOfDouble3D flAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
-    arrayOfDouble3D fgAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
+    arrayOfDouble3D fAllCompartments;
+    arrayOfDouble3D flAllCompartments;
+    arrayOfDouble3D fgAllCompartments;
+
+    if(TWOWAYCOUPLE)
+    {
+        fAllCompartments = pData->readCompartmentInputFile(/*timeValueString*/ string("19.881836"), string("particles"));
+        flAllCompartments = pData->readCompartmentInputFile(/*timeValueString*/ string("19.881836"), string("liquid"));
+        fgAllCompartments = pData->readCompartmentInputFile(/*timeValueString*/ string("19.881836"), string("gas"));
+        
+        // cout << "dumping test data" << endl;
+        // if(mpi_id == MASTER)
+        // {
+        //     DUMP3DCSV(fAllCompartments);
+        //     DUMP3DCSV(flAllCompartments);
+        //     DUMP3DCSV(fgAllCompartments);
+        // }
+    }
+    else
+    {
+        fAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
+        flAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
+        fgAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
+    }
 
     arrayOfDouble3D dfdtAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);
     arrayOfDouble3D dfldtAllCompartments = getArrayOfDouble3D(nCompartments, nFirstSolidBins, nSecondSolidBins);

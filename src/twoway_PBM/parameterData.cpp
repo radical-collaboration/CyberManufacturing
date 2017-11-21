@@ -298,28 +298,28 @@ void parameterData::readPBMInputFile (/*parameter to specify iteration specific 
     lineData >> nDEMBins;    
 }
 
-arrayOfDouble3D parameterData::readCompartmentInputFile (double time, string content)
+arrayOfDouble3D parameterData::readCompartmentInputFile (string timeStr, string content)
 {
     arrayOfDouble3D f;
 
-    string filePath = string("./csvDump");
-    string fileName = content + string("_") + to_string(time) + string(".csv");
+    string filePath = string("./csvDump/");
+    string fileName = content + string("_") + timeStr + string(".csv");
     ifstream csvInputFile;
     csvInputFile.open((filePath + fileName).c_str(), ifstream::in);
 
     if (!csvInputFile.is_open())
     {
-        std::cout << "No " << content << " file with " << time << " time stamp " << endl;
+        std::cout << "No " << content << " file with " << timeStr << " time stamp " << endl;
         return f;
     }
     
     f = getArrayOfDouble3D (nCompartments, nFirstSolidBins, nSecondSolidBins);
-
+    
     string line;
-    string tmpStr;
     stringstream lineData;
 
     getline(csvInputFile, line); // read and ignore first header line
+    cout << line << endl;
 
     size_t compartment = 0;
     size_t firstSolid = 0;
@@ -335,10 +335,16 @@ arrayOfDouble3D parameterData::readCompartmentInputFile (double time, string con
         lineData >> secondSolid;
         lineData >> value;
 
-        if(compartment > nCompartments || firstSolid > nFirstSolidBins || secondSolid > nSecondSolidBins)
-            break;
+        if(compartment > (nCompartments-1) || firstSolid > (nFirstSolidBins-1) || secondSolid > (nSecondSolidBins-1))
+            {
+                cout << "Dimension(s) exceed while reading csv input" << endl;
+                cout << "Compartment = " << compartment << "; Should be less than " << nCompartments << endl;
+                cout << "First Solid Bin = " << firstSolid << "; Should be less than " << nFirstSolidBins << endl;
+                cout << "Second Solid Bin = " << secondSolid << "; Should be less than " << nSecondSolidBins << endl;
+                break;
+            }
 
-        f[compartment][firstSolid][secondSolid] = value;        
+        f[compartment-1][firstSolid-1][secondSolid-1] = value;        
     }
     return f;
 }

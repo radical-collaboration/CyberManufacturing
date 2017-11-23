@@ -105,6 +105,8 @@ class controller_DEMresource_main(object):
             dump_data['Mixing Time'].append(25)
             dump_data['Liquid Addition Time'] = []
             dump_data['Liquid Addition Time'].append(125)
+            dump_data['PBM_init_time_step'] = []
+            dump_data['PBM_init_time_step'].append(0.000000)
             #dump_data['collision_matrix'] = []
             #dump_data['collision_matrix'].append(list(list(obj_inter.collision_matrix)))
             #dump_data.update({'collision_matrix': obj_inter.collision_matrix})

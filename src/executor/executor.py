@@ -10,6 +10,7 @@ import sys
 import warnings
 import radical.utils as ru
 import radical.pilot as rp
+import json
 
 
 class Executor(object):
@@ -270,16 +271,13 @@ class Executor(object):
             # Submit the first unit and wait until it staged its input files. Waiting is
             # needed so that we can get the path of the unit and pass it to the DEM monitor.
             dem_unit = self._umgr.submit_units(cud)
-            print "Waiting for DEM"
             # This line blocks the execution until the DEM unit has a path.
             self._umgr.wait_units(uids=[dem_unit.uid],state=[rp.AGENT_SCHEDULING_PENDING])
-            print "creating Monitor"
 
             #Now that we have a path we can continue
             cud2 = rp.ComputeUnitDescription()
             cud2.executable = 'python'
             cud2.arguments = ['controller_DEMresource_main.py',timestep,self._types,ru.Url(dem_unit.sandbox).path]
-            print cud2.arguments
             cud2.input_staging = [{'source':'client:///controller_DEMresource_main.py',
                                    'target':'unit:///controller_DEMresource_main.py',
                                    'action': rp.TRANSFER},
@@ -483,7 +481,6 @@ class Executor(object):
 
             self._start_dem_units(timestep=dem_timestep,restart=restart)
 
-            print 'Units submitted'
             self._umgr.wait_units(uids=self._dem_monitor_unit.uid)
 
             # Check DEM status returns whether the execution should continue

@@ -101,8 +101,8 @@ class controller_DEMresource_main(object):
             dump_data['Aggregation Kernel Constant'].append(1e-9)
             dump_data['Breakage Kernel Constant'] = []
             dump_data['Breakage Kernel Constant'].append(1e-7)
-            dump_data['Mixing Time'] = []
-            dump_data['Mixing Time'].append(25)
+            dump_data['mixing_times'] = []
+            dump_data['mixing_times'].append(25)
             dump_data['Liquid Addition Time'] = []
             dump_data['Liquid Addition Time'].append(125)
             dump_data['PBM_init_time_step'] = []

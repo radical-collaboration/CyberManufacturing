@@ -15,7 +15,7 @@
 
 using namespace std;
 
-#define TWOWAYCOUPLE false
+#define TWOWAYCOUPLE true
 #define MASTER 0
 
 //MACROS
@@ -43,6 +43,8 @@ int main(int argc, char *argv[])
 
     string coreVal;
     string diaVal;
+    string pbmInFilePath;
+    string timeVal;
 
     //**************************************************************************************************
     int num_mpi = 0;
@@ -56,15 +58,17 @@ int main(int argc, char *argv[])
     {
         startTimeStr = string(timestring());
         startTime = MPI_Wtime();
-        if (argc < 3)
+        if (argc < 5)
         {
-            cout << "Core and Diameter values aren't available as input parameters" << endl;
+            cout << "All values aren't available as input parameters" << endl;
             int mpi_err = 0;
             MPI_Abort(MPI_COMM_WORLD, mpi_err);
         }
     }
-    coreVal = string(argv[1]);
-    diaVal = string(argv[2]);
+    pbmInFilePath = string(argv[1]); 
+    coreVal = string(argv[2]);
+    diaVal = string(argv[3]);
+    timeVal = string(argv[4]);
 
     MPI_Barrier(MPI_COMM_WORLD);
 
@@ -72,7 +76,7 @@ int main(int argc, char *argv[])
     //cout << "Hello, I am mpi process # = " << mpi_id << endl;
 
     pData = parameterData::getInstance();
-    pData->readPBMInputFile();
+    pData->readPBMInputFile(pbmInFilePath);
 
     int nCompartments = pData->nCompartments;
     if (mpi_id == MASTER)
@@ -412,11 +416,11 @@ int main(int argc, char *argv[])
     arrayOfDouble3D flAllCompartments;
     arrayOfDouble3D fgAllCompartments;
 
-    if(TWOWAYCOUPLE)
+    if (TWOWAYCOUPLE && fabs(stod(timeVal)) > 1.0e-16)
     {
-        fAllCompartments = pData->readCompartmentInputFile(/*timeValueString*/ string("19.881836"), string("particles"));
-        flAllCompartments = pData->readCompartmentInputFile(/*timeValueString*/ string("19.881836"), string("liquid"));
-        fgAllCompartments = pData->readCompartmentInputFile(/*timeValueString*/ string("19.881836"), string("gas"));
+        fAllCompartments = pData->readCompartmentInputFile(/*timeValueString*/ timeVal, string("particles"));
+        flAllCompartments = pData->readCompartmentInputFile(/*timeValueString*/ timeVal, string("liquid"));
+        fgAllCompartments = pData->readCompartmentInputFile(/*timeValueString*/ timeVal, string("gas"));
         
         // cout << "dumping test data" << endl;
         // if(mpi_id == MASTER)
@@ -536,7 +540,7 @@ int main(int argc, char *argv[])
     double liqDensity = pData->liqDensity;
     double liquidAddRate = (liqSolidRatio * throughput) / (liqDensity * 3600);
     liquidAdditionRateAllCompartments[0] = liquidAddRate;
-    double time = 0.0;
+    double time = stod(timeVal);
     double timeStep = 0.5; //1.0e-1;
     vector<double> Time;
     arrayOfDouble4D fAllCompartmentsOverTime;
@@ -612,12 +616,12 @@ int main(int argc, char *argv[])
     double premixTime = pData->premixTime;
     double liqAddTime = pData->liqAddTime;
     double postMixTime = pData->postMixTime;
-    double finalTime = premixTime + liqAddTime + postMixTime;
+    double finalTime = premixTime + liqAddTime + postMixTime + stod(timeVal);
     double initPorosity = pData->initPorosity;
     while (time <= finalTime)
     {
-        if (time > premixTime + liqAddTime)
-            fIn = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+        // if (time > premixTime + liqAddTime)
+        //     fIn = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
         for (int c = core_low; c < core_up; c++) //for (int c = 0; c < nCompartments; c++)
         {
             compartmentIn.fAll = fAllCompartments[c];

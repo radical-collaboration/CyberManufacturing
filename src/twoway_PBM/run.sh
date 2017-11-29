@@ -12,7 +12,7 @@ echo "Running model.out"
 
 #export OMP_NUM_THREADS=2
 
-mpirun -n 4 ./model.out 128 200 > output_test.txt
+mpirun -n 4 ./model.out /home/chai/Documents/git/CyberManufacturing/src/twoway_PBM/PBM_Input.in 128 200 11.250000 > output_test.txt
 
 echo "DONE"
 

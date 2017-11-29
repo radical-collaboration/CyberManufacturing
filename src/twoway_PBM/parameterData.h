@@ -66,7 +66,7 @@ public:
     static parameterData *getInstance();
     ~parameterData();
 
-    void readPBMInputFile (/*parameter to specify iteration specific file */);
+    void readPBMInputFile (std::string pbmInFilePath);
     
     //Function to read csv file of particles, liquid or gas
     // Specify content as particles/liquid/gas

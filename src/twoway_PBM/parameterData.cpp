@@ -35,7 +35,7 @@ parameterData *parameterData::getInstance()
         return pData;
 }
 
-void parameterData::readPBMInputFile (/*parameter to specify iteration specific file */)
+void parameterData::readPBMInputFile (string pbmInFilePath)
 {
     //For now, initialising values from parameters.h
     //Later, when format of input file is finalized, following values will be initialized by reading PBM input files
@@ -90,7 +90,7 @@ void parameterData::readPBMInputFile (/*parameter to specify iteration specific 
     // Read input values from file
 
     ifstream pbmInputFile;
-    pbmInputFile.open("PBM_Input.in", ifstream::in);
+    pbmInputFile.open(pbmInFilePath.c_str(), ifstream::in);
 
     if (!pbmInputFile.is_open())
     {
@@ -212,7 +212,7 @@ void parameterData::readPBMInputFile (/*parameter to specify iteration specific 
     lineData = move(stringstream(line));
     lineData >> tmpStr;
     lineData >> liqAddTime;
-
+    
     //Read PostMixingTime
     getline(pbmInputFile, line);
     lineData = move(stringstream(line));

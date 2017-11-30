@@ -45,8 +45,8 @@ def dummy_PBM(last_timestep_index, copypath):
         print(d50_nextfile)
         print(particles_nextfile)
         if (os.path.isfile(d50_nextfile) and os.path.isfile(particles_nextfile)):
-            shutil.copy2(d50_nextfile, os.getcwd())
-            shutil.copy2(particles_nextfile, os.getcwd())
+            shutil.copy2(d50_nextfile, os.getcwd() + '/csvDump')
+            shutil.copy2(particles_nextfile, os.getcwd()+ '/csvDump')
             print("Waiting")
             time.sleep(rand_num)
         else:

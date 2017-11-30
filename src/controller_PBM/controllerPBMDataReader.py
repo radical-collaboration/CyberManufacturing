@@ -38,7 +38,7 @@ class controllerPBMDataReader(object):
     def nextfile_time_finder(self, last_ts):
         particles_file_list = glob.glob(self.PBM_output_path + "/particles_*.csv")
         num_start_particles = re.search("particles_",particles_file_list[0]).end()
-        num_end_particles = re.search(".csv",particles_file_list[0]).start()
+        num_end_particles = re.search("0.csv",particles_file_list[0]).start()
         # the generated file list is sorted by extracting the time step from the file name and then sorted according to the time step
         if (num_end_particles - num_start_particles == 8):
             particles_file_list = sorted(particles_file_list, key=lambda x: float(x[num_start_particles:num_end_particles]))
@@ -47,7 +47,7 @@ class controllerPBMDataReader(object):
         d50_file_list = glob.glob(self.PBM_output_path + "/d50_*.csv")
         # file_list_d50 = sorted(file_list_d50, key=lambda x: float(x[-13:-5]))
         # print(d50_file_list)
-        num_end_d50 = re.search(".csv",d50_file_list[0]).start()
+        num_end_d50 = re.search("0.csv",d50_file_list[0]).start()
         num_start_d50 = re.search("d50_",d50_file_list[0]).end()
         if (num_end_d50 - num_start_d50 == 8):
             d50_file_list = sorted(d50_file_list, key=lambda x: float(x[num_start_d50:num_end_d50]))
@@ -95,7 +95,7 @@ class controllerPBMDataReader(object):
             read_d50 = pd.read_csv(d50_current_file, header = 0)
             ts_len = len(read_d50.Time)
             for x in range(0, ts_len):
-                for i in range(0,self.compartments + 1):
+                for i in range(0,self.compartments):
                     if np.isnan(read_d50.iloc[x][i+1]):
                         temp_d50[0][i] = 0
                     else:

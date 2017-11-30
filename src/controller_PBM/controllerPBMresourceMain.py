@@ -102,12 +102,10 @@ class controllerPBMresourceMain(object):
                 #pbmsf.write(str(new_timestep))
         elif (flag == 2):
             print("Kill both DEM and PBM")
-            status = {'status':str(flag)}
-            out_data = {'last timestep': str(new_timestep)}
+            status = {'status':str(flag),'last timestep': str(new_timestep)}
+            # out_data = {'last timestep': str(new_timestep)}
             with open('PBM_status.json' , 'w') as pbmsf:
                 json.dump(status, pbmsf)
-            with open('PBM_output.json', 'w') as pbmsf:
-                json.dump(out_data, pbmsf)
                 # pbmsf.write(str(new_timestep))
             
 

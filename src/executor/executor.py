@@ -90,12 +90,13 @@ class Executor(object):
 
             # If there is a key named PBMnumber use the assigned value, else spawn
             # as many as possible in the cores that DEM used.
-            self._PBMs                = conf['PBMnumber'] if conf.has_key('PBMnumber') else self._DEMcores/self._PBMcores
+            self._PBMs                = conf['PBMnumber'] if conf.has_key('PBMnumber') else int(self._DEMcores/self._PBMcores)
             self._DEMs                = 1
             self._types               = conf['types'] if conf.has_key('types') else 16
             self._bins1               = conf['bins1'] if conf.has_key('bins1') else 16
             self._bins2               = conf['bins2'] if conf.has_key('bins2') else 16
             self._diff_DEM            = conf['diff_DEM'] if conf.has_key('diff_DEM') else 50000
+            self._compartments        = conf['compartments'] if conf.has_key('compartments') else 4
 
         # Initialize the Pilot Manager, Unit Manager and Session to None, until those objects are 
         # being created.
@@ -155,12 +156,13 @@ class Executor(object):
 
         # If there is a key named PBMnumber use the assigned value, else spawn
         # as many as possible in the cores that DEM used.
-        self._PBMs                = conf['PBMnumber'] if conf.has_key('PBMnumber') else self._DEMcores/self._PBMcores
+        self._PBMs                = conf['PBMnumber'] if conf.has_key('PBMnumber') else int(self._DEMcores/self._PBMcores)
         self._DEMs                = 1
         self._types               = conf['types'] if conf.has_key('types') else 16
         self._bins1               = conf['bins1'] if conf.has_key('bins1') else 16
         self._bins2               = conf['bins2'] if conf.has_key('bins2') else 16
         self._diff_DEM            = conf['diff_DEM'] if conf.has_key('diff_DEM') else 50000
+        self._compartments        = conf['compartments'] if conf.has_key('compartments') else 4
 
     def _start(self):
         """
@@ -317,14 +319,14 @@ class Executor(object):
         status_dict = json.load(status_fid)
         status_fid.close()
 
-        if status_dict['status'] == 1:
+        if int(status_dict['status'][0]) == 1:
             cont = True
         else:
             cont = False
         
-        dem_timestep      = status_dict['DEM_time_step']
-        pbm_init_timestep = status_dict['PBM_init_time_step']
-        pbm_mixing_time   = status_dict['mixing_times']
+        dem_timestep      = int(status_dict['DEM_time_step'][0])
+        pbm_init_timestep = float(status_dict['PBM_init_time_step'][0])
+        pbm_mixing_time   = int(status_dict['mixing_times'][0])
 
         return cont,dem_timestep,pbm_init_timestep,pbm_mixing_time
 
@@ -361,7 +363,7 @@ class Executor(object):
             # Get the path to the DEM folder. This will allow correct staging
             # input for the PBMs
             dem_monitor_path = ru.Url(self._dem_monitor_unit.sandbox).path
-            dem_path         = ru.Url(dem_unit.sandbox).path
+            dem_path         = ru.Url(self._dem_unit.sandbox).path
 
             # Create a list of PBM units and insert every description in that list
             pbm_cud_list = list()
@@ -370,6 +372,7 @@ class Executor(object):
                 cud.environment    = ['PATH='+self._pathtoLIGGHTS+':$PATH']
                 cud.executable     = 'model.out'
                 cud.arguments      = [dem_monitor_path+'PBM_input.in',self._DEMcores,self._diameter,init_timestep]
+                cud.post_exec      = ['tar cfz csvDump.tar.gz csvDump']
                 cud.output_staging = [{'source': 'unit:///csvDump.tar.gz',
                                        'target': 'client:///csvDump.tar.gz',
                                        'action'  : rp.TRANSFER}]
@@ -379,86 +382,93 @@ class Executor(object):
                 cud.mpi            = True
                 if restart:
                     cud.pre_exec       = ['mkdir txtDumps']
-                    cud.input_staging = [{'source': dem_path+'post/collision%d.atom'%timesteps,
-                                 'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%(timesteps,self._DEMcores,self._diameter),
+                    cud.input_staging = [{'source': dem_path+'post/collision%d.atom'%timestep,
+                                 'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%(timestep,self._DEMcores,self._diameter),
                                  'action'  : rp.LINK},
-                                {'source': dem_path+'post/impact%d.atom'%timesteps,
-                                 'target': 'unit:///sampledumpfiles/impact%d.%d_%f'%(timesteps,self._DEMcores,self._diameter),
+                                {'source': dem_path+'post/impact%d.atom'%timestep,
+                                 'target': 'unit:///sampledumpfiles/impact%d.%d_%d'%(timestep,self._DEMcores,self._diameter),
                                  'action' : rp.LINK},
-                                {'source' : dem_path+'post/collision%d.atom'%timesteps-self._diff_DEM,
-                                 'target' : 'unit:///sampledumpfiles/collision%d.%d_%d'%(timesteps-self._diff_DEM,self._DEMcores,self._diameter),
+                                {'source' : dem_path+'post/collision%d.atom'%(timestep-self._diff_DEM),
+                                 'target' : 'unit:///sampledumpfiles/collision%d.%d_%d'%((timestep-self._diff_DEM),self._DEMcores,self._diameter),
                                  'action' : rp.LINK},
-                                {'source' : dem_path+'post/impact%d.atom'%timesteps-self._diff_DEM,
-                                 'target' : 'unit:///sampledumpfiles/impact%d.%d_%f'%(timesteps-self._diff_DEM,self._DEMcores,self._diameter),
+                                {'source' : dem_path+'post/impact%d.atom'%(timestep-self._diff_DEM),
+                                 'target' : 'unit:///sampledumpfiles/impact%d.%d_%d'%((timestep-self._diff_DEM),self._DEMcores,self._diameter),
                                  'action' : rp.LINK},
-                                {'source' : dem_path+'post/collision%d.atom'%timesteps-2*self._diff_DEM,
-                                 'target' : 'unit:///sampledumpfiles/collision%d.%d_%d'%(timesteps-2*self._diff_DEM,self._DEMcores,self._diameter),
+                                {'source' : dem_path+'post/collision%d.atom'%(timestep-2*self._diff_DEM),
+                                 'target' : 'unit:///sampledumpfiles/collision%d.%d_%d'%((timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
                                  'action' : rp.LINK},
-                                {'source' : dem_path+'post/impact%d.atom'%timesteps-2*self._diff_DEM,
-                                 'target' : 'unit:///sampledumpfiles/impact%d.%d_%f'%(timesteps-2*self._diff_DEM,self._DEMcores,self._diameter),
+                                {'source' : dem_path+'post/impact%d.atom'%(timestep-2*self._diff_DEM),
+                                 'target' : 'unit:///sampledumpfiles/impact%d.%d_%d'%((timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
                                  'action' : rp.LINK},
-                                {'source' : ru.Url(self._pbm_unit[i]).path+'csvDump/particles_%f.csv'%init_timestep,
-                                 'target' : 'unit:///csvDump/particles_%f.csv'%init_timestep,
+                                {'source' : ru.Url(self._pbm_unit[i]).path+'csvDump/particles_%d.csv'%init_timestep,
+                                 'target' : 'unit:///csvDump/particles_%d.csv'%init_timestep,
                                  'action' : rp.LINK}]
                 else:
                     cud.pre_exec       = ['mkdir csvDump','mkdir txtDumps']
-                    cud.input_staging = [{'source': dem_path+'post/collision%d.atom'%timesteps,
-                                 'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%(timesteps,self._DEMcores,self._diameter),
+                    cud.input_staging = [{'source': dem_path+'post/collision%d.atom'%timestep,
+                                 'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%(timestep,self._DEMcores,self._diameter),
                                  'action'  : rp.LINK},
-                                {'source': dem_path+'post/impact%d.atom'%timesteps,
-                                 'target': 'unit:///sampledumpfiles/impact%d.%d_%f'%(timesteps,self._DEMcores,self._diameter),
+                                {'source': dem_path+'post/impact%d.atom'%timestep,
+                                 'target': 'unit:///sampledumpfiles/impact%d.%d_%d'%(timestep,self._DEMcores,self._diameter),
                                  'action'  : rp.LINK},
-                                {'source': dem_path+'post/collision%d.atom'%timesteps-self._diff_DEM,
-                                 'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%(timesteps-self._diff_DEM,self._DEMcores,self._diameter),
+                                {'source': dem_path+'post/collision%d.atom'%(timestep-self._diff_DEM),
+                                 'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%((timestep-self._diff_DEM),self._DEMcores,self._diameter),
                                  'action'  : rp.LINK},
-                                {'source': dem_path+'post/impact%d.atom'%timesteps-self._diff_DEM,
-                                 'target': 'unit:///sampledumpfiles/impact%d.%d_%f'%(timesteps-self._diff_DEM,self._DEMcores,self._diameter),
+                                {'source': dem_path+'post/impact%d.atom'%(timestep-self._diff_DEM),
+                                 'target': 'unit:///sampledumpfiles/impact%d.%d_%d'%((timestep-self._diff_DEM),self._DEMcores,self._diameter),
                                  'action'  : rp.LINK},
-                                {'source': dem_path+'post/collision%d.atom'%timesteps-2*self._diff_DEM,
-                                 'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%(timesteps-2*self._diff_DEM,self._DEMcores,self._diameter),
+                                {'source': dem_path+'post/collision%d.atom'%(timestep-2*self._diff_DEM),
+                                 'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%((timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
                                  'action'  : rp.LINK},
-                                {'source': dem_path+'post/impact%d.atom'%timesteps-2*self._diff_DEM,
-                                 'target': 'unit:///sampledumpfiles/impact%d.%d_%f'%(timesteps-2*self._diff_DEM,self._DEMcores,self._diameter),
+                                {'source': dem_path+'post/impact%d.atom'%(timestep-2*self._diff_DEM),
+                                 'target': 'unit:///sampledumpfiles/impact%d.%d_%d'%((timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
                                   'action'  : rp.LINK}]
             
                 pbm_cud_list.append(cud)
 
             # Submit them to the agent and wait until all have a path
             pbm_uids = self._umgr.submit_units(pbm_cud_list)
-            self._umgr.wait_units(uids=pbm_uids.uid,state=rp.AGENT_SCHEDULING_PENDING)
+            self._umgr.wait_units(uids=[cu.uid for cu in pbm_uids],state=rp.AGENT_SCHEDULING_PENDING)
 
             pbm_monitor_cud_list = list()
             for i in range(self._PBMs):
-                cud = rp.ComputeUnitDescription()
-                cud.input_staging = [{'source':'client:///controllerPBMresourceMain.py',
+                cud2 = rp.ComputeUnitDescription()
+                cud2.input_staging = [{'source':'client:///controllerPBMresourceMain.py',
                                        'target':'unit:///controllerPBMresourceMain.py',
                                        'action': rp.TRANSFER},
-                                      {'source':'client:///controllerPBMresourceDataReader.py',
-                                       'target':'unit:///controllerPBMresourceDataReader.py',
+                                      {'source':'client:///controllerPBMDataReader.py',
+                                       'target':'unit:///controllerPBMDataReader.py',
                                        'action': rp.TRANSFER},
-                                      {'source':'client:///controllerPBMresourceDataInterpretor.py',
-                                       'target':'unit:///controllerPBMresourceDataInterpretor.py',
+                                      {'source':'client:///controllerPBMDataInterpretor.py',
+                                       'target':'unit:///controllerPBMDataInterpretor.py',
+                                       'action': rp.TRANSFER},
+                                      {'source':'client:///liggghts_restart.py',
+                                       'target':'unit:///liggghts_restart.py',
                                        'action': rp.TRANSFER}]
-                cud.output_staging = [{'source': 'unit:///PBM_status.json',
+                cud2.output_staging = [{'source': 'unit:///PBM_status.json',
                                        'target': 'client:///PBM_status.json',
                                        'action'  : rp.TRANSFER},
                                       {'source': 'unit:///in.restart_from_%d'%timestep,
                                        'target':'pilot:///in.restart_from_%d'%timestep,
                                        'action': rp.LINK}]
-                cud.executable     = 'python'
-                cud.arguments      = ['controllerPBMresourceMain.py',\
-                                      init_timestep,self._bins1,self._bins2,\
-                                      ru.Url(pbm_uids[i].sandbox).path+'csvDump',mixing_time]
-                cud.cores          = 1
-                cud.mpi            = False
-                pbm_cud_list.append(cud)
+                cud2.executable     = 'python'
+                cud2.arguments      = ['controllerPBMresourceMain.py',\
+                                      float(0.00),self._compartments,self._bins1,self._bins2,\
+                                      ru.Url(pbm_uids[i].sandbox).path+'csvDump',mixing_time,int(init_timestep),int(init_timestep+10000000),0.2,0.2,self._types,15,476]
+
+                cud2.cores          = 1
+                cud2.mpi            = False
+                pbm_monitor_cud_list.append(cud2)
 
             # Submit the monitor unit and return
-            pbm_monitor_unit = self._umgr.submit_units(cud2)
+            pbm_monitor_unit = self._umgr.submit_units(pbm_monitor_cud_list)
 
-            self._pbm_unit = pbm_uids
-            self._pbm_monitor_unit = pbm_monitor_unit
-        except:
+            self._pbm_units = pbm_uids
+            self._pbm_monitor_units = pbm_monitor_unit
+
+        except Exception as e:
+
+            self._session.close()
             # Something unexpected happened in the pilot code above
             raise RuntimeError('caught Exception %s\n'%e)
 
@@ -470,40 +480,51 @@ class Executor(object):
         # Start the RP session and setup the selected resource.
         self._start()
 
-        cont = True
-        #Does DEM restart or not
-        restart = False
-        #Timestep input for DEM.
-        pbm_timestep=0
-        dem_timestep = 0
+        try:
 
-        while cont:
+            cont = True
+            #Does DEM restart or not
+            restart = False
+            #Timestep input for DEM.
+            pbm_timestep=0
+            dem_timestep = 0
 
-            self._start_dem_units(timestep=dem_timestep,restart=restart)
+            while cont:
 
-            self._umgr.wait_units(uids=self._dem_monitor_unit.uid)
+                self._start_dem_units(timestep=dem_timestep,restart=restart)
 
-            # Check DEM status returns whether the execution should continue
-            # or not. It also returns the timestep PBM should start.
-            cont, dem_timestep, pbm_init_timestep, pbm_mixing_time = self._check_DEM_status('DEM_status.json')
+                self._umgr.wait_units(uids=self._dem_monitor_unit.uid)
 
-            if self._dem_unit.state() != rp.FINAL:
-                self._umgr.cancel_units(uids=self._dem_unit.uid)
+                # Check DEM status returns whether the execution should continue
+                # or not. It also returns the timestep PBM should start.
+                cont, dem_timestep, pbm_init_timestep, pbm_mixing_time = self._check_DEM_status('DEM_status.json')
+                
+                if self._dem_unit.state != rp.FINAL:
+                    self._umgr.cancel_units(uids=self._dem_unit.uid)
 
-            if cont == True:
-                self._start_pbm_units(timestep=pbm_timestep, init_timestep=pbm_init_timestep,\
-                                      mixing_time=pbm_mixing_time,restart=restart)
 
-                # Waits for all the PBM units to finish. Should wait only for the
-                # first
-                self._umgr.wait_units(uids=[cu.uid for cu in self._pbm_monitor_units])
+                if cont == True:
+                    self._start_pbm_units(timestep=pbm_timestep, init_timestep=pbm_init_timestep,\
+                                          mixing_time=pbm_mixing_time,restart=restart)
 
-                self._umgr.cancel_units(uids=[cu.uid for cu in self._pbm_units])
+                    # Waits for all the PBM units to finish. Should wait only for the
+                    # first
+                    self._umgr.wait_units(uids=[cu.uid for cu in self._pbm_monitor_units])
 
-                cont, pbm_timestep = self._check_PBM_status('PBM_status.json')
+                    self._umgr.cancel_units(uids=[cu.uid for cu in self._pbm_units])
 
-            if cont == True:
-                restart = True
+                    cont, pbm_timestep = self._check_PBM_status('PBM_status.json')
 
-        self._shutdown()
+                if cont == True:
+                    restart = True
+        except Exception as e:
+            raise RuntimeError('caught Exception %s\n'%e)
+        finally:
+            self._shutdown()
+
+if __name__ == '__main__':
+    
+    Test = Executor(config='test.json')
+
+    Test.run()
     

@@ -304,7 +304,7 @@ if needed after the DEM simulation.
 Running several simulations that are dependent on High Performance Computing (HPC) resources can 
 be extremely time consuming, since each simulation must be submitted in the resource independently.
 This can lead to varying queuing times. RADICAL-Pilot (RP) is a framework that implements the Pilot 
-abstraction~\cite{pstar12}, where a container job is submitted to the HPC 
+abstraction~\citep{pstar12}, where a container job is submitted to the HPC 
 resource, the Pilot,
 and once the necessary computing resources are being acquired they can be used to execute multiple
 simulations by reusing the same resources. By utilizing RADICAL-Pilot, we implemented an execution
@@ -326,7 +326,6 @@ made from the various controlling components.
 
 \section{Results}
 \label{results}
-<<<<<<< HEAD
 This coupled DEM-PBM simulation were tested on the Stampede2 supercomputer with the Knights Landing 
 configuration. Each of the compute node of the cluster consists of Intel Xeon Phi 7250 
 (\textquotedblleft Knights Landing\textquotedblright) which has 68 cores on a single socket 
@@ -338,9 +337,7 @@ their respective executions.\\
 The coupled system took \textbf{X} DEM and \textbf{Y} PBM simulations to reach steady state. The 
 total simulation time of DEM execution was \textbf{A} seconds and PBM was \textbf{B} seconds. 
 %Discuss how many instances of the simulation of each occured 
-=======
-Discuss how many instances of the simulation of each occurred
->>>>>>> 59acc51d052c5dc3dfe767a32229d54514c9d0d1
+
 \subsection{Scaling results}
 Cores used for DEM and PBM and how scaling occured
 \subsection{Improved results over one way coupling}

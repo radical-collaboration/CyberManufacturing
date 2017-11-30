@@ -53,7 +53,7 @@ class controllerPBMresourceMain(object):
         if os.path.isfile(self.pbm_output_path + '/d50_' + str(self.initial_timestep) + '.csv'):
             obj_reader = PBMreader.controllerPBMDataReader(self.initial_timestep, self.compartments, self.bins1, self.bins2, self.pbm_output_path)
         else:
-            time.sleep(2)
+            time.sleep(10)
         obj_reader = PBMreader.controllerPBMDataReader(self.initial_timestep, self.compartments, self.bins1, self.bins2, self.pbm_output_path)
         obj_inter = PBMinter.controllerPBMDataInterpretor(self.initial_timestep, self.compartments, self.bins1, self.bins2, self.pbm_output_path)
         new_timestep = obj_reader.nextfile_time_finder(self.initial_timestep)

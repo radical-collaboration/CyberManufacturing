@@ -96,7 +96,7 @@ class controllerPBMresourceMain(object):
             liggghts_restart_file = liggghts_restart.liggghts_input_creator(self.init_timestep, self.final_timestep, \
                                     self.min_dia, self.max_dia, self.types_of_particles, self.total_flow_rate, self.solid_density)
             liggghts_restart_file.main_writer()
-            status = {'status':str(flag),'last timestep': str(new_timestep)}
+            status = {'status':str(flag),'last_time_step': str(new_timestep)}
             # out_data = {'last timestep': str(new_timestep)}
             with open('PBM_status.json' , 'w') as pbmsf:
                 json.dump(status, pbmsf)
@@ -104,7 +104,7 @@ class controllerPBMresourceMain(object):
                 #pbmsf.write(str(new_timestep))
         elif (flag == 2):
             print("Kill both DEM and PBM")
-            status = {'status':str(flag),'last timestep': str(new_timestep)}
+            status = {'status':str(flag),'last_time_step': str(new_timestep)}
             # out_data = {'last timestep': str(new_timestep)}
             with open('PBM_status.json' , 'w') as pbmsf:
                 json.dump(status, pbmsf)

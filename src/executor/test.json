@@ -1,0 +1,15 @@
+{
+"session": "test2",
+"resource": "local.localhost_anaconda",
+"cores": 4,
+"queue": null,
+"runtime": 20,
+"project": null,
+"pathtoLIGGHTSinputs": "/Volumes/Data/Repositories/Collaborations/CyberManufacturing/src/dummy_DEM_PBM/test_2",
+"pathtoLIGGHTS": "/Volumes/Data/Repositories/Collaborations/CyberManufacturing/src/dummy_DEM_PBM",
+"pathtoPBMexecutable": "/Volumes/Data/Repositories/Collaborations/CyberManufacturing/src/dummy_DEM_PBM",
+"DEMcores": 1,
+"PBMcores": 1,
+"timesteps": 10000000,
+"diameter": 200
+}

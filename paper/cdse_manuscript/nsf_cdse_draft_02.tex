@@ -63,6 +63,8 @@
 \newcommand{\note}[1]{}
 \fi
 
+
+
 \journal{Chemical Engineering Research and Design}
 \begin{document}
 \begin{frontmatter}
@@ -772,6 +774,9 @@ Number of second solid bins & $ss$ & $16$ & $-$\\
 
 
 \subsection{PBM Parallel \textit{C++}}
+
+\jhanote{bad style to have a subsubsection immediately after a subsection start.. similarly for the earlier (PBM) and DEM subsections}
+
 \subsubsection{Discretization \& parallelizing PBM}
 The PBM was discretized by converting each of its coordinates in to discrete bins. For the spatial 
 coordinates a linear bin spacing was used. For the internal coordinates, solid, liquid and gas a 
@@ -840,7 +845,7 @@ RAM.
 processes from 1 to 16 and the number of OMP threads from 1 to 8, thus, using a maximum of 128 cores.
 
 \subsection{Radical Pilot (RP) \& PBM+DEM communication}
-RADICAL-Pilot defines a number of abstractions to describe ressources, and computational 
+RADICAL-Pilot defines a number of abstractions to describe resources, and computational 
 tasks. The Pilot Desciption is the abstraction that describes resources by defining the 
 number of cores that will be used, the used HPC resource and the total time that the 
 resources are needed, and the queue that will be used. The abstraction that defines the 
@@ -858,7 +863,7 @@ pilot is active the DEM simulation start executing. When finished a CU that desc
 simulation is submitted at the Unit Manager and start executing. Any data dependency is satisfied 
 by doing the necessary file linking through the CU description.
 
-In more detail, the DEM and PBM executables are preplaced in the resource along with any initial 
+The DEM and PBM executables are preplaced in the resource along with any initial 
 information for the DEM simulation. The DEM unit first creates links for the data files that will 
 be needed for the DEM simulation and call the executable. When the execution finishes, new links 
 with the output are created in a shared space. The PBM unit uses those links to read the necessary 
@@ -1019,7 +1024,7 @@ computationally more expensive.
 \includegraphics[scale=0.75]{rslsts_2mm_DEM_speedup_mtlb.pdf}
 \caption{The speedup achieved in the DEM simulations of 2 mm particles. There 
 is a linear increase up to 16 cores, then as the parallel 
-efficiency decreases, plateauing of the speedup is observed.}
+efficiency decreases, plateauing of the speedup is observed. \jhanote{we should the same tense not past. }}
 \label{fig:rslts_DEM_speedup}
 \end{figure}
 
@@ -1325,7 +1330,8 @@ decreasing the wait times even further.
 \begin{figure}
 \centering
 \includegraphics[scale=1]{final_RP_plot.pdf}
-\caption{A comparison of times taken by 2 individual simulations (DEM + PBM) (without adding queue time) to the  time taken by 
+\caption{A comparison of times taken by 2 individual simulations (DEM + PBM) (without 
+including queue time) to the  time taken by 
 Radical-Pilot to complete the same set of simulation. A minimal increase in the time is observed, proving that using RP is 
 a more convenient method to perform simulations which have large number of different submissions are required.}
 \label{fig:rslts_RP_time_plot}

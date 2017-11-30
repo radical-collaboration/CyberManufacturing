@@ -808,14 +808,13 @@ This was a good conformation for the hybrid parallel technique, thus being imple
 preliminary studies have been addressed in more detail in the supplemental information.
 
 
-Since the DEM informed PBM code required dynamic size increase for the data structure due to different number of particles being
- present in the DEM simulation,
+Since the DEM informed PBM code required dynamic size increase for the data structure due to different number of particles being 
+present in the DEM simulation,
 the PBM code developed used the Standard Template Library containers and their features available in \textit{C++} 11 and later. It 
 requires intel v17.0.2 (gcc 5.3+)  or later for compilation. Since this module was not present on the Stampede, the execution of the 
 PBM was done on the newer Stampede2 supercomputer. Each of the compute node of the cluster consists of Intel Xeon Phi 7250 
 (\textquotedblleft Knights Landing\textquotedblright) which has 68 cores on a single socket clocked at 1.4 GHz, with 96 GB of DDR4 
-RAM.
- Each of the cores consists of 4 hardware threads. The simulations were then run by varying the the number of MPI 
+RAM. Each of the cores consists of 4 hardware threads. The simulations were then run by varying the the number of MPI 
 processes from 1 to 16 and the number of OMP threads from 1 to 8, thus, using a maximum of 128 cores.
 
 \begin{algorithm}

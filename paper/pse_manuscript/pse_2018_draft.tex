@@ -326,7 +326,21 @@ made from the various controlling components.
 
 \section{Results}
 \label{results}
+<<<<<<< HEAD
+This coupled DEM-PBM simulation were tested on the Stampede2 supercomputer with the Knights Landing 
+configuration. Each of the compute node of the cluster consists of Intel Xeon Phi 7250 
+(\textquotedblleft Knights Landing\textquotedblright) which has 68 cores on a single socket 
+clocked at 1.4 GHz, with 96 GB of DDR4 RAM. Each of the cores consists of 4 hardware threads. 
+The simulations were run on various configuration of the cores used for each of the 
+component of the system. The number of cores used for the DEM simulation varied from 16 to 256, 
+while the PBM used cores from 1 to 16. The DEM and PBM controller scripts used 1 process each for 
+their respective executions.\\
+The coupled system took \textbf{X} DEM and \textbf{Y} PBM simulations to reach steady state. The 
+total simulation time of DEM execution was \textbf{A} seconds and PBM was \textbf{B} seconds. 
+%Discuss how many instances of the simulation of each occured 
+=======
 Discuss how many instances of the simulation of each occurred
+>>>>>>> 59acc51d052c5dc3dfe767a32229d54514c9d0d1
 \subsection{Scaling results}
 Cores used for DEM and PBM and how scaling occured
 \subsection{Improved results over one way coupling}

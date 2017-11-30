@@ -31,7 +31,7 @@ class liggghts_input_creator(object):
         self.types_of_particles = types_of_particles
         self.flow_rate = total_flow_rate
         self.density = solid_density
-        self.main_writer()
+        # self.main_writer()
 
     def isPrime(self, n):
         i = 2

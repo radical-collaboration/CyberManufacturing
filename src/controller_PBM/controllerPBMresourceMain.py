@@ -90,10 +90,12 @@ class controllerPBMresourceMain(object):
 #                continue
         dump_d50.close()
         dump_particles.close()
+        print(flag)
         if (flag == 1):
             print("Kill PBM and execute DEM")
             liggghts_restart_file = liggghts_restart.liggghts_input_creator(self.init_timestep, self.final_timestep, \
                                     self.min_dia, self.max_dia, self.types_of_particles, self.total_flow_rate, self.solid_density)
+            liggghts_restart_file.main_writer()
             status = {'status':str(flag),'last timestep': str(new_timestep)}
             # out_data = {'last timestep': str(new_timestep)}
             with open('PBM_status.json' , 'w') as pbmsf:
@@ -110,7 +112,7 @@ class controllerPBMresourceMain(object):
             
 
 # abcd = controllerPBMresourceMain(7,4,16,16,'/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy',5)
-abcd = controllerPBMresourceMain(float(sys.argv[1]), float(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]), sys.argv[5], float(sys.argv[6]),int(sys.argv[7]), \
+abcd = controllerPBMresourceMain(float(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]), sys.argv[5], float(sys.argv[6]),int(sys.argv[7]), \
                                  int(sys.argv[8]), float(sys.argv[9]), float(sys.argv[10]), int(sys.argv[11]), float(sys.argv[12]), int(sys.argv[13]))
 abcd.main()
 

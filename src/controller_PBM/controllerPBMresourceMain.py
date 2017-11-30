@@ -98,7 +98,7 @@ class controllerPBMresourceMain(object):
             # out_data = {'last timestep': str(new_timestep)}
             with open('PBM_status.json' , 'w') as pbmsf:
                 json.dump(status, pbmsf)
-                json.dump(out_data, pbmsf)
+                # json.dump(out_data, pbmsf)
                 #pbmsf.write(str(new_timestep))
         elif (flag == 2):
             print("Kill both DEM and PBM")
@@ -106,7 +106,7 @@ class controllerPBMresourceMain(object):
             # out_data = {'last timestep': str(new_timestep)}
             with open('PBM_status.json' , 'w') as pbmsf:
                 json.dump(status, pbmsf)
-                # pbmsf.write(str(new_timestep))
+
             
 
 # abcd = controllerPBMresourceMain(7,4,16,16,'/home/chai/Documents/git/CyberManufacturing/src/dummy_DEM_PBM/sample_copy',5)

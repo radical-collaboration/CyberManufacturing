@@ -348,15 +348,16 @@ class Executor(object):
         status_fid = open(status_file)
         status_dict = json.load(status_fid)
         status_fid.close()
-        if status_dict['status'] == 1:
+        
+        if int(status_dict['status']) == 1:
             cont = True
         else:
             cont = False
 
-        return cont,status_dict['last_time_step']
+        return cont,float(status_dict['last_time_step'])
 
 
-    def _start_pbm_units(self,timestep=0, init_timestep=0,\
+    def _start_pbm_units(self,timestep=0, init_timestep=0,dem_timestep=0,\
                          mixing_time=0,restart=False):
 
         try:
@@ -400,7 +401,7 @@ class Executor(object):
                                 {'source' : dem_path+'post/impact%d.atom'%(timestep-2*self._diff_DEM),
                                  'target' : 'unit:///sampledumpfiles/impact%d.%d_%d'%((timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
                                  'action' : rp.LINK},
-                                {'source' : ru.Url(self._pbm_unit[i]).path+'csvDump/particles_%d.csv'%init_timestep,
+                                {'source' : ru.Url(self._pbm_units[i]).path+'csvDump/particles_%d.csv'%init_timestep,
                                  'target' : 'unit:///csvDump/particles_%d.csv'%init_timestep,
                                  'action' : rp.LINK}]
                 else:
@@ -448,13 +449,13 @@ class Executor(object):
                 cud2.output_staging = [{'source': 'unit:///PBM_status.json',
                                        'target': 'client:///PBM_status.json',
                                        'action'  : rp.TRANSFER},
-                                      {'source': 'unit:///in.restart_from_%d'%timestep,
-                                       'target':'pilot:///in.restart_from_%d'%timestep,
+                                      {'source': 'unit:///in.restart_from_%d'%dem_timestep,
+                                       'target':'pilot:///in.restart_from_%d'%dem_timestep,
                                        'action': rp.LINK}]
                 cud2.executable     = 'python'
                 cud2.arguments      = ['controllerPBMresourceMain.py',\
-                                      float(0.00),self._compartments,self._bins1,self._bins2,\
-                                      ru.Url(pbm_uids[i].sandbox).path+'csvDump',mixing_time,int(init_timestep),int(init_timestep+10000000),0.2,0.2,self._types,15,476]
+                                      int(init_timestep),self._compartments,self._bins1,self._bins2,\
+                                      ru.Url(pbm_uids[i].sandbox).path+'csvDump',mixing_time,dem_timestep,(dem_timestep+10000000),0.2,0.2,self._types,15,476]
 
                 cud2.cores          = 1
                 cud2.mpi            = False
@@ -500,23 +501,25 @@ class Executor(object):
                 cont, dem_timestep, pbm_init_timestep, pbm_mixing_time = self._check_DEM_status('DEM_status.json')
                 
                 if self._dem_unit.state != rp.FINAL:
+                    print 'Canceling DEM simulation'
                     self._umgr.cancel_units(uids=self._dem_unit.uid)
-
 
                 if cont == True:
                     self._start_pbm_units(timestep=pbm_timestep, init_timestep=pbm_init_timestep,\
-                                          mixing_time=pbm_mixing_time,restart=restart)
+                                          dem_timestep=dem_timestep,mixing_time=pbm_mixing_time,restart=restart)
 
                     # Waits for all the PBM units to finish. Should wait only for the
                     # first
                     self._umgr.wait_units(uids=[cu.uid for cu in self._pbm_monitor_units])
-
+                    print 'Canceling PBM units'
                     self._umgr.cancel_units(uids=[cu.uid for cu in self._pbm_units])
 
                     cont, pbm_timestep = self._check_PBM_status('PBM_status.json')
 
                 if cont == True:
+                    print 'Restarting DEM'
                     restart = True
+
         except Exception as e:
             raise RuntimeError('caught Exception %s\n'%e)
         finally:

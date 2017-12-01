@@ -39,7 +39,7 @@ def dummy_DEM(last_timestep_index, copyPath):
         impact_file_list = sorted(impact_file_list, key=lambda x: float(x[(num_start_impact):(num_end_impact)]))
     #print(collision_file_list)
     for x in range(last_timestep_index,len(collision_file_list)):
-        rand_num =  random.randint(2, 15)
+        rand_num =  random.randint(1, 2)
         print(x)
         collision_nextfile = collision_file_list[x]
         impact_nextfile = impact_file_list[x]
@@ -54,6 +54,9 @@ def dummy_DEM(last_timestep_index, copyPath):
             time.sleep(rand_num)
             print("Next file")            
         a = x
+    status = {'last_index':str(a)}
+    with open(copyPath+'DEM_index.json' , 'w') as demsf:
+        json.dump(status, demsf) 
     return a
 
 if __name__ == '__main__':

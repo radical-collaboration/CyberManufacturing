@@ -42,8 +42,8 @@ class controller_DEMresource_main(object):
         timestep = int(self.init_timestep) + int(self.dump_difference)
         flag = 0
         dump_data = {}
-        timestep_collision_file = "/collision%d.atom"%int(self.init_timestep)
-        timestep_impact_file = '/impact%d.atom'%int(self.init_timestep)
+        timestep_collision_file = "/collision%d.atom"%int(timestep)
+        timestep_impact_file = '/impact%d.atom'%int(timestep)
         collision_file = self.liggghts_output_dir + str(timestep_collision_file)
         impact_file = self.liggghts_output_dir + str(timestep_impact_file)
         # the execution waits for a seconds everytime it enters the loop till the file do not exist

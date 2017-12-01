@@ -70,8 +70,8 @@ class controllerPBMresourceMain(object):
         while (flag1):
 #            print(count)
             new_timestep = obj_reader.nextfile_time_finder(new_timestep)
-            next_d50_filename = "/d50_%.2f.csv"%new_timestep
-            next_particles_filename = "/particles_%.2f.csv"%new_timestep
+            next_d50_filename = "d50_%.2f.csv"%new_timestep
+            next_particles_filename = "particles_%.2f.csv"%new_timestep
             d50_filecheck = self.pbm_output_path + str(next_d50_filename)
             particles_filecheck = self.pbm_output_path + str(next_particles_filename)
 #                if (os.path.isfile(d50_filecheck) and os.path.isfile(particles_filecheck)):

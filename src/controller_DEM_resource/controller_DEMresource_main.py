@@ -61,8 +61,8 @@ class controller_DEMresource_main(object):
             # defining the files and path of the files that it needs to search for.
             #liggghts_output_files_path = os.getcwd() + '/liggghts_output_files/'
 
-            timestep_collision_file = "/collision%d.atom"%timestep
-            timestep_impact_file = '/impact%d.atom'%timestep
+            timestep_collision_file = "collision%d.atom"%timestep
+            timestep_impact_file = 'impact%d.atom'%timestep
             collision_file = self.liggghts_output_dir + str(timestep_collision_file)
             impact_file = self.liggghts_output_dir + str(timestep_impact_file)
             print(impact_file)

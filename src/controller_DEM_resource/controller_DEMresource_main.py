@@ -59,7 +59,7 @@ class controller_DEMresource_main(object):
             print(impact_file)
             # the execution waits for a seconds everytime it enters the loop till the file do not exist
             while not(os.path.exists(collision_file) and os.path.exists(impact_file)):
-                time.sleep(2)
+                time.sleep(5)
                 print("Waiting for file to be printed")
             #once the files are found the it performs the comparison to the initial data files using the interpretor class
             if (os.path.isfile(collision_file) and os.path.isfile(impact_file)):

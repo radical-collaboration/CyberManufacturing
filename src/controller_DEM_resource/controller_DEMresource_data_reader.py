@@ -46,8 +46,8 @@ class Controller_DEM_resource_reader(object):
     def liggghts_collision_raw_data(self):
         # check if both impact and the collision files exist
         liggghts_output_files_path = self.liggghts_output_dir
-        timestep_collision_file = "/collision%d.atom"% self.timestep
-        timestep_impact_file = '/impact%d.atom'% self.timestep
+        timestep_collision_file = "collision%d.atom"% self.timestep
+        timestep_impact_file = 'impact%d.atom'% self.timestep
         path_collision_file = liggghts_output_files_path + str(timestep_collision_file)
         path_impact_file = liggghts_output_files_path + str(timestep_impact_file)
         temp1 = Path(path_collision_file)

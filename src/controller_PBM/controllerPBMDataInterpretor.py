@@ -64,21 +64,21 @@ class controllerPBMDataInterpretor(object):
         temp1 = self.obj_PBM_reader.data_d50_extractor(ts)
         temp2 = self.num_particles[-1]
         particles_check = abs(self.initial_num_particles - temp2) / self.initial_num_particles
-        ss_check_time = 1
+        ss_check_time = 5
         print(ts)
         # print("Now checking %f with initial time %f"%(ts, self.initial_ts))
         # This checks if the current timestep is greater than the older timestep and whether the properties have changed by 25% so that we kill PBM and start DEM.
-        if (ts > self.initial_ts and particles_check < 0.015):
+        if (ts > self.initial_ts and particles_check < 0.15):
             for i in range(0,self.compartments):
                 d50_check = (abs(self.initial_d50[0][i] - temp1[0][i]) / self.initial_d50[0][i])
-                if (int(d50_check) > 0.015):
+                if (int(d50_check) > 0.15):
                     flag = 1
                     break
                 else:
                     continue
         elif ((ts - self.initial_ts) > ss_check_time):
             flag = 2
-        elif ((ts - self.initial_ts) < ss_check_time and particles_check > 0.015):
+        elif ((ts - self.initial_ts) < ss_check_time and particles_check > 0.15):
             flag = 1
         else:
             flag = 0

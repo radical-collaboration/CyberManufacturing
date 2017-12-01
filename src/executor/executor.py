@@ -279,7 +279,7 @@ class Executor(object):
             #Now that we have a path we can continue
             cud2 = rp.ComputeUnitDescription()
             cud2.executable = 'python'
-            cud2.arguments = ['controller_DEMresource_main.py',timestep,self._types,ru.Url(dem_unit.sandbox).path]
+            cud2.arguments = ['controller_DEMresource_main.py',timestep,self._types,ru.Url(dem_unit.sandbox).path+'post']
             cud2.input_staging = [{'source':'client:///controller_DEMresource_main.py',
                                    'target':'unit:///controller_DEMresource_main.py',
                                    'action': rp.TRANSFER},
@@ -401,8 +401,14 @@ class Executor(object):
                                 {'source' : dem_path+'post/impact%d.atom'%(timestep-2*self._diff_DEM),
                                  'target' : 'unit:///sampledumpfiles/impact%d.%d_%d'%((timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
                                  'action' : rp.LINK},
-                                {'source' : ru.Url(self._pbm_units[i]).path+'csvDump/particles_%d.csv'%init_timestep,
-                                 'target' : 'unit:///csvDump/particles_%d.csv'%init_timestep,
+                                {'source' : ru.Url(self._pbm_units[i]).path+'csvDump/particles_%f.csv'%init_timestep,
+                                 'target' : 'unit:///csvDump/particles_%f.csv'%init_timestep,
+                                 'action' : rp.LINK},
+                                 {'source' : ru.Url(self._pbm_units[i]).path+'csvDump/gas_%f.csv'%init_timestep,
+                                 'target' : 'unit:///csvDump/gas_%f.csv'%init_timestep,
+                                 'action' : rp.LINK},
+                                 {'source' : ru.Url(self._pbm_units[i]).path+'csvDump/liquid_%f.csv'%init_timestep,
+                                 'target' : 'unit:///csvDump/liquid_%f.csv'%init_timestep,
                                  'action' : rp.LINK}]
                 else:
                     cud.pre_exec       = ['mkdir csvDump','mkdir txtDumps']

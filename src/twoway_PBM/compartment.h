@@ -68,6 +68,6 @@ typedef struct
     arrayOfDouble2D fgComingIn;
 } PreviousCompartmentIn;
 
-CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, CompartmentIn compartmentIn, CompartmentDEMIn compartmentDEMIn, double time, double timeStep);
+CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, CompartmentIn compartmentIn, CompartmentDEMIn compartmentDEMIn, double time, double timeStep, double initialTime = 0.0);
 
 #endif // COMPARTMENT_H

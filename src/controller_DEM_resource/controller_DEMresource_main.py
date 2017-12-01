@@ -52,8 +52,8 @@ class controller_DEMresource_main(object):
             # defining the files and path of the files that it needs to search for.
             #liggghts_output_files_path = os.getcwd() + '/liggghts_output_files/'
 
-            timestep_collision_file = "collision%d.atom"%timestep
-            timestep_impact_file = 'impact%d.atom'%timestep
+            timestep_collision_file = "/collision%d.atom"%timestep
+            timestep_impact_file = '/impact%d.atom'%timestep
             collision_file = self.liggghts_output_dir + str(timestep_collision_file)
             impact_file = self.liggghts_output_dir + str(timestep_impact_file)
             print(impact_file)
@@ -121,14 +121,41 @@ class controller_DEMresource_main(object):
             #     json.dump(dump_data, outfile)
             # # also printing a text file, whichever is easier for yuktesh to read, we can remove the json or this once decided
             with open('PBM_input.txt', 'w') as ipt:
-                ipt.write("types %d"%int(obj_inter.num_of_particles))
-                ipt.writelines("total number of particles %f\n"%item for item in tot_part_each_type)
-                ipt.writelines("average velocity of particles  %f\n"%item for item in avg_vel_array)
-                ipt.write("\nlast timestep %d"%timestep)
-                ipt.write("\naggregation Kernel Constant %f"%(1e-9))
-                ipt.write("\nbreakage Kernel Constant %f"%(1e-7))
-                ipt.write("\nmixing time %d"%(25))
-                ipt.write("\nliquid addition time %d"%(125))
+                # ipt.write("types %d"%int(obj_inter.num_of_particles))
+                # ipt.writelines("total number of particles %f\n"%item for item in tot_part_each_type)
+                # ipt.writelines("average velocity of particles  %f\n"%item for item in avg_vel_array)
+                ipt.write("\nAggregationKernelConstant %f"%(1.0e-3))
+                ipt.write("\nBreakageKernelConstant %f"%(1.0e-2))
+                ipt.write("\nConsolidationConstant %f"%((1.0e-20))
+                ipt.write("\nInitialPorosity %f"%((1.0e-3))
+                ipt.write("\nMinimumPorosity %f"%((1.0e-3))
+                ipt.write("\nGranuleSaturationFactor %f"%((0))
+                ipt.write("\nCriticalStokesDeformationNumber %f"%(0.0059))
+                ipt.write("\nBinderViscosity %f"%(0.05))
+                ipt.write("\nCoefficientOfRestitution %f"%(0.2))
+                ipt.write("\nLiquidThickness %f"%(10.0))
+                ipt.write("\nSurfaceAsperities %f"%(1.0))
+                ipt.write("\nGranulatorLength %f"%(0.38))
+                ipt.write("\nNumberOfCompartmets %d"%(4))
+                ipt.write("\nParticleResidenceTime %f"%(49.0))
+                ipt.write("\nDiammeterOfImpeller %f"%(0.114))
+                ipt.write("\nSpeedOfImpeller %f"%(2000.0))
+                ipt.write("\nPreMixingTime %f"%(5.0))
+                ipt.write("\nLiquidAdditionTime %f"%(15.0))
+                ipt.write("\nPostMixingTime %f"%(0.0))
+                ipt.write("\nThroughput %f"%(15.0))
+                ipt.write("\nSolidDensity %f"%(476.0))
+                ipt.write("\nLiquidToSolidRatio %f"%(0.35))
+                ipt.write("\nLiquidDensity %f"%(1000.0))
+                ipt.write("\nNumberOfFirstSolidBins %d"%(16))
+                ipt.write("\nFirstSolidVolumeCoefficients %f"%(5.0e-16))
+                ipt.write("\nFirstSolidVolumeBase %f"%(3.0))
+                ipt.write("\nNumberOfSecondSolidBins %d"%(16))
+                ipt.write("\nSecondSolidVolumeCoefficient %f"%(5.0e-16))
+                ipt.write("\nSecondSolidVolumeBase %f"%(3.0))
+                ipt.write("\nCollisionEfficiencyConstant %f"%(0.01))
+                ipt.write("\nDEMTimeStep %f"%(5.0e-7))
+                ipt.write("\nNumberOfDEMBins %d"%(16))
         elif (flag == 2):
             # kill the DEM since there has been no change in the number of collisions / impacts / velocity for 2 seconds.
             status = {'status':str(flag)}

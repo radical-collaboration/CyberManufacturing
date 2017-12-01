@@ -17,7 +17,7 @@ using namespace std;
 #define DUMP3DCSV(varName) dump3DCSV(varName, #varName)
 #define DUMP4DCSV(varName) dump4DCSV(varName, #varName)
 
-CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, CompartmentIn compartmentIn, CompartmentDEMIn compartmentDEMIn, double time, double timeStep)
+CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, CompartmentIn compartmentIn, CompartmentDEMIn compartmentDEMIn, double time, double timeStep, double initialTime)
 {
     CompartmentOut compartmentOut;
 
@@ -553,7 +553,8 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
     //cout << "Begin rate calculations" << endl << endl;
     double premixTime = pData->premixTime;
     double liqAddTime = pData->liqAddTime;
-    if (time >= premixTime && time <= premixTime + liqAddTime)
+    double finalTime = premixTime + liqAddTime + initialTime;
+    if (time >= premixTime && time <= finalTime)
         liquidAdditionRate *= timeStep;
     else
         liquidAdditionRate = 0.0;

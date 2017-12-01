@@ -419,8 +419,24 @@ int main(int argc, char *argv[])
     if (TWOWAYCOUPLE && fabs(stod(timeVal)) > 1.0e-16)
     {
         fAllCompartments = pData->readCompartmentInputFile(/*timeValueString*/ timeVal, string("particles"));
+        if (fAllCompartments.empty())
+        {
+            cout << "particle file missing for time = " << timeVal << endl;
+            MPI_Abort(MPI_COMM_WORLD,1);
+        }
+
         flAllCompartments = pData->readCompartmentInputFile(/*timeValueString*/ timeVal, string("liquid"));
+        if (flAllCompartments.empty())
+        {
+            cout << "liquid file missing for time = " << timeVal << endl;
+            MPI_Abort(MPI_COMM_WORLD,1);
+        }
         fgAllCompartments = pData->readCompartmentInputFile(/*timeValueString*/ timeVal, string("gas"));
+        if (fgAllCompartments.empty())
+        {
+            cout << "gas file missing for time = " << timeVal << endl;
+            MPI_Abort(MPI_COMM_WORLD,1);
+        }
         
         // cout << "dumping test data" << endl;
         // if(mpi_id == MASTER)
@@ -651,7 +667,7 @@ int main(int argc, char *argv[])
                 prevCompInData.fgComingIn = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
             }
 
-            compartmentOut = performCompartmentCalculations(prevCompInData, compartmentIn, compartmentDEMIn, time, timeStep);
+            compartmentOut = performCompartmentCalculations(prevCompInData, compartmentIn, compartmentDEMIn, time, timeStep, stod(timeVal));
 
             dfdtAllCompartments[c] = compartmentOut.dfAlldt;
             dfldtAllCompartments[c] = compartmentOut.dfLiquiddt;

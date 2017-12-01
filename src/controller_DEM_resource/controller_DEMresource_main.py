@@ -42,12 +42,21 @@ class controller_DEMresource_main(object):
         timestep = int(self.init_timestep) + int(self.dump_difference)
         flag = 0
         dump_data = {}
+        timestep_collision_file = "/collision%d.atom"%int(timestep)
+        timestep_impact_file = '/impact%d.atom'%int(timestep)
+        collision_file = self.liggghts_output_dir + str(timestep_collision_file)
+        impact_file = self.liggghts_output_dir + str(timestep_impact_file)
+        # the execution waits for a seconds everytime it enters the loop till the file do not exist
+        while not(os.path.exists(collision_file) and os.path.exists(impact_file)):
+            time.sleep(5)
+            print("Waiting for file to be printed")
         # opening the different files so as to write the calculated average / total data ovetime
         dump_avg_vel = open("velocity_average_overtime_starting_%d.txt"%self.init_timestep, "w") 
         dump_collisions = open("collisions_overtime_starting_%d.txt"%self.init_timestep, "w")
         dump_impacts = open("impacts_overtime_starting_%d.txt"%self.init_timestep, "w")
         obj_inter = DEMinter.controller_DEM_resource_interpretor(timestep, self.type, self.init_timestep, self.liggghts_output_dir)
         # Keeps checking for the existence of the file till one of the criteria for a killing the DEM are not met
+        print 'start searching'
         while (flag == 0):
             # defining the files and path of the files that it needs to search for.
             #liggghts_output_files_path = os.getcwd() + '/liggghts_output_files/'

@@ -499,7 +499,7 @@ class Executor(object):
 
                 cud2.cores          = 1
                 cud2.mpi            = False
-                self._logger.debug('ΠΒΜ Controller unit %d description: %s'%(i,cud2.as_dict()))
+                self._logger.debug('PBM Controller unit %d description: %s'%(i,cud2.as_dict()))
                 pbm_monitor_cud_list.append(cud2)
 
             # Submit the monitor unit and return
@@ -577,5 +577,4 @@ if __name__ == '__main__':
     
     Test = Executor(config='test.json')
 
-    Test.run()
-    
+    Test.run() 

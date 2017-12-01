@@ -321,12 +321,15 @@ class Executor(object):
 
         if int(status_dict['status'][0]) == 1:
             cont = True
+            dem_timestep      = int(status_dict['DEM_time_step'][0])
+            pbm_init_timestep = float(status_dict['PBM_init_time_step'][0])
+            pbm_mixing_time   = int(status_dict['mixing_times'][0])
         else:
             cont = False
+            dem_timestep      = None
+            pbm_init_timestep = None
+            pbm_mixing_time   = None
         
-        dem_timestep      = int(status_dict['DEM_time_step'][0])
-        pbm_init_timestep = float(status_dict['PBM_init_time_step'][0])
-        pbm_mixing_time   = int(status_dict['mixing_times'][0])
 
         return cont,dem_timestep,pbm_init_timestep,pbm_mixing_time
 
@@ -401,7 +404,7 @@ class Executor(object):
                                 {'source' : dem_path+'post/impact%d.atom'%(timestep-2*self._diff_DEM),
                                  'target' : 'unit:///sampledumpfiles/impact%d.%d_%d'%((timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
                                  'action' : rp.LINK},
-                                {'source' : ru.Url(self._pbm_units[i]).path+'csvDump/particles_%d.csv'%init_timestep,
+                                {'source' : ru.Url(self._pbm_units[i].sandbox).path+'csvDump/particles_%d.csv'%init_timestep,
                                  'target' : 'unit:///csvDump/particles_%d.csv'%init_timestep,
                                  'action' : rp.LINK}]
                 else:
@@ -506,6 +509,7 @@ class Executor(object):
 
                 if cont == True:
                     print 'Continue with PBM'
+                    print cont, dem_timestep, pbm_init_timestep, pbm_mixing_time
                     self._start_pbm_units(timestep=pbm_timestep, init_timestep=pbm_init_timestep,\
                                           dem_timestep=dem_timestep,mixing_time=pbm_mixing_time,restart=restart)
 

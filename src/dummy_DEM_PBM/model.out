@@ -26,13 +26,13 @@ def dummy_PBM(last_timestep_index, copypath):
     # print(particles_file_list)
     num_start_d50 = re.search("d50_",d50_file_list[0]).end()
     num_start_particles = re.search("particles_",particles_file_list[0]).end()
-    num_end_d50 = re.search(".csv",d50_file_list[0]).start()
-    num_end_particles = re.search(".csv",particles_file_list[0]).start()
-    if (num_end_d50 - num_start_d50 == 8):
+    num_end_d50 = re.search("0.csv",d50_file_list[0]).start()
+    num_end_particles = re.search("0.csv",particles_file_list[0]).start()
+    if (num_end_d50 - num_start_d50 == 7):
         d50_file_list = sorted(d50_file_list, key=lambda x: float(x[num_start_d50:num_end_d50]))
     else:
         d50_file_list = sorted(d50_file_list, key=lambda x: float(x[num_start_d50:(num_end_d50 - 1)]))
-    if (num_end_particles - num_start_particles == 8):
+    if (num_end_particles - num_start_particles == 7):
         particles_file_list = sorted(particles_file_list, key=lambda x: float(x[num_start_particles:num_end_particles]))
     else:
         particles_file_list = sorted(particles_file_list, key=lambda x: float(x[num_start_particles:(num_end_particles - 1)]))

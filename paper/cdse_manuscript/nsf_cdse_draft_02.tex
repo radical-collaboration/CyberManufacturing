@@ -91,20 +91,6 @@ Piscataway, NJ, USA-08854}
 
 \begin{abstract}
 Particulate processes are prevalent in the pharmaceutical industry but, the physics underlying 
-<<<<<<< HEAD:paper/nsf_cdse_draft_02.tex
-these processes are complicated and difficult to predict. Modelling such processes using particle-
-scale data is very computationally heavy and slow, while using a bulk model is not a very accurate
-assumption. A quicker and a more accurate way to model this system is to use the particle-scale data 
-into a bulk model. In this work, a multi-scale model was used to model the high shear wet granulation 
-process. A multi-dimensional population balance model (PBM) was developed which 
-consisted of a mechanistic kernel, which obtained the collision data from the discrete element 
-modelling (DEM) simulation. The PBM code was developed on 
-C++ and was run in parallel using MPI + OMP hybrid technique. The DEM simulations were performed on
-LIGGGHTS, which runs in parallel using MPI. Speedup of about 14 times was obtained for the PBM 
-simulations and around 12 for the DEM simulations. This coupling was performed using the radical 
-pilot for scaling studies from 1 processor to 128 for the PBM and upto 256 cores for the DEM. Using 
-this developed framework, the granulation process has been modelled accurately much faster than
-=======
 these processes are complicated and difficult to predict. Modeling such 
 processes using particle-
 scale data is very computationally heavy and slow, while using a bulk model is not a very accurate
@@ -121,7 +107,6 @@ simulations and around 12 for the DEM simulations. This coupling was performed u
 pilot for scaling studies from 1 processor to 128 for the PBM and up to 256 cores for the DEM. Using 
 this developed framework, the granulation process has been modeled accurately 
 much faster than
->>>>>>> fix/paperedits:paper/cdse_manuscript/nsf_cdse_draft_02.tex
 established techniques currently being used.
 \end{abstract}
 \begin{keyword}
@@ -202,18 +187,6 @@ discussed by \citep{Bettencourt2017}, as their computational time of the simulat
 half of the actual granulation time. Such quick simulations can also help improve control of 
 continuous pharmaceutical processes. Modeling these processes also abides by 
 Quality-by-Design(QbD) approach being employed by the industry. This work showcases the speed 
-<<<<<<< HEAD:paper/nsf_cdse_draft_02.tex
-improvements that can be achieved using HPCs and how they can help improve process design.\\
-The main objective of this work is to develop a uni-directional DEM-PBM model that runs well in 
-parallel so that it can take advantage of the computational capabilities of  modern computing 
-clusters. Specific studies performed in this work include:
-\begin{itemize}
-\item Developed a 4-Dimensional, DEM informed PBM that is parallelized using hybrid techniques (MPI + 
-OMP)to model the bulk processes occuring during the granulation process.
-\item Perform DEM simulations on LIGGGHTS to  model the micro-mechanics of the L\"{o}dige CoriMix 
-CM5 high shear granulator. 
-\item Uni-directionally coupled DEM to PBM using Radical Pilot, which is a framework developed in
-=======
 improvements that can be achieved using HPCs and how they can help improve process design.
 
 The main objective of this work is to develop a unidirectional DEM-PBM model 
@@ -227,7 +200,6 @@ techniques (MPI + OMP)to model the bulk processes occurring during the granulati
 simulations (LIGGGHTS) to  model the micro-mechanics of the L\"{o}dige CoriMix 
 CM5 high shear granulator. 
 \item Unidirectionally couple DEM to PBM using Radical Pilot, which is a framework developed in
->>>>>>> fix/paperedits:paper/cdse_manuscript/nsf_cdse_draft_02.tex
 Python which provides task level parallelization, to help develop an accurate model which can be 
 run quickly on high performance computing systems
 \end{itemize}

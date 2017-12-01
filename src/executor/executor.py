@@ -495,7 +495,7 @@ class Executor(object):
                 self._start_dem_units(timestep=dem_timestep,restart=restart)
 
                 self._umgr.wait_units(uids=self._dem_monitor_unit.uid)
-
+                print 'Checking DEM status'
                 # Check DEM status returns whether the execution should continue
                 # or not. It also returns the timestep PBM should start.
                 cont, dem_timestep, pbm_init_timestep, pbm_mixing_time = self._check_DEM_status('DEM_status.json')
@@ -505,6 +505,7 @@ class Executor(object):
                     self._umgr.cancel_units(uids=self._dem_unit.uid)
 
                 if cont == True:
+                    print 'Continue with PBM'
                     self._start_pbm_units(timestep=pbm_timestep, init_timestep=pbm_init_timestep,\
                                           dem_timestep=dem_timestep,mixing_time=pbm_mixing_time,restart=restart)
 
@@ -513,7 +514,7 @@ class Executor(object):
                     self._umgr.wait_units(uids=[cu.uid for cu in self._pbm_monitor_units])
                     print 'Canceling PBM units'
                     self._umgr.cancel_units(uids=[cu.uid for cu in self._pbm_units])
-
+                    print 'Checking PBM status'
                     cont, pbm_timestep = self._check_PBM_status('PBM_status.json')
 
                 if cont == True:

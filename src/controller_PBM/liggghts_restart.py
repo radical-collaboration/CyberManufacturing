@@ -77,7 +77,7 @@ class liggghts_input_creator(object):
             in_file.write("read_restart       restart/granulator.%d.restart\n"%in_ts)
             in_file.write("region             reg block -0.01 0.450 -0.150 0.150 -0.080 0.100\n")
             in_file.write("neighbor           0.0005 bin\n")
-            in_file.write("neigh_modify       delay 0 check yes page 10000000 one 30000\n")
+            in_file.write("neigh_modify       delay 0 check yes page 100000 one 30000\n")
             in_file.write("timestep           5e-7\n")
             in_file.write("fix                gravi all gravity 9.81 vector 0.0 -1.0 0.0\n\n\n")
             in_file.write("pair_style         gran model hertz tangential history\n")

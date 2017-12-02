@@ -54,7 +54,7 @@ class controller_DEMresource_main(object):
         dump_avg_vel = open("velocity_average_overtime_starting_%d.txt"%self.init_timestep, "w") 
         dump_collisions = open("collisions_overtime_starting_%d.txt"%self.init_timestep, "w")
         dump_impacts = open("impacts_overtime_starting_%d.txt"%self.init_timestep, "w")
-        obj_inter = DEMinter.controller_DEM_resource_interpretor(timestep, self.type, self.init_timestep, self.liggghts_output_dir)
+        obj_inter = DEMinter.controller_DEM_resource_interpretor(timestep, self.type, timestep, self.liggghts_output_dir)
         # Keeps checking for the existence of the file till one of the criteria for a killing the DEM are not met
         print 'start searching'
         while (flag == 0):

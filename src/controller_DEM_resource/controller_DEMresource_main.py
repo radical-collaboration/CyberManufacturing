@@ -54,7 +54,7 @@ class controller_DEMresource_main(object):
         dump_avg_vel = open("velocity_average_overtime_starting_%d.txt"%self.init_timestep, "w") 
         dump_collisions = open("collisions_overtime_starting_%d.txt"%self.init_timestep, "w")
         dump_impacts = open("impacts_overtime_starting_%d.txt"%self.init_timestep, "w")
-        obj_inter = DEMinter.controller_DEM_resource_interpretor(timestep, self.type, self.init_timestep, self.liggghts_output_dir)
+        obj_inter = DEMinter.controller_DEM_resource_interpretor(timestep, self.type, timestep, self.liggghts_output_dir)
         # Keeps checking for the existence of the file till one of the criteria for a killing the DEM are not met
         print 'start searching'
         while (flag == 0):
@@ -135,10 +135,10 @@ class controller_DEMresource_main(object):
                 # ipt.writelines("average velocity of particles  %f\n"%item for item in avg_vel_array)
                 ipt.write("\nAggregationKernelConstant %f"%(1.0e-3))
                 ipt.write("\nBreakageKernelConstant %f"%(1.0e-2))
-                ipt.write("\nConsolidationConstant %f"%((1.0e-20))
-                ipt.write("\nInitialPorosity %f"%((1.0e-3))
-                ipt.write("\nMinimumPorosity %f"%((1.0e-3))
-                ipt.write("\nGranuleSaturationFactor %f"%((0))
+                ipt.write("\nConsolidationConstant %f"%(1.0e-20))
+                ipt.write("\nInitialPorosity %f"%(1.0e-3))
+                ipt.write("\nMinimumPorosity %f"%(1.0e-3))
+                ipt.write("\nGranuleSaturationFactor %f"%(0))
                 ipt.write("\nCriticalStokesDeformationNumber %f"%(0.0059))
                 ipt.write("\nBinderViscosity %f"%(0.05))
                 ipt.write("\nCoefficientOfRestitution %f"%(0.2))

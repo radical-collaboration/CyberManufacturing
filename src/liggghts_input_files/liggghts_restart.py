@@ -77,7 +77,7 @@ class liggghts_input_creator(object):
             in_file.write("read_restart       restart/granulator.%d.restart\n"%in_ts)
             in_file.write("region             reg block -0.01 0.450 -0.150 0.150 -0.080 0.100\n")
             in_file.write("neighbor           0.0005 bin\n")
-            in_file.write("neigh_modify       delay 0 check yes page 500000 one 30000\n")
+            in_file.write("neigh_modify       delay 0 check yes page 10000000 one 30000\n")
             in_file.write("timestep           5e-7\n")
             in_file.write("fix                gravi all gravity 9.81 vector 0.0 -1.0 0.0\n\n\n")
             in_file.write("pair_style         gran model hertz tangential history\n")
@@ -168,12 +168,12 @@ class liggghts_input_creator(object):
             in_file.write("# Collecting particle collision data \n")
             in_file.write("fix                fppacc all property/atom fppacc scalar yes yes yes 0\n")
             in_file.write("\n\n# Collecting particle-particle collision data\n")
-            for x in xrange(0,mode+1):
+            for x in xrange(0,mode):
                 in_file.write("compute            cc_%d type%d_ contact/atom\n"%(x+1,x+1))
             in_file.write("\n\n\n\n# Dump files configurationn\n")
             in_file.write("run                1\n")
-            in_file.write("dump               myDump  all custom 50000 post/collision*.atom id type x y z ix iy iz vx vy vz fx fy fz c_cc_1 c_cc_2 c_cc_3 c_cc_4 c_cc_5 c_cc_6 c_cc_7 c_cc_8 c_cc_9 c_cc_10 c_cc_11 c_cc_12 c_cc_13 c_cc_14 c_cc_15 c_cc_16 f_fppacc radius c_cc_17\n")
-            in_file.write("dump               myDump2 all local 50000 post/impact*.atom c_pwc[1] c_pwc[2] c_pwc[3] c_pwc[4] c_pwc[5] c_pwc[6] c_pwc[7] c_pwc[8] c_pwc[9] c_pwc[10] c_pwc[11] c_pwc[12] c_pwc[13] c_pwc[14]\n")
+            in_file.write("dump               myDump  all custom 50000 post/dump*.atom id type x y z ix iy iz vx vy vz fx fy fz c_cc_1 c_cc_2 c_cc_3 c_cc_4 c_cc_5 c_cc_6 c_cc_7 c_cc_8 c_cc_9 c_cc_10 c_cc_11 c_cc_12 c_cc_13 c_cc_14 c_cc_15 c_cc_16 f_fppacc radius\n")
+            in_file.write("dump               myDump2 all local 50000 post/coll*.atom c_pwc[1] c_pwc[2] c_pwc[3]\n")
             in_file.write("dump               myDump3 all local 50000 post/pcoll*.atom c_ppc[1] c_ppc[2] c_ppc[3] c_ppc[4]\n")
             in_file.write("dump               dumpstl1 all mesh/stl 50000 post/dump*.stl\n")
             in_file.write("restart            50000 restart/granulator.*.restart\n\n\n\n\n")
@@ -189,5 +189,6 @@ class liggghts_input_creator(object):
 
 # -------------------------------------------------------------------------------------------------
 
-a = liggghts_input_creator(2000000,4000000,0.002,0.002,16,15,500)
+a = liggghts_input_creator(0,100000,0.002,0.002,16,15,500)
+a.main_writer()
 #in_file.write("\n")

@@ -401,7 +401,7 @@ class Executor(object):
             self._logger.info('Create PBM units')
             for i in range(self._PBMs):
                 cud = rp.ComputeUnitDescription()
-                cud.environment    = ['PATH='+self._pathtoLIGGHTS+':$PATH']
+                cud.environment    = ['PATH='+self._pathtoPBMexecutable+':$PATH']
                 cud.executable     = 'model.out'
                 cud.arguments      = [dem_monitor_path+'PBM_input.in',self._DEMcores,self._diameter,init_timestep]
                 cud.post_exec      = ['tar cfz csvDump.tar.gz csvDump']
@@ -432,13 +432,13 @@ class Executor(object):
                                 {'source' : dem_path+'post/impact%d.atom'%(timestep-2*self._diff_DEM),
                                  'target' : 'unit:///sampledumpfiles/impact%d.%d_%d'%((timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
                                  'action' : rp.LINK},
-                                {'source' : ru.Url(self._pbm_units[i]).path+'csvDump/particles_%f.csv'%init_timestep,
+                                {'source' : ru.Url(self._pbm_units[i].sandbox).path+'csvDump/particles_%f.csv'%init_timestep,
                                  'target' : 'unit:///csvDump/particles_%f.csv'%init_timestep,
                                  'action' : rp.LINK},
-                                 {'source' : ru.Url(self._pbm_units[i]).path+'csvDump/gas_%f.csv'%init_timestep,
+                                 {'source' : ru.Url(self._pbm_units[i].sandbox).path+'csvDump/gas_%f.csv'%init_timestep,
                                  'target' : 'unit:///csvDump/gas_%f.csv'%init_timestep,
                                  'action' : rp.LINK},
-                                 {'source' : ru.Url(self._pbm_units[i]).path+'csvDump/liquid_%f.csv'%init_timestep,
+                                 {'source' : ru.Url(self._pbm_units[i].sandbox).path+'csvDump/liquid_%f.csv'%init_timestep,
                                  'target' : 'unit:///csvDump/liquid_%f.csv'%init_timestep,
                                  'action' : rp.LINK}]
                 else:

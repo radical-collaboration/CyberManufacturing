@@ -127,7 +127,7 @@ compute            cc_5 type5_ contact/atom
 compute            cc_6 type6_ contact/atom
 compute            cc_7 type7_ contact/atom
 compute            cc_8 type8_ contact/atom
-compute            cc_9 type9_ contact/atom
+compute            cc_9 type9_ contact/atom:q
 compute            cc_10 type10_ contact/atom
 compute            cc_11 type11_ contact/atom
 compute            cc_12 type12_ contact/atom
@@ -135,6 +135,7 @@ compute            cc_13 type13_ contact/atom
 compute            cc_14 type14_ contact/atom
 compute            cc_15 type15_ contact/atom
 compute            cc_16 type16_ contact/atom
+compute            cc_17 type17_ contact/atom
 
 
 

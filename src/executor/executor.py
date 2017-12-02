@@ -108,8 +108,8 @@ class Executor(object):
         self._pmgr = None
         self._umgr = None
         self._session = None
-        self._logger = ru.get_logger('cyber.executor')
-        self._reporter = ru.Reporter('cyber.executor')
+        self._logger = ru.get_logger('cyber.executor','REPORT')
+        self._reporter = ru.Reporter()
 
     def configure(self,config):
         """
@@ -536,7 +536,8 @@ class Executor(object):
 
             while cont:
 
-                self._reporter.progress('Starting DEM simulation')
+                if not restart:
+                    self._reporter.header('Starting DEM simulation')
                 self._start_dem_units(timestep=dem_timestep,restart=restart)
 
                 self._umgr.wait_units(uids=self._dem_monitor_unit.uid)
@@ -546,31 +547,31 @@ class Executor(object):
                 cont, dem_timestep, pbm_init_timestep, pbm_mixing_time = self._check_DEM_status('DEM_status.json')
                 
                 if self._dem_unit.state != rp.FINAL:
-                    self._reporter.progress('Canceling DEM simulation')
+                    self._reporter.header('Canceling DEM simulation')
                     self._umgr.cancel_units(uids=self._dem_unit.uid)
 
                 if cont == True:
-                    self._reporter.progress('Starting PBM simulation')
+                    self._reporter.header('Starting PBM simulation')
                     self._start_pbm_units(timestep=pbm_timestep, init_timestep=pbm_init_timestep,\
                                           dem_timestep=dem_timestep,mixing_time=pbm_mixing_time,restart=restart)
 
                     # Waits for all the PBM units to finish. Should wait only for the
                     # first
                     self._umgr.wait_units(uids=[cu.uid for cu in self._pbm_monitor_units])
-                    self._reporter.progress('Canceling PBM simulation')
+                    self._reporter.header('Canceling PBM simulation')
                     self._umgr.cancel_units(uids=[cu.uid for cu in self._pbm_units])
 
                     cont, pbm_timestep = self._check_PBM_status('PBM_status.json')
 
                 if cont == True:
-                    self._reporter.progress('Restarting DEM simulation')
+                    self._reporter.header('Restarting DEM simulation')
                     restart = True
 
-            self._reporter.title('Simulations Finished.')
         
         except Exception as e:
             raise RuntimeError('caught Exception %s\n'%e)
         finally:
+            self._reporter.title('Simulations Finished.')
             self._shutdown()
 
 if __name__ == '__main__':

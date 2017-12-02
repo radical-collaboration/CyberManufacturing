@@ -109,7 +109,7 @@ class Executor(object):
         self._umgr = None
         self._session = None
         self._logger = ru.get_logger('cyber.executor')
-        self._reporter = self._logger.reporter
+        self._reporter = ru.Reporter('cyber.executor')
 
     def configure(self,config):
         """

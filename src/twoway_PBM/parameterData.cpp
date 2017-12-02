@@ -182,6 +182,7 @@ void parameterData::readPBMInputFile (string pbmInFilePath)
     lineData = move(stringstream(line));
     lineData >> tmpStr;
     lineData >> nCompartments;
+    cout << "Number of compaertments from in file " << nCompartments << endl;
 
     //Read ParticleResidenceTime
     getline(pbmInputFile, line);

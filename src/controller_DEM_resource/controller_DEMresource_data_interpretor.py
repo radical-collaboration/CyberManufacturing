@@ -44,6 +44,9 @@ class controller_DEM_resource_interpretor(object):
         for x in xrange(0, self.type):
             self.tot_part_each_type[x] = int(len(obj_data_reader.collision_data_acc_types[str(x+1)]))
             temp1 = self.tot_part_each_type[x]
+            if (temp1 == 0):
+                temp1 = 0
+                print("Collision for %d type is 0")
             temp2 = obj_data_reader.collision_data_acc_types[str(x+1)]
             vx = 0.0
             vy = 0.0

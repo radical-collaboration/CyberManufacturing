@@ -321,12 +321,14 @@ class Executor(object):
 
         if int(status_dict['status'][0]) == 1:
             cont = True
+            dem_timestep      = int(status_dict['DEM_time_step'][0])
+            pbm_init_timestep = float(status_dict['PBM_init_time_step'][0])
+            pbm_mixing_time   = int(status_dict['mixing_times'][0])
         else:
             cont = False
-        
-        dem_timestep      = int(status_dict['DEM_time_step'][0])
-        pbm_init_timestep = float(status_dict['PBM_init_time_step'][0])
-        pbm_mixing_time   = int(status_dict['mixing_times'][0])
+            dem_timestep      = None
+            pbm_init_timestep = None
+            pbm_mixing_time   = None
 
         return cont,dem_timestep,pbm_init_timestep,pbm_mixing_time
 
@@ -351,10 +353,12 @@ class Executor(object):
         
         if int(status_dict['status']) == 1:
             cont = True
+            last_time_step = float(status_dict['last_time_step'])
         else:
             cont = False
+            last_time_step = None
 
-        return cont,float(status_dict['last_time_step'])
+        return cont, last_time_step
 
 
     def _start_pbm_units(self,timestep=0, init_timestep=0,dem_timestep=0,\

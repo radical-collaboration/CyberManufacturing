@@ -401,13 +401,13 @@ class Executor(object):
                                 {'source' : dem_path+'post/impact%d.atom'%(timestep-2*self._diff_DEM),
                                  'target' : 'unit:///sampledumpfiles/impact%d.%d_%d'%((timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
                                  'action' : rp.LINK},
-                                {'source' : ru.Url(self._pbm_units[i]).path+'csvDump/particles_%f.csv'%init_timestep,
+                                {'source' : ru.Url(self._pbm_units[i].sandbox).path+'csvDump/particles_%f.csv'%init_timestep,
                                  'target' : 'unit:///csvDump/particles_%f.csv'%init_timestep,
                                  'action' : rp.LINK},
-                                 {'source' : ru.Url(self._pbm_units[i]).path+'csvDump/gas_%f.csv'%init_timestep,
+                                 {'source' : ru.Url(self._pbm_units[i].sandbox).path+'csvDump/gas_%f.csv'%init_timestep,
                                  'target' : 'unit:///csvDump/gas_%f.csv'%init_timestep,
                                  'action' : rp.LINK},
-                                 {'source' : ru.Url(self._pbm_units[i]).path+'csvDump/liquid_%f.csv'%init_timestep,
+                                 {'source' : ru.Url(self._pbm_units[i].sandbox).path+'csvDump/liquid_%f.csv'%init_timestep,
                                  'target' : 'unit:///csvDump/liquid_%f.csv'%init_timestep,
                                  'action' : rp.LINK}]
                 else:

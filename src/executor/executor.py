@@ -370,7 +370,7 @@ class Executor(object):
             pbm_cud_list = list()
             for i in range(self._PBMs):
                 cud = rp.ComputeUnitDescription()
-                cud.environment    = ['PATH='+self._pathtoLIGGHTS+':$PATH']
+                cud.environment    = ['PATH='+self._pathtoPBMexecutable+':$PATH']
                 cud.executable     = 'model.out'
                 cud.arguments      = [dem_monitor_path+'PBM_input.in',self._DEMcores,self._diameter,init_timestep]
                 cud.post_exec      = ['tar cfz csvDump.tar.gz csvDump']

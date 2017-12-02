@@ -168,7 +168,7 @@ class liggghts_input_creator(object):
             in_file.write("# Collecting particle collision data \n")
             in_file.write("fix                fppacc all property/atom fppacc scalar yes yes yes 0\n")
             in_file.write("\n\n# Collecting particle-particle collision data\n")
-            for x in xrange(0,mode):
+            for x in xrange(0,mode+1):
                 in_file.write("compute            cc_%d type%d_ contact/atom\n"%(x+1,x+1))
             in_file.write("\n\n\n\n# Dump files configurationn\n")
             in_file.write("run                1\n")

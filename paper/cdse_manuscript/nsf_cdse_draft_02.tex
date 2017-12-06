@@ -87,27 +87,24 @@ Jersey, Piscataway, NJ, USA-08854}
 Piscataway, NJ, USA-08854}
 \cortext[cor1]{Equal contribution by C. Sampat and F. Bettencourt}
 \cortext[cor2]{Corresponding author}
-\ead{marianth@soe.rutgers,edu}
+\ead{marianth@soe.rutgers.edu}
 
 \begin{abstract}
 Particulate processes are prevalent in the pharmaceutical industry but, the physics underlying 
-these processes are complicated and difficult to predict. Modeling such 
-processes using particle-
-scale data is very computationally heavy and slow, while using a bulk model is not a very accurate
-assumption. A quicker and a more accurate way to model this system is to use the particle-scale data 
-into a bulk model. In this work, a unidirectional multi-scale model was used to 
-model the high shear wet granulation 
+these processes are complicated and requires large amount of compuatation to solve a model at the
+particle-level. This approach makes the simulation slow when compared to using a bulk model, 
+which has less accuracy. A quicker and a more accurate way to model this system is to use a multi-scale 
+model the i.e. use the particle-scale data into a bulk model. 
+In this work, a unidirectional multi-scale model was used to model the high shear wet granulation 
 process. A multi-dimensional population balance model (PBM) was developed which 
 consisted of a mechanistic kernel, which obtained the collision data from the discrete element 
-modeling (DEM) simulation. The PBM code was developed on 
-\textit{C++} and was run in parallel using MPI + OMP hybrid technique. The DEM 
+modeling (DEM) simulation. The PBM was run in parallel using MPI + OMP hybrid technique. The DEM 
 simulations were performed on
 LIGGGHTS, which runs in parallel using MPI. Speedup of about 14 times was obtained for the PBM 
 simulations and around 12 for the DEM simulations. This coupling was performed using the radical 
 pilot for scaling studies from 1 processor to 128 for the PBM and up to 256 cores for the DEM. Using 
 this developed framework, the granulation process has been modeled accurately 
-much faster than
-established techniques currently being used.
+much faster than existing approches in literature.
 \end{abstract}
 \begin{keyword}
 Population balance model \sep Granulation \sep Discrete element methods  \sep MPI and OpenMP 
@@ -135,7 +132,7 @@ Particulate processes are defined by chaotic micro-scale phenomena that result f
 particle-particle interactions inside these systems. These small scale phenomenon develop into 
 complex bulk behavior of these processes. To successfully predict the bulk behavior of these 
 systems, a model needs to capture the particle-particle interactions and emergent meso-scale phenomena. 
-The discrete Element Method (DEM)\citep{Cundall1979} has proven to be an accurate way 
+The Discrete Element Method (DEM)\citep{Cundall1979} has proven to be an accurate way 
 to  model a bulk material properties of particulate systems using micro-scale particle level 
 interactions for instance pharmaceutical processes \citep{Hancock2011}. DEM uses Newton's equations of 
 motion to model the forces on each particle in the system and it's interactions with the system 
@@ -145,8 +142,7 @@ and force computations, it usually takes a large amount of time to run. Thus ano
 efficient, but potentially less accurate technique, used to model these particulate processes is population 
 balance model (PBM). % \textbf{need to cite 1-2 papers}.
 
-PBM takes into account the changes in internal or spatial particle properties 
-This 
+PBM takes into account the changes in internal or spatial particle properties.This 
 model lacks sensitivity to design parameters such as equipment geometry. It is semi-mechanistic in 
 nature, meaning they use population averages and probability to capture bulk behavior but still 
 seek to capture some of the micro-phenomena of particle-particle interactions using correlations or 
@@ -305,7 +301,8 @@ to build a mechanistic model for the PBM. \cite{Goldschmidt2003} solved a PBM us
 replacing smaller particles as they successfully coalesce with larger particles. 
 \cite{Reinhold2012} tried to replace a mechanistic aggregation kernel with an empirical kernel 
 in order to prove that, in certain cases DEM simulations may not be necessary for the 
-development of kernels. A hybrid model for one-way coupling has been reported for continuous mixing (\cite{sen2013} \&  \cite{sen2013b}) and is discussed in Section \ref{sec:pbm_model}.
+development of kernels. A hybrid model for one-way coupling has been reported for continuous mixing (\cite{sen2013} \&  
+\cite{sen2013b}) and is discussed in Section \ref{sec:pbm_model}.
 
 In this work, a coupled DEM and PBM model has been implemented. The PBM gives 
 meso-scale 
@@ -385,7 +382,8 @@ could not achieve the
 speed improvements of parallelization of a program if it were written in a native programming language 
 like C/C++ or FORTRAN. 
 
-LAMMPS Improved for general granular and granular heat transfer simulations (LIGGGHTS) is an open-source software used to perform DEM simulations. This package natively 
+LAMMPS Improved for general granular and granular heat transfer simulations (LIGGGHTS) is an open-source software used 
+to perform DEM simulations. This package natively 
 supports MPI for parallelizing the simulation by static decomposition which partitions space such that 
 the area of communication between the the MPI processes is minimized. \cite{kacianauskas2010} used 
 load balancing methods similar to a static decomposition and observed that this works well for a 
@@ -437,7 +435,8 @@ support scalable and efficient launching of heterogeneous tasks across different
 
 \subsection{Discrete Element Modeling (DEM)}
 \subsubsection{LIGGGHTS}
-LAMMPS Improved for general granular and granular heat transfer simulations (LIGGGHTS) v3.60(\cite{Kloss2012}) developed by DCS computing was used for all the simulation performed 
+LAMMPS Improved for general granular and granular heat transfer simulations (LIGGGHTS) v3.60(\cite{Kloss2012}) 
+developed by DCS computing was used for all the simulation performed 
 in this study. Source code files were modified to obtain particle-particle 
 collisions. The aforementioned version of LIGGGHTS was compiled using the mvapich (mvapich2 v2.1) 
 and intel (intel v15.0.2) compilers with the -O3 optimization option as well as an option to side load the 
@@ -826,22 +825,24 @@ step.
 
 The PBM code was initially developed using a simple empirical kernel which did 
 not take into account the DEM collision data.
-The code utilized static arrays, whose size was allocated on initiation and then the code was parallelized using the same
-technique as discussed above. This code was compiled using the intel/15.0.2 and mvapich2/2.1 compilers. The code was tested on
-Stampede1 supercomputer for the configuration of the cores varying from the 1 to 128 cores. The speedup obtained for this simulation 
-was about 37, i.e. the parallel code run using 128 processes was 37 times faster than the simulation which ran just on 1 core.
-This was a good conformation for the hybrid parallel technique, thus being implemented in the coupled model. The results of these 
-preliminary studies have been addressed in more detail in the supplemental information.
+The code utilized static arrays, whose size was allocated on initiation and then the code was parallelized using 
+the same technique as discussed above. This code was compiled using the intel/15.0.2 and mvapich2/2.1 compilers. 
+The code was tested on Stampede1 supercomputer for the configuration of the cores varying from the 1 to 128 cores. 
+The speedup obtained for this simulation was about 37, i.e. the parallel code run using 128 processes was 37 times 
+faster than the simulation which ran just on 1 core. This was a good conformation for the hybrid parallel technique, 
+thus being implemented in the coupled model. The results of these preliminary studies have been addressed in more 
+detail in the supplemental information.
 
 
 Since the DEM informed PBM code required dynamic size increase for the data structure due to different number of particles being 
 present in the DEM simulation,
-the PBM code developed used the Standard Template Library containers and their features available in \textit{C++} 11 and later. It 
-requires intel v17.0.2 (gcc 5.3+)  or later for compilation. Since this module was not present on the Stampede, the execution of the 
-PBM was done on the newer Stampede2 supercomputer. Each of the compute node of the cluster consists of Intel Xeon Phi 7250 
-(\textquotedblleft Knights Landing\textquotedblright) which has 68 cores on a single socket clocked at 1.4 GHz, with 96 GB of DDR4 
-RAM. Each of the cores consists of 4 hardware threads. The simulations were then run by varying the the number of MPI 
-processes from 1 to 16 and the number of OMP threads from 1 to 8, thus, using a maximum of 128 cores.
+the PBM code developed used the Standard Template Library containers and their features available in \textit{C++} 11 
+and later. It requires intel v17.0.2 (gcc 5.3+)  or later for compilation. Since this module was not present on the 
+Stampede, the execution of the PBM was done on the newer Stampede2 supercomputer. Each of the compute node of the 
+cluster consists of Intel Xeon Phi 7250 (\textquotedblleft Knights Landing\textquotedblright) which has 68 cores on 
+a single socket clocked at 1.4 GHz, with 96 GB of DDR4 RAM. Each of the cores consists of 4 hardware threads. 
+The simulations were then run by varying the the number of MPI processes from 1 to 16 and the number of OMP threads 
+from 1 to 8, thus, using a maximum of 128 cores.
 
 \subsection{Radical Pilot (RP) \& PBM+DEM communication}
 RADICAL-Pilot defines a number of abstractions to describe resources, and computational 

@@ -132,9 +132,9 @@ Particulate processes are defined by chaotic micro-scale phenomena that result f
 particle-particle interactions inside these systems. These small scale phenomenon develop into 
 complex bulk behavior of these processes. To successfully predict the bulk behavior of these 
 systems, a model needs to capture the particle-particle interactions and emergent meso-scale phenomena. 
-The Discrete Element Method (DEM)\citep{Cundall1979} has proven to be an accurate way 
-to  model a bulk material properties of particulate systems using micro-scale particle level 
-interactions for instance pharmaceutical processes \citep{Hancock2011}. DEM uses Newton's equations of 
+Recently, the discrete element method (DEM)\citep{Cundall1979} simulations have been employed in 
+pharmaceutical process modeling to obtain particle-level data, which helps describe the bulk properties
+of the particulate system accurately~\citep{Hancock2011}. DEM uses Newton's equations of 
 motion to model the forces on each particle in the system and it's interactions with the system 
 geometry and other particles. This enables DEM to model the small scale phenomena that 
 determines the bulk behavior of particulate system. Since DEM includes large amount of interactions
@@ -166,8 +166,8 @@ years  this technique has been applied to DEM and PBM simulations
 \citep{Bettencourt2017}\citep{Prakash2013a}\citep{Gunawan2008}.
 
 In order to solve large computational problems, parallel computing can be used to distribute the 
-problem across many CPUs which can work together to solve the problem more quickly. To solve 
-problems in parallel, computing clusters are often used and with drop  in the prices of hardware, 
+problem across many CPUs which can work together to solve the problem faster.\csnote{Giannis can rewrite this paragraph}. 
+To solve problems in parallel, computing clusters are often used and with drop  in the prices of hardware, 
 they are becoming popular. A cluster is essentially a collection of conventional computers 
 connected together via a high speed network like Ethernet or Infiniband. The difficulty with 
 implementing parallel computing to solve a computational problem is that it involves a lot of 
@@ -177,28 +177,27 @@ run on.
 
 High performance computing (HPC) is the utilization of supercomputers and parallel processing
 techniques for solving complicated computational problems. Some of the potential benefits of using
-HPC in the pharmaceutical industry include really high accuracy for parameter estimation as detailed 
-particle-scale simulations can be performed quickly. On-line modeling of continuous processes as 
-discussed by \citep{Bettencourt2017}, as their computational time of the simulations was less than 
-half of the actual granulation time. Such quick simulations can also help improve control of 
-continuous pharmaceutical processes. Modeling these processes also abides by 
-Quality-by-Design(QbD) approach being employed by the industry. This work showcases the speed 
-improvements that can be achieved using HPCs and how they can help improve process design.
+HPC in the pharmaceutical industry include high accuracy for parameter estimation as detailed 
+particle-scale simulations can be performed quickly. On-line modeling of continuous processes can 
+be performed using HPCs as discussed by \citep{Bettencourt2017}, as the computational time of the 
+simulations was less than half of the actual granulation time. 
+Such quick simulations can also help improve control of continuous pharmaceutical processes. 
+This work showcases the speed improvements that can be achieved using HPCs and 
+how they can help improve process design.
 
-The main objective of this work is to develop a unidirectional DEM-PBM model 
-that runs efficiently in 
+The main objective of this work was to develop a unidirectional DEM-PBM model that run efficiently in 
 parallel so that it can take advantage of the computational capabilities of  modern computing 
-clusters. Specific studies performed in this work include:
-\begin{itemize}
-\item Development of 4-Dimensional, reduced order DEM informed PBM that is parallelized using hybrid 
+clusters. 
+
+ Development of 4-Dimensional, reduced order DEM informed PBM that is parallelized using hybrid 
 techniques (MPI + OMP)to model the bulk processes occurring during the granulation process.
-\item Perform DEM simulations on LAMMPS Improved for general granular and granular heat transfer 
+ Perform DEM simulations on LAMMPS Improved for general granular and granular heat transfer 
 simulations (LIGGGHTS) to  model the micro-mechanics of the L\"{o}dige CoriMix 
 CM5 high shear granulator. 
-\item Unidirectionally couple DEM to PBM using Radical Pilot, which is a framework developed in
+ Unidirectionally couple DEM to PBM using Radical Pilot, which is a framework developed in
 Python which provides task level parallelization, to help develop an accurate model which can be 
 run quickly on high performance computing systems
-\end{itemize}
+
 
 \section{Background \& Motivation}
 

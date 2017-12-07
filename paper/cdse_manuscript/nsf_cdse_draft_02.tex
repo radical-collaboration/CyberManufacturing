@@ -165,18 +165,24 @@ problems such as Molecular Dynamics (MD), Computational Fluid Dynamics (CFD), bu
 years  this technique has been applied to DEM and PBM simulations 
 \citep{Bettencourt2017}\citep{Prakash2013a}\citep{Gunawan2008}.
 
-In order to solve large computational problems, parallel computing can be used to distribute the 
-problem across many CPUs which can work together to solve the problem faster.\csnote{Giannis can you rewrite this paragraph??}. 
-To solve problems in parallel, computing clusters are often used and with drop  in the prices of hardware, 
-they are becoming popular. A cluster is essentially a collection of conventional computers 
-connected together via a high speed network like Ethernet or Infiniband. The difficulty with 
-implementing parallel computing to solve a computational problem is that it involves a lot of 
-computer-computer communication and algorithm redesigning which needs to be done very 
-carefully to ensure numerical consistency and with consideration of the cluster the program will be 
-run on.
+%In order to solve large computational problems, parallel computing can be used to distribute the 
+%problem across many CPUs which can work together to solve the problem faster.
+\csnote{Giannis can you rewrite this paragraph??}. \gpnote{Is this okay?}
 
-High performance computing (HPC) is the utilization of supercomputers and parallel processing
-techniques for solving complicated computational problems. Some of the potential benefits of using
+Parallel Computing is the standard procedure to solve large computational problems in many sciences. This method uses High Performance Computers (HPC) to solve over a large number of cores. A HPC consists of thousands compute nodes connected via a high speed network. A typical compute node has multiple cores and several GBs or memory. The network that connects them, usually Infiniband, reaches speeds of 56 Gbps. In addition, a high performance parallel filesystem accompanies the compute nodes, allowing users to read and write GBs of data efficiently. One of the challenges when implementing parallel programs \gpnote{a different word should be used} is making sure that data are written in a similar manner with serial programs to ensure correctness of the results. This depends in implementing correctly data communication between parallel computing processes.
+
+%To solve problems in parallel, computing clusters are often used and with drop in the prices of hardware, 
+%they are becoming popular. A cluster is essentially a collection of conventional computers 
+%connected together via a high speed network like Ethernet or Infiniband. The difficulty with 
+%implementing parallel computing to solve a computational problem is that it involves a lot of 
+%computer-computer communication and algorithm redesigning which needs to be done very 
+%carefully to ensure numerical consistency and with consideration of the cluster the program will be 
+%run on.
+
+%High performance computing (HPC) is the utilization of supercomputers and parallel processing
+%techniques for solving complicated computational problems. 
+
+Some of the benefits of using
 HPC in the pharmaceutical industry include high accuracy for parameter estimation as detailed 
 particle-scale simulations can be performed quickly. Quick simulations can also help 
 improve control of continuous pharmaceutical processes. This work showcases the speed improvements 
@@ -1262,69 +1268,69 @@ through the grant number: 1547171.
 \section*{Appendix}
 
 \begin{algorithm}[H]
-\caption*{\textbf{Pseudo Code}\gpnote{There are still }}\csnote{the integral signs have been removed}
-\label{alg:MyAlgorithm}
-\begin{algorithmic}[*]
-
-\While{ $t<t_{final}$ }
-\begin{itemize}[noitemsep,nolistsep,itemindent=10pt]
-\item The spatial domain is divided into equal chunks)
-\item Each MPI process is assigned on chunk of spatial domain shown as $c_{low}$ to $c_{up}$ 
-\item Sum all $c_{low_i}$ to $c_{up_i}$ is = to [0,number of Compartments]
-\end{itemize}
-\For{each MPI processes} $c = c_{low_i}$ to $c_{up_i}$
-\begin{itemize}[noitemsep,nolistsep,itemindent=20pt]
-\item Each MPI process is further divided with OMP to take advantage of multi-core CPU
-\item Each OMP process is allocated to a single compute core
-\item $\Re$ integrates for each first solid bin as the second solid bins is 
-divided across the OMP threads, thus 
-%$(i_1)$ $\int_{0}^{s_{2(OMP_0)}}$, $(i_2)$ $\int_{s_{2(OMP_0)}}^{s_{2(OMP_1)}}$, $(i_3)$ 
-%$\int_{s_{2(OMP_1)}}^{s_{2(OMP_2)}}$ and so on 
-divided into smaller integrals 
-%by MPI  
-%$\int_{i_1low_n}^{i_1up_n}$, $\int_{i_2low_n}
-%^{i_2up_n}$, $\int_{i_3low_n}^{i_3up_n}$ 
-%upto 16 compartments
-%which are solved by the "n" OMP processes. 
-Figure \ref{fig:mthds_OMP_distribution} depicts this distribution.
-\item Allocated to that MPI process (CPU)
-\end{itemize}
-\For{ each OMP process}
-\begin{itemize}[noitemsep,nolistsep,itemindent=30pt]
-\item Calculate the Aggregation Constant $\Re_{agg}(s_1,s_2,c)$
-\end{itemize}
-%\begin{align}
-%\Re_{agg}(s_1,s_2,c)=& \frac{1}{2}\int_{0}^{s_{1}} \int_{i_1low_n}^{i_1up_n} 
-%\beta(s_1',s_2',s_1-s_1',s_2-s_2',c)F(s_1',s_2',c)F(s_1-s_1',s_2-s_2',c)ds_1'ds_2'\notag\\ 
-%&- F(s_1,s_2,c)\int _{0}^{s_{max_1}-s_1} \int_{i_2low_n}^{i_2up_n} 
-%\beta(s_1,s_2,s_1',s_2',c)F(s_1',s_2',c)ds_1'ds_2'\notag
-%\end{align}
-%\begin{align*}
-%\Re_{break}(s_1,s_2,c) = \int_{0}^{s_{max_1}} \int_{i_3low_n}^{i_3up_n} K_{break}(s_1',s_2',c)F(s_1',s_2',c)ds_1'ds_2' - K_{break}
-%(s_1,s_2,c)F(s_1,s_2,c)
-%\end{align*}
-\EndFor
-\begin{itemize}[noitemsep,nolistsep,itemindent=20pt]
-\item  Calculate total number of particles using Euler's rule. 
-\end{itemize}
-%\begin{align*}
-%F_{t,c} &= \frac{\Delta F(s_1,s_2,c)}{\Delta t}\Delta t  + F(s_1,s_2,c)_{t-1}\\
-%      &=   (\Re_{agg}(s_1,s_2,c)+\Re_{break}(s_1,s_2,c)+\dot{F}_{in}(s_1,s_2,c)-\dot{F}_{out}(s_1,s_2,c))\Delta t + 
-%F(s_1,s_2,c)_{t-1}
-%\end{align*}
-
-\EndFor
-\begin{itemize}[noitemsep,nolistsep,itemindent=10pt]
-\item MPI Send $F_{t,c}$ to Master MPI process
-\item MPI Recv $F_{t,c}$ from MPI all slave processes
-\item Master consolidate all $F_{t,c}$ chunks into a complete $F_{t,all}$
-\item Master does inter-bin particle transfers (updates $F_{t,all}$)
-\item MPI Bcast $F_{t,all}$ to all slave processes
-\item $t_{new} = t + timestep$
-\end{itemize}
-\EndWhile   
-
-\end{algorithmic}
+    \caption*{\textbf{Pseudo Code}\gpnote{Pseudocode of what? }}
+    \label{alg:MyAlgorithm}
+    \begin{algorithmic}[1]
+        
+        \While{ $t<t_{final}$ }
+        %\begin{Stateize}[noStatesep,nolistsep,Stateindent=10pt]
+        \State The spatial domain is divided into equal chunks
+        \State Each MPI process is assigned on chunk of spatial domain shown as $c_{low}$ to $c_{up}$ 
+        \State Sum all $c_{low_i}$ to $c_{up_i}$ is = to [0,number of Compartments]
+        %\end{Stateize}
+        \For{each MPI processes} $c = c_{low_i}$ to $c_{up_i}$
+        %\begin{Stateize}[noStatesep,nolistsep,Stateindent=20pt]
+        \State Each MPI process is further divided with OMP to take advantage of multi-core CPU
+        \State Each OMP process is allocated to a single compute core
+        \State $\Re$ integrates for each first solid bin as the second solid bins is 
+        divided across the OMP threads, thus 
+        %$(i_1)$ $\int_{0}^{s_{2(OMP_0)}}$, $(i_2)$ $\int_{s_{2(OMP_0)}}^{s_{2(OMP_1)}}$, $(i_3)$ 
+        %$\int_{s_{2(OMP_1)}}^{s_{2(OMP_2)}}$ and so on 
+        divided into smaller integrals 
+        %by MPI  
+        %$\int_{i_1low_n}^{i_1up_n}$, $\int_{i_2low_n}
+        %^{i_2up_n}$, $\int_{i_3low_n}^{i_3up_n}$ 
+        %upto 16 compartments
+        %which are solved by the "n" OMP processes. 
+        Figure \ref{fig:mthds_OMP_distribution} depicts this distribution.
+        \State Allocated to that MPI process (CPU)
+        %\end{Stateize}
+        \For{ each OMP process}
+        %\begin{Stateize}[noStatesep,nolistsep,Stateindent=30pt]
+        \State Calculate the Aggregation Constant $\Re_{agg}(s_1,s_2,c)$
+        %\end{Stateize}
+        %\begin{align}
+        %\Re_{agg}(s_1,s_2,c)=& \frac{1}{2}\int_{0}^{s_{1}} \int_{i_1low_n}^{i_1up_n} 
+        %\beta(s_1',s_2',s_1-s_1',s_2-s_2',c)F(s_1',s_2',c)F(s_1-s_1',s_2-s_2',c)ds_1'ds_2'\notag\\ 
+        %&- F(s_1,s_2,c)\int _{0}^{s_{max_1}-s_1} \int_{i_2low_n}^{i_2up_n} 
+        %\beta(s_1,s_2,s_1',s_2',c)F(s_1',s_2',c)ds_1'ds_2'\notag
+        %\end{align}
+        %\begin{align*}
+        %\Re_{break}(s_1,s_2,c) = \int_{0}^{s_{max_1}} \int_{i_3low_n}^{i_3up_n} K_{break}(s_1',s_2',c)F(s_1',s_2',c)ds_1'ds_2' - K_{break}
+        %(s_1,s_2,c)F(s_1,s_2,c)
+        %\end{align*}
+        \EndFor
+        %\begin{Stateize}[noStatesep,nolistsep,Stateindent=20pt]
+            \State  Calculate total number of particles using Euler's rule. 
+        %\end{Stateize}
+        %\begin{align*}
+        %F_{t,c} &= \frac{\Delta F(s_1,s_2,c)}{\Delta t}\Delta t  + F(s_1,s_2,c)_{t-1}\\
+        %      &=   (\Re_{agg}(s_1,s_2,c)+\Re_{break}(s_1,s_2,c)+\dot{F}_{in}(s_1,s_2,c)-\dot{F}_{out}(s_1,s_2,c))\Delta t + 
+        %F(s_1,s_2,c)_{t-1}
+        %\end{align*}
+        
+        \EndFor
+        %\begin{Stateize}[noStatesep,nolistsep,Stateindent=10pt]
+            \State MPI Send $F_{t,c}$ to Master MPI process
+            \State MPI Recv $F_{t,c}$ from MPI all slave processes
+            \State Master consolidate all $F_{t,c}$ chunks into a complete $F_{t,all}$
+            \State Master does inter-bin particle transfers (updates $F_{t,all}$)
+            \State MPI Bcast $F_{t,all}$ to all slave processes
+            \State $t_{new} = t + timestep$
+        %\end{Stateize}
+        \EndWhile   
+        
+    \end{algorithmic}
 \end{algorithm}  
  
 \begin{figure}[H]

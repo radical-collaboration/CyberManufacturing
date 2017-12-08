@@ -165,11 +165,16 @@ problems such as Molecular Dynamics (MD), Computational Fluid Dynamics (CFD), bu
 years  this technique has been applied to DEM and PBM simulations 
 \citep{Bettencourt2017}\citep{Prakash2013a}\citep{Gunawan2008}.
 
-%In order to solve large computational problems, parallel computing can be used to distribute the 
-%problem across many CPUs which can work together to solve the problem faster.
-\csnote{Giannis can you rewrite this paragraph??}. \gpnote{Is this okay?}
 
-Parallel Computing is the standard procedure to solve large computational problems in many sciences. This method uses High Performance Computers (HPC) to solve over a large number of cores. A HPC consists of thousands compute nodes connected via a high speed network. A typical compute node has multiple cores and several GBs or memory. The network that connects them, usually Infiniband, reaches speeds of 56 Gbps. In addition, a high performance parallel filesystem accompanies the compute nodes, allowing users to read and write GBs of data efficiently. One of the challenges when implementing parallel programs \gpnote{a different word should be used} is making sure that data are written in a similar manner with serial programs to ensure correctness of the results. This depends in implementing correctly data communication between parallel computing processes.
+Parallel Computing is the standard procedure to solve large computational problems in many sciences. 
+This method uses High Performance Computers (HPC) to solve over a large number of cores. 
+A HPC consists of thousands compute nodes connected via a high speed network. A typical compute 
+node has multiple cores and several GBs or memory. The network that connects them, usually Infiniband, 
+reaches speeds of 56 Gbps. In addition, a high performance parallel filesystem accompanies the compute 
+nodes, allowing users to read and write GBs of data efficiently. One of the challenges when implementing 
+parallel applications is to make sure that data is written in a similar manner with serial programs 
+to ensure correctness of the results. This depends in implementing 
+correctly data communication between parallel computing processes.
 
 %To solve problems in parallel, computing clusters are often used and with drop in the prices of hardware, 
 %they are becoming popular. A cluster is essentially a collection of conventional computers 
@@ -726,11 +731,7 @@ Number of second solid bins & $ss$ & $16$ & $-$\\
 \end{table}
 
 
-\subsection{PBM Parallel \textit{C++}}
-
-\jhanote{bad style to have a subsubsection immediately after a subsection start.. similarly for the earlier (PBM) and DEM subsections}
-
-\subsubsection{Discretization \& parallelizing PBM}
+\subsection{Discretization \& parallelizing PBM}
 The PBM was discretized by converting each of its coordinates in to discrete bins. For the spatial 
 coordinates a linear bin spacing was used. For the internal coordinates, solid, liquid and gas a 
 non-linear discretization was used \citep{barrasso2012}. 
@@ -1266,9 +1267,17 @@ The authors would like to acknowledge National Science Foundation (NSF) for
 funding this project
 through the grant number: 1547171.
 \section*{Appendix}
-
+The parallelization technique used for the PBM used was dependent on the number of compartments present inside 
+granulator. Each of the compartments, had calculations indpendent from each other for each time step. So each of them were
+loaded onto different MPI processes. Since there is minimal commmunication between them, they could easily be parallelized using MPI. 
+To get further speed improvements, the time independent calculations of the PBM were parallelized using OMP. 
+This parallelization technique is decribed as an algorithm in Algorithm 1. \\
+OMP was used to parallelize the calculations inside each compartment. Since the PBM consisted of 2 solid bins, one of 
+the solid bins was parallelized. The number of solid bins of solid were equally divided by the number of OMP threads. 
+Figure \ref{fig:app_OMP_distribution} depicts the equal distribution of 16 solild bins of the second solid using 4 OMP 
+threads.
 \begin{algorithm}[H]
-    \caption*{\textbf{Pseudo Code}\gpnote{Pseudocode of what? }}
+    \caption*{\textbf{Algorithm 1}}
     \label{alg:MyAlgorithm}
     \begin{algorithmic}[1]
         
@@ -1338,7 +1347,7 @@ through the grant number: 1547171.
 \includegraphics[scale=0.5]{OMP_table.pdf}
 \caption{The integration of aggregation rate distributed among OMP processes. This figure indicates the use of 4 OMP processes, the 
 configuration that gave us the best performance. This technique has been implemented for each MPI process.}
-\label{fig:mthds_OMP_distribution}
+\label{fig:app_OMP_distribution}
 \end{figure}	
 
 \section*{References} 

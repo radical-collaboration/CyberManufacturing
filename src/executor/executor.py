@@ -4,6 +4,11 @@ __copyright__ = 'Copyright 2017-2018, http://radical.rutgers.edu'
 __license__   = 'MIT'
 __author__    = 'Ioannis Paraskevakos'
 
+################################################################################
+# Disclaimer: There are not detailed comments in this file yet. Any change does
+#             not require my attention to debug. If a change is needed, please
+#             open an issue in the GitHub repo requesting a feature.
+################################################################################
 
 import os
 import sys
@@ -103,6 +108,8 @@ class Executor(object):
         self._pmgr = None
         self._umgr = None
         self._session = None
+        self._logger = ru.get_logger('cyber.executor','REPORT')
+        self._reporter = ru.Reporter()
 
     def configure(self,config):
         """
@@ -163,6 +170,7 @@ class Executor(object):
         self._bins2               = conf['bins2'] if conf.has_key('bins2') else 16
         self._diff_DEM            = conf['diff_DEM'] if conf.has_key('diff_DEM') else 50000
         self._compartments        = conf['compartments'] if conf.has_key('compartments') else 4
+        self._logger.info('Configured passed: %s'%config)
 
     def _start(self):
         """
@@ -194,13 +202,13 @@ class Executor(object):
                       }
 
             pdesc = rp.ComputePilotDescription(pd_desc)
-
+            self._logger.info('Pilot created: %s'%pd_desc)
             # Launch the pilot.
             pilot = self._pmgr.submit_pilots(pdesc)
             # Register the ComputePilot in a UnitManager object.
             self._umgr.add_pilots(pilot)
 
-
+            self._logger.info('Resource configured')
         except Exception as e:
             self._session.close()
             # Something unexpected happened in the pilot code above
@@ -224,81 +232,85 @@ class Executor(object):
         restart  : defines if the unit that will be created is restarting the DEM simulation
                    or not.
         """
+        self._logger.info('Creating DEM descirptions')
+        # TODO: Create a for loop for multiple DEM pipelines
+        cud = rp.ComputeUnitDescription()
+        cud.environment    = ['PATH='+self._pathtoLIGGHTS+':$PATH']
+        cud.pre_exec       = ['mkdir CSVs','mkdir post','mkdir restart']
+        cud.executable     = 'lmp_micstam'
+        cud.arguments      = ['-in','in.*' ]
+        if restart:
+            cud.input_staging  = [{'source': 'pilot:///in.restart_from_%d'%timestep,
+                                   'target':'unit:///in.restart_from_%d'%timestep,
+                                   'action'  :rp.LINK},
+                                  {'source': self._pathtoLIGGHTSinputs+'/shell_closed.stl',
+                                   'target':'unit:///shell_closed.stl',
+                                   'action'  :rp.LINK},
+                                  {'source': self._pathtoLIGGHTSinputs+'/shell',
+                                   'target':'unit:///shell',
+                                   'action'  :rp.LINK},
+                                  {'source': self._pathtoLIGGHTSinputs+'/impeller',
+                                   'target':'unit:///impeller',
+                                   'action'  :rp.LINK},
+                                  {'source': self._pathtoLIGGHTSinputs+'/impeller_coarse.stl',
+                                   'target':'unit:///impeller_coarse.stl',
+                                   'action'  :rp.LINK},
+                                ]
+            cud.cores          = self._DEMcores
+            cud.mpi            = True
+        else:
+            cud.input_staging  = [{'source': self._pathtoLIGGHTSinputs+'/in.2_sim_new',
+                                   'target':'unit:///in.2_sim_new',
+                                   'action'  :rp.LINK},
+                                  {'source': self._pathtoLIGGHTSinputs+'/shell_closed.stl',
+                                   'target':'unit:///shell_closed.stl',
+                                   'action'  :rp.LINK},
+                                  {'source': self._pathtoLIGGHTSinputs+'/shell',
+                                   'target':'unit:///shell',
+                                   'action'  :rp.LINK},
+                                  {'source': self._pathtoLIGGHTSinputs+'/impeller',
+                                   'target':'unit:///impeller',
+                                   'action'  :rp.LINK},
+                                  {'source': self._pathtoLIGGHTSinputs+'/impeller_coarse.stl',
+                                   'target':'unit:///impeller_coarse.stl',
+                                   'action'  :rp.LINK},
+                                ]
+            cud.cores          = self._DEMcores
+            cud.mpi            = True
+        self._logger.debug('DEM unit description: %s'%cud.as_dict())
+        # Submit the first unit and wait until it staged its input files. Waiting is
+        # needed so that we can get the path of the unit and pass it to the DEM monitor.
+        dem_unit = self._umgr.submit_units(cud)
+        # This line blocks the execution until the DEM unit has a path.
+        self._logger.info('Waiting DEMs to be scheduled')
+        self._umgr.wait_units(uids=[dem_unit.uid],state=[rp.AGENT_SCHEDULING_PENDING])
 
-        for i in range(self._DEMs):
-            cud = rp.ComputeUnitDescription()
-            cud.environment    = ['PATH='+self._pathtoLIGGHTS+':$PATH']
-            cud.pre_exec       = ['mkdir CSVs','mkdir post','mkdir restart']
-            cud.executable     = 'lmp_micstam'
-            cud.arguments      = ['-in','in.*' ]
-            if restart:
-                cud.input_staging  = [{'source': 'pilot:///in.restart_from_%d'%timestep,
-                                       'target':'unit:///in.restart_from_%d'%timestep,
-                                       'action'  :rp.LINK},
-                                      {'source': self._pathtoLIGGHTSinputs+'/shell_closed.stl',
-                                       'target':'unit:///shell_closed.stl',
-                                       'action'  :rp.LINK},
-                                      {'source': self._pathtoLIGGHTSinputs+'/shell',
-                                       'target':'unit:///shell',
-                                       'action'  :rp.LINK},
-                                      {'source': self._pathtoLIGGHTSinputs+'/impeller',
-                                       'target':'unit:///impeller',
-                                       'action'  :rp.LINK},
-                                      {'source': self._pathtoLIGGHTSinputs+'/impeller_coarse.stl',
-                                       'target':'unit:///impeller_coarse.stl',
-                                       'action'  :rp.LINK},
-                                    ]
-                cud.cores          = self._DEMcores
-                cud.mpi            = True
-            else:
-                cud.input_staging  = [{'source': self._pathtoLIGGHTSinputs+'/in.2_sim_new',
-                                       'target':'unit:///in.2_sim_new',
-                                       'action'  :rp.LINK},
-                                      {'source': self._pathtoLIGGHTSinputs+'/shell_closed.stl',
-                                       'target':'unit:///shell_closed.stl',
-                                       'action'  :rp.LINK},
-                                      {'source': self._pathtoLIGGHTSinputs+'/shell',
-                                       'target':'unit:///shell',
-                                       'action'  :rp.LINK},
-                                      {'source': self._pathtoLIGGHTSinputs+'/impeller',
-                                       'target':'unit:///impeller',
-                                       'action'  :rp.LINK},
-                                      {'source': self._pathtoLIGGHTSinputs+'/impeller_coarse.stl',
-                                       'target':'unit:///impeller_coarse.stl',
-                                       'action'  :rp.LINK},
-                                    ]
-                cud.cores          = self._DEMcores
-                cud.mpi            = True
+        #Now that we have a path we can continue
+        self._logger.info('Creating Controller description')
+        cud2 = rp.ComputeUnitDescription()
+        cud2.executable = 'python'
+        cud2.arguments = ['controller_DEMresource_main.py',timestep,self._types,ru.Url(dem_unit.sandbox).path+'post']
+        cud2.input_staging = [{'source':'client:///controller_DEMresource_main.py',
+                               'target':'unit:///controller_DEMresource_main.py',
+                               'action': rp.TRANSFER},
+                              {'source':'client:///controller_DEMresource_data_reader.py',
+                               'target':'unit:///controller_DEMresource_data_reader.py',
+                               'action': rp.TRANSFER},
+                              {'source':'client:///controller_DEMresource_data_interpretor.py',
+                               'target':'unit:///controller_DEMresource_data_interpretor.py',
+                               'action': rp.TRANSFER}]
+        cud2.output_staging = [{'source': 'unit:///DEM_status.json',
+                                'target': 'client:///DEM_status.json',
+                                'action'  : rp.TRANSFER}]
+        self._logger.debug('DEM Controller unit description: %s'%cud2.as_dict())
 
-            # Submit the first unit and wait until it staged its input files. Waiting is
-            # needed so that we can get the path of the unit and pass it to the DEM monitor.
-            dem_unit = self._umgr.submit_units(cud)
-            # This line blocks the execution until the DEM unit has a path.
-            self._umgr.wait_units(uids=[dem_unit.uid],state=[rp.AGENT_SCHEDULING_PENDING])
-
-            #Now that we have a path we can continue
-            cud2 = rp.ComputeUnitDescription()
-            cud2.executable = 'python'
-            cud2.arguments = ['controller_DEMresource_main.py',timestep,self._types,ru.Url(dem_unit.sandbox).path+'post']
-            cud2.input_staging = [{'source':'client:///controller_DEMresource_main.py',
-                                   'target':'unit:///controller_DEMresource_main.py',
-                                   'action': rp.TRANSFER},
-                                  {'source':'client:///controller_DEMresource_data_reader.py',
-                                   'target':'unit:///controller_DEMresource_data_reader.py',
-                                   'action': rp.TRANSFER},
-                                  {'source':'client:///controller_DEMresource_data_interpretor.py',
-                                   'target':'unit:///controller_DEMresource_data_interpretor.py',
-                                   'action': rp.TRANSFER}]
-            cud2.output_staging = [{'source': 'unit:///DEM_status.json',
-                                    'target': 'client:///DEM_status.json',
-                                    'action'  : rp.TRANSFER}]
-
-            # Submit the monitor unit and return
-            dem_monitor_unit = self._umgr.submit_units(cud2)
+        # Submit the monitor unit and return
+        dem_monitor_unit = self._umgr.submit_units(cud2)
 
 
-            self._dem_unit = dem_unit
-            self._dem_monitor_unit = dem_monitor_unit
+        self._dem_unit = dem_unit
+        self._dem_monitor_unit = dem_monitor_unit
+        self._logger.info('Return from start_dem_units')
 
     def _check_DEM_status(self,status_file):
         """
@@ -315,20 +327,29 @@ class Executor(object):
         arguments: A list that contains the necessary arguments for the PBM execution.
         """
 
+        self._logger.info('Checking json file %s'%status_file)
         status_fid = open(status_file)
         status_dict = json.load(status_fid)
         status_fid.close()
+        self._logger.debug('DEM Status Dict: %s'%status_dict)
 
         if int(status_dict['status'][0]) == 1:
             cont = True
             dem_timestep      = int(status_dict['DEM_time_step'][0])
             pbm_init_timestep = float(status_dict['PBM_init_time_step'][0])
             pbm_mixing_time   = int(status_dict['mixing_times'][0])
+
+            self._logger.debug('check DEM return values: Cont %d, DEM Timestep %d '%(cont,dem_timestep)+
+                               'PBM init timestep %f, PBM Mixing Time %d'%(pbm_init_timestep,pbm_mixing_time))
         else:
             cont = False
             dem_timestep      = None
             pbm_init_timestep = None
             pbm_mixing_time   = None
+
+            self._logger.debug('check DEM return values: Cont %d, DEM Timestep %s '%(cont,dem_timestep)+
+                               'PBM init timestep %s, PBM Mixing Time %s'%(pbm_init_timestep,pbm_mixing_time))
+
 
         return cont,dem_timestep,pbm_init_timestep,pbm_mixing_time
 
@@ -347,18 +368,24 @@ class Executor(object):
         arguments: A list that contains the necessary arguments for the PBM execution.
         """
 
+        self._logger.info('Checking json file %s'%status_file)
         status_fid = open(status_file)
         status_dict = json.load(status_fid)
         status_fid.close()
-        
+        self._logger.debug('DEM Status Dict: %s'%status_dict)
+
         if int(status_dict['status']) == 1:
             cont = True
             last_time_step = float(status_dict['last_time_step'])
+
+            self._logger.debug('check PBM return values: Cont %d, Last Timestep %s '%(cont,last_time_step))
         else:
             cont = False
             last_time_step = None
+            self._logger.debug('check DEM return values: Cont %d, Last Timestep %s '%(cont,last_time_step))
 
-        return cont, last_time_step
+
+        return cont,last_time_step
 
 
     def _start_pbm_units(self,timestep=0, init_timestep=0,dem_timestep=0,\
@@ -367,11 +394,15 @@ class Executor(object):
         try:
             # Get the path to the DEM folder. This will allow correct staging
             # input for the PBMs
+            self._logger.info('Getting DEM and controller paths')
             dem_monitor_path = ru.Url(self._dem_monitor_unit.sandbox).path
+            self._logger.debug('DEM controler path: %s'%dem_monitor_path)
             dem_path         = ru.Url(self._dem_unit.sandbox).path
+            self._logger.debug('DEM path: %s'%dem_path)
 
             # Create a list of PBM units and insert every description in that list
             pbm_cud_list = list()
+            self._logger.info('Create PBM units')
             for i in range(self._PBMs):
                 cud = rp.ComputeUnitDescription()
                 cud.environment    = ['PATH='+self._pathtoPBMexecutable+':$PATH']
@@ -436,12 +467,15 @@ class Executor(object):
                                   'action'  : rp.LINK}]
             
                 pbm_cud_list.append(cud)
+                self._logger.debug('PBM unit %d description: %s'%(i,cud.as_dict()))
 
             # Submit them to the agent and wait until all have a path
             pbm_uids = self._umgr.submit_units(pbm_cud_list)
+            self._logger.info('Waiting PBMs to be scheduled')
             self._umgr.wait_units(uids=[cu.uid for cu in pbm_uids],state=rp.AGENT_SCHEDULING_PENDING)
 
             pbm_monitor_cud_list = list()
+            self._logger.info('Creating Controller description')
             for i in range(self._PBMs):
                 cud2 = rp.ComputeUnitDescription()
                 cud2.input_staging = [{'source':'client:///controllerPBMresourceMain.py',
@@ -469,6 +503,7 @@ class Executor(object):
 
                 cud2.cores          = 1
                 cud2.mpi            = False
+                self._logger.debug('PBM Controller unit %d description: %s'%(i,cud2.as_dict()))
                 pbm_monitor_cud_list.append(cud2)
 
             # Submit the monitor unit and return
@@ -476,6 +511,8 @@ class Executor(object):
 
             self._pbm_units = pbm_uids
             self._pbm_monitor_units = pbm_monitor_unit
+        
+            self._logger.info('Return from start_pbm_units')
 
         except Exception as e:
 
@@ -488,6 +525,7 @@ class Executor(object):
 
     def run(self):
 
+        self._reporter.title('Starting Two-way DEM PBM simulation')
         # Start the RP session and setup the selected resource.
         self._start()
 
@@ -502,6 +540,8 @@ class Executor(object):
 
             while cont:
 
+                if not restart:
+                    self._reporter.header('Starting DEM simulation')
                 self._start_dem_units(timestep=dem_timestep,restart=restart)
 
                 self._umgr.wait_units(uids=self._dem_monitor_unit.uid)
@@ -511,33 +551,35 @@ class Executor(object):
                 cont, dem_timestep, pbm_init_timestep, pbm_mixing_time = self._check_DEM_status('DEM_status.json')
                 
                 if self._dem_unit.state != rp.FINAL:
-                    print 'Canceling DEM simulation'
+                    self._reporter.header('Canceling DEM simulation')
                     self._umgr.cancel_units(uids=self._dem_unit.uid)
 
                 if cont == True:
+                    self._reporter.header('Starting PBM simulation')
                     self._start_pbm_units(timestep=pbm_timestep, init_timestep=pbm_init_timestep,\
                                           dem_timestep=dem_timestep,mixing_time=pbm_mixing_time,restart=restart)
 
                     # Waits for all the PBM units to finish. Should wait only for the
                     # first
                     self._umgr.wait_units(uids=[cu.uid for cu in self._pbm_monitor_units])
-                    print 'Canceling PBM units'
+                    self._reporter.header('Canceling PBM simulation')
                     self._umgr.cancel_units(uids=[cu.uid for cu in self._pbm_units])
 
                     cont, pbm_timestep = self._check_PBM_status('PBM_status.json')
 
                 if cont == True:
-                    print 'Restarting DEM'
+                    self._reporter.header('Restarting DEM simulation')
                     restart = True
 
+        
         except Exception as e:
             raise RuntimeError('caught Exception %s\n'%e)
         finally:
+            self._reporter.title('Simulations Finished.')
             self._shutdown()
 
 if __name__ == '__main__':
     
     Test = Executor(config='test.json')
 
-    Test.run()
-    
+    Test.run() 

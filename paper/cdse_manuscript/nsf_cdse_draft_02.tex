@@ -92,8 +92,8 @@ Piscataway, NJ, USA-08854}
 \begin{abstract}
 Particulate processes are prevalent in the pharmaceutical industry but, the physics underlying 
 these processes are complicated and requires large amount of compuatation to solve a model at the
-particle-level. This approach makes the simulation slow when compared to using a bulk model, 
-which has less accuracy. A quicker and a more accurate way to model this system is to use a multi-scale 
+particle-level. This approach makes the simulation slow, when compared to using a less accurate 
+bulk model. A quicker and a more accurate way to model this system is to use a multi-scale 
 model the i.e. use the particle-scale data into a bulk model. 
 In this work, a unidirectional multi-scale model was used to model the high shear wet granulation 
 process. A multi-dimensional population balance model (PBM) was developed which 
@@ -148,12 +148,12 @@ nature, meaning they use population averages and probability to capture bulk beh
 seek to capture some of the micro-phenomena of particle-particle interactions using correlations or 
 empirically developed kernels to approximate those interactions. Even though PBM is much faster 
 than DEM, a detailed PBM can still take a significant amount of time to solve which prevents them 
-from being used as widely as they could be in academia and industries \citep{Barrasso2013}. Due to the 
-populating averaging and their semi-mechanistic kernels, highly detailed PBMs still can have 
-difficulties in capturing the micro-scale phenomena that are crucial to predicting accurate dynamics of 
-particulate processes. 
+from being used as widely as they could be in academia and industries \citep{Barrasso2013}. Though highly 
+detailed PBMs take into account populating, averaging and contain semi-mechanistic kernels, these 
+PBMs still can have difficulties in capturing the micro-scale phenomena that are crucial to 
+predicting accurate dynamics of particulate processes. 
 
-Thus, to complement the limitations of each of these modeling methods they are coupled to 
+Thus, to complement the limitations of each of these modeling techniques they are coupled to 
 provide a more accurate model.  The typical work flow of such a PBM-DEM coupled model involves 
 using a short DEM simulation to capture the particle-particle level interactions of the system and 
 then this physics is fed into the PBM, so that the PBM can more accurately simulate bulk system 
@@ -173,8 +173,8 @@ node has multiple cores and several GBs or memory. The network that connects the
 reaches speeds of 56 Gbps. In addition, a high performance parallel filesystem accompanies the compute 
 nodes, allowing users to read and write GBs of data efficiently. One of the challenges when implementing 
 parallel applications is to make sure that data is written in a similar manner with serial programs 
-to ensure correctness of the results. This depends in implementing 
-correctly data communication between parallel computing processes.
+to ensure correctness of the results. This depends on implementing correctly data communication 
+between parallel computing processes.
 
 %To solve problems in parallel, computing clusters are often used and with drop in the prices of hardware, 
 %they are becoming popular. A cluster is essentially a collection of conventional computers 
@@ -202,7 +202,7 @@ reduced order DEM informed PBM was developed that is parallelized using hybrid t
 (MPI + OMP)to model the bulk processes occurring during the granulation process and 
 is dicussed in section \ref{sec:pbm_model}. Section\ref{sec:RPandCommunications} decribes 
 the unidirectional coupling of the DEM and PBM using Radical Pilot, which is a 
-framework developed in Python which provides task level parallelization, to help develop 
+framework developed in Python. This provides task level parallelization, to help develop 
 an accurate model which can be run quickly on high performance computing systems. The speed
 improvements obtained for the parallel code and improvments that can be implemented are discussed
 in Section \ref{sec:Results}
@@ -227,7 +227,7 @@ expensive. Thus, newer research is focused on the QbD concept i.e,
 mathematically modeling the process to better understand the dynamics of such processes.
 
 \subsection{Modeling}
-The paradigm shift of the pharmaceutical industry ofr instance towards continuous manufacturing, 
+The paradigm shift of the pharmaceutical industry for instance towards continuous manufacturing, 
 emphasizes the need for a more accurate model. This further helps develop better control strategies 
 for the process. The modeling of particulate processes is more time consuming and computationally 
 expensive when compared to a fluid systems since the particles are considered as individual entities 
@@ -271,7 +271,7 @@ is the Hertz-Mindlin contact model \citep{gantt2006}\citep{hassanpour2013}.
     (\cite{ramkrishna2014}). In the context of process engineering and granulation, population 
     balance models are used to describe how the number densities, of different types of particles, in 
     the granulator change as rate processes such as aggregation and breakage reshape particles 
-    (\cite{Barrasso2013}). A general form of population balance model is shown here as equation 
+    (\cite{Barrasso2013}). A general form of population balance model is shown in Equation 
     \ref{eqn:bkgd_pbm_general}.
     
     \begin{align}
@@ -358,10 +358,10 @@ Since MPI is preferred for distributed computing and OMP is better for shared co
 individuals have studied the performance of MPI vs MPI+OMP methods and many studies have used 
 MPI+OMP for scientific computation for improved performance. Often times a trade of is made 
 between optimizing a program for performance and trying to make it flexible enough to run on many 
-different computer architectures. In the conclusion to the work by \cite{Bettencourt2017} it was found 
-that hybrid methods for PBMs allow the code flexibility for different architectures while still maintaining 
-good performance.  It was also reported that only the external(spatial) coordinates of the PBM were 
-parallelized. In this current work external and internal(compositions) calculations are parallelized. 
+different computer architectures. It was found that hybrid methods for PBMs allow the code 
+flexibility for different architectures while still maintaining good performance \citep{Bettencourt2017}.  
+It was also reported that only the external(spatial) coordinates of the PBM were parallelized. 
+In this current work external and internal(compositions) calculations are parallelized. 
 
 \subsubsection{Previous works on parallel development and solution of PBM and DEM}
 The idea of parallelization to reduce the computation time of the DEM and PBM simulations have 
@@ -370,7 +370,8 @@ finite volumes solution methods for the parallelization of their PBM. They perfo
 balancing effectively by decomposing the internal coordinates of their PBM. They achieved 
 speed improvements up to 100 cores on one system size, but was not tested for models 
 with more dimensions. Moreover, they mentioned that the parallelization could be 
-improved using shared memory processing. In our previous work, \cite{Bettencourt2017} took a 
+improved using shared memory processing. 
+In our previous work, \cite{Bettencourt2017} took a 
 hybrid approach towards the parallelization of the PBM using both MPI and OMP. 
 The hybrid parallelization helped achieve a speed improvement of about 98\% using 
 128 cores over the serial code. 
@@ -878,7 +879,7 @@ x-axis reduced the space available for the insertion of the particles thus, many
 inserted incorrectly. Another abnormal behavior observed during these simulation was the particles 
 halted at certain compartment and no particle traveled beyond this compartment in the x-direction. 
 Thus, another set of timing studies were performed for the 128 and 256 core simulations. The 
-comparison of simulation times have been shown in table .
+comparison of simulation times have been shown in Table \ref{table:rslts_dem_128_256_decomp}.
 
 \begin{table}
 \caption{Comparison of time taken for the DEM simulations using 128 and 256 core due to different spatial decomposition 
@@ -1045,30 +1046,30 @@ particles of the smaller size. The particle size distributions at 2 intermediate
 the number of larger particles  and a subsequent decrease in the number of smaller particles. 
 Figure \ref{fig:rslts_PBM_d50_plots}(\subref{fig:100s}) shows the distribution 
 of the particle size at the end of the granulation process. It can be seen that the number of particles in 
-the higher diameter bins increase.
+the higher diameter bins have increased.
 
 \begin{figure}
 \begin{subfigure}{.5\textwidth}
 \includegraphics[scale=0.45]{rslts-PBM_30s_psd.pdf}
-\caption{•}	
+\caption{}	
 \label{fig:30s}
 \end{subfigure}\hfill
 \begin{subfigure}{.5\textwidth}
 
 \includegraphics[scale=0.6]{rslts-PBM_50s_psd.pdf}
-\caption{•}
+\caption{}
 \label{fig:50s}
 \end{subfigure}
 \begin{subfigure}{.5\textwidth}
 
 \includegraphics[scale=0.45]{rslts-PBM_75s_psd.pdf}
-\caption{•}
+\caption{}
 \label{fig:75s}
 \end{subfigure}\hfill
 \begin{subfigure}{.5\textwidth}
 
 \includegraphics[scale=0.45]{rslts-PBM_100s_psd.pdf}
-\caption{•}
+\caption{}
 \label{fig:100s}
 \end{subfigure}
 \caption{ Representation of the total number of particles inside all compartments with diameters less than 0.2 mm 
@@ -1159,22 +1160,22 @@ Two simulations from the current scenario will be compared, the DEM + PBM simula
 mono-sized particle and the second being the simulation where the inserted particles were in a size 
 distribution. The ratio of rate of formation to the rate of depletion, both due to aggregation 
 observed during these simulations was 0.5 which indicated that the PBM is stable. This meant that the
-mono-sized and the psd simulation were stable and had similar stability.
+mono-sized and the psd simulation were stable.
 
 One of the metrics to determine the physics of the system after a PBM simulation is to check the 
-median diameter plots of the system after the granulation process. 
+median diameter (D\textsubscript{50}) plots of the system after the granulation process. 
 D\textsubscript{50} indicates the maximum diameter of particles that constitute 50\% of the total mass. 
 These diameters vary along the length of the granulator since the granulated particles take time to 
 pass through the granulator and that there is not enough liquid content in the later sections of 
-the granulator to encourage the formation of granules. Thus, the d\textsubscript{50} for compartments 
+the granulator to encourage the formation of granules. Thus, the D\textsubscript{50} for compartments 
 in the latter section of the granulator is low. Figures \ref{fig:rslts_PBM_2mm_d50} and 
-\ref{fig:rslts_PBM_psd_d50} show the d\textsubscript{50} plots of the mono-sized and PSD respectively. 
+\ref{fig:rslts_PBM_psd_d50} show the D\textsubscript{50} plots of the mono-sized and PSD respectively. 
 It can be seen that both these plots have a similar behavior when it comes to the nature of the 
-increase of the d\textsubscript{50} during the granulation process. There is a difference of about 
+increase of the D\textsubscript{50} during the granulation process. There is a difference of about 
 20\% in the final diameter of the particles predicted, which at the of micrometer scale does not affect 
 the final product quality. This slight deviation is observed due to the sudden jump in the 
 rate of the aggregation which increases when particles from one compartment with higher 
-d\textsubscript{50} get transferred to the next compartment with a lower d\textsubscript{50}. 
+D\textsubscript{50} get transferred to the next compartment with a lower D\textsubscript{50}. 
 The advantage of running the mono-sized simulation compared to the PSD simulation is the 
 time taken to simulate the DEM. It can be seen from Figure \ref{fig:rslts_DEM_timing_studies} that 
 the 2mm mono-sized particle took about 1.6 times less than the PSD simulation time for the DEM. 
@@ -1193,7 +1194,7 @@ for the DEM help save time on the overall simulations.
 \begin{figure}
 \centering
 \includegraphics[scale=0.5]{rslts_pbm_d50_128_200.pdf}
-\caption{d\textsubscript{50} of the particles obtained after 100s of granulation time (25s of mixing and 75s of 
+\caption{D\textsubscript{50} of the particles obtained after 100s of granulation time (25s of mixing and 75s of 
 liquid addition) for the 2mm mono-sized particle DEM simulation.}
 \label{fig:rslts_PBM_2mm_d50}
 \end{figure}
@@ -1201,7 +1202,7 @@ liquid addition) for the 2mm mono-sized particle DEM simulation.}
 \begin{figure}
 \centering
 \includegraphics[scale=0.5]{rslts_pbm_d50_128_555.pdf}
-\caption{d\textsubscript{50} of the particles obtained after 100s of granulation time (25s of mixing and 75s of 
+\caption{D\textsubscript{50} of the particles obtained after 100s of granulation time (25s of mixing and 75s of 
 liquid addition) for the distributed particle size DEM simulation. The trend observed is similar to the trend 
 found in Figure \ref{fig:rslts_PBM_2mm_d50}}
 \label{fig:rslts_PBM_psd_d50}
@@ -1230,15 +1231,15 @@ simulate the one-way coupling. This time did not include the time spent by each 
 scheduler. This time could vary from a few hours to a few days depending upon the load of the cluster. The total 
 time taken for the simulation using the RADICAL-pilot was determined from the time the DEM was first executed until 
 the PBM execution completed. The time of the individual DEM and PBM simulation was added to get the total amount of 
-time it requires for a single one-way coupling simulation. Figure \ref{fig:rslts_RP_time_plot} shows a comparison of 
+time it required for a single one-way coupling simulation. Figure \ref{fig:rslts_RP_time_plot} shows a comparison of 
 the total times of simulation in seconds for the sum of DEM and PBM individual simulations to the times taken to 
 run the simulation using RP. It can be observed that the times taken by the pilot job are slightly higher 
 than the summation of times of the individual simulations. The slight increase in the times of the simulation 
 can be accounted to the communication required for the pilot realize that the DEM simulation has completed 
 and link the data from the DEM to the PBM executable before it is executable. But, this communication is 
-lower than the amount of time the executable the job would spend in the scheduler. Thus, the benefits of using RP become 
-clear. An extension of this work would be to use RP to schedule multiple such coupled simulations as one job, thus 
-decreasing the wait times even further. 
+lower than the amount of time the executable the job would spend in the job scheduler queue. 
+Thus, the benefits of using RP become clear. An extension of this work would be to use RP to schedule 
+multiple such coupled simulations as one job, thus decreasing the wait times even further. 
 \begin{figure}
 \centering
 \includegraphics[scale=0.7]{rslts_RP_timeComparison.pdf}

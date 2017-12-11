@@ -1,10 +1,10 @@
 #!/bin/bash
 
 rm -f *.txt
+rm -f csvDump/*.csv
+#make clean
 
-make clean
-
-make -j 7
+#make -j 7
 
 echo "compilation & linkin done"
 
@@ -12,7 +12,7 @@ echo "Running model.out"
 
 #export OMP_NUM_THREADS=2
 
-mpirun -n 4 ./model.out /home/chai/Documents/git/CyberManufacturing/src/twoway_PBM/PBM_Input.in 128 200 11.250000 > output_test.txt
+mpirun -n 4 ./model.out /home/chai/Documents/git/CyberManufacturing/src/twoway_PBM/PBM_Input.in 128 200 0.0 > output_test.txt
 
 echo "DONE"
 

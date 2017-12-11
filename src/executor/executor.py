@@ -282,7 +282,7 @@ class Executor(object):
         # needed so that we can get the path of the unit and pass it to the DEM monitor.
         dem_unit = self._umgr.submit_units(cud)
         # This line blocks the execution until the DEM unit has a path.
-        self._logger.info('Waiting DEMs to start running')
+        self._logger.info('Waiting DEMs to be scheduled')
         self._umgr.wait_units(uids=[dem_unit.uid],state=[rp.AGENT_SCHEDULING_PENDING])
 
         #Now that we have a path we can continue
@@ -471,7 +471,7 @@ class Executor(object):
 
             # Submit them to the agent and wait until all have a path
             pbm_uids = self._umgr.submit_units(pbm_cud_list)
-            self._logger.info('Waiting PBMs to start running')
+            self._logger.info('Waiting PBMs to be scheduled')
             self._umgr.wait_units(uids=[cu.uid for cu in pbm_uids],state=rp.AGENT_SCHEDULING_PENDING)
 
             pbm_monitor_cud_list = list()

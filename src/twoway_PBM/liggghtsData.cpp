@@ -53,7 +53,7 @@ bool liggghtsData::checkFileConsistency(std::string collisionFile, std::string i
         return false;
     }
     string timeStr = collisionFile.substr(firstDigitPos, dotPos - firstDigitPos);
-    double timeInCollisionFile = stod(timeStr);
+    double timeInCollisionFile = abs(stod(timeStr));
 
     const char *impactFileStr = impactFile.c_str();
     firstDigitPos = strcspn(impactFileStr, digits);

@@ -338,6 +338,7 @@ class Executor(object):
             dem_timestep      = int(status_dict['DEM_time_step'][0])
             pbm_init_timestep = float(status_dict['PBM_init_time_step'][0])
             pbm_mixing_time   = int(status_dict['mixing_times'][0])
+
             self._logger.debug('check DEM return values: Cont %d, DEM Timestep %d '%(cont,dem_timestep)+
                                'PBM init timestep %f, PBM Mixing Time %d'%(pbm_init_timestep,pbm_mixing_time))
         else:
@@ -345,8 +346,10 @@ class Executor(object):
             dem_timestep      = None
             pbm_init_timestep = None
             pbm_mixing_time   = None
+
             self._logger.debug('check DEM return values: Cont %d, DEM Timestep %s '%(cont,dem_timestep)+
                                'PBM init timestep %s, PBM Mixing Time %s'%(pbm_init_timestep,pbm_mixing_time))
+
 
         return cont,dem_timestep,pbm_init_timestep,pbm_mixing_time
 
@@ -374,6 +377,7 @@ class Executor(object):
         if int(status_dict['status']) == 1:
             cont = True
             last_time_step = float(status_dict['last_time_step'])
+
             self._logger.debug('check PBM return values: Cont %d, Last Timestep %s '%(cont,last_time_step))
         else:
             cont = False
@@ -414,23 +418,23 @@ class Executor(object):
                 cud.mpi            = True
                 if restart:
                     cud.pre_exec       = ['mkdir txtDumps']
-                    cud.input_staging = [{'source': dem_path+'post/collision%d.atom'%timestep,
-                                 'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%(timestep,self._DEMcores,self._diameter),
+                    cud.input_staging = [{'source': dem_path+'post/collision%d.atom'%dem_timestep,
+                                 'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%(dem_timestep,self._DEMcores,self._diameter),
                                  'action'  : rp.LINK},
-                                {'source': dem_path+'post/impact%d.atom'%timestep,
-                                 'target': 'unit:///sampledumpfiles/impact%d.%d_%d'%(timestep,self._DEMcores,self._diameter),
+                                {'source': dem_path+'post/impact%d.atom'%dem_timestep,
+                                 'target': 'unit:///sampledumpfiles/impact%d.%d_%d'%(dem_timestep,self._DEMcores,self._diameter),
                                  'action' : rp.LINK},
-                                {'source' : dem_path+'post/collision%d.atom'%(timestep-self._diff_DEM),
-                                 'target' : 'unit:///sampledumpfiles/collision%d.%d_%d'%((timestep-self._diff_DEM),self._DEMcores,self._diameter),
+                                {'source' : dem_path+'post/collision%d.atom'%(dem_timestep-self._diff_DEM),
+                                 'target' : 'unit:///sampledumpfiles/collision%d.%d_%d'%((dem_timestep-self._diff_DEM),self._DEMcores,self._diameter),
                                  'action' : rp.LINK},
-                                {'source' : dem_path+'post/impact%d.atom'%(timestep-self._diff_DEM),
-                                 'target' : 'unit:///sampledumpfiles/impact%d.%d_%d'%((timestep-self._diff_DEM),self._DEMcores,self._diameter),
+                                {'source' : dem_path+'post/impact%d.atom'%(dem_timestep-self._diff_DEM),
+                                 'target' : 'unit:///sampledumpfiles/impact%d.%d_%d'%((dem_timestep-self._diff_DEM),self._DEMcores,self._diameter),
                                  'action' : rp.LINK},
-                                {'source' : dem_path+'post/collision%d.atom'%(timestep-2*self._diff_DEM),
-                                 'target' : 'unit:///sampledumpfiles/collision%d.%d_%d'%((timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
+                                {'source' : dem_path+'post/collision%d.atom'%(dem_timestep-2*self._diff_DEM),
+                                 'target' : 'unit:///sampledumpfiles/collision%d.%d_%d'%((dem_timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
                                  'action' : rp.LINK},
-                                {'source' : dem_path+'post/impact%d.atom'%(timestep-2*self._diff_DEM),
-                                 'target' : 'unit:///sampledumpfiles/impact%d.%d_%d'%((timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
+                                {'source' : dem_path+'post/impact%d.atom'%(dem_timestep-2*self._diff_DEM),
+                                 'target' : 'unit:///sampledumpfiles/impact%d.%d_%d'%((dem_timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
                                  'action' : rp.LINK},
                                 {'source' : ru.Url(self._pbm_units[i].sandbox).path+'csvDump/particles_%f.csv'%init_timestep,
                                  'target' : 'unit:///csvDump/particles_%f.csv'%init_timestep,
@@ -443,23 +447,23 @@ class Executor(object):
                                  'action' : rp.LINK}]
                 else:
                     cud.pre_exec       = ['mkdir csvDump','mkdir txtDumps']
-                    cud.input_staging = [{'source': dem_path+'post/collision%d.atom'%timestep,
-                                 'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%(timestep,self._DEMcores,self._diameter),
+                    cud.input_staging = [{'source': dem_path+'post/collision%d.atom'%dem_timestep,
+                                 'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%(dem_timestep,self._DEMcores,self._diameter),
                                  'action'  : rp.LINK},
-                                {'source': dem_path+'post/impact%d.atom'%timestep,
-                                 'target': 'unit:///sampledumpfiles/impact%d.%d_%d'%(timestep,self._DEMcores,self._diameter),
+                                {'source': dem_path+'post/impact%d.atom'%dem_timestep,
+                                 'target': 'unit:///sampledumpfiles/impact%d.%d_%d'%(dem_timestep,self._DEMcores,self._diameter),
                                  'action'  : rp.LINK},
-                                {'source': dem_path+'post/collision%d.atom'%(timestep-self._diff_DEM),
-                                 'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%((timestep-self._diff_DEM),self._DEMcores,self._diameter),
+                                {'source': dem_path+'post/collision%d.atom'%(dem_timestep-self._diff_DEM),
+                                 'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%((dem_timestep-self._diff_DEM),self._DEMcores,self._diameter),
                                  'action'  : rp.LINK},
-                                {'source': dem_path+'post/impact%d.atom'%(timestep-self._diff_DEM),
-                                 'target': 'unit:///sampledumpfiles/impact%d.%d_%d'%((timestep-self._diff_DEM),self._DEMcores,self._diameter),
+                                {'source': dem_path+'post/impact%d.atom'%(dem_timestep-self._diff_DEM),
+                                 'target': 'unit:///sampledumpfiles/impact%d.%d_%d'%((dem_timestep-self._diff_DEM),self._DEMcores,self._diameter),
                                  'action'  : rp.LINK},
-                                {'source': dem_path+'post/collision%d.atom'%(timestep-2*self._diff_DEM),
-                                 'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%((timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
+                                {'source': dem_path+'post/collision%d.atom'%(dem_timestep-2*self._diff_DEM),
+                                 'target': 'unit:///sampledumpfiles/collision%d.%d_%d'%((dem_timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
                                  'action'  : rp.LINK},
-                                {'source': dem_path+'post/impact%d.atom'%(timestep-2*self._diff_DEM),
-                                 'target': 'unit:///sampledumpfiles/impact%d.%d_%d'%((timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
+                                {'source': dem_path+'post/impact%d.atom'%(dem_timestep-2*self._diff_DEM),
+                                 'target': 'unit:///sampledumpfiles/impact%d.%d_%d'%((dem_timestep-2*self._diff_DEM),self._DEMcores,self._diameter),
                                   'action'  : rp.LINK}]
             
                 pbm_cud_list.append(cud)

@@ -927,7 +927,7 @@ hold-up of particles of about 6500.
 \centering
 \includegraphics[scale=0.75]{rslsts_2mm_timing_mtlb.pdf}
 \caption{The variation in the amount of time taken for the DEM simulation of 2 mm particles as a function of number of cores. The 
-speed increase on increasing the number of cores from 1 to 16 is higher than the speed improvements observed from increase of cores 
+speed increase on increasing the number of cores from 1 to 16 was higher than the speed improvements observed from increase of cores 
 from 16 to 256.}
 \label{fig:rslts_DEM_2mm_timing}
 \end{figure}	
@@ -980,8 +980,8 @@ computationally more expensive.
 \centering
 \includegraphics[scale=0.75]{rslsts_2mm_DEM_speedup_mtlb.pdf}
 \caption{The speedup achieved in the DEM simulations of 2 mm particles. There 
-is a linear increase up to 16 cores, then as the parallel 
-efficiency decreases, plateauing of the speedup is observed. \jhanote{we should the same tense not past. }}
+was a linear increase up to 16 cores, then as the parallel 
+efficiency decreased, plateauing of the speedup is observed.}
 \label{fig:rslts_DEM_speedup}
 \end{figure}
 
@@ -990,7 +990,7 @@ efficiency decreases, plateauing of the speedup is observed. \jhanote{we should 
 \includegraphics[scale=0.85]{rslsts_DEM_alldia_timing_mtlb.pdf}
 \caption{ Time taken for a 10 second DEM simulation for radii ranging from
  0.63mm to 2mm and a particle size distribution ranging from 1mm - 3mm. The speed improvements 
- for the smaller particles is higher as the core count is increased as compared to the larger particles.}
+ for the smaller particles was higher as the core count increased when compared to the larger particles.}
 \label{fig:rslts_DEM_timing_studies}
 \end{figure}
 
@@ -1009,7 +1009,7 @@ geometry for faster simulations with higher core counts.
 \centering
 \includegraphics[scale=0.75]{rslsts_DEM_profle_mtlb.pdf}
 \caption{The distribution of time taken by each component of the DEM simulation with varying number of cores for the 2mm particles. It 
-can be observed that the percentage of time in communication between the processes is the highest due to the rotation of the impeller 
+can be observed that the percentage of time in communication between the processes was the highest due to the rotation of the impeller 
 at high speeds.}
 \label{fig:rslts_DEM_percent_plot}
 \end{figure}
@@ -1031,7 +1031,7 @@ is expected to have a value of 0.5 during the aggregation process. Figure \ref{f
 \begin{center}
 \includegraphics[scale=0.5]{rslts_PBM_2mm_validation.pdf}
 \caption{The ratio of rate of formation to the rate of depletion of particles due to 
-aggregation as a function of time. The ratio is constant at 0.5 as aggregation is 
+aggregation as a function of time. The ratio was constant at 0.5 as aggregation was 
 considered to happen only between 2 particles at a given instant of time.}
 \label{fig:rslts_PBM_ratio_plot_2mm}
 \end{center}
@@ -1074,7 +1074,7 @@ the higher diameter bins have increased.
 \end{subfigure}
 \caption{ Representation of the total number of particles inside all compartments with diameters less than 0.2 mm 
 in mm after (\subref{fig:30s}) 30s (\subref{fig:50s}) 50s (\subref{fig:75s}) 75s and
- (\subref{fig:100s}) 100s of PBM simulation (there is only mixing taking place for the first 25 seconds).}
+ (\subref{fig:100s}) 100s of PBM simulation (Mixing takes place for the first 25 seconds).}
 \label{fig:rslts_PBM_d50_plots}
 \end{figure}   
 
@@ -1096,8 +1096,8 @@ only MPI cores shows substantial increase in performance. \\
 \centering
 \includegraphics[scale=0.75]{rslsts_PBM_timing.pdf}
 \caption{Average time taken to run the PBM simulation which consisted of 25 seconds of mixing time 
-and 75 seconds of granulation time at different core configurations. There is a steady decrease as 
-the number of MPI processes are increased, but the improvements on increasing the OMP threads are 
+and 75 seconds of granulation time at different core configurations. There was a steady decrease as 
+the number of MPI processes were increased, but the improvements on increasing the OMP threads were 
 not that significant.}
 \label{fig:rslts_PBM_timing_studies}
 \end{figure}
@@ -1141,8 +1141,8 @@ of the program using OMP, especially in section of the code where nested loops a
 \centering
 \includegraphics[scale=0.75]{rslsts_PBM_efficiency.pdf}
 \caption{The parallel efficiency for the hybrid (MPI + OMP) parallelized PBM code. The efficiency of the 
-code decreases as the number of cores are increased. The higher number of cores have very low 
-efficiency of about 11\% which depicts that there is large time being spent in communication in 
+code decreased as the number of cores are increased. The higher number of cores have very low 
+efficiency of about 11\% which depicted that there is large time being spent in communication in 
 between the cores.}
 \label{fig:rslts_PBM_parallel_efficiency}
 \end{figure}
@@ -1203,7 +1203,7 @@ liquid addition) for the 2mm mono-sized particle DEM simulation.}
 \centering
 \includegraphics[scale=0.5]{rslts_pbm_d50_128_555.pdf}
 \caption{D\textsubscript{50} of the particles obtained after 100s of granulation time (25s of mixing and 75s of 
-liquid addition) for the distributed particle size DEM simulation. The trend observed is similar to the trend 
+liquid addition) for the distributed particle size DEM simulation. The trend observed was similar to the trend 
 found in Figure \ref{fig:rslts_PBM_2mm_d50}}
 \label{fig:rslts_PBM_psd_d50}
 \end{figure}
@@ -1245,7 +1245,7 @@ multiple such coupled simulations as one job, thus decreasing the wait times eve
 \includegraphics[scale=0.7]{rslts_RP_timeComparison.pdf}
 \caption{A comparison of times taken by 2 individual simulations (DEM + PBM) (without 
 including queue time) to the  time taken by Radical-Pilot to complete the same set of simulation. 
-A slight increase in the time of the simulations is observed making RP a more convenient 
+A slight increase in the time of the simulations was observed making RP a more convenient 
 tool to perform simulations where a large number of job submissions are required.}
 \label{fig:rslts_RP_time_plot}
 \end{figure}

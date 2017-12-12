@@ -222,7 +222,7 @@ class Executor(object):
             self._session.close()
             warnings.warn('exit requested\n',UserWarning)
 
-    def _start_dem_units(self,timestep=0,types=0,restart=False):
+    def _start_dem_units(self,timestep=0,types=0,restart=False,pbm_timestep=0):
         """
         This method creates DEM units, their monitors and submits them for execution. 
         It also returns the unit objects so that they can be monitored. This method takes
@@ -236,10 +236,10 @@ class Executor(object):
         # TODO: Create a for loop for multiple DEM pipelines
         cud = rp.ComputeUnitDescription()
         cud.environment    = ['PATH='+self._pathtoLIGGHTS+':$PATH']
-        cud.pre_exec       = ['mkdir CSVs','mkdir post','mkdir restart']
         cud.executable     = 'lmp_micstam'
         cud.arguments      = ['-in','in.*' ]
         if restart:
+            cud.pre_exec       = ['mkdir CSVs','mkdir post']
             cud.input_staging  = [{'source': 'pilot:///in.restart_from_%d'%timestep,
                                    'target':'unit:///in.restart_from_%d'%timestep,
                                    'action'  :rp.LINK},
@@ -255,10 +255,14 @@ class Executor(object):
                                   {'source': self._pathtoLIGGHTSinputs+'/impeller_coarse.stl',
                                    'target':'unit:///impeller_coarse.stl',
                                    'action'  :rp.LINK},
-                                ]
+                                  {'source': ru.Url(self._dem_unit.sandbox).path+'restart/granulator.%d.restart'%timestep,
+                                   'target':'unit:///restart/granulator.%d.restart'%timestep,
+                                   'action'  :rp.LINK}]
+
             cud.cores          = self._DEMcores
             cud.mpi            = True
         else:
+            cud.pre_exec       = ['mkdir CSVs','mkdir post','mkdir restart']
             cud.input_staging  = [{'source': self._pathtoLIGGHTSinputs+'/in.2_sim_new',
                                    'target':'unit:///in.2_sim_new',
                                    'action'  :rp.LINK},
@@ -289,7 +293,7 @@ class Executor(object):
         self._logger.info('Creating Controller description')
         cud2 = rp.ComputeUnitDescription()
         cud2.executable = 'python'
-        cud2.arguments = ['controller_DEMresource_main.py',timestep,self._types,ru.Url(dem_unit.sandbox).path+'post']
+        cud2.arguments = ['controller_DEMresource_main.py',timestep,self._types,ru.Url(dem_unit.sandbox).path+'post',pbm_timestep]
         cud2.input_staging = [{'source':'client:///controller_DEMresource_main.py',
                                'target':'unit:///controller_DEMresource_main.py',
                                'action': rp.TRANSFER},
@@ -498,8 +502,8 @@ class Executor(object):
                                        'action': rp.LINK}]
                 cud2.executable     = 'python'
                 cud2.arguments      = ['controllerPBMresourceMain.py',\
-                                      int(init_timestep),self._compartments,self._bins1,self._bins2,\
-                                      ru.Url(pbm_uids[i].sandbox).path+'csvDump',mixing_time,dem_timestep,(dem_timestep+10000000),0.2,0.2,self._types,15,476]
+                                      float(init_timestep),self._compartments,self._bins1,self._bins2,\
+                                      ru.Url(pbm_uids[i].sandbox).path+'csvDump',mixing_time,dem_timestep,(dem_timestep+1000000),0.001,0.001,self._types,15,476]
 
                 cud2.cores          = 1
                 cud2.mpi            = False
@@ -542,7 +546,7 @@ class Executor(object):
 
                 if not restart:
                     self._reporter.header('Starting DEM simulation')
-                self._start_dem_units(timestep=dem_timestep,restart=restart)
+                self._start_dem_units(timestep=dem_timestep,restart=restart,pbm_timestep=pbm_timestep)
 
                 self._umgr.wait_units(uids=self._dem_monitor_unit.uid)
 
@@ -580,6 +584,6 @@ class Executor(object):
 
 if __name__ == '__main__':
     
-    Test = Executor(config='test.json')
+    Test = Executor(config='stam_test_dev_2.json')
 
     Test.run() 

@@ -556,9 +556,7 @@ int main(int argc, char *argv[])
     double liqDensity = pData->liqDensity;
     double liquidAddRate = (liqSolidRatio * throughput) / (liqDensity * 3600);
     liquidAdditionRateAllCompartments[0] = liquidAddRate;
-    double time = stod(timeVal);
-    double timeStep = 0.5; //1.0e-1;
-    vector<double> Time;
+    
     arrayOfDouble4D fAllCompartmentsOverTime;
     arrayOfDouble4D externalVolumeBinsAllCompartmentsOverTime;
     arrayOfDouble4D internalVolumeBinsAllCompartmentsOverTime;
@@ -625,7 +623,11 @@ int main(int argc, char *argv[])
     arrayOfDouble2D d50OverTime;
     arrayOfDouble2D d90OverTime;
 
-    double lastTime = 0.0;
+    double time = stod(timeVal); // initial time to start PBM
+    double timeStep = 0.5; //1.0e-1;
+    vector<double> Time;
+
+    double lastTime = time;
     int timeIdxCount = 0;
     int lastTimeIdxCount = 0;
 
@@ -634,10 +636,22 @@ int main(int argc, char *argv[])
     double postMixTime = pData->postMixTime;
     double finalTime = premixTime + liqAddTime + postMixTime + stod(timeVal);
     double initPorosity = pData->initPorosity;
+    
+    arrayOfDouble2D formationThroughAggregationOverTime;
+    arrayOfDouble2D depletionThroughAggregationOverTime;
+    arrayOfDouble2D formationThroughBreakageOverTime;
+    arrayOfDouble2D depletionThroughBreakageOverTime;
+   
+    
     while (time <= finalTime)
     {
-        // if (time > premixTime + liqAddTime)
+        // if (time > premixTime + liqAddTime + stod(timeVal))
         //     fIn = getArrayOfDouble2D(nFirstSolidBins, nSecondSolidBins);
+        vector<double> formationThroughAggregation(nCompartments, 0.0);
+        vector<double> depletionThroughAggregation(nCompartments, 0.0);
+        vector<double> formationThroughBreakage(nCompartments, 0.0);
+        vector<double> depletionThroughBreakage(nCompartments, 0.0);
+
         for (int c = core_low; c < core_up; c++) //for (int c = 0; c < nCompartments; c++)
         {
             compartmentIn.fAll = fAllCompartments[c];
@@ -675,7 +689,17 @@ int main(int argc, char *argv[])
 
             liquidBinsAllCompartments[c] = compartmentOut.liquidBins;
             gasBinsAllCompartments[c] = compartmentOut.gasBins;
+
+            formationThroughAggregation[c] = compartmentOut.formationThroughAggregation;
+            depletionThroughAggregation[c] = compartmentOut.depletionThroughAggregation;
+            formationThroughBreakage[c] = compartmentOut.formationThroughBreakage;
+            depletionThroughBreakage[c] = compartmentOut.depletionThroughBreakage;
         }
+
+        formationThroughAggregationOverTime.push_back(formationThroughAggregation);
+        depletionThroughAggregationOverTime.push_back(depletionThroughAggregation);
+        formationThroughBreakageOverTime.push_back(formationThroughBreakage);
+        depletionThroughBreakageOverTime.push_back(depletionThroughBreakage);
 
         // *************************************************************
         //************** START MPI Send Recv ***************************
@@ -1020,6 +1044,12 @@ int main(int argc, char *argv[])
         cout << endl;
         cout << "Number of time steps = " << nTimeSteps << endl;
         cout << endl;
+
+        //dump values for ratio plots
+        dumpDiaCSV(Time, formationThroughAggregationOverTime, string("FormationThroughAggregation"));
+        dumpDiaCSV(Time, depletionThroughAggregationOverTime, string("DepletionThroughAggregation"));
+        dumpDiaCSV(Time, formationThroughBreakageOverTime, string("FormationThroughBreakage"));
+        dumpDiaCSV(Time, depletionThroughBreakageOverTime, string("DepletionThroughBreakage"));
     }
     MPI_Barrier(MPI_COMM_WORLD);
 
@@ -1173,8 +1203,8 @@ int main(int argc, char *argv[])
         //     d10OverTime[n][c] = d10;
         //     d50OverTime[n][c] = d50;
         //     d90OverTime[n][c] = d90;
-         }
-    }
+         //}
+    //}
     //cout << "End computing D10, D50, D90" << endl;
     // if (mpi_id == 0)
     // {

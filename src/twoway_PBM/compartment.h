@@ -50,6 +50,10 @@ typedef struct
     arrayOfDouble2D externalVolumeBins;
     arrayOfDouble4D aggregationKernel;
     arrayOfDouble4D breakageKernel;
+    double formationThroughAggregation;
+    double depletionThroughAggregation;
+    double formationThroughBreakage;
+    double depletionThroughBreakage;
 } CompartmentOut;
 
 typedef struct

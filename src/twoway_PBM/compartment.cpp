@@ -613,6 +613,10 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
     compartmentOut.dfAlldt = dfAlldt;
     compartmentOut.dfLiquiddt = dfLiquiddt;
     compartmentOut.dfGasdt = dfGasdt;
+    compartmentOut.formationThroughAggregation = getSumOf2DArray(formationThroughAggregationCA);
+    compartmentOut.depletionThroughAggregation = getSumOf2DArray(depletionThroughAggregation);
+    compartmentOut.formationThroughBreakage = getSumOf2DArray(formationThroughBreakageCA);
+    compartmentOut.depletionThroughBreakage = getSumOf2DArray(depletionThroughBreakage);
 
     return compartmentOut;
 }

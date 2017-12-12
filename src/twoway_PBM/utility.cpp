@@ -96,6 +96,17 @@ double getMaximumOf2DArray(arrayOfDouble2D array2D)
     return maxValue;
 }
 
+double getSumOf2DArray(arrayOfDouble2D array2D)
+{
+    double sum = 0.0;
+    for (size_t d1 = 0; d1 < array2D.size(); d1++)
+        for (size_t d2 = 0; d2 < array2D[d1].size(); d2++)
+        {
+            sum += array2D[d1][d2];
+        }
+    return sum;
+}
+
 int getCountOfNegativeIn3DArray(arrayOfDouble3D array3D)
 {
     int count = 0;

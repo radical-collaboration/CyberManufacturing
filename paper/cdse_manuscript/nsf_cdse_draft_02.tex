@@ -91,7 +91,7 @@ Piscataway, NJ, USA-08854}
 
 \begin{abstract}
 Particulate processes are prevalent in the pharmaceutical industry but, the physics underlying 
-these processes are complicated and requires large amount of compuatation to solve a model at the
+these processes are complicated and requires large amount of computation to solve a model at the
 particle-level. This approach makes the simulation slow, when compared to using a less accurate 
 bulk model. A quicker and a more accurate way to model this system is to use a multi-scale 
 model the i.e. use the particle-scale data into a bulk model. 
@@ -104,7 +104,7 @@ LIGGGHTS, which runs in parallel using MPI. Speedup of about 14 times was obtain
 simulations and around 12 for the DEM simulations. This coupling was performed using the radical 
 pilot for scaling studies from 1 processor to 128 for the PBM and up to 256 cores for the DEM. Using 
 this developed framework, the granulation process has been modeled accurately 
-much faster than existing approches in literature.
+much faster than existing approaches in literature.
 \end{abstract}
 \begin{keyword}
 Population balance model \sep Granulation \sep Discrete element methods  \sep MPI and OpenMP 
@@ -200,11 +200,11 @@ LAMMPS Improved for general granular and granular heat transfer simulations (LIG
 model the micro-mechanics of the L\"{o}dige CoriMix CM5 high shear granulator. A 4-Dimensional, 
 reduced order DEM informed PBM was developed that is parallelized using hybrid techniques 
 (MPI + OMP)to model the bulk processes occurring during the granulation process and 
-is dicussed in section \ref{sec:pbm_model}. Section\ref{sec:RPandCommunications} decribes 
+is discussed in section \ref{sec:pbm_model}. Section\ref{sec:RPandCommunications} decries 
 the unidirectional coupling of the DEM and PBM using Radical Pilot, which is a 
 framework developed in Python. This provides task level parallelization, to help develop 
 an accurate model which can be run quickly on high performance computing systems. The speed
-improvements obtained for the parallel code and improvments that can be implemented are discussed
+improvements obtained for the parallel code and improvements that can be implemented are discussed
 in Section \ref{sec:Results}
 
 
@@ -261,7 +261,7 @@ process-level simulations.
 The particle-particle collisions are not always elastic, thus there is a need for models for the 
 contact forces. The earliest elastic model was developed by Hertz and was extended by Mindlin 
 by accounting for the  tangential forces during the collisions \citep{adams2000}. The most commonly used contact 
-force model for modelling the flow of particles inside the granulation process 
+force model for modeling the flow of particles inside the granulation process 
 is the Hertz-Mindlin contact model \citep{gantt2006}\citep{hassanpour2013}. 
  
 
@@ -310,7 +310,7 @@ in order to prove that, in certain cases DEM simulations may not be necessary fo
 development of kernels. A hybrid model for one-way coupling has been reported for continuous mixing (\cite{sen2013} \&  
 \cite{sen2013b}) and is discussed in Section \ref{sec:pbm_model}.
 
-In this work, a coupled DEM and PBM model has been implemented. In genral, the PBM provides meso-scale 
+In this work, a coupled DEM and PBM model has been implemented. In general, the PBM provides meso-scale 
 information while the DEM gives particle scale information. The combination of these two methods helps 
 describe the process dynamics with more accuracy. However, calculations involved due to the number 
 of particles involved in the DEM process as well as PBM become very computationally heavy, hence the
@@ -380,8 +380,8 @@ of cores, but this faced the shortcomings of MATLAB's internal processing and
 could not achieve the speed improvements of parallelization of a program if 
 it were written in a native programming language like C/C++ or FORTRAN. 
 
-LIGGGHTS \citep{Kloss2012}, an open-source software used to perform DEM simulations natively 
-supports MPI for parallelizing the simulation by static decomposition which partitions space such that 
+LIGGGHTS \citep{Kloss2012}, an open-source software used to perform DEM simulations has native 
+support for MPI for parallelizing the simulation by static decomposition which partitions space such that 
 the area of communication between the the MPI processes is minimized. \cite{kacianauskas2010} used 
 load balancing methods similar to a static decomposition and observed that this works well for a 
 mono-dispersed system but the computational effort increases for simulations for poly-dispersed 
@@ -430,7 +430,7 @@ collisions. This version of LIGGGHTS was compiled using the mvapich (mvapich2 v2
 and intel (intel v15.0.2) compilers with the -O3 optimization option as well as an option to side load the 
 process to the Xeon phi co-processors was added. The initial timing studies were performed on Stampede 
 supercomputer located at TACC, University of Texas, Austin. The hardware configuration of each node 
-consists of 2 8-core Intel Xeon E5-2680 processors based on the Sandy Bridge architecture, 32 gb of 
+consists of 2 8-core Intel Xeon E5-2680 processors based on the Sandy Bridge architecture, 32 GB of 
 memory with QPI interconnects at 8.0 GT/s PCI-e lanes.
 
 
@@ -495,7 +495,7 @@ inside the L\"{o}dige CoriMix CM5 continuous high shear granulator.}
 
 \subsubsection{Meshing}
  After the geometry was built in SolidWorks$^{TM}$ (Dassault Syst\`{e}mes) the shell and impeller 
-were exported as stereolithography (STL) files. The coarsest output option was used to keep the STL files 
+were exported as stereo lithography (STL) files. The coarsest output option was used to keep the STL files 
 small and simple for faster computations times. The origin of the geometry was not preserved while saving 
 the STL files since it needs to be aligned in LIGGGHTS as per the process conditions.This resulted in 
 the impeller having 2802 faces and 1281 points with approximately a file size of 775 kilobytes. 
@@ -802,7 +802,7 @@ from 1 to 8, thus, using a maximum of 128 cores.
 \subsection{Radical Pilot (RP) \& PBM+DEM communication}
 \label{sec:RPandCommunications}
 RADICAL-Pilot defines a number of abstractions to describe resources, and computational 
-tasks. The Pilot Desciption is the abstraction that describes resources by defining the 
+tasks. The Pilot Description is the abstraction that describes resources by defining the 
 number of cores that will be used, the used HPC resource and the total time that the 
 resources are needed, and the queue that will be used. The abstraction that defines the 
 execution of a computational task is the Compute Unit (CU). A CU defines the executable, 
@@ -819,7 +819,7 @@ pilot is active the DEM simulation start executing. When finished a CU that desc
 simulation is submitted at the Unit Manager and start executing. Any data dependency is satisfied 
 by doing the necessary file linking through the CU description.
 
-The DEM and PBM executables are preplaced in the resource along with any initial 
+The DEM and PBM executables are pre-placed in the resource along with any initial 
 information for the DEM simulation. The DEM unit first creates links for the data files that will 
 be needed for the DEM simulation and call the executable. When the execution finishes, new links 
 with the output are created in a shared space. The PBM unit uses those links to read the necessary 
@@ -1014,7 +1014,7 @@ at high speeds.}
 \end{figure}
 
 
-\subsection{Population Balance Modelling (PBM)}
+\subsection{Population Balance Modeling (PBM)}
 \subsubsection{PBM model validation}
  The population balance model implemented was considered to have an inlet flow of particles in the 
 first compartment at a constant mass flow rate of 15 kilograms per hour. The particles were assumed 
@@ -1126,7 +1126,7 @@ becomes almost constant from 32 cores to 128 cores}
 \label{fig:rslts_PBM_speed_up}
 \end{figure}
 
-A similar behaviour as in Figure \ref{fig:rslts_PBM_parallel_efficiency} where the parallel 
+A similar behavior as in Figure \ref{fig:rslts_PBM_parallel_efficiency} where the parallel 
 efficiency of the program has been plotted against the number of the cores used. This efficiency 
 decreases as the number of cores used increase. The decrease in efficiency initially up till 8 cores is steep as 
 the communication time in between the MPI process decreases the efficiency, deviating its value from 
@@ -1159,7 +1159,7 @@ Two simulations from the current scenario will be compared, the DEM + PBM simula
 mono-sized particle and the second being the simulation where the inserted particles were in a size 
 distribution. The ratio of rate of formation to the rate of depletion, both due to aggregation 
 observed during these simulations was 0.5 which indicated that the PBM is stable. This meant that the
-mono-sized and the psd simulation were stable.
+mono-sized and the PSD simulation were stable.
 
 One of the metrics to determine the physics of the system after a PBM simulation is to check the 
 median diameter (D\textsubscript{50}) plots of the system after the granulation process. 
@@ -1257,24 +1257,25 @@ to help them utilize the multi-core hardware of a cluster. The DEM was paralleli
 MPI as well as OMP for a faster execution. The speed-up achieved for the DEM simulation was about 12 times using 64 cores, 
 where as the PBM achieved a speed-up of 14 times when 16 cores were used. RP was utilized to execute the simulations for lower 
 wait times.
- A more accurate model for the high shear granulator would be to couple the DEM and PBM bi-directionally i.e. these 
+ A more accurate model for the high shear granulator would be to couple the DEM and PBM bidirectionally i.e. these 
 two methods are executed iteratively up till a steady state is reached. For the two-way coupling, the computation resources 
-required would be really large as it would involve multiple DEM simulations. The role RP in such a situation would more crucial 
-as the communication required would increase and it would help reduce total time taken to complete the multiple runs required. 
+required would be really large as it would involve multiple DEM and PBM simulations. The role RP in such a detailed simulation
+would be more crucial as it would need to handle more communications and various job submissions. This would also help reduce 
+total time taken to complete the multiple runs required. 
 
-\section{Acknowledgements}
+\section{Acknowledgments}
 The authors would like to acknowledge National Science Foundation (NSF) for 
 funding this project
 through the grant number: 1547171.
 \section*{Appendix}
 The parallelization technique used for the PBM used was dependent on the number of compartments present inside 
-granulator. Each of the compartments, had calculations indpendent from each other for each time step. So each of them were
-loaded onto different MPI processes. Since there is minimal commmunication between them, they could easily be parallelized using MPI. 
+granulator. Each of the compartments, had calculations independent from each other for each time step. So each of them were
+loaded onto different MPI processes. Since there is minimal communication between them, they could easily be parallelized using MPI. 
 To get further speed improvements, the time independent calculations of the PBM were parallelized using OMP. 
-This parallelization technique is decribed as an algorithm in Algorithm 1. \\
+This parallelization technique is decried as an algorithm in Algorithm 1. \\
 OMP was used to parallelize the calculations inside each compartment. Since the PBM consisted of 2 solid bins, one of 
 the solid bins was parallelized. The number of solid bins of solid were equally divided by the number of OMP threads. 
-Figure \ref{fig:app_OMP_distribution} depicts the equal distribution of 16 solild bins of the second solid using 4 OMP 
+Figure \ref{fig:app_OMP_distribution} depicts the equal distribution of 16 solid bins of the second solid using 4 OMP 
 threads.
 \begin{algorithm}[H]
     \caption*{\textbf{Algorithm 1}}

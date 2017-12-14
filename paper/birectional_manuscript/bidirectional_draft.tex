@@ -1,0 +1,179 @@
+\documentclass[preprint,11pt,authoryear]{elsarticle}
+\usepackage{amsmath}
+\usepackage[font=sf, labelfont={sf,bf}, margin=0cm]{caption}
+\usepackage[inline]{enumitem}
+\usepackage{epstopdf}   
+\usepackage[usenames,dvipsnames]{color}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage{textcomp}
+\usepackage{graphicx}
+\usepackage{tabulary}
+\usepackage{float}
+\usepackage[utf8]{inputenc}
+\usepackage{nomencl}
+\usepackage[font=sf, labelfont={sf,bf}, margin=1cm]{caption}  % Margin similar to Anik
+\usepackage[authoryear]{natbib}
+\usepackage[margin=1in]{geometry}
+\usepackage[english]{babel} 
+\usepackage{multirow}
+\usepackage{nomencl}
+\makenomenclature
+
+\usepackage[normalem]{ulem}
+\makeatletter
+\def\cyanuwave{\bgroup \markoverwith{\lower3.5\p@\hbox{\sixly \textcolor{cyan}{\char58}}}\ULon}
+\def\reduwave{\bgroup \markoverwith{\lower3.5\p@\hbox{\sixly \textcolor{red}{\char58}}}\ULon}
+\def\blueuwave{\bgroup \markoverwith{\lower3.5\p@\hbox{\sixly \textcolor{blue}{\char58}}}\ULon}
+\font\sixly=lasy6 % does not re-load if already loaded, so no memory problem.
+\makeatother
+
+\newif\ifdraft
+\drafttrue
+\ifdraft
+\usepackage{xcolor}
+\definecolor{ocolor}{rgb}{1,0,0.4}
+\newcommand{\terminology}[1]{ {\textcolor{red} {(Terminology used: \textbf{#1}) }}}
+\newcommand{\jwave}[1]{ {\reduwave{#1}}}
+\newcommand{\jhanote}[1]{ {\textcolor{red} { ***shantenu: #1 }}}
+\newcommand{\csnote}[1]{ {\textcolor{blue} { ***chaitanya: #1 }}}
+\definecolor{orange}{rgb}{1,.5,0}
+\definecolor{dandelion}{cmyk}{0,0.29,0.84,0}
+\newcommand{\gpnote}[1]{{\textcolor{green} {***giannis: #1}}}
+\newcommand{\note}[1]{ {\textcolor{magenta} { ***Note: #1 }}}
+\else
+\newcommand{\terminology}[1]{}
+\newcommand{\jwave}[1]{#1}
+\newcommand{\jhanote}[1]{}
+\newcommand{\csnote}[1]{}
+\newcommand{\gpnote}[1]{}
+\newcommand{\note}[1]{}
+\fi
+
+
+
+\journal{Chemical Engineering Research and Design}
+\begin{document}
+\begin{frontmatter}
+
+\title{A parallel unidirectional coupled DEM-PBM model for the efficient solution and simulation of 
+computationally  intensive systems.}
+\author[add1]{Chaitanya Sampat}
+\author[add1]{Yukteshwar Baranwal}
+\author[add2]{Ioannis Paraskevakos}
+\author[add2]{Shantenu Jha}
+\author[add1]{Rohit Ramachandran\corref{cor2}}
+\author[add1]{Marianthi Ierapetritou}
+\address[add1]{Department of Chemical and Biochemical Engineering, Rutgers, The State University of New
+Jersey, Piscataway, NJ, USA-08854}
+\address[add2]{Electrical and Computer Engineering, Rutgers, The State University of New Jersey, 
+Piscataway, NJ, USA-08854}
+\cortext[cor2]{Corresponding author}
+\ead{rohitrr@soe.rutgers.edu}
+
+\begin{abstract}
+A multiscale model combines the computational efficiency of a macro-scale model and the 
+accuracy of a micro-scale model. It is preferred over a fully micro-scale model for its speed 
+advantages while maintaining the physics of the problem. A less accurate way to perform such a
+simulation is to use data from a precomputed microscale model in a macroscale model. With the
+current cyberinfrastructure resources available, using more computationally intensive and 
+concurrent multiscale models are more feasible This study proposes to use Discrete Element Method
+(DEM), a microscale model, and a Population Balance Model (PBM), a macroscale model, in a
+concurrent manner to model the granulation process of a pharmaceutical product inside a high
+shear granulator. The granulation between the components of a pharmaceutical blend is governed
+by the collision in between the particles. This leads to increase in their size, due to physical bonds
+in between them. The DEM provides the collision data while the PBM helps in predicting the
+macroscale phenomena like aggregation and breakage. This work attempts to couple these two
+models using a controller program, which triggers the DEM first, to give initial seed data to run
+the PBM. Then, the controller uses the data generated from the PBM continuously to determine
+the change in the physical properties and trigger the DEM from its last known state. The controller
+does the same with the DEM data to trigger the PBM. This occurs iteratively until a steady state
+is reached. A workflow diagram of the procedure followed is provided in Figure 1. The execution
+of each of the components is governed by a multilevel job scheduler which allocates resources
+rather than waiting for each simulation to run on a normal job scheduler on a cluster. The DEM
+is parallelized using Message Parsing Interface (MPI) while the PBM is parallelized using a faster
+hybrid approach which is a combination of both MPI and Open Multi-Processing (OMP). Since
+the DEM is computationally heavy, an algorithm is developed to utilize the idle cores during the
+PBM execution to run multiple instances of the PBM such that parameter estimation of the kernels
+of the PBM occurs on the fly as well. This method of using shorter bursts of each simulation led to
+faster simulation times as well as a more accurate model of the high shear granulator. The Quality
+by Design (QbD) approach is addressed using such a modeling framework and it also helps us
+understand the granulation process in a quantitative as well as in a mechanistic manner. %\citep{barrasso2015cerd}
+\end{abstract}
+\begin{keyword}
+Population balance model \sep Granulation \sep Discrete element methods  \sep MPI 
+\sep Pharmaceutical process design
+\end{keyword}
+\end{frontmatter}
+\section{Introduction}
+\begin{itemize}
+\item{Intorudce multi-scale models}
+\item{Explain benefits}
+\item{What is granulation \& how a multi-scale model helps with better modelling}
+\item{Brief DEM and PBM works}
+\item{Give an introduction to this work}
+\end{itemize}
+
+\section{Methods and Background}
+\begin{itemize}
+\item{Introduce particulate processes}
+\item{Segway into DEM and PBM and why they are necessary}
+\end{itemize}
+
+\subsection{Discrte Element Method (DEM)}
+
+\subsubsection{Background and previous works}
+
+\subsubsection{DEM methodology used, Setup and Execution}
+Talk about contact models used and other things
+
+\subsection{Population Balance Model}
+
+\subsubsection{Background and previous works}
+
+\subsubsection{PBM Model Implemented}
+
+\subsubsection{PBM discretization technique}
+
+\subsection{Coupling of DEM and PBM}
+Give a  background of the DEM and PBM coupling and why it is useful.
+\subsubsection{Previous works}
+
+\subsubsection{Controller of the PBM and DEM}
+
+\subsubsection{Radical Pilot}
+\begin{itemize}
+\item{Background}
+\item{Advantages}
+\item{Setup}
+\end{itemize}
+
+\section{Results}
+
+\subsection{Speed improvements and Scaling Studies}
+
+\subsubsection{Speed studies of new MPI discretization}
+
+\subsubsection{Speed improvements over one-way simulations}
+
+\subsection{Process parameter study (DEM and PBM)}
+\par This will have various sections depending upon the process parameters studied.
+Some of them I can think of at the of my head
+\begin{itemize}
+\item{Impeller speed}
+\item{Liquid Addition Rate}
+\item{Material Density}
+\end{itemize} 
+\par Both these parameters will be changed in both the simulations, hopefully that results in a few changes.
+May even have some timing profiles since that will affect the simulations.
+
+\subsection{Radical Pilot Magic}
+\par Show how radical pilot can used for multiple such couplings at once.
+\textbf{Need to discuss with Giannis for complete details.}
+
+\section{Conclusions}
+
+
+\bibliographystyle{elsarticle-harv}
+%\bibliographystyle{plain}
+%\bibliography{ref_bidir}
+\end{document}

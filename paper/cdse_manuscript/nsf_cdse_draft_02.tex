@@ -73,7 +73,6 @@
 computationally  intensive systems.}
 \author[add1]{Chaitanya Sampat\corref{cor1}}
 \author[add1]{Franklin Bettencourt\corref{cor1}}
-%\thanks{These two authors has equal contribution.}
 \author[add1]{Yukteshwar Baranwal}
 \author[add2]{Ioannis Paraskevakos}
 \author[add1]{Anik Chaturbedi}
@@ -174,18 +173,7 @@ reaches speeds of 56 Gbps. In addition, a high performance parallel filesystem a
 nodes, allowing users to read and write GBs of data efficiently. One of the challenges when implementing 
 parallel applications is to make sure that data is written in a similar manner with serial programs 
 to ensure correctness of the results. This depends on implementing correctly data communication 
-between parallel computing processes.
-
-%To solve problems in parallel, computing clusters are often used and with drop in the prices of hardware, 
-%they are becoming popular. A cluster is essentially a collection of conventional computers 
-%connected together via a high speed network like Ethernet or Infiniband. The difficulty with 
-%implementing parallel computing to solve a computational problem is that it involves a lot of 
-%computer-computer communication and algorithm redesigning which needs to be done very 
-%carefully to ensure numerical consistency and with consideration of the cluster the program will be 
-%run on.
-
-%High performance computing (HPC) is the utilization of supercomputers and parallel processing
-%techniques for solving complicated computational problems. 
+between parallel computing processes. 
 
 Some of the benefits of using
 HPC in the pharmaceutical industry include high accuracy for parameter estimation as detailed 
@@ -778,17 +766,6 @@ the completely updated $F_{t,all}$ value is shared before calculating a new time
 have the same $F_{t,all}$ value. As a result each process calculates the same size for the new time 
 step. 
 
-%The PBM code was initially developed using a simple empirical kernel which did 
-%not take into account the DEM collision data.
-%The code utilized static arrays, whose size was allocated on initiation and then the code was parallelized using 
-%the same technique as discussed above. This code was compiled using the intel/15.0.2 and mvapich2/2.1 compilers. 
-%The code was tested on Stampede1 supercomputer for the configuration of the cores varying from the 1 to 128 cores. 
-%The speedup obtained for this simulation was about 37, i.e. the parallel code run using 128 processes was 37 times 
-%faster than the simulation which ran just on 1 core. This was a good conformation for the hybrid parallel technique, 
-%thus being implemented in the coupled model. The results of these preliminary studies have been addressed in more 
-%detail in the supplemental information.
-
-
 Since the DEM informed PBM code required dynamic size increase for the data structure due to different number of particles being 
 present in the DEM simulation,
 the PBM code developed used the Standard Template Library containers and their features available in \textit{C++} 11 
@@ -1024,17 +1001,9 @@ The PBM used in this study employs an aggregation kernel that takes into account
 larger particle from only two smaller particles. The ratio of the rate of formation and the rate of 
 depletion due to aggregation helps us monitor whether the PBM satisfies the conservation of mass. 
 Since this PBM takes into account the aggregation of only 2 particles at once, the ratio of the particles 
-is expected to have a value of 0.5 during the aggregation process. Figure \ref{fig:rslts_PBM_ratio_plot_2mm}
- illustrates this ratio to be 0.5 throughout the simulation, validating the accuracy of the PBM used.
-\begin{figure}
-\begin{center}
-\includegraphics[scale=0.5]{rslts_PBM_2mm_validation.pdf}
-\caption{The ratio of rate of formation to the rate of depletion of particles due to 
-aggregation as a function of time. The ratio was constant at 0.5 as aggregation was 
-considered to happen only between 2 particles at a given instant of time.}
-\label{fig:rslts_PBM_ratio_plot_2mm}
-\end{center}
-\end{figure}
+is expected to have a value of 0.5 during the aggregation process. This ratio was reported by the PBM 
+to be 0.5 throughout the simulation, validating the accuracy of the PBM used.
+
 Figure \ref{fig:rslts_PBM_d50_plots} shows four different particle size distribution plots at four 
 different time instants. Figure \ref{fig:rslts_PBM_d50_plots}(\subref{fig:30s}) shows the distribution of 
 the particles at 30 seconds, where we expect to have the highest number of the smaller particles. 
@@ -1181,15 +1150,6 @@ the 2mm mono-sized particle took about 1.6 times less than the PSD simulation ti
 Since the physics of both the systems are not different, using the mono-sized simulations 
 for the DEM help save time on the overall simulations. 
 
-%\begin{figure}
-%\centering
-%\includegraphics[scale=0.5]{rslts_pbm_psd_validation.pdf}
-%\caption{The ratio of rate of formation to the rate of depletion due to aggregation as a function of time. 
-%The constant value of 0.5 shows that the PBM is stable through the simulation time. This is similar to 
-%Figure \ref{fig:rslts_PBM_ratio_plot_2mm} which was for the 2mm mono-sized DEM simulation}
-%\label{fig:rslts_PBM_psd_ratio}
-%\end{figure}
-
 \begin{figure}
 \centering
 \includegraphics[scale=0.5]{rslts_pbm_d50_128_200.pdf}
@@ -1283,61 +1243,30 @@ threads.
     \begin{algorithmic}[1]
         
         \While{ $t<t_{final}$ }
-        %\begin{Stateize}[noStatesep,nolistsep,Stateindent=10pt]
         \State The spatial domain is divided into equal chunks
         \State Each MPI process is assigned on chunk of spatial domain shown as $c_{low}$ to $c_{up}$ 
         \State Sum all $c_{low_i}$ to $c_{up_i}$ is = to [0,number of Compartments]
-        %\end{Stateize}
         \For{each MPI processes} $c = c_{low_i}$ to $c_{up_i}$
-        %\begin{Stateize}[noStatesep,nolistsep,Stateindent=20pt]
         \State Each MPI process is further divided with OMP to take advantage of multi-core CPU
         \State Each OMP process is allocated to a single compute core
         \State $\Re$ integrates for each first solid bin as the second solid bins is 
         divided across the OMP threads, thus 
-        %$(i_1)$ $\int_{0}^{s_{2(OMP_0)}}$, $(i_2)$ $\int_{s_{2(OMP_0)}}^{s_{2(OMP_1)}}$, $(i_3)$ 
-        %$\int_{s_{2(OMP_1)}}^{s_{2(OMP_2)}}$ and so on 
+
         divided into smaller integrals 
-        %by MPI  
-        %$\int_{i_1low_n}^{i_1up_n}$, $\int_{i_2low_n}
-        %^{i_2up_n}$, $\int_{i_3low_n}^{i_3up_n}$ 
-        %upto 16 compartments
-        %which are solved by the "n" OMP processes. 
         Figure \ref{fig:mthds_OMP_distribution} depicts this distribution.
         \State Allocated to that MPI process (CPU)
-        %\end{Stateize}
         \For{ each OMP process}
-        %\begin{Stateize}[noStatesep,nolistsep,Stateindent=30pt]
         \State Calculate the Aggregation Constant $\Re_{agg}(s_1,s_2,c)$
-        %\end{Stateize}
-        %\begin{align}
-        %\Re_{agg}(s_1,s_2,c)=& \frac{1}{2}\int_{0}^{s_{1}} \int_{i_1low_n}^{i_1up_n} 
-        %\beta(s_1',s_2',s_1-s_1',s_2-s_2',c)F(s_1',s_2',c)F(s_1-s_1',s_2-s_2',c)ds_1'ds_2'\notag\\ 
-        %&- F(s_1,s_2,c)\int _{0}^{s_{max_1}-s_1} \int_{i_2low_n}^{i_2up_n} 
-        %\beta(s_1,s_2,s_1',s_2',c)F(s_1',s_2',c)ds_1'ds_2'\notag
-        %\end{align}
-        %\begin{align*}
-        %\Re_{break}(s_1,s_2,c) = \int_{0}^{s_{max_1}} \int_{i_3low_n}^{i_3up_n} K_{break}(s_1',s_2',c)F(s_1',s_2',c)ds_1'ds_2' - K_{break}
-        %(s_1,s_2,c)F(s_1,s_2,c)
-        %\end{align*}
         \EndFor
-        %\begin{Stateize}[noStatesep,nolistsep,Stateindent=20pt]
             \State  Calculate total number of particles using Euler's rule. 
-        %\end{Stateize}
-        %\begin{align*}
-        %F_{t,c} &= \frac{\Delta F(s_1,s_2,c)}{\Delta t}\Delta t  + F(s_1,s_2,c)_{t-1}\\
-        %      &=   (\Re_{agg}(s_1,s_2,c)+\Re_{break}(s_1,s_2,c)+\dot{F}_{in}(s_1,s_2,c)-\dot{F}_{out}(s_1,s_2,c))\Delta t + 
-        %F(s_1,s_2,c)_{t-1}
-        %\end{align*}
-        
+
         \EndFor
-        %\begin{Stateize}[noStatesep,nolistsep,Stateindent=10pt]
             \State MPI Send $F_{t,c}$ to Master MPI process
             \State MPI Recv $F_{t,c}$ from MPI all slave processes
             \State Master consolidate all $F_{t,c}$ chunks into a complete $F_{t,all}$
             \State Master does inter-bin particle transfers (updates $F_{t,all}$)
             \State MPI Bcast $F_{t,all}$ to all slave processes
             \State $t_{new} = t + timestep$
-        %\end{Stateize}
         \EndWhile   
         
     \end{algorithmic}

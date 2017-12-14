@@ -1,6 +1,6 @@
 # Input Parameters for PBM
-AggregationKernelConstant 1.0e-17
-BreakageKernelConstant 1.0e-10
+AggregationKernelConstant 1.0e-12
+BreakageKernelConstant 1.0e-9
 ConsolidationConstant 1.0e-15
 InitialPorosity 0.5
 MinimumPorosity 0.2
@@ -15,8 +15,8 @@ NumberOfCompartmets 4
 ParticleResidenceTime 5.0
 DiameterOfImpeller 0.114
 SpeedOfImpeller 2000.0
-PreMixingTime 10.0
-LiquidAdditionTime 40.0
+PreMixingTime 5.0
+LiquidAdditionTime 5.0
 PostMixingTime 0.0
 Throughput 15.0
 SolidDensity 476.0

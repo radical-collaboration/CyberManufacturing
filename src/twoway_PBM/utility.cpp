@@ -135,6 +135,19 @@ vector<double> linearize3DVector(arrayOfDouble3D array3D)
     return data;
 }
 
+vector<double> linearize2DVector(arrayOfDouble2D array2D)
+{
+    // vector<double> data;
+    size_t dim1 = array2D.size();
+    size_t dim2 = array2D[0].size();
+    vector<double> data(dim1 * dim2, 0.0);
+    for (size_t d1 = 0; d1 < dim1; d1++)
+        for (size_t d2 = 0; d2 < dim2; d2++)
+                data[d1 * dim2 + d2] = array2D[d1][d2];
+
+    return data;
+}
+
 string moreSigs(double d, int prec)
 {
     std::stringstream ss;

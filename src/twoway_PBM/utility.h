@@ -36,6 +36,7 @@ double getSumOf2DArray(arrayOfDouble2D array2D);
 int getCountOfNegativeIn3DArray(arrayOfDouble3D array3D);
 
 std::vector<double> linearize3DVector(arrayOfDouble3D array3D);
+std::vector<double> linearize2DVector(arrayOfDouble2D array2D);
 
 std::string moreSigs(double d, int prec); //return string of 'd' with ''prec' sig digits: trailing zeros removed
 

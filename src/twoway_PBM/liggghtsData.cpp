@@ -332,8 +332,6 @@ vector<double> liggghtsData::getFinalDEMCollisionVelocity()
 
 	    if(mapData.empty())
 	    	continue;
-
-	    array<double,3> aveColVel{{0.0}};
         
         parameterData *pData = parameterData::getInstance();
         unsigned int nDEMBins = pData->nDEMBins;
@@ -343,15 +341,17 @@ vector<double> liggghtsData::getFinalDEMCollisionVelocity()
 
 	    for(auto itMapData = mapData.begin(); itMapData != mapData.end(); itMapData++)
 	    {
+            array<double,3> aveColVel{{0.0}};
 	    	vector<collisionData> vecColData = get<1>(itMapData->second);
+            size_t nPartilcesOfEachType = vecColData.size();
 	    	int row = itMapData->first;
 	    	for(auto vecData : vecColData)
 	    	{
-	    		aveColVel[0] += vecData.velocity[0];
-	    		aveColVel[1] += vecData.velocity[1];
-	    		aveColVel[2] += vecData.velocity[2];
+	    		aveColVel[0] += fabs(vecData.velocity[0]);
+	    		aveColVel[1] += fabs(vecData.velocity[1]);
+	    		aveColVel[2] += fabs(vecData.velocity[2]);
 	    	}
-	    	velocityIntCollision[row - 1] = sqrt(pow(aveColVel[0],2) + pow(aveColVel[1],2) + pow(aveColVel[2],2));
+	    	velocityIntCollision[row - 1] = sqrt(pow(aveColVel[0],2) + pow(aveColVel[1],2) + pow(aveColVel[2],2)) / nPartilcesOfEachType;
 	    	velocityCollision[row -1] += velocityIntCollision[row -1] / 3;
 	    }
 	}
@@ -390,14 +390,15 @@ vector<double> liggghtsData::getFinalDEMImpactVelocity()
 	    for (auto itMapData = mapData.begin(); itMapData != mapData.end(); itMapData++)
 	    {
             vector<impactData> vecImpData = itMapData->second;
+            size_t nPartilcesOfEachType = vecImpData.size();
             int row = itMapData->first;            
             for (auto impData : vecImpData)
             {
-                aveVeloComp[0] += impData.velocity[3];
-                aveVeloComp[1] += impData.velocity[4];
-                aveVeloComp[2] += impData.velocity[5];
+                aveVeloComp[0] += fabs(impData.velocity[3]);
+                aveVeloComp[1] += fabs(impData.velocity[4]);
+                aveVeloComp[2] += fabs(impData.velocity[5]);
             }
-            velocityInt[row - 1] = sqrt(pow(aveVeloComp[0], 2) + pow(aveVeloComp[1], 2) + pow(aveVeloComp[2], 2));
+            velocityInt[row - 1] = sqrt(pow(aveVeloComp[0], 2) + pow(aveVeloComp[1], 2) + pow(aveVeloComp[2], 2)) / nPartilcesOfEachType / 1000;
             velocity[row -1] += velocityInt[row -1] / 3; 
         }
     }

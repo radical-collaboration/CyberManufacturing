@@ -696,18 +696,98 @@ int main(int argc, char *argv[])
             depletionThroughBreakage[c] = compartmentOut.depletionThroughBreakage;
         }
 
+        // *************************************************************
+        //************** START MPI Send Recv ***************************
+        // *************************************************************
+        MPI_Status status;
+        vector<double> buff_sr_lin(nCompartments, 0.0);
+
+        if (mpi_id != MASTER)
+        {
+            /* send */
+            //printf("msg pre dfdt sent i=%d\n",i);
+            buff_sr_lin = formationThroughAggregation; //linearize2DVector(formationThroughAggregation); //memcpy(&buff_sr, &dfdtAllCompartments,sizeof(dfdtAllCompartments));
+            MPI_Send(buff_sr_lin.data(), static_cast<int>(buff_sr_lin.size()), MPI_DOUBLE, MASTER, mpi_id, MPI_COMM_WORLD);
+            //printf("msg dfdt sent i=%d\n",i);
+        }
+
+        if (mpi_id == MASTER)
+        {
+            for (int i = 1; i < num_mpi; i++)
+            {
+                MPI_Recv(buff_sr_lin.data(), static_cast<int>(buff_sr_lin.size()), MPI_DOUBLE, i, i, MPI_COMM_WORLD, &status);
+
+                for (int c = load[i]; c < load[i + 1]; c++)
+                    formationThroughAggregation[c] = buff_sr_lin[c];
+            }
+        }
+        if (mpi_id != MASTER)
+        {
+            /* send */
+            //printf("msg pre dfdt sent i=%d\n",i);
+            buff_sr_lin = depletionThroughAggregation; //memcpy(&buff_sr, &dfdtAllCompartments,sizeof(dfdtAllCompartments));
+            MPI_Send(buff_sr_lin.data(), static_cast<int>(buff_sr_lin.size()), MPI_DOUBLE, MASTER, mpi_id, MPI_COMM_WORLD);
+            //printf("msg dfdt sent i=%d\n",i);
+        }
+
+        if (mpi_id == MASTER)
+        {
+            for (int i = 1; i < num_mpi; i++)
+            {
+                MPI_Recv(buff_sr_lin.data(), static_cast<int>(buff_sr_lin.size()), MPI_DOUBLE, i, i, MPI_COMM_WORLD, &status);
+
+                for (int c = load[i]; c < load[i + 1]; c++)
+                    depletionThroughAggregation[c] = buff_sr_lin[c];
+            }
+        }
+        if (mpi_id != MASTER)
+        {
+            /* send */
+            //printf("msg pre dfdt sent i=%d\n",i);
+            buff_sr_lin = formationThroughBreakage; //memcpy(&buff_sr, &dfdtAllCompartments,sizeof(dfdtAllCompartments));
+            MPI_Send(buff_sr_lin.data(), static_cast<int>(buff_sr_lin.size()), MPI_DOUBLE, MASTER, mpi_id, MPI_COMM_WORLD);
+            //printf("msg dfdt sent i=%d\n",i);
+        }
+
+        if (mpi_id == MASTER)
+        {
+            for (int i = 1; i < num_mpi; i++)
+            {
+                MPI_Recv(buff_sr_lin.data(), static_cast<int>(buff_sr_lin.size()), MPI_DOUBLE, i, i, MPI_COMM_WORLD, &status);
+
+                for (int c = load[i]; c < load[i + 1]; c++)
+                    formationThroughBreakage[c] = buff_sr_lin[c];
+            }
+        }
+        if (mpi_id != MASTER)
+        {
+            /* send */
+            //printf("msg pre dfdt sent i=%d\n",i);
+            buff_sr_lin = depletionThroughBreakage; //memcpy(&buff_sr, &dfdtAllCompartments,sizeof(dfdtAllCompartments));
+            MPI_Send(buff_sr_lin.data(), static_cast<int>(buff_sr_lin.size()), MPI_DOUBLE, MASTER, mpi_id, MPI_COMM_WORLD);
+            //printf("msg dfdt sent i=%d\n",i);
+        }
+
+        if (mpi_id == MASTER)
+        {
+            for (int i = 1; i < num_mpi; i++)
+            {
+                MPI_Recv(buff_sr_lin.data(), static_cast<int>(buff_sr_lin.size()), MPI_DOUBLE, i, i, MPI_COMM_WORLD, &status);
+
+                for (int c = load[i]; c < load[i + 1]; c++)
+                    depletionThroughBreakage[c] = buff_sr_lin[c];
+            }
+        }
+
         formationThroughAggregationOverTime.push_back(formationThroughAggregation);
         depletionThroughAggregationOverTime.push_back(depletionThroughAggregation);
         formationThroughBreakageOverTime.push_back(formationThroughBreakage);
         depletionThroughBreakageOverTime.push_back(depletionThroughBreakage);
 
-        // *************************************************************
-        //************** START MPI Send Recv ***************************
-        // *************************************************************
-        MPI_Status status;
-        vector<double> buff_sr(nCompartments * nFirstSolidBins * nSecondSolidBins, 0.0);
 
         MPI_Barrier(MPI_COMM_WORLD);
+        vector<double> buff_sr(nCompartments * nFirstSolidBins * nSecondSolidBins, 0.0);
+
 
         // MPI SR dFdT_AllComaprments START
 
@@ -843,7 +923,7 @@ int main(int argc, char *argv[])
         while (maxofthree < 0.1 / timeStep && timeStep < 0.25)
             timeStep *= 2.0;
 
-        while (maxofthree > 0.1 / timeStep && timeStep > 5.0e-4)//5.0e-5)
+        while (maxofthree > 0.1 / timeStep && timeStep > 5.0e-5)
             timeStep /= 2.0;
 
         int nanCount = 0;

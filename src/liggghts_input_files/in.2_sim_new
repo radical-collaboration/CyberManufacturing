@@ -142,8 +142,8 @@ compute            cc_17 type17_ contact/atom
 
 # Dump files configurationn
 run                1
-dump               myDump  all custom 50000 post/dump*.atom id type x y z ix iy iz vx vy vz fx fy fz c_cc_1 c_cc_2 c_cc_3 c_cc_4 c_cc_5 c_cc_6 c_cc_7 c_cc_8 c_cc_9 c_cc_10 c_cc_11 c_cc_12 c_cc_13 c_cc_14 c_cc_15 c_cc_16 f_fppacc radius c_cc_17
-dump               myDump2 all local 50000 post/coll*.atom c_pwc[1] c_pwc[2] c_pwc[3] c_pwc[4] c_pwc[5] c_pwc[6] c_pwc[7] c_pwc[8] c_pwc[9] c_pwc[10] c_pwc[11] c_pwc[12] c_pwc[13] c_pwc[14]
+dump               myDump  all custom 50000 post/collision*.atom id type x y z ix iy iz vx vy vz fx fy fz c_cc_1 c_cc_2 c_cc_3 c_cc_4 c_cc_5 c_cc_6 c_cc_7 c_cc_8 c_cc_9 c_cc_10 c_cc_11 c_cc_12 c_cc_13 c_cc_14 c_cc_15 c_cc_16 f_fppacc radius c_cc_17
+dump               myDump2 all local 50000 post/impact*.atom c_pwc[1] c_pwc[2] c_pwc[3] c_pwc[4] c_pwc[5] c_pwc[6] c_pwc[7] c_pwc[8] c_pwc[9] c_pwc[10] c_pwc[11] c_pwc[12] c_pwc[13] c_pwc[14]
 dump               myDump3 all local 50000 post/pcoll*.atom c_ppc[1] c_ppc[2] c_ppc[3] c_ppc[4]
 dump               dumpstl1 all mesh/stl 50000 post/dump*.stl
 restart            50000 restart/granulator.*.restart

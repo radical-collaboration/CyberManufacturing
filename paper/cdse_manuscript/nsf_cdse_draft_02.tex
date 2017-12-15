@@ -1232,16 +1232,13 @@ threads.
         \State Each MPI process is further divided with OMP to take advantage of multi-core CPU
         \State Each OMP process is allocated to a single compute core
         \State $\Re$ integrates for each first solid bin as the second solid bins is 
-        divided across the OMP threads, thus 
-
-        divided into smaller integrals 
+        divided across the OMP\\ \hspace{1.05cm} threads, thus divided into smaller integrals 
         Figure~\ref{fig:app_OMP_distribution} depicts this distribution.
         \State Allocated to that MPI process (CPU)
-        \For{ each OMP process}
+        \For{each OMP process}
         \State Calculate the Aggregation Constant $\Re_{agg}(s_1,s_2,c)$
         \EndFor
-            \State  Calculate total number of particles using Euler's rule. 
-
+        \State Calculate total number of particles using Euler's rule.
         \EndFor
             \State MPI Send $F_{t,c}$ to Master MPI process
             \State MPI Recv $F_{t,c}$ from MPI all slave processes
@@ -1249,8 +1246,7 @@ threads.
             \State Master does inter-bin particle transfers (updates $F_{t,all}$)
             \State MPI Bcast $F_{t,all}$ to all slave processes
             \State $t_{new} = t + timestep$
-        \EndWhile   
-        
+        \EndWhile        
     \end{algorithmic}
 \end{algorithm}  
  

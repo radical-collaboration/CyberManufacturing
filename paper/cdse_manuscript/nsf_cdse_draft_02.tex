@@ -93,15 +93,15 @@ Particulate processes are prevalent in the pharmaceutical industry but, the phys
 these processes are complicated and requires large amount of computation to solve a model at the
 particle-level. This approach makes the simulation slow, when compared to using a less accurate 
 bulk model. A quicker and a more accurate way to model this system is to use a multi-scale 
-model the i.e. use the particle-scale data into a bulk model. 
+model i.e. use the particle-scale data into a bulk model. 
 In this work, a unidirectional multi-scale model was used to model the high shear wet granulation 
 process. A multi-dimensional population balance model (PBM) was developed which 
-consisted of a mechanistic kernel, which obtained the collision data from the discrete element 
+consisted of a mechanistic kernel, which in turn obtained the collision data from the discrete element 
 modeling (DEM) simulation. The PBM was run in parallel using MPI + OMP hybrid technique. The DEM 
 simulations were performed on
 LIGGGHTS, which runs in parallel using MPI. Speedup of about 14 times was obtained for the PBM 
 simulations and around 12 for the DEM simulations. This coupling was performed using the radical 
-pilot for scaling studies from 1 processor to 128 for the PBM and up to 256 cores for the DEM. Using 
+pilot for scaling studies from 1 to 128 cores for the PBM and up to 256 cores for the DEM. Using 
 this developed framework, the granulation process has been modeled accurately 
 much faster than existing approaches in literature.
 \end{abstract}
@@ -136,9 +136,10 @@ of the particulate system accurately~\citep{Hancock2011}. DEM uses Newton's equa
 motion to model the forces on each particle in the system and it's interactions with the system 
 geometry and other particles. This enables DEM to model the small scale phenomena that 
 determines the bulk behavior of particulate system. Since DEM includes large amount of interactions
-and force computations, it usually takes a large amount of time to run. Thus another more computationally 
-efficient, but potentially less accurate technique, used to model these particulate processes is population 
-balance model (PBM).
+and force computations, it usually takes a large amount of time to run. Thus, there is a need for a 
+more efficient simulation technique for these particulate particles. One of the common methods used 
+in the industry is the population balance model (PBM), which is more compuatationally efficient but,
+lacks the accuracy of the DEM.
 
 PBM takes into account the changes in internal or spatial particle properties.This 
 model lacks sensitivity to design parameters such as equipment geometry. It is semi-mechanistic in 
@@ -159,39 +160,38 @@ behavior~\citep{Goldschmidt2003}~\citep{Reinhold2012}~\citep{Barrasso2013}. This
 method is more accurate than a PBM simulation alone but runs much faster than a complete DEM 
 simulation. Despite the performance benefits of these coupled PBM-DEM models they still take too 
 long to solve. In the past parallel computing has been used to speed up computationally intensive 
-problems such as Molecular Dynamics (MD), Computational Fluid Dynamics (CFD), but in recent 
+problems such as Molecular Dynamics (MD), Computational Fluid Dynamics (CFD) and in recent 
 years  this technique has been applied to DEM and PBM simulations~\citep{Bettencourt2017}~\citep{Prakash2013a}~\citep{Gunawan2008}.
 
 
 Parallel Computing is the standard procedure to solve large computational problems in many sciences. 
 This method uses High Performance Computers (HPC) to solve over a large number of cores. 
-A HPC consists of thousands compute nodes connected via a high speed network. A typical compute 
+A HPC consists of thousands of compute nodes connected via a high speed network. A typical compute 
 node has multiple cores and several GBs or memory. The network that connects them, usually Infiniband, 
 reaches speeds of 56 Gbps. In addition, a high performance parallel filesystem accompanies the compute 
 nodes, allowing users to read and write GBs of data efficiently. One of the challenges when implementing 
-parallel applications is to make sure that data is written in a similar manner with serial programs 
-to ensure correctness of the results. This depends on implementing correctly data communication 
-between parallel computing processes. 
+parallel applications is to make sure that data is written in a similar manner to serial programs. To 
+ensure correctness of the results, an appropiate data communication implementation is required.
 
-Some of the benefits of using
-HPC in the pharmaceutical industry include high accuracy for parameter estimation as detailed 
-particle-scale simulations can be performed quickly. Quick simulations can also help 
-improve control of continuous pharmaceutical processes. This work showcases the speed improvements 
-that can be achieved using HPCs and how they can help improve process design.
+Some of the benefits of using HPC in the pharmaceutical industry include high accuracy for 
+parameter estimation as detailed particle-scale simulations can be performed quickly. 
+Quick simulations can also help improve control of continuous pharmaceutical processes. 
+This work showcases the speed improvements that can be achieved using HPCs and how 
+they can help improve process design.
 
-The main objective of this work was to develop a unidirectional DEM-PBM model that run efficiently in 
+The main objective of this work is to develop a unidirectional DEM-PBM model that run efficiently in 
 parallel so that it can take advantage of the computational capabilities of  modern computing 
 clusters. In the course of development of the model, the DEM simulation were performed on 
-LAMMPS Improved for general granular and granular heat transfer simulations (LIGGGHTS)~\citep{Kloss2012} to  
+LAMMPS Improved for General Granular and Granular Heat Transfer simulations (LIGGGHTS)~\citep{Kloss2012} to  
 model the micro-mechanics of the L\"{o}dige CoriMix CM5 high shear granulator. A 4-Dimensional, 
 reduced order DEM informed PBM was developed that is parallelized using hybrid techniques 
-(MPI + OMP)to model the bulk processes occurring during the granulation process and 
+(Message Parsing Interface (MPI) + Open Multi-Processing (OMP))to model the bulk processes occurring during the granulation process and 
 is discussed in section~\ref{sec:pbm_model}. Section~\ref{sec:RPandCommunications} describes 
 unidirectional coupling of DEM and PBM using Radical Pilot, which is a 
 framework developed in Python. This provides task level parallelization, to help develop 
 an accurate model which can be run quickly on high performance computing systems. The speed
-improvements obtained for the parallel code and improvements that can be implemented are discussed
-in Section~\ref{sec:Results}
+improvements obtained for the parallel code and further improvements that can be 
+implemented are discussed in Section~\ref{sec:Results}
 
 
 \section{Background \& Motivation}
@@ -199,25 +199,25 @@ in Section~\ref{sec:Results}
 \subsection{Particulate processes}
 Particulate processes are ones in which a system of discrete species exist, such as granules 
 or catalyst pellets, that undergo changes in average composition, size, or other pertinent 
-properties. These processes are especially prevalent in the pharmaceutical industry and one of the 
-most important is granulation. 
-Fine powders are converted to larger granules using a liquid binder. The three processes 
-influencing granulation are wetting and nucleation, consolidation and aggregation and attrition and 
-breakage~\citep{Iveson2001}~\citep{Cameron2005}. As the liquid is added to the fine powder, it 
-forms a porous nuclei that can coalesce, deform and break~\citep{Barrasso2015ces}. There is an 
-alteration in the properties of these nuclei as they can take up additional liquid or finer powder.
-To understand how a granulation processes will behave with different parameter settings and 
-chemical mixtures, experimental studies of the process parameter space are performed which is a 
-method referred to as Quality-by-Testing (QbT). This methodology is time consuming and 
+properties. Granulation is one such particulate process which is commonly found in the 
+pharmacuetical industry. In this process, fine powders are converted to larger granules 
+using a liquid binder. The three rate processes governing granulation are wetting and 
+nucleation, consolidation and aggregation and attrition and breakage~\citep{Iveson2001}~\citep{Cameron2005}. 
+As the liquid is added to the fine powder, it 
+forms a porous nuclei that can coalesce, deform and break~\citep{Barrasso2015ces}. As there is an 
+alteration in the properties of these nuclei, they can take up additional liquid or breakdown to a 
+finer powder.To understand how a granulation processes will behave with different design and operating 
+parameter settings and formulations, experimental studies are performed which is a method referred 
+to as Quality-by-Testing (QbT). This methodology is time consuming and 
 expensive. Thus, newer research is focused on the QbD concept i.e, 
-mathematically modeling the process to better understand the dynamics of such processes.
+developing a mathematical model to represent the rate process.
 
 \subsection{Modeling}
 The paradigm shift of the pharmaceutical industry for instance towards continuous manufacturing, 
-emphasizes the need for a more accurate model. This further helps develop better control strategies 
+emphasizes the need for a more accurate model. This further helps to develop better control strategies 
 for the process. The modeling of particulate processes is more time consuming and computationally 
-expensive when compared to a fluid systems since the particles are considered as individual entities 
-rather than a continuum like in fluid systems. The models discussed ahead represent the 
+expensive when compared to fluid systems since particles are considered as individual entities 
+rather than a continuum like fluid systems. The models discussed ahead represent the 
 particle-particle interaction at meso and micro-scale.
 \subsubsection{Discrete Element Modeling (DEM)}
  Discrete Element Method is a simulation technique used to monitor the behavior of each particle 
@@ -234,7 +234,7 @@ Where, $m_i$ is the mass of the particle, $v_i$ represents the velocity of
 the particle, $F_{i,net}$  represents the net force on the particle, forces on the particle due to collisions 
 and other external forces are represented in $F_{i,coll}$ and $F_{i,ext}$ respectively.
 
-Using this method, the distance between each particle calculated at every time step and if the distance between two 
+Using this method, the distance between each particle is calculated at every time step and if the distance between two 
 particles is less than the sum of the radii (for spherical particles)  a collision between the two particles 
 is recorded. The tolerance for overlap is low in the normal as well as the tangential direction. 
 Micro-scale DEM simulations are computationally demanding and simulations may take up to several 
@@ -245,9 +245,9 @@ process-level simulations.
 
 The particle-particle collisions are not always elastic, thus there is a need for models for the 
 contact forces. The earliest elastic model was developed by Hertz and was extended by Mindlin 
-by accounting for the  tangential forces during the collisions~\citep{adams2000}. The most commonly used contact 
-force model for modeling the flow of particles inside the granulation process 
-is the Hertz-Mindlin contact model~\citep{gantt2006}~\citep{hassanpour2013}. 
+by accounting for the  tangential forces during the collisions~\citep{adams2000}. 
+The Hertz-Mindlin contact model~\citep{gantt2006}~\citep{hassanpour2013} has been utilized 
+in this work.
  
 
 \subsubsection{Population Balance Model (PBM)}
@@ -281,9 +281,9 @@ inferred from coupling of various physics models \textit{viz.} CFD,
 DEM and PBM. Earlier works from \cite{sen2014} \& \cite{Barrasso2015cerd} have successfully 
 predicted process dynamics of the granulation process using such multi-physics models.
 
-Initially, \cite{ingram2004} coupled PBM and DEM using two different multi-scale frameworks and 
-focused on methods of integrating the two methods and information exchange required between the 
-two. Later efforts on coupling of PBM and DEM were unidirectional in nature, where the collision 
+Initially, \cite{ingram2004} coupled PBM and DEM using two different multi-scale frameworks which 
+focused on methods of integration and information exchange required between these two methods. 
+Later efforts on coupling of PBM and DEM were unidirectional in nature, where the collision 
 data was obtained from the DEM and then used it in PBM. \cite{gantt2006} used the DEM data 
 to build a mechanistic model for the PBM. \cite{Goldschmidt2003} solved a PBM using DEM by 
 replacing smaller particles as they successfully coalesce with larger particles. 
@@ -294,7 +294,7 @@ development of kernels. A hybrid model for one-way coupling has been reported fo
 In this work, a coupled DEM and PBM model has been implemented. In general, the PBM provides meso-scale 
 information while the DEM gives particle scale information. The combination of these two methods helps 
 describe the process dynamics with more accuracy. However, calculations involved due to the number 
-of particles involved in the DEM process as well as PBM become very computationally heavy, hence the
+of particles involved in the DEM process as well as PBM become computationally very heavy, hence the
 motivation and need for running the simulations on HPCs and parallelization techniques. 
  
 
@@ -321,7 +321,7 @@ Message Passing Interface (MPI) is a common parallel computing application
 programming interface standard. MPI is used for distributed memory parallel computing and this is 
 because the application programming interface will operate 
 every MPI process as a discrete unit that does not share memory with the other processes unless explicit 
-message passing is used. Even on shared a single node where the hardware is supports shared 
+message passing is used. Even on shared a single node where the hardware supports shared 
 memory computing, MPI will still operate it in a distributed memory fashion~\citep{Jin2011}. Operating all 
 cores as distinct units also means they each need their own copy of all variables used for computation 
 which results in a large overall memory foot print compared to a similar system if it was operated in 
@@ -334,8 +334,7 @@ prevents it from being used to efficiently carry out computations across multipl
 simultaneously~\citep{Jin2011}. 
 
 Since MPI is preferred for distributed computing and OMP is better for shared computing many 
-individuals have studied the performance of MPI vs MPI+OMP methods and many studies have used 
-MPI+OMP for scientific computation for improved performance. Often times a trade of is made 
+researchers have studied the performance of MPI vs MPI+OMP methods. Many a times a trade off is made 
 between optimizing a program for performance and trying to make it flexible enough to run on many 
 different computer architectures. It was found that hybrid methods for PBMs allow the code 
 flexibility for different architectures while still maintaining good performance~\citep{Bettencourt2017}.  
@@ -348,7 +347,7 @@ been employed by various researchers in the past. \cite{Gunawan2008} used high-r
 finite volumes solution methods for the parallelization of their PBM. They performed load 
 balancing effectively by decomposing the internal coordinates of their PBM. They achieved 
 speed improvements up to 100 cores on one system size, but was not tested for models 
-with more dimensions. Moreover, they mentioned that the parallelization could be 
+with more dimensions. Moreover, they mentioned that parallelization could be 
 improved using shared memory processing. 
 In our previous work, \cite{Bettencourt2017} took a 
 hybrid approach towards the parallelization of the PBM using both MPI and OMP. 
@@ -378,7 +377,7 @@ A primary challenge faced is the scalable execution of multiple (often two,
 but possibly more) heterogeneous simulations that need to run independently
 but have a need to communicate and exchange information. Traditionally each
 simulation is submitted as an individual job, but that invariably leads
-to a situation where each simulations gets through the batch-queue systems
+to a situation where each simulation gets through the batch-queue systems
 independent of the other. So although the first-through-the-queue is ready to
 run, it stalls fairly soon waiting for the other simulation to make it through
 the queue.  On the other hand MPI capabilities can be used to  execute both
@@ -390,7 +389,7 @@ suitable to execute tasks that are homogeneous and have no dependencies.
 The Pilot abstraction~\citep{pstar12} solves these issues:  The Pilot abstraction 
 (i) uses a container-job as a placeholder to acquire resources, and (ii) decouples 
 the initial resource acquisition from task-to-resource assignment. Once the 
-Pilot (container-job) is has acquired the resources, it can be populated with 
+Pilot (container-job) has acquired the resources, it can be populated with 
 computational tasks. This functionality allows all tasks to be executed directly 
 on the resources, without being queued individually. Thus, this approach supports 
 the requirements of task-level parallelism and high-throughput as needed by 
@@ -401,9 +400,9 @@ RADICAL-Pilot is an implementation of the Pilot abstraction in Python, engineere
 support scalable and efficient launching of heterogeneous tasks across different platforms.
 \section{Methods}
 
-\subsection{Discrete Element Modeling (DEM)}
+\subsection{Discrete Element Method (DEM)}
 \subsubsection{LIGGGHTS}
-LAMMPS Improved for general granular and granular heat transfer simulations (LIGGGHTS) v3.60 
+LAMMPS Improved for General Granular and Granular Heat Transfer simulations (LIGGGHTS) v3.60 
 developed by DCS computing was used for all the simulation performed in this study. 
 Source code files were modified to obtain particle-particle 
 collisions. This version of LIGGGHTS was compiled using the mvapich (mvapich2 v2.1) 
@@ -415,7 +414,7 @@ memory with QPI interconnects at 8.0 GT/s PCI-e lanes.
 
 
 \subsubsection{Geometry}    
- In this study, the L\"{o}dige CoriMix CM5 continuous high shear granulator has been studied. Its 
+ In this work, the L\"{o}dige CoriMix CM5 continuous high shear granulator has been studied. Its 
 geometry was developed using the SolidWorks$^{TM}$ (Dassault Syst\`{e}mes). This granulator 
 consisted of a high speed rotating element enclosed within a horizontal cylindrical casing. The casing 
 (shown in Figure~\ref{fig:mthdsDemCharlesGranShell}) consists of a cylinder with diameter of 120 mm 
@@ -476,7 +475,7 @@ inside the L\"{o}dige CoriMix CM5 continuous high shear granulator.}
 \subsubsection{Meshing}
  After the geometry was built in SolidWorks$^{TM}$ (Dassault Syst\`{e}mes) the shell and impeller 
 were exported as stereo lithography (STL) files. The coarsest output option was used to keep the STL files 
-small and simple for faster computations times. The origin of the geometry was not preserved while saving 
+small and simple for faster computation times. The origin of the geometry was not preserved while saving 
 the STL files since it needs to be aligned in LIGGGHTS as per the process conditions.This resulted in 
 the impeller having 2802 faces and 1281 points with approximately a file size of 775 kilobytes. 
 The shell had 1948 faces and 720 points and size was about 544 kilobytes. Meshlab was used to 
@@ -485,7 +484,7 @@ The meshes were then imported into LIGGGHTS using the write command in serial. T
 in 50 elements of the impeller file having highly skewed elements, which have more than 5 
 neighbors per surface or have an angle less than 0.0181185 radian, that according to LIGGGHTS 
 would degrade parallel performance. The write exclusion list command in LIGGGHTS was used and 
-this exclusion list file as then used in the simulation to skip the highly skewed elements during 
+this exclusion list file is then used in the simulation to skip the highly skewed elements during 
 the simulation. 
 
 
@@ -507,7 +506,7 @@ The physical constants used for the simulations are given in Table~\ref{table:mt
 
 The simulation data was collected after every 50,000 time steps (5$\times 10^{-3}$ sec) 
 for the visualization of the particles inside the shell, further post processing . The collisions 
-between each of the particles and the collisions between of the particle and the geometry was 
+between each of the particles and the collisions between the particle and the geometry was 
 collected and used in the PBM. 
 
 \begin{table}

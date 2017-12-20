@@ -1,22 +1,22 @@
 # Input Parameters for PBM
-AggregationKernelConstant 1.0e-12
-BreakageKernelConstant 1.0e-9
-ConsolidationConstant 1.0e-15
+AggregationKernelConstant 2.0e-5
+BreakageKernelConstant 2.0e-29
+ConsolidationConstant 1.0e-20
 InitialPorosity 0.5
 MinimumPorosity 0.2
 GranuleSaturationFactor 0.0
 CriticalStokesDeformationNumber 0.0059
 BinderViscosity 0.05
 CoefficientOfRestitution 0.2
-LiquidThickness 10.0
-SurfaceAsperities 1.0
+LiquidThickness 100.0
+SurfaceAsperities 0.001
 GranulatorLength 0.38
 NumberOfCompartmets 4
 ParticleResidenceTime 5.0
 DiameterOfImpeller 0.114
 SpeedOfImpeller 2000.0
-PreMixingTime 5.0
-LiquidAdditionTime 5.0
+PreMixingTime 25.0
+LiquidAdditionTime 75.0
 PostMixingTime 0.0
 Throughput 15.0
 SolidDensity 476.0
@@ -31,6 +31,10 @@ SecondSolidVolumeBase 3.0
 CollisionEfficiencyConstant 0.01
 DEMTimeStep 5.0e-7
 NumberOfDEMBins 16
+
+
+
+
 
 
 

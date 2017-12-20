@@ -696,6 +696,7 @@ int main(int argc, char *argv[])
             depletionThroughBreakage[c] = compartmentOut.depletionThroughBreakage;
         }
 
+
         // *************************************************************
         //************** START MPI Send Recv ***************************
         // *************************************************************
@@ -955,7 +956,7 @@ int main(int argc, char *argv[])
         }
         int countnegfAll = 0;
         minfAll = getMinimumOf3DArray(fAllCompartments, countnegfAll);
-        if (minfAll < -1.0e-16)
+        if (minfAll < -1.0e-16 &&  countnegfAll > 0.1 * nCompartments * nFirstSolidBins * nSecondSolidBins)
         {
             int mpi_err = 0;
             cout << endl;
@@ -964,7 +965,8 @@ int main(int argc, char *argv[])
             cout << "My process id = " << mpi_id << endl;
             cout << "minfAll" << minfAll << endl;
             cout << "******fAllCompartments has negative values********" << endl;
-            cout << countnegfAll << endl;
+            cout << "Number of negative values = " << countnegfAll << endl;
+            DUMP3DCSV(fAllCompartments);
             cout << " Aborting..." << endl;
             MPI_Abort(MPI_COMM_WORLD, mpi_err);
         }

@@ -62,7 +62,7 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
     vector<double> velocity = lData->getFinalDEMCollisionVelocity();
     if ((velocity).size() == 0)
     {
-        cout << "Velocity data is missing in LIGGGHTS collision file" << endl;
+        // cout << "Velocity data is missing in LIGGGHTS collision file" << endl;
         return aggregationKernel;
     }
     double inverseDiameterSum = 0.0;
@@ -124,10 +124,13 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
                 {
                     bool flag1 = (fAll[s1][ss1] >= 0.0) && (fAll[s2][ss2] >= 0.0);
                     bool flag2 = (externalLiquidContent[s1][ss1] >= criticalExternalLiquid) && (externalLiquidContent[s2][ss2] >= criticalExternalLiquid);
-                    bool flag3 = (velocity[ss2] < uCritical * 8);
+                    bool flag3 = (velocity[s1] < uCritical);
                     if (flag1 && flag2 && flag3)
+                    {
                         //collisionEfficiency[s1][ss1][s2][ss2] = COLLISIONEFFICIENCYCONSTANT;
                         collisionEfficiency[s1][ss1][s2][ss2] = probablityOfVelocity[ss2];
+                        // cout << "Coll EFFF = " << collisionEfficiency[s1][ss1][s2][ss2] << endl; 
+                    }
                 }
     
     //Aggregation Kernel Calculation
@@ -136,7 +139,10 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
         for (int ss1 = 0; ss1 < nSecondSolidBins; ss1++)
             for (int s2 = 0; s2 < nFirstSolidBins; s2++)
                 for (int ss2 = 0; ss2 < nSecondSolidBins; ss2++)
+                {
                     aggregationKernel[s1][ss1][s2][ss2] = aggKernelConst * collisionFrequency[s1][ss1][s2][ss2] * collisionEfficiency[s1][ss1][s2][ss2];
+                    // cout << "AGG kernel = " << aggregationKernel[s1][ss1][s2][ss2] << endl;
+                }
 
     return aggregationKernel;
 }
@@ -178,7 +184,7 @@ arrayOfDouble4D DEMDependentBreakageKernel(CompartmentIn compartmentIn, Compartm
     double initPorosity = pData->initPorosity;
     double bindVisc = pData->bindVisc;
     double Ubreak = (2 * critStDefNum / solDensity) * (9 / 8.0) * (pow((1 - initPorosity),2) / pow(initPorosity,2)) * (9 / 16.0) * (bindVisc / compartmentIn.diameter[0][0]); 
-    // cout << "Ubreak = " << Ubreak << endl;
+    // cout << "Uabreak = " << Ubreak << endl;
     liggghtsData* lData = liggghtsData::getInstance();
     vector<double> velocity = lData->getFinalDEMImpactVelocity();
     if ((velocity).size() == 0)
@@ -208,8 +214,11 @@ arrayOfDouble4D DEMDependentBreakageKernel(CompartmentIn compartmentIn, Compartm
     vector<double> probablityOfVelocity(size1, 0.0);
     for (int i = 0; i < size1; i++)
     {
-     	probablityOfVelocity[i] = (1 / (velocity[i] * sqrt(2 * M_PI) * stdDevVelocity)) * exp(-((log(velocity[i]) - averageVelocity) / (2 * pow(varianceVelocity, 2))));
-     	// cout << "Probability at " << velocity[i] << "is " << probablityOfVelocity[i] << endl;
+        if (velocity[i] != 0)
+        {
+         	probablityOfVelocity[i] = (1 / (velocity[i] * sqrt(2 * M_PI) * stdDevVelocity)) * exp(-((log(velocity[i]) - averageVelocity) / (2 * pow(varianceVelocity, 2))));
+         	// cout << "Probability breakage at " << velocity[i] << "is " << probablityOfVelocity[i] << endl;
+        }
     }
 
     /*for (int i = 0; i < size1 - 1; ++i)
@@ -227,7 +236,7 @@ arrayOfDouble4D DEMDependentBreakageKernel(CompartmentIn compartmentIn, Compartm
         for (int ss1 = 0; ss1 < nSecondSolidBins; ss1++)
             for (int s2 = 0; s2 < nFirstSolidBins; s2++)
                 for (int ss2 = 0; ss2 < nSecondSolidBins; ss2++)
-                	if(velocity[ss2] > Ubreak*10)
+                	if(velocity[ss2] > Ubreak)
                     {
                 		breakageKernel[s1][ss1][s2][ss2] = impactFrequency[ss1] * probablityOfVelocity[ss2] * brkKernelConst;
                         // cout << "Breakae Kernel = " << breakageKernel[s1][ss1][s2][ss2] << endl;

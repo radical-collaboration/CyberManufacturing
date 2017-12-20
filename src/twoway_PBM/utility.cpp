@@ -59,9 +59,11 @@ double getMinimumOf3DArray(arrayOfDouble3D array3D, int& c)
             for (size_t d3 = 0; d3 < array3D[d1][d2].size(); d3++)
             {
                 minValue = min(minValue, array3D[d1][d2][d3]);
-                if(minValue < array3D[d1][d2][d3] && minValue < 0.0)
+                if(array3D[d1][d2][d3] < 0.0)
                     c++;
             }
+
+    // cout << "value of c = " << c << endl;
     return minValue;
 }
 

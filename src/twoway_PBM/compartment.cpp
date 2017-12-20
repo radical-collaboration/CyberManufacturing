@@ -220,7 +220,10 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
         for (ss1 = 0; ss1 < nSecondSolidBins; ss1++)
             for (s2 = 0; s2 < nFirstSolidBins; s2++)
                 for (ss2 = 0; ss2 < nSecondSolidBins; ss2++)
-                    aggregationRate[s1][ss1][s2][ss2] = sAggregationCheck[s1][ss1] * ssAggregationCheck[s2][ss2] * aggregationKernel[s1][ss1][s2][ss2] * fAll[s1][ss1] * fAll[s2][ss2];
+                    {
+                        aggregationRate[s1][ss1][s2][ss2] = sAggregationCheck[s1][ss1] * ssAggregationCheck[s2][ss2] * aggregationKernel[s1][ss1][s2][ss2] * fAll[s1][ss1] * fAll[s2][ss2];
+                        // cout << "Agg kernel = " << aggregationKernel[s1][ss1][s2][ss2] << endl;
+                    }
 
     //cout << "End aggregationRate" << endl;
 
@@ -447,6 +450,7 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
                             }
                         liquidBirthThroughBreakage1[s2][ss2] += (liquidBins[s1][ss1] * (volumeBins[s2][ss2] / volumeBins[s1][ss1])) * breakageRate[s1][ss1][s2][ss2];
                         gasBirthThroughBreakage1[s2][ss2] += (gasBins[s1][ss1] * (volumeBins[s2][ss2] / volumeBins[s1][ss1])) * breakageRate[s1][ss1][s2][ss2];
+                        // cout << "gas bins  =  " << gasBins[s2][ss2] << endl;
                     }
     }
     //cout << "End birthThroughBreakage2, firstSolidBirthThroughBreakage, secondSolidBirthThroughBreakage, ";
@@ -593,12 +597,16 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
             if(fGas[s][ss] > 1.0e-16)
             {
                 transferThroughConsolidation[s][ss] = consConst * internalVolumeBins[s][ss] * ((1 - minPorosity) / (vs[s] + vss[ss])) * (gasBins[s][ss] - (minPorosity/(1 - minPorosity)) * (vs[s] + vss[ss]) + internalLiquid[s][ss]);
+                // cout << "Consolidation transfer constant = " << transferThroughConsolidation[s][ss] << endl;
             }
             dfGasdt[s][ss] = gasMovement[s][ss];
             dfGasdt[s][ss] += fAll[s][ss] * transferThroughConsolidation[s][ss];
+            // cout << "fALL = " <<  fAll[s][ss] << endl;
             dfGasdt[s][ss] += formationOfGasThroughAggregationCA[s][ss] - depletionOfGasThroughAggregation[s][ss];
             dfGasdt[s][ss] += gasBirthThroughBreakage1[s][ss] + formationOfGasThroughBreakageCA[s][ss];
+            // cout << "gasBirthThroughBreakage1 = " << gasBirthThroughBreakage1[s][ss] << endl;
             dfGasdt[s][ss] -= depletionOfGasThroughBreakage[s][ss];
+            // cout << "Consolidation = " << dfGasdt[s][ss] << endl;
         }
 
     //cout << "**************End of Rate Calculations****************" << endl << endl;

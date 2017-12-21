@@ -209,7 +209,7 @@ CompartmentOut performCompartmentCalculations(PreviousCompartmentIn prevCompIn, 
     //                    // compartmentOut.aggregationKernel[s1][ss1][s2][ss2] = DEMAGGREGATIONKERNELCONST*DEMAGGREGATIONKERNELVALUE;
     //                }
     //compartmentOut.aggregationKernel = DEMDependentAggregationKernel(compartmentIn, compartmentDEMIn, externalLiquidContent, timeStep);
-    aggregationKernel = DEMDependentAggregationKernel(compartmentIn, compartmentDEMIn, externalLiquidContent, timeStep);
+    aggregationKernel = DEMDependentAggregationKernel(compartmentIn, compartmentDEMIn, externalLiquidContent, timeStep, externalLiquid);
 
     //cout << "End Aggregation Kernel" << endl;
 

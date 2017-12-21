@@ -15,7 +15,7 @@ using namespace std;
 #define DUMP4DCSV(varName) dump4DCSV(varName, #varName)
 
 
-arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, CompartmentDEMIn compartmentDEMIn, arrayOfDouble2D externalLiquidContent, double timeStep)
+arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, CompartmentDEMIn compartmentDEMIn, arrayOfDouble2D externalLiquidContent, double timeStep, arrayOfDouble2D externalLiquid)
 {
     parameterData *pData = parameterData::getInstance();
 
@@ -31,7 +31,8 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
     //Collision Frequency (from 2D Number of Collisions)
    
     arrayOfDouble2D fAll = compartmentIn.fAll;
-
+    vector<double> vs = compartmentIn.vs;
+    vector<double> vss = compartmentIn.vss;
     arrayOfDouble2D DEMCollisionData = compartmentDEMIn.DEMCollisionData;
 
     double demTimeStep = pData->demTimeStep;
@@ -83,7 +84,7 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
     
     double harmonic_diameter = sized / inverseDiameterSum;
     double harmonic_mass = sized / inverseMassSum;
-    double uCritical = (1 + (1/coefOfRest)) * log((liqThick / surfAsp)) * (3 * M_PI * pow(harmonic_diameter, 2) * bindVisc) / (8 * harmonic_mass);
+    double uCritical = (10 + (1/coefOfRest)) * log((liqThick / surfAsp)) * (3 * M_PI * pow(harmonic_diameter, 2) * bindVisc) / (8 * harmonic_mass);
     
     // cout << "Critical velocity for agg is " << uCritical << endl;
 
@@ -123,8 +124,12 @@ arrayOfDouble4D DEMDependentAggregationKernel(CompartmentIn compartmentIn, Compa
                 for (int ss2 = 0; ss2 < nSecondSolidBins; ss2++)
                 {
                     bool flag1 = (fAll[s1][ss1] >= 0.0) && (fAll[s2][ss2] >= 0.0);
-                    bool flag2 = (externalLiquidContent[s1][ss1] >= criticalExternalLiquid) && (externalLiquidContent[s2][ss2] >= criticalExternalLiquid);
+                    //bool flag2 = (externalLiquidContent[s1][ss1] >= criticalExternalLiquid) && (externalLiquidContent[s2][ss2] >= criticalExternalLiquid);
+                    // bool flag2 = (externalLiquidContent[s1][ss1] + externalLiquidContent[s2][ss2] >= criticalExternalLiquid);
+                    bool flag2 = ((externalLiquid[s1][ss1] + externalLiquid[s2][ss2]) / (fAll[s1][ss1] * vs[s1] + fAll[s2][ss2] * vss[s2]));
                     bool flag3 = (velocity[s1] < uCritical);
+                    // cout << "flag3 = " << flag3 << endl;
+
                     if (flag1 && flag2 && flag3)
                     {
                         //collisionEfficiency[s1][ss1][s2][ss2] = COLLISIONEFFICIENCYCONSTANT;

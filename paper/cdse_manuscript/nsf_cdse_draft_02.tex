@@ -138,7 +138,7 @@ geometry and other particles. This enables DEM to model the small scale phenomen
 determines the bulk behavior of particulate system. Since DEM includes large amount of interactions
 and force computations, it usually takes a large amount of time to run. Thus, there is a need for a 
 more efficient simulation technique for these particulate particles. One of the common methods used 
-in the industry is the population balance model (PBM), which is more compuatationally efficient but,
+in the industry is the population balance model (PBM), which is more computationally efficient but,
 lacks the accuracy of the DEM.
 
 PBM takes into account the changes in internal or spatial particle properties.This 
@@ -171,7 +171,7 @@ node has multiple cores and several GBs or memory. The network that connects the
 reaches speeds of 56 Gbps. In addition, a high performance parallel filesystem accompanies the compute 
 nodes, allowing users to read and write GBs of data efficiently. One of the challenges when implementing 
 parallel applications is to make sure that data is written in a similar manner to serial programs. To 
-ensure correctness of the results, an appropiate data communication implementation is required.
+ensure correctness of the results, an appropriate data communication implementation is required.
 
 Some of the benefits of using HPC in the pharmaceutical industry include high accuracy for 
 parameter estimation as detailed particle-scale simulations can be performed quickly. 
@@ -200,7 +200,7 @@ implemented are discussed in Section~\ref{sec:Results}
 Particulate processes are ones in which a system of discrete species exist, such as granules 
 or catalyst pellets, that undergo changes in average composition, size, or other pertinent 
 properties. Granulation is one such particulate process which is commonly found in the 
-pharmacuetical industry. In this process, fine powders are converted to larger granules 
+pharmaceutical industry. In this process, fine powders are converted to larger granules 
 using a liquid binder. The three rate processes governing granulation are wetting and 
 nucleation, consolidation and aggregation and attrition and breakage~\citep{Iveson2001}~\citep{Cameron2005}. 
 As the liquid is added to the fine powder, it 
@@ -482,7 +482,7 @@ The shell had 1948 faces and 720 points and size was about 544 kilobytes. Meshla
 align the STL files for importing into LIGGGHTS. No mesh treatments were used on the STLs. 
 The meshes were then imported into LIGGGHTS using the write command in serial. This resulted 
 in 50 elements of the impeller file having highly skewed elements, which have more than 5 
-neighbors per surface or have an angle less than 0.0181185 radian, that according to LIGGGHTS 
+neighbors per surface or have an angle less than 0.0181185 radians, that according to LIGGGHTS 
 would degrade parallel performance. The write exclusion list command in LIGGGHTS was used and 
 this exclusion list file is then used in the simulation to skip the highly skewed elements during 
 the simulation. 

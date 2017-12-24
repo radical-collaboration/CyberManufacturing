@@ -164,14 +164,17 @@ problems such as Molecular Dynamics (MD), Computational Fluid Dynamics (CFD) and
 years  this technique has been applied to DEM and PBM simulations~\citep{Bettencourt2017}~\citep{Prakash2013a}~\citep{Gunawan2008}.
 
 
-Parallel Computing is the standard procedure to solve large computational problems in many sciences. 
-This method uses High Performance Computers (HPC) to solve over a large number of cores. 
-A HPC consists of thousands of compute nodes connected via a high speed network. A typical compute 
-node has multiple cores and several GBs or memory. The network that connects them, usually Infiniband, 
-reaches speeds of 56 Gbps. In addition, a high performance parallel filesystem accompanies the compute 
-nodes, allowing users to read and write GBs of data efficiently. One of the challenges when implementing 
-parallel applications is to make sure that data is written in a similar manner to serial programs. To 
-ensure correctness of the results, an appropriate data communication implementation is required.
+Parallel Computing is the standard procedure to solve large computational
+problems in many sciences. This method uses High Performance Computers (HPC)
+to solve over a large number of cores. A HPC consists of thousands of compute
+nodes connected via a high speed network. A typical compute node has multiple
+cores and several GBs or memory. The network that connects them, usually
+Infiniband, reaches speeds of 56 Gbps. In addition, a high performance
+parallel filesystem accompanies the compute nodes, allowing users to read and
+write GBs of data efficiently. One of the challenges when implementing
+parallel applications is to make sure that data is written in a similar manner
+to serial programs. To ensure correctness of the results, an appropriate data
+communication implementation is required.
 
 Some of the benefits of using HPC in the pharmaceutical industry include high accuracy for 
 parameter estimation as detailed particle-scale simulations can be performed quickly. 
@@ -299,21 +302,28 @@ motivation and need for running the simulations on HPCs and parallelization tech
  
 
 \subsection{Parallel computing and computer architectures}
-\subsubsection{Computer Architecture}
-Analogous to a conventional PC a High Performance Computing cluster node has one
-or more CPUs and RAM. Commonly nodes are manufactured with two CPUs, each CPU 
-is a multi-core meaning it has multiple compute cores such that each can carry out calculations 
-separately from one another. On a node, memory is divided by CPU sockets, so each CPU has direct 
-access to memory that is local to its own socket, however accessing memory on another socket 
-is much slower~\citep{Jin2011}. For this reason. data that is needed for computation should 
-be stored locally to the CPU that needs it.  
 
-There are two classes of computer architecture which can be classified by memory locality features such as 
-distributed memory systems or shared memory systems. These two classes co-exist in a cluster, 
-thus providing the benefits of each. All the nodes exchange memory using explicit message passing 
-while each has its own independent memory. The cores on each node can access data from the 
-shared memory without any explicit message passing statements from the user. While designing a 
-parallel program all these aspects need to be considered for optimal performance of the code~\citep{Adhianto2007}.
+\subsubsection{Computer Architecture}
+
+\jhanote{HPC has been defined. Please use it}
+
+Analogous to a conventional PC a High Performance Computing cluster node has
+one or more CPUs and RAM. Commonly nodes are manufactured with two CPUs, each
+CPU is a multi-core meaning it has multiple compute cores such that each can
+carry out calculations separately from one another. On a node, memory is
+divided by CPU sockets, so each CPU has direct access to memory that is local
+to its own socket, however accessing memory on another socket is much
+slower~\citep{Jin2011}. For this reason. data that is needed for computation
+should be stored locally to the CPU that needs it.
+
+There are two classes of computer architecture which can be classified by
+memory locality features such as distributed memory systems or shared memory
+systems. These two classes co-exist in a cluster, thus providing the benefits
+of each. All the nodes exchange memory using explicit message passing while
+each has its own independent memory. The cores on each node can access data
+from the shared memory without any explicit message passing statements from
+the user. While designing a parallel program all these aspects need to be
+considered for optimal performance of the code~\citep{Adhianto2007}.
 
 
 \subsubsection{Parallel application programming interfaces}

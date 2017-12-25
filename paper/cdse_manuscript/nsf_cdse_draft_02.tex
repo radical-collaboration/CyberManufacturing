@@ -1201,36 +1201,52 @@ found in Figure \ref{fig:rslts_PBM_2mm_d50}}
 
 
 \subsection{One-way coupled DEM+PBM using RADICAL-Pilot and its performance} 
-The RADICAL pilot (RP) being a pilot job system it can bypass the need of waiting on the long scheduler
-queues on a cluster. With resources allocated to itself the pilot can execute multiple simulation runs 
-at once. The pilot job initiates the DEM simulation using the LIGGGHTS executable compiled for the DEM
-studies and then creates a link between the collision data obtained, which is utilized by then utilized 
-by the PBM executable. After the link is established, it also initiates the PBM. The timing profiles and
-results from both the simulations are then obtained. Since the executables and inputs files used in the 
-simulations and the RP job are the similar, we do not expect to see any changes in the physics of the 
-system. A value of 0.5 was obtained for the ratio of the rate of formation to the rate of depletion due to aggregation
+
+The RADICAL pilot (RP) being a pilot job system it can bypass the need of
+waiting on the long scheduler queues on a cluster. \jhanote{This is wrong! It
+avoids the individual tasks from waiting for different periods of time at the
+scheduler, not waiting itself at the scheduler!} With resources allocated to
+itself the pilot can execute multiple simulation runs at once. The pilot job
+initiates the DEM simulation using the LIGGGHTS executable compiled for the
+DEM studies and then creates a link between the collision data obtained, which
+is utilized by then utilized by the PBM executable. After the link is
+established, it also initiates the PBM. The timing profiles and results from
+both the simulations are then obtained. Since the executables and inputs files
+used in the simulations and the RP job are the similar, we do not expect to
+see any changes in the physics of the system. A value of 0.5 was obtained for
+the ratio of the rate of formation to the rate of depletion due to aggregation
 due to aggregation.
 
-Since the platforms used for initial development and testing of the DEM and PBM respectively were different, 
-the DEM simulations were executed again on Stampede2 for a fair and accurate comparison. The need for re-running
-the simulations arises due to the clock speeds of the nodes and their configuration for the 2 platforms is different.
-The RADICAL-pilot was setup for Stampede2 and aforementioned experiments were replicated. The DEM simulations were 
-run for 64, 128 and 256 cores (MPI processes) and the PBM was run for 1, 2, 4, 8 and 16 MPI processes. No OMP threads 
-were implemented for the PBM run, since the current version of RP does not support threading. 
- The times for the individual DEM and PBM simulations were added to determine the total amount time taken to 
-simulate the one-way coupling. This time did not include the time spent by each executable in the queue of the 
-scheduler. This time could vary from a few hours to a few days depending upon the load of the cluster. The total 
-time taken for the simulation using the RADICAL-pilot was determined from the time the DEM was first executed until 
-the PBM execution completed. The time of the individual DEM and PBM simulation was added to get the total amount of 
-time it required for a single one-way coupling simulation. Figure~\ref{fig:rslts_RP_time_plot} shows a comparison of 
-the total times of simulation in seconds for the sum of DEM and PBM individual simulations to the times taken to 
-run the simulation using RP. It can be observed that the times taken by the pilot job are slightly higher 
-than the summation of times of the individual simulations. The slight increase in the times of the simulation 
-can be accounted to the communication required for the pilot realize that the DEM simulation has completed 
-and link the data from the DEM to the PBM executable before it is executable. But, this communication is 
-lower than the amount of time the executable the job would spend in the job scheduler queue. 
-Thus, the benefits of using RP become clear. An extension of this work would be to use RP to schedule 
-multiple such coupled simulations as one job, thus decreasing the wait times even further. 
+Since the platforms used for initial development and testing of the DEM and
+PBM respectively were different, the DEM simulations were executed again on
+Stampede2 for a fair and accurate comparison. The need for re-running the
+simulations arises due to the clock speeds of the nodes and their
+configuration for the 2 platforms is different. The RADICAL-pilot was setup
+for Stampede2 and aforementioned experiments were replicated. The DEM
+simulations were run for 64, 128 and 256 cores (MPI processes) and the PBM was
+run for 1, 2, 4, 8 and 16 MPI processes. No OMP threads were implemented for
+the PBM run, since the current version of RP does not support threading. The
+times for the individual DEM and PBM simulations were added to determine the
+total amount time taken to simulate the one-way coupling. This time did not
+include the time spent by each executable in the queue of the scheduler. This
+time could vary from a few hours to a few days depending upon the load of the
+cluster. The total time taken for the simulation using the RADICAL-pilot was
+determined from the time the DEM was first executed until the PBM execution
+completed. The time of the individual DEM and PBM simulation was added to get
+the total amount of time it required for a single one-way coupling simulation.
+Figure~\ref{fig:rslts_RP_time_plot} shows a comparison of the total times of
+simulation in seconds for the sum of DEM and PBM individual simulations to the
+times taken to run the simulation using RP. It can be observed that the times
+taken by the pilot job are slightly higher than the summation of times of the
+individual simulations. The slight increase in the times of the simulation can
+be accounted for by the communication required for the pilot to realize that the
+DEM simulation has completed and link the data from the DEM to the PBM
+executable before it is executable. But, this communication is lower than the
+amount of time the executable the job would spend in the job scheduler queue.
+Thus, the benefits of using RP become clear. \jhanote{It is unclear what the
+benefit is!} An extension of this work would be to use RP to schedule multiple
+such coupled simulations as one job, thus decreasing the wait times even
+further.
 \begin{figure}
 \centering
 \includegraphics[scale=0.7]{rslts_RP_timeComparison.pdf}

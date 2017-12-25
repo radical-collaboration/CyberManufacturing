@@ -89,21 +89,24 @@ Piscataway, NJ, USA-08854}
 \ead{marianth@soe.rutgers.edu}
 
 \begin{abstract}
-Particulate processes are prevalent in the pharmaceutical industry but, the physics underlying 
-these processes are complicated and requires large amount of computation to solve a model at the
-particle-level. This approach makes the simulation slow, when compared to using a less accurate 
-bulk model. A quicker and a more accurate way to model this system is to use a multi-scale 
-model i.e. use the particle-scale data into a bulk model. 
-In this work, a unidirectional multi-scale model was used to model the high shear wet granulation 
-process. A multi-dimensional population balance model (PBM) was developed which 
-consisted of a mechanistic kernel, which in turn obtained the collision data from the discrete element 
-modeling (DEM) simulation. The PBM was run in parallel using MPI + OMP hybrid technique. The DEM 
-simulations were performed on
-LIGGGHTS, which runs in parallel using MPI. Speedup of about 14 times was obtained for the PBM 
-simulations and around 12 for the DEM simulations. This coupling was performed using the radical 
-pilot for scaling studies from 1 to 128 cores for the PBM and up to 256 cores for the DEM. Using 
-this developed framework, the granulation process has been modeled accurately 
-much faster than existing approaches in literature.
+Particulate processes are prevalent in the pharmaceutical industry but, the
+physics underlying these processes are complicated and requires large amount
+of computation to solve a model at the particle-level. This approach makes the
+simulation slow, when compared to using a less accurate bulk model. A quicker
+and a more accurate way to model this system is to use a multi-scale model
+i.e. use the particle-scale data into a bulk model. In this work, a
+unidirectional multi-scale model was used to model the high shear wet
+granulation process. A multi-dimensional population balance model (PBM) was
+developed which consisted of a mechanistic kernel, which in turn obtained the
+collision data from the discrete element modeling (DEM) simulation. The PBM
+was run in parallel using MPI + OMP hybrid technique. The DEM simulations were
+performed on LIGGGHTS, which runs in parallel using MPI. Speedup of about 14
+times was obtained for the PBM simulations and around 12 for the DEM
+simulations. This coupling was performed using the radical pilot for scaling
+studies from 1 to 128 cores for the PBM and up to 256 cores for the DEM. Using
+this developed framework, the granulation process has been modeled accurately
+much faster than existing approaches in literature. \jhanote{Which figure
+speaks to the accuracy? Why does the accuracy arise?}
 \end{abstract}
 \begin{keyword}
 Population balance model \sep Granulation \sep Discrete element methods  \sep MPI and OpenMP 

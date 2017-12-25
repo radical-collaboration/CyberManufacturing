@@ -762,36 +762,47 @@ Number of second solid bins & $ss$ & $16$ & $-$\\
 
 
 \subsection{Discretization \& parallelizing PBM}
-The PBM was discretized by converting each of its coordinates in to discrete bins. For the spatial 
-coordinates a linear bin spacing was used. For the internal coordinates, solid, liquid and gas a 
-non-linear discretization was used~\citep{barrasso2012}. 
-Once the PBM had been discretized, a finite differences method was 
-used which created a system of ordinary differential equations (ODEs)~\citep{Barrasso2015cerd}. The 
-numerical integration technique used to evaluate the system of ODEs was first order Euler integration 
-as it is commonly used to solve these types of systems and author found an improvement in  speed while
-having minimal impact on accuracy~\citep{Barrasso2013}. In order to avoid numerical instability due 
-to the explicit nature of the Euler integration, Courant-Friedrichs-Lewis (CFL) condition must be 
-satisfied~\citep{courant1967}. For our PBM model, time-step was calculated at each iteration such 
-that, the number of particles leaving a particular bin at any time is less than the number of 
-particles present at that time~\citep{Ramachandran2010}. To obtain the most optimal parallel 
-performance, when solving the PBM, work loads were distributed in a manner which took into account 
-the shared and distributed memory aspects of the clusters, the PBM was being run on. To 
-parallelize the model in a way which could take advantage of shared memory but still effectively run 
-across a distributed system both MPI and OMP were implemented. One MPI process was used per CPU core and one OMP 
-thread was used per CPU core, as~\cite{Bettencourt2017} found it resulted in the best performance. 
-MPI was used for message passing from one node to another while OMP was used for calculations on each 
-node that could be efficiently solved using a shared memory system. 
 
-An algorithm in the form of pseudo code is presented below illustrating how the calculations are distributed and 
-carried out 
-during the simulation. For each time step, the MPI processes are made responsible for a specific chunk 
-of the spatial compartments. Then each OMP thread, inside of each MPI process, is allocated to one of 
-the cores of multi-core CPU the MPI process is bound too. The OMP threads divide up and 
-compute $\Re_{agg}$. After $\Re_{agg}$ is calculated the MPI 
-processes calculate the new PSD value for their chunk at that specific time step, $F_{t,c}$. The slave 
-processes send their $F_{t,c}$ to the master processes which collects them into the complete 
-$F_{t,all}$. The master process then broadcasts the $F_{t,all}$ value to all slave processes. This 
-decomposition of the data into different CPUs and further into various threads is illustrated in Figure~\ref{fig:mthds_PBM_decompostion}.	
+The PBM was discretized by converting each of its coordinates in to discrete
+bins. For the spatial coordinates a linear bin spacing was used. For the
+internal coordinates, solid, liquid and gas a non-linear discretization was
+used~\citep{barrasso2012}. Once the PBM had been discretized, a finite
+differences method was used which created a system of ordinary differential
+equations (ODEs)~\citep{Barrasso2015cerd}. The numerical integration technique
+used to evaluate the system of ODEs was first order Euler integration as it is
+commonly used to solve these types of systems and author found an improvement
+in  speed while having minimal impact on accuracy~\citep{Barrasso2013}. In
+order to avoid numerical instability due to the explicit nature of the Euler
+integration, Courant-Friedrichs-Lewis (CFL) condition must be
+satisfied~\citep{courant1967}. For our PBM model, time-step was calculated at
+each iteration such that, the number of particles leaving a particular bin at
+any time is less than the number of particles present at that
+time~\citep{Ramachandran2010}. To obtain the most optimal parallel
+performance, when solving the PBM, work loads were distributed in a manner
+which took into account the shared and distributed memory aspects of the
+clusters, the PBM was being run on. To parallelize the model in a way which
+could take advantage of shared memory but still effectively run across a
+distributed system both MPI and OMP were implemented. One MPI process was used
+per CPU core and one OMP thread was used per CPU core,
+as~\cite{Bettencourt2017} found it resulted in the best performance. MPI was
+used for message passing from one node to another while OMP was used for
+calculations on each node that could be efficiently solved using a shared
+memory system.
+
+An algorithm in the form of pseudo code is presented below illustrating how
+the calculations are distributed and carried out during the simulation. For
+each time step, the MPI processes are made responsible for a specific chunk of
+the spatial compartments. \jhanote{please use proper format to present an
+algorithm. giannis please use format of CCGrid paper, for example} Then each
+OMP thread, inside of each MPI process, is allocated to one of the cores of
+multi-core CPU the MPI process is bound too. The OMP threads divide up and
+compute $\Re_{agg}$. After $\Re_{agg}$ is calculated the MPI processes
+calculate the new PSD value for their chunk at that specific time step,
+$F_{t,c}$. The slave processes send their $F_{t,c}$ to the master processes
+which collects them into the complete $F_{t,all}$. The master process then
+broadcasts the $F_{t,all}$ value to all slave processes. This decomposition of
+the data into different CPUs and further into various threads is illustrated
+in Figure~\ref{fig:mthds_PBM_decompostion}.
 
 \begin{figure}
 \centering
@@ -800,48 +811,58 @@ decomposition of the data into different CPUs and further into various threads i
 \label{fig:mthds_PBM_decompostion}
 \end{figure}
 
-A crucial feature of the PBM is that the current PSD ($F_{t,all}$) value is used to compute a new 
-time step size for the next iteration. This means all of the MPI processes need to have the same 
-dynamic time step size at each iteration for the calculations to be properly carried out in parallel. Since 
-the completely updated $F_{t,all}$ value is shared before calculating a new time step each process will 
-have the same $F_{t,all}$ value. As a result each process calculates the same size for the new time 
-step. 
+A crucial feature of the PBM is that the current PSD ($F_{t,all}$) value is
+used to compute a new time step size for the next iteration. This means all of
+the MPI processes need to have the same dynamic time step size at each
+iteration for the calculations to be properly carried out in parallel. Since
+the completely updated $F_{t,all}$ value is shared before calculating a new
+time step each process will have the same $F_{t,all}$ value. As a result each
+process calculates the same size for the new time step.
 
-Since the DEM informed PBM code required dynamic size increase for the data structure due to different number of particles being 
-present in the DEM simulation,
-the PBM code developed used the Standard Template Library containers and their features available in \textit{C++} 11 
-and later. It requires intel v17.0.2 (gcc 5.3+)  or later for compilation. Since this module was not present on the 
-Stampede, the execution of the PBM was done on the newer Stampede2 supercomputer. Each of the compute node of the 
-cluster consists of Intel Xeon Phi 7250 (\textquotedblleft Knights Landing\textquotedblright) which has 68 cores on 
-a single socket clocked at 1.4 GHz, with 96 GB of DDR4 RAM. Each of the cores consists of 4 hardware threads. 
-The simulations were then run by varying the the number of MPI processes from 1 to 16 and the number of OMP threads 
-from 1 to 8, thus, using a maximum of 128 cores.
+Since the DEM informed PBM code required dynamic size increase for the data
+structure due to different number of particles being present in the DEM
+simulation, the PBM code developed used the Standard Template Library
+containers and their features available in \textit{C++} 11 and later. It
+requires intel v17.0.2 (gcc 5.3+)  or later for compilation. Since this module
+was not present on the Stampede, the execution of the PBM was done on the
+newer Stampede2 supercomputer. Each of the compute node of the cluster
+consists of Intel Xeon Phi 7250 (\textquotedblleft Knights
+Landing\textquotedblright) which has 68 cores on a single socket clocked at
+1.4 GHz, with 96 GB of DDR4 RAM. Each of the cores consists of 4 hardware
+threads. The simulations were then run by varying the the number of MPI
+processes from 1 to 16 and the number of OMP threads from 1 to 8, thus, using
+a maximum of 128 cores.
 
 \subsection{Radical Pilot (RP) \& PBM+DEM communication}
 \label{sec:RPandCommunications}
-RADICAL-Pilot defines a number of abstractions to describe resources, and computational 
-tasks. The Pilot Description is the abstraction that describes resources by defining the 
-number of cores that will be used, the used HPC resource and the total time that the 
-resources are needed, and the queue that will be used. The abstraction that defines the 
-execution of a computational task is the Compute Unit (CU). A CU defines the executable, 
-the necessary environment that is needed during execution, execution arguments, and any 
-file dependencies the executable may have. RP also defines two managing components, the
-Pilot Manager, and Unit Manager. The Pilot Manager is responsible to submit a Pilot to the
-selected resources. The Unit Manager is responsible to place CUs to active Pilots. As soon as
-a unit is placed in a pilot it starts executing on the acquired resources.
+RADICAL-Pilot defines a number of abstractions to describe resources, and
+computational tasks. The Pilot Description is the abstraction that describes
+resources by defining the number of cores that will be used, the used HPC
+resource and the total time that the resources are needed, and the queue that
+will be used. The abstraction that defines the execution of a computational
+task is the Compute Unit (CU). A CU defines the executable, the necessary
+environment that is needed during execution, execution arguments, and any file
+dependencies the executable may have. RP also defines two managing components,
+the Pilot Manager, and Unit Manager. The Pilot Manager is responsible to
+submit a Pilot to the selected resources. The Unit Manager is responsible to
+place CUs to active Pilots. As soon as a unit is placed in a pilot it starts
+executing on the acquired resources.
 
-RADICAL-Pilot was utilized to execute and monitor DEM and PBM simulations. Initially, a pilot
-description is created to use several cores of a resource and submitted to the pilot manager. A
-CU description is created for the DEM simulation and submitted to the Unit Manager. As soon as the
-pilot is active the DEM simulation start executing. When finished a CU that describes a PBM 
-simulation is submitted at the Unit Manager and start executing. Any data dependency is satisfied 
-by doing the necessary file linking through the CU description.
+RADICAL-Pilot was utilized to execute and monitor DEM and PBM simulations.
+Initially, a pilot description is created to use several cores of a resource
+and submitted to the pilot manager. A CU description is created for the DEM
+simulation and submitted to the Unit Manager. As soon as the pilot is active
+the DEM simulation start executing. When finished a CU that describes a PBM
+simulation is submitted at the Unit Manager and start executing. Any data
+dependency is satisfied by doing the necessary file linking through the CU
+description.
 
-The DEM and PBM executables are pre-placed in the resource along with any initial 
-information for the DEM simulation. The DEM unit first creates links for the data files that will 
-be needed for the DEM simulation and call the executable. When the execution finishes, new links 
-with the output are created in a shared space. The PBM unit uses those links to read the necessary 
-data to execute the simulation. When both have finished RP downloads the PBM results.
+The DEM and PBM executables are pre-placed in the resource along with any
+initial information for the DEM simulation. The DEM unit first creates links
+for the data files that will be needed for the DEM simulation and call the
+executable. When the execution finishes, new links with the output are created
+in a shared space. The PBM unit uses those links to read the necessary data to
+execute the simulation. When both have finished RP downloads the PBM results.
 
 
 
@@ -849,19 +870,29 @@ data to execute the simulation. When both have finished RP downloads the PBM res
 \label{sec:Results}
 \subsection{Discrete Element Modeling (DEM)}
 \subsubsection{DEM Spatial Decomposition Studies}
-LIGGGHTS as discussed previously, statically decomposes the work space and each section is sent to 
-a MPI process for calculations. Thus, the division of the space becomes an important criteria for the 
-simulation for efficient load balancing. The initial studies were undertaken for a mono-sized particle of 
-size 1 mm and the simulation was carried out for 0.5 second of granulation time. The initial timing studies
-for the decomposition were performed using 64 cores. The effect of the decomposition on the simulation 
-time can be seen in Table~\ref{table:rslts_dem_slicing_studies}. This indicates that dividing the 
-x-direction in more number of compartments help increase the speed of the simulation. This is easy to 
-comprehend since the granulator has its length parallel to the x-axis. These results also show that if 
-the geometry is divided into more than 2 compartments in the y-axis or the z-axis the simulation time 
-increases. This can be accounted to the increased communication required to transfer the rotating 
-impeller mesh from one compartment in the y-axis or the z-axis to the another compartment for each 
-time step. Since MPI is limited by communication in between the nodes, a speed decrease is observed 
-due to increased partitioning in these directions.
+LIGGGHTS as discussed previously, statically decomposes the work space and
+each section is sent to a MPI process for calculations. Thus, the division of
+the space becomes an important criteria for the simulation for efficient load
+balancing. The initial studies were undertaken for a mono-sized particle of
+size 1 mm and the simulation was carried out for 0.5 second of granulation
+time. The initial timing studies for the decomposition were performed using 64
+cores. The effect of the decomposition on the simulation time can be seen in
+Table~\ref{table:rslts_dem_slicing_studies}. This indicates that dividing the
+x-direction in more number of compartments help increase the speed of the
+simulation. \jhanote{increasing the "speed of the simulation" is typically
+associated with improved performance. what you mean here is the converse,
+greater the number of compartments, slower the simulation? please clarify or
+fix.} This is easy to comprehend since the granulator has its length parallel
+to the x-axis. These results also show that if the geometry is divided into
+more than 2 compartments in the y-axis or the z-axis the simulation time
+increases. \jhanote{this is inconsistent with results in table 3!} This can be
+accounted to the increased communication required to transfer the rotating
+impeller mesh from one compartment in the y-axis or the z-axis to the another
+compartment for each time step. Since MPI is limited by communication in
+between the nodes, a speed decrease is observed due to increased partitioning
+in these directions. \jhanote{this sentence does not make sense. MPI is "not
+limited": it is the message passing interface. please rewrite and make
+consistent with data in table 3, or clarify}.
 
 \begin{table}
 \caption{The effect of spatial decomposition on the performance of the DEM simulations using 64 cores.}
@@ -884,19 +915,30 @@ $8$ & $2$ & $4$ & $7.96$\\
       
 \end{table}
 
-When MPI is used for parallelization of a task, load balancing becomes an important parameter 
-that needs to be considered. When the geometry is divided, the amount of computation done by one core
-should be in a similar to other processors. This helps in better utilization of the resources as well as
-make the simulations run faster. Following the results from the initial timing studies,the y 
-and the z-axes were not divided in more than 2 compartments for 128 and 256 core simulation as well. 
-This meant that the x-axis was divided into 32 and 64 compartments respectively. In order to avoid the 
-expensive communication between the processes, LIGGGHTS tries to insert the particles towards the 
-center of the compartment such that the number of ghost atoms are minimized. But, slicing in the 
-x-axis reduced the space available for the insertion of the particles thus, many of the particles were 
-inserted incorrectly. Another abnormal behavior observed during these simulation was the particles 
-halted at certain compartment and no particle traveled beyond this compartment in the x-direction. 
-Thus, another set of timing studies were performed for the 128 and 256 core simulations. The 
-comparison of simulation times have been shown in Table~\ref{table:rslts_dem_128_256_decomp}.
+When MPI is used for parallelization of a task, load balancing becomes an
+important parameter that needs to be considered. When the geometry is divided,
+the amount of computation done by one core should be similar to other
+processors. \jhanote{What evidence/indication is there that load balancing is
+a problem, as opposed to communication limited?} This helps better utilization
+of the resources as well as make the simulations run faster. Following the
+results from the initial timing studies,the y and the z-axes were not divided
+in more than 2 compartments for 128 and 256 core simulation as well. This
+meant that the x-axis was divided into 32 and 64 compartments respectively. 
+
+\jhanote{1 paragraph, 1 idea. Is the following part of the above 'load balancing' or is 
+now about 'communication'?} In order to avoid the expensive communication
+between the processes, LIGGGHTS tries to insert the particles towards the
+center of the compartment such that the number of ghost atoms are minimized.
+But, slicing in the x-axis reduced the space available for the insertion of
+the particles thus, many of the particles were inserted incorrectly.
+\jhanote{please elaborate} Another abnormal behavior observed during these
+simulation was the particles halted \jhanote{in a?} at certain compartment and
+no particle traveled beyond this compartment in the x-direction. \jhanote{I'm
+confused: the previous sentences imply a functional problem. The next sentence
+suggests a performance solution. Doesn't make sense to me.} Thus, another set
+of timing studies were performed for the 128 and 256 core simulations. The
+comparison of simulation times have been shown in
+Table~\ref{table:rslts_dem_128_256_decomp}.
 
 \begin{table}
 \caption{Comparison of time taken for the DEM simulations using 128 and 256 core due to different spatial decomposition 
@@ -919,26 +961,34 @@ $256$ & $16$ & $4$ & $4$ & $265.32$\\
 \end{center}
       
 \end{table}
-The simulation times illustrated in Table~\ref{table:rslts_dem_128_256_decomp} show that 
-incorrectly slicing the geometry also affects the performance of the system. It can be noted that slicing 
-along y-axis is more favorable than slicing along the z-direction. The insertion of particles is hindered 
-when the geometry is cut along the z-axis as the inlet is perpendicular to it. LIGGGHTS thus provisions 
-lesser space for the insertion of these particles, thus increasing the time of the simulation. Thus, just 
-slicing the geometry into 2 sections along the z-axis is preferred. So, the chosen configurations for the 
-final simulations consisted of the geometry having only 2 sections in the z-direction and more slices 
-along the y-axis. 
+The simulation times illustrated in Table~\ref{table:rslts_dem_128_256_decomp}
+show that incorrectly slicing the geometry also affects the performance of the
+system. It can be noted that slicing along y-axis is more favorable than
+slicing along the z-direction. \jhanote{Without further
+discussion/explaination, it is difficult to discern how/why?.} The
+insertion of particles is hindered when the geometry is cut along the z-axis
+as the inlet is perpendicular to it. LIGGGHTS thus provisions less space for
+the insertion of these particles, thus increasing the time of the simulation.
+Thus, just slicing the geometry into 2 sections along the z-axis is preferred.
+So, the chosen configurations for the final simulations consisted of the
+geometry having only 2 sections in the z-direction and more slices along the
+y-axis.
 
 \subsubsection{DEM Performance}
-A test case was run for mono-sized particle of 2mm diameter for timing comparison studies. The 
-times are plotted in Figure~\ref{fig:rslts_DEM_2mm_timing} indicate that using lower number of cores is 
-not feasible for long simulations since the time taken while using 1 core is about $11$x times slower.
-Thus, the simulations were carried out in core configurations of 64, 128 and 256 cores. The studies 
-undertaken had 5 mono-sized population of particles of diameter 0.63, 1, 1.26, 1.59 and 2 mm 
-simulations and one simulation consisted of particle size distribution. Figure~\ref{fig:rslts_DEM_timing_studies} shows that the amount of CPU time required for a 10 second 
-simulation of the granulator. The post processing MATLAB script was run on the dump files obtained 
-from the simulation and it was observed that the system reached a steady state about 3-5 seconds of 
-the simulation time. Particles with larger diameter reached steady state at a faster rate with an average 
-hold-up of particles of about 6500. 
+A test case was run for mono-sized particle of 2mm diameter for timing
+comparison studies. The times are plotted in
+Figure~\ref{fig:rslts_DEM_2mm_timing} indicate that using lower number of
+cores is not feasible for long simulations since the time taken while using 1
+core is about $11$x times slower. Thus, the simulations were carried out in
+core configurations of 64, 128 and 256 cores. The studies undertaken had 5
+mono-sized population of particles of diameter 0.63, 1, 1.26, 1.59 and 2 mm
+simulations and one simulation consisted of particle size distribution.
+Figure~\ref{fig:rslts_DEM_timing_studies} shows that the amount of CPU time
+required for a 10 second simulation of the granulator. The post processing
+MATLAB script was run on the dump files obtained from the simulation and it
+was observed that the system reached a steady state about 3-5 seconds of the
+simulation time. Particles with larger diameter reached steady state at a
+faster rate with an average hold-up of particles of about 6500.
 \begin{figure}
 \centering
 \includegraphics[scale=0.75]{rslsts_2mm_timing_mtlb.pdf}

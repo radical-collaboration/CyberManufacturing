@@ -186,8 +186,8 @@ usage; see next paragraph.}
 
 Parallel Computing is the standard procedure to solve large computational
 problems in many sciences. \jhanote{What is this a reference to?} This method
-uses High Performance Computers (HPC) \jhanote{HPC = High-peformance
-computing, not computers} to solve over a large number of cores. A HPC
+uses High Performance Computing (HPC) systems \jhanote{HPC = High-peformance
+computing, not computers} \csnote{Have addressed the name} to solve over a large number of cores. A HPC
 consists of thousands of compute nodes connected via a high speed network. A
 typical compute node has multiple cores and several GBs or memory. The network
 that connects them, usually Infiniband, reaches speeds of 56 Gbps. In
@@ -349,9 +349,9 @@ motivation and need for running the simulations on HPCs and parallelization tech
 
 \subsubsection{Computer Architecture}
 
-\jhanote{HPC has been defined. Please use it}
+\jhanote{HPC has been defined. Please use it} \csnote{Changed}
 
-Analogous to a conventional PC a High Performance Computing cluster node has
+Analogous to a conventional PC a HPC cluster node has
 one or more CPUs and RAM. Commonly nodes are manufactured with two CPUs, each
 CPU is a multi-core meaning it has multiple compute cores such that each can
 carry out calculations separately from one another. On a node, memory is
@@ -672,7 +672,7 @@ and is shown below:
 where, $\beta_o$ is aggregation rate constant.\\
 Collision rate coefficient ($C$) is a function of particle sizes and is calculated by normalizing the 
 number of collisions between group of particles~\citep{gantt2006} and is obtained from LIGGGHTS 
-DEM simulation. A recent study shows that collision frequency depends on PSD as well~\citep{sen2014}. Collision rate coefficient for every time step can be expressed as:
+DEM simulation. A recent study shows that collision frequency depends on the Particle Size Distribution (PSD) as well~\citep{sen2014}. Collision rate coefficient for every time step can be expressed as:
 
 \begin{align}
 C(s_1,s_2,s_1',s_2')=\frac{N_{coll}(s_1,s_2,s_1',s_2')}{N_p(s_1,s_2)N_p(s_1',s_2')\Delta t}
@@ -885,14 +885,20 @@ greater the number of compartments, slower the simulation? please clarify or
 fix.} This is easy to comprehend since the granulator has its length parallel
 to the x-axis. These results also show that if the geometry is divided into
 more than 2 compartments in the y-axis or the z-axis the simulation time
-increases. \jhanote{this is inconsistent with results in table 3!} This can be
-accounted to the increased communication required to transfer the rotating
-impeller mesh from one compartment in the y-axis or the z-axis to the another
-compartment for each time step. Since MPI is limited by communication in
-between the nodes, a speed decrease is observed due to increased partitioning
-in these directions. \jhanote{this sentence does not make sense. MPI is "not
-limited": it is the message passing interface. please rewrite and make
-consistent with data in table 3, or clarify}.
+increases. \jhanote{this is inconsistent with results in table 3!} 
+\csnote{it is consistent the 3rd value is the least among the 5 of them}
+This can beaccounted to the increased communication required to transfer 
+the rotating impeller mesh from one compartment in the y-axis or the z-axis 
+to the another compartment for each time step. Since MPI has to pass explicit 
+messages in between the nodes for it to communicate data, there is a delay 
+associated with the master process to obtain all the data since it has to 
+wait for all the other processes to complete their task until it can obtain 
+the data. This leads to a speed decrease when extra partitions in the y and 
+z directions are present as this leads to more larger number of communications 
+and wait times for the master process. \jhanote{this sentence does 
+not make sense. MPI is "not limited": it is the message passing interface. 
+please rewrite and make consistent with data in table 3, or clarify} 
+\csnote{have explained the communications in a better manner}
 
 \begin{table}
 \caption{The effect of spatial decomposition on the performance of the DEM simulations using 64 cores.}
@@ -905,9 +911,9 @@ consistent with data in table 3, or clarify}.
 second simulation (in minutes)}\\
 \hline
 $64$ & $1$ & $1$ & $10.27$\\
-$32$ & $2$ & $1$ & $8.7$\\
+$32$ & $2$ & $1$ & $8.70$\\
 $16$ & $2$ & $2$ & $6.83$\\
-$8$ & $4$ & $2$ & $7.2$\\		  
+$8$ & $4$ & $2$ & $7.20$\\		  
 $8$ & $2$ & $4$ & $7.96$\\
 \hline  		  
 \end{tabulary}
@@ -992,9 +998,9 @@ faster rate with an average hold-up of particles of about 6500.
 \begin{figure}
 \centering
 \includegraphics[scale=0.75]{rslsts_2mm_timing_mtlb.pdf}
-\caption{The variation in the amount of time taken for the DEM simulation of 2 mm particles as a function of number of cores. The 
-speed increase on increasing the number of cores from 1 to 16 was higher than the speed improvements observed from increase of cores 
-from 16 to 256.}
+\caption{The variation in the amount of time taken for the DEM simulation of 2 mm particles as a function of number of cores. 
+The improvements in the speed of the simulation was higher when the cores were increased from 1 
+16 when compared to speed improvements obtained with a core count greater than 16.}
 \label{fig:rslts_DEM_2mm_timing}
 \end{figure}	
 
@@ -1045,8 +1051,8 @@ computationally more expensive.
 \centering
 \includegraphics[scale=0.75]{rslsts_2mm_DEM_speedup_mtlb.pdf}
 \caption{The speedup achieved in the DEM simulations of 2 mm particles. There 
-was a linear increase up to 16 cores, then as the parallel 
-efficiency decreased, plateauing of the speedup is observed.}
+was a linear increase up to 16 cores while the speedup seems to plateau when 
+more number of cores are used due to larger amount of communications.}
 \label{fig:rslts_DEM_speedup}
 \end{figure}
 
@@ -1055,7 +1061,9 @@ efficiency decreased, plateauing of the speedup is observed.}
 \includegraphics[scale=0.85]{rslsts_DEM_alldia_timing_mtlb.pdf}
 \caption{ Time taken for a 10 second DEM simulation for radii ranging from
  0.63mm to 2mm and a particle size distribution ranging from 1mm - 3mm. The speed improvements 
- for the smaller particles was higher as the core count increased when compared to the larger particles.}
+ for the smaller particles was higher as the core count increased when compared to the larger particles. 
+ The larger number of smaller particles require more computational power thus benefit more as the number 
+ of cores are increased. }
 \label{fig:rslts_DEM_timing_studies}
 \end{figure}
 
@@ -1072,9 +1080,11 @@ geometry for faster simulations with higher core counts.
 \begin{figure}
 \centering
 \includegraphics[scale=0.75]{rslsts_DEM_profle_mtlb.pdf}
-\caption{The distribution of time taken by each component of the DEM simulation with varying number of cores for the 2mm particles. It 
-can be observed that the percentage of time in communication between the processes was the highest due to the rotation of the impeller 
-at high speeds.}
+\caption{The distribution of time taken by each component of the DEM 
+simulation with varying number of cores for the 2mm particles. It 
+can be observed that the percentage of time required to modify the 
+geometry (indicated by the modify time), i.e. rotating the impeller 
+at high speeds, was the highest.}
 \label{fig:rslts_DEM_percent_plot}
 \end{figure}
 

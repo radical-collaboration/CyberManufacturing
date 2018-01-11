@@ -1379,6 +1379,42 @@ threads.
     \end{algorithmic}
 \end{algorithm}  
  
+ \gpnote{ Hello Chaitanya, this is the algorithm style that I have. I define a procedure and then I write the pseudocode of the algorithm. In your algorithm, for example, there is no need to say "each process is assigned on chunk of....". It can be a comment. An algorithm should be well defined steps, not continuous text. Think what each process is doing not the whole program. If you need to specify specific values per process then give them as input or add a comment.     
+     \begin{algorithm}[H]
+     \scriptsize
+     \caption{Path Similarity Algorithm: Hausdorff Distance}
+     \label{alg:hausdorff}
+     \begin{algorithmic}[1]
+         \Procedure{HausdorffDistance}{$T_1$,$T_2$}\Comment{$T_1$ and $T_2$ are a set of 
+             3D points}
+         \State \texttt{List $D_1$,$D_2$}
+         \For{$\forall frame_1$ in $T_1$}
+         \For{$\forall frame_2$ in $T_2$}
+         \State \texttt{Append in $D_1$ $d_{RMS}$($frame_1$, $frame_2$)}
+         \EndFor
+         \State \texttt{$D_{t_1}$ append $min(D_1)$}
+         \EndFor
+         \For{$\forall frame_2$ in $T_2$}
+         \For{$\forall frame_1$ in $T_1$}
+         \State \texttt{Append in $D_2$ $d_{RMS}$($frame_2$, $frame_1$)}
+         \EndFor
+         \State\texttt{$D_{t_2}$ append $min(D_2)$}
+         \EndFor
+         \State \textbf{return} $max\Big(max(D_{t_1}),max(D_{t_2})\Big)$
+         \EndProcedure
+         \\        
+         \Procedure{PSA}{$Traj$}\Comment{$Traj$ is a set of trajectories}
+         \For{$\forall T_1$ in $Traj$}
+         \For{$\forall T_2$ in $Traj$}
+         \State \texttt{ $D_{( T_1,T_2 )}$=HausdorffDistance$\Big( T_1,T_2 \Big)$} 
+         \EndFor
+         \EndFor
+         \State \Return $D$
+         \EndProcedure
+     \end{algorithmic}
+ \end{algorithm}
+}
+ 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{OMP_table.pdf}

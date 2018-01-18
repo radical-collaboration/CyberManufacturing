@@ -173,7 +173,7 @@ behavior~\citep{Goldschmidt2003}~\citep{Reinhold2012}~\citep{Barrasso2013}.
 This PBM-DEM method is more accurate than a PBM simulation alone but runs much
 faster than a complete DEM simulation. Despite the performance benefits of
 these coupled PBM-DEM models they still take unacceptably long to solve. In
-the past parallel computing has been used to speed up computationally
+the past high-oerformance computing (HPC) has been used to speed up computationally
 intensive problems such as Molecular Dynamics (MD), Computational Fluid
 Dynamics (CFD) and in recent years  this technique has been applied to DEM and
 PBM
@@ -181,7 +181,7 @@ simulations~\citep{Bettencourt2017}~\citep{Prakash2013a}~\citep{Gunawan2008}.
 
 \jhanote{Parallel computing is a type/subset of high-performance computing
 (HPC). Please use HPC rather than parallel computing. Also need consistency of
-usage; see next paragraph.}
+usage; see next paragraph.} \csnote{have changed the occurence parallel computing to HPC}
 
 
 Parallel Computing is the standard procedure to solve large computational
@@ -877,25 +877,30 @@ balancing. The initial studies were undertaken for a mono-sized particle of
 size 1 mm and the simulation was carried out for 0.5 second of granulation
 time. The initial timing studies for the decomposition were performed using 64
 cores. The effect of the decomposition on the simulation time can be seen in
-Table~\ref{table:rslts_dem_slicing_studies}. This indicates that dividing the
-x-direction in more number of compartments help increase the speed of the
+Table~\ref{table:rslts_dem_slicing_studies}. The time values indicate that dividing the
+x-direction in more number of compartments decreases the speed of the
 simulation. \jhanote{increasing the "speed of the simulation" is typically
 associated with improved performance. what you mean here is the converse,
 greater the number of compartments, slower the simulation? please clarify or
-fix.} This is easy to comprehend since the granulator has its length parallel
-to the x-axis. These results also show that if the geometry is divided into
-more than 2 compartments in the y-axis or the z-axis the simulation time
+fix.} \csnote{A good spot! I meant the converse. Have fixed the 2 following lines as well} 
+The extra slicing in the x-direction leads to lesser amount of computation required 
+for a single process but it also leads to each particle being transferred to 
+a new process in lesser number of time steps. Thus, leading to slower simulations when
+the number of slices increase beyond 16 in the x-direction. 
+%This is easy to comprehend since the granulator has its length parallel to the x-axis. 
+Table \ref{table:rslts_dem_slicing_studies} also indicate that if the geometry is divided into
+more than 2 compartments in either the y-axis or the z-axis the simulation time
 increases. \jhanote{this is inconsistent with results in table 3!} 
-\csnote{it is consistent the 3rd value is the least among the 5 of them}
-This can beaccounted to the increased communication required to transfer 
+This can be accounted to the increased communication required to transfer 
 the rotating impeller mesh from one compartment in the y-axis or the z-axis 
 to the another compartment for each time step. Since MPI has to pass explicit 
 messages in between the nodes for it to communicate data, there is a delay 
-associated with the master process to obtain all the data since it has to 
-wait for all the other processes to complete their task until it can obtain 
-the data. This leads to a speed decrease when extra partitions in the y and 
-z directions are present as this leads to more larger number of communications 
-and wait times for the master process. \jhanote{this sentence does 
+associated with the master process to obtain all the data. The master process
+need to wait for all the other processes to complete their task before it receives 
+the data from all the processes. With the increased 
+partitions in the y and the z-axes, the master process needs to wait for more 
+processes, leading to delays before the next time step can be simulated which 
+in turn makes the simulation slower.\jhanote{this sentence does 
 not make sense. MPI is "not limited": it is the message passing interface. 
 please rewrite and make consistent with data in table 3, or clarify} 
 \csnote{have explained the communications in a better manner}
@@ -921,18 +926,22 @@ $8$ & $2$ & $4$ & $7.96$\\
       
 \end{table}
 
-When MPI is used for parallelization of a task, load balancing becomes an
-important parameter that needs to be considered. When the geometry is divided,
-the amount of computation done by one core should be similar to other
-processors. \jhanote{What evidence/indication is there that load balancing is
-a problem, as opposed to communication limited?} This helps better utilization
-of the resources as well as make the simulations run faster. Following the
+%When MPI is used for parallelization of a task, load balancing becomes an
+%important parameter that needs to be considered. When the geometry is divided,
+%the amount of computation done by one core should be similar to other
+%processors. 
+\jhanote{What evidence/indication is there that load balancing is
+a problem, as opposed to communication limited?} \csnote{The first few lines 
+are  just general statments I could do away with this paragraph altogether. 
+It really does not fit with the flow} %This helps better utilization
+%of the resources as well as make the simulations run faster. 
+Following the
 results from the initial timing studies,the y and the z-axes were not divided
 in more than 2 compartments for 128 and 256 core simulation as well. This
 meant that the x-axis was divided into 32 and 64 compartments respectively. 
-
 \jhanote{1 paragraph, 1 idea. Is the following part of the above 'load balancing' or is 
-now about 'communication'?} In order to avoid the expensive communication
+now about 'communication'?} \csnote{tried to clear the air by removing the general statements}
+In order to avoid the expensive communication
 between the processes, LIGGGHTS tries to insert the particles towards the
 center of the compartment such that the number of ghost atoms are minimized.
 But, slicing in the x-axis reduced the space available for the insertion of

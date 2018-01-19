@@ -1294,9 +1294,10 @@ found in Figure \ref{fig:rslts_PBM_2mm_d50}}
 \subsection{One-way coupled DEM+PBM using RADICAL-Pilot and its performance} 
 
 The RADICAL pilot (RP) being a pilot job system it can bypass the need of
-waiting on the long scheduler queues on a cluster. \jhanote{This is wrong! It
+waiting on the long scheduler queues on a cluster for each individual task. \jhanote{This is wrong! It
 avoids the individual tasks from waiting for different periods of time at the
-scheduler, not waiting itself at the scheduler!} With resources allocated to
+scheduler, not waiting itself at the scheduler!} \csnote{corrected, could you please check if it is clear now} 
+With resources allocated to
 itself the pilot can execute multiple simulation runs at once. The pilot job
 initiates the DEM simulation using the LIGGGHTS executable compiled for the
 DEM studies and then creates a link between the collision data obtained, which
@@ -1334,7 +1335,9 @@ be accounted for by the communication required for the pilot to realize that the
 DEM simulation has completed and link the data from the DEM to the PBM
 executable before it is executable. But, this communication is lower than the
 amount of time the executable the job would spend in the job scheduler queue.
-Thus, the benefits of using RP become clear. \jhanote{It is unclear what the
+Thus, when a large number of these simulations need to be run, the could uploaded 
+as a single pilot job using RADICAL pilot reducing scheduler wait times on individual 
+jobs. \jhanote{It is unclear what the
 benefit is!} An extension of this work would be to use RP to schedule multiple
 such coupled simulations as one job, thus decreasing the wait times even
 further.
@@ -1376,72 +1379,95 @@ OMP was used to parallelize the calculations inside each compartment. Since the 
 the solid bins was parallelized. The number of solid bins of solid were equally divided by the number of OMP threads. 
 Figure~\ref{fig:app_OMP_distribution} depicts the equal distribution of 16 solid bins of the second solid using 4 OMP 
 threads.
-\begin{algorithm}[H]
-    \caption*{\textbf{Algorithm 1}}
-    \label{alg:MyAlgorithm}
-    \begin{algorithmic}[1]
-        
-        \While{ $t<t_{final}$ }
-        \State The spatial domain is divided into equal chunks
-        \State Each MPI process is assigned on chunk of spatial domain shown as $c_{low}$ to $c_{up}$ 
-        \State Sum all $c_{low_i}$ to $c_{up_i}$ is = to [0,number of Compartments]
-        \For{each MPI processes} $c = c_{low_i}$ to $c_{up_i}$
-        \State Each MPI process is further divided with OMP to take advantage of multi-core CPU
-        \State Each OMP process is allocated to a single compute core
-        \State $\Re$ integrates for each first solid bin as the second solid bins is 
-        divided across the OMP\\ \hspace{1.05cm} threads, thus divided into smaller integrals 
-        Figure~\ref{fig:app_OMP_distribution} depicts this distribution.
-        \State Allocated to that MPI process (CPU)
-        \For{each OMP process}
-        \State Calculate the Aggregation Constant $\Re_{agg}(s_1,s_2,c)$
-        \EndFor
-        \State Calculate total number of particles using Euler's rule.
-        \EndFor
-            \State MPI Send $F_{t,c}$ to Master MPI process
-            \State MPI Recv $F_{t,c}$ from MPI all slave processes
-            \State Master consolidate all $F_{t,c}$ chunks into a complete $F_{t,all}$
-            \State Master does inter-bin particle transfers (updates $F_{t,all}$)
-            \State MPI Bcast $F_{t,all}$ to all slave processes
-            \State $t_{new} = t + timestep$
-        \EndWhile        
-    \end{algorithmic}
-\end{algorithm}  
- 
- \gpnote{ Hello Chaitanya, this is the algorithm style that I have. I define a procedure and then I write the pseudocode of the algorithm. In your algorithm, for example, there is no need to say "each process is assigned on chunk of....". It can be a comment. An algorithm should be well defined steps, not continuous text. Think what each process is doing not the whole program. If you need to specify specific values per process then give them as input or add a comment.     
+%\begin{algorithm}[H]
+%    \caption*{\textbf{Algorithm 1}}
+%    \label{alg:MyAlgorithm}
+%    \begin{algorithmic}[1]
+%        
+%        \While{ $t<t_{final}$ }
+%        \State The spatial domain is divided into equal chunks
+%        \State Each MPI process is assigned on chunk of spatial domain shown as $c_{low}$ to $c_{up}$ 
+%        \State Sum all $c_{low_i}$ to $c_{up_i}$ is = to [0,number of Compartments]
+%        \For{each MPI processes} $c = c_{low_i}$ to $c_{up_i}$
+%        \State Each MPI process is further divided with OMP to take advantage of multi-core CPU
+%        \State Each OMP process is allocated to a single compute core
+%        \State $\Re$ integrates for each first solid bin as the second solid bins is 
+%        divided across the OMP\\ \hspace{1.05cm} threads, thus divided into smaller integrals 
+%        Figure~\ref{fig:app_OMP_distribution} depicts this distribution.
+%        \State Allocated to that MPI process (CPU)
+%        \For{each OMP process}
+%        \State Calculate the Aggregation Constant $\Re_{agg}(s_1,s_2,c)$
+%        \EndFor
+%        \State Calculate total number of particles using Euler's rule.
+%        \EndFor
+%            \State MPI Send $F_{t,c}$ to Master MPI process
+%            \State MPI Recv $F_{t,c}$ from MPI all slave processes
+%            \State Master consolidate all $F_{t,c}$ chunks into a complete $F_{t,all}$
+%            \State Master does inter-bin particle transfers (updates $F_{t,all}$)
+%            \State MPI Bcast $F_{t,all}$ to all slave processes
+%            \State $t_{new} = t + timestep$
+%        \EndWhile        
+%    \end{algorithmic}
+%\end{algorithm}  
+
      \begin{algorithm}[H]
      \scriptsize
-     \caption{Path Similarity Algorithm: Hausdorff Distance}
-     \label{alg:hausdorff}
+     \caption{Parallel Population Balance Model}
+     \label{alg:parallelPBM}
      \begin{algorithmic}[1]
-         \Procedure{HausdorffDistance}{$T_1$,$T_2$}\Comment{$T_1$ and $T_2$ are a set of 
-             3D points}
-         \State \texttt{List $D_1$,$D_2$}
-         \For{$\forall frame_1$ in $T_1$}
-         \For{$\forall frame_2$ in $T_2$}
-         \State \texttt{Append in $D_1$ $d_{RMS}$($frame_1$, $frame_2$)}
-         \EndFor
-         \State \texttt{$D_{t_1}$ append $min(D_1)$}
-         \EndFor
-         \For{$\forall frame_2$ in $T_2$}
-         \For{$\forall frame_1$ in $T_1$}
-         \State \texttt{Append in $D_2$ $d_{RMS}$($frame_2$, $frame_1$)}
-         \EndFor
-         \State\texttt{$D_{t_2}$ append $min(D_2)$}
-         \EndFor
-         \State \textbf{return} $max\Big(max(D_{t_1}),max(D_{t_2})\Big)$
-         \EndProcedure
-         \\        
-         \Procedure{PSA}{$Traj$}\Comment{$Traj$ is a set of trajectories}
-         \For{$\forall T_1$ in $Traj$}
-         \For{$\forall T_2$ in $Traj$}
-         \State \texttt{ $D_{( T_1,T_2 )}$=HausdorffDistance$\Big( T_1,T_2 \Big)$} 
-         \EndFor
-         \EndFor
-         \State \Return $D$
-         \EndProcedure
+     \Procedure{Population Balance Model}{$N_{Comp}$,$N_{MPI}$,$N_{OMP}$}\Comment{$N_{Comp}$ is the number of compartments}
+     \State \texttt{Divide $N_{Comp}$ in $N_{MPI}$}
+     \While{$t < t_{final}$}
+     \For{$\forall n_{Comp}$ in 1 MPI process}
+     \For{$\forall n$ in $N_{OMP}$}
+     \State \texttt{Calculate $\Re_{agg}$ for solid bins $s_1$,$s_2$}
+     \EndFor 
+     \State \texttt{Calculate $n_{particles}$ using Euler's method}
+     \EndFor
+     \State \texttt{Collect $n_{particles}$ from $N_{MPI}$}\Comment{Master process collects all data}
+     \State \texttt{Calculate $timestep$ using \textit{CFL} condition}
+     \State \texttt{$t_{new} = t + timestep$ }
+     \EndWhile
+     \EndProcedure
      \end{algorithmic}
- \end{algorithm}
-}
+ \end{algorithm}     
+ 
+
+ \gpnote{ Hello Chaitanya, this is the algorithm style that I have. I define a procedure and then I write the pseudocode of the algorithm. In your algorithm, for example, there is no need to say "each process is assigned on chunk of....". It can be a comment. An algorithm should be well defined steps, not continuous text. Think what each process is doing not the whole program. If you need to specify specific values per process then give them as input or add a comment.     
+%     \begin{algorithm}[H]
+%     \scriptsize
+%     \caption{Path Similarity Algorithm: Hausdorff Distance}
+%     \label{alg:hausdorff}
+%     \begin{algorithmic}[1]
+%         \Procedure{HausdorffDistance}{$T_1$,$T_2$}\Comment{$T_1$ and $T_2$ are a set of 
+%             3D points}
+%         \State \texttt{List $D_1$,$D_2$}
+%         \For{$\forall frame_1$ in $T_1$}
+%         \For{$\forall frame_2$ in $T_2$}
+%         \State \texttt{Append in $D_1$ $d_{RMS}$($frame_1$, $frame_2$)}
+%         \EndFor
+%         \State \texttt{$D_{t_1}$ append $min(D_1)$}
+%         \EndFor
+%         \For{$\forall frame_2$ in $T_2$}
+%         \For{$\forall frame_1$ in $T_1$}
+%         \State \texttt{Append in $D_2$ $d_{RMS}$($frame_2$, $frame_1$)}
+%         \EndFor
+%         \State\texttt{$D_{t_2}$ append $min(D_2)$}
+%         \EndFor
+%         \State \textbf{return} $max\Big(max(D_{t_1}),max(D_{t_2})\Big)$
+%         \EndProcedure
+%         \\        
+%         \Procedure{PSA}{$Traj$}\Comment{$Traj$ is a set of trajectories}
+%         \For{$\forall T_1$ in $Traj$}
+%         \For{$\forall T_2$ in $Traj$}
+%         \State \texttt{ $D_{( T_1,T_2 )}$=HausdorffDistance$\Big( T_1,T_2 \Big)$} 
+%         \EndFor
+%         \EndFor
+%         \State \Return $D$
+%         \EndProcedure
+%     \end{algorithmic}
+% \end{algorithm}
+}\csnote{Giannis please have a look}
  
 \begin{figure}[H]
 \centering

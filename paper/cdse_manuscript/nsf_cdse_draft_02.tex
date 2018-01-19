@@ -104,9 +104,9 @@ performed on LIGGGHTS, which runs in parallel using MPI. Speedup of about 14
 times was obtained for the PBM simulations and around 12 for the DEM
 simulations. This coupling was performed using the radical pilot for scaling
 studies from 1 to 128 cores for the PBM and up to 256 cores for the DEM. Using
-this developed framework, the granulation process has been modeled accurately
+this developed framework, the granulation process has been modeled 
 much faster than existing approaches in literature. \jhanote{Which figure
-speaks to the accuracy? Why does the accuracy arise?}
+speaks to the accuracy? Why does the accuracy arise?} \csnote{I have edited the line to remove this misunderstading}
 \end{abstract}
 \begin{keyword}
 Population balance model \sep Granulation \sep Discrete element methods  \sep MPI and OpenMP 
@@ -804,7 +804,7 @@ An algorithm in the form of pseudo code is presented below illustrating how
 the calculations are distributed and carried out during the simulation. For
 each time step, the MPI processes are made responsible for a specific chunk of
 the spatial compartments. \jhanote{please use proper format to present an
-algorithm. giannis please use format of CCGrid paper, for example} Then each
+algorithm. giannis please use format of CCGrid paper, for example} \csnote{re-wrote the algorithm please have a look} Then each
 OMP thread, inside of each MPI process, is allocated to one of the cores of
 multi-core CPU the MPI process is bound too. The OMP threads divide up and
 compute $\Re_{agg}$. After $\Re_{agg}$ is calculated the MPI processes
@@ -969,7 +969,7 @@ in the x-direction were reduced and a new set of experiments with different 3-d 
 configuration were carried out. 
 \jhanote{I'm
 confused: the previous sentences imply a functional problem. The next sentence
-suggests a performance solution. Doesn't make sense to me.}  The
+suggests a performance solution. Doesn't make sense to me.} \csnote{edited structure of the paragraph} The
 comparison of the simulation times of experiments with the new configurations are shown in
 Table~\ref{table:rslts_dem_128_256_decomp}.
 
@@ -1338,7 +1338,7 @@ amount of time the executable the job would spend in the job scheduler queue.
 Thus, when a large number of these simulations need to be run, the could uploaded 
 as a single pilot job using RADICAL pilot reducing scheduler wait times on individual 
 jobs. \jhanote{It is unclear what the
-benefit is!} An extension of this work would be to use RP to schedule multiple
+benefit is!}\csnote{tried to address the benefit elaborately} An extension of this work would be to use RP to schedule multiple
 such coupled simulations as one job, thus decreasing the wait times even
 further.
 \begin{figure}

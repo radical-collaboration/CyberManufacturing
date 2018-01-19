@@ -208,6 +208,17 @@ improvements that can be achieved using HPCs and how they can help improve
 process design. \jhanote{All of this can come later. Get to the problem this paper
 is addressing, the solution/approach and specific contribution. You've alread
 irritated the reviwer and reader by now} 
+\csnote{Will be replacing the above paragraph with the one below.}
+
+Product quality is of prime importance when it comes to the pharmaceutical 
+products. Thus, the model implemented to control the system should be fast 
+enough to predict the deviation and correct it before the product 
+quality is affected. DEM and PBM are used to model granulation which take 
+a large amount of time to simulate. This arises the need to increase speed 
+of the simulation such that this process can be controlled online. 
+To apply the corrective actions, parallel versions of these codes need to be run 
+on large number of cores. This infrastructure is usually found on a supercomputer 
+making HPC systems a major component for the online control of such system.
 
 \jhanote{What is the specific engineering problem you are interested in
 solving that cannot be solved without HPC? It is unclear to the reader.} The
@@ -903,7 +914,10 @@ processes, leading to delays before the next time step can be simulated which
 in turn makes the simulation slower.\jhanote{this sentence does 
 not make sense. MPI is "not limited": it is the message passing interface. 
 please rewrite and make consistent with data in table 3, or clarify} 
-\csnote{have explained the communications in a better manner}
+\csnote{have explained the communications in a better manner} Following the 
+results from the initial timing studies,the y and the z-axes were not divided
+in more than 2 compartments for 128 and 256 core simulation as well. This
+meant that the x-axis was divided into 32 and 64 compartments respectively. 
 
 \begin{table}
 \caption{The effect of spatial decomposition on the performance of the DEM simulations using 64 cores.}
@@ -933,26 +947,30 @@ $8$ & $2$ & $4$ & $7.96$\\
 \jhanote{What evidence/indication is there that load balancing is
 a problem, as opposed to communication limited?} \csnote{The first few lines 
 are  just general statments I could do away with this paragraph altogether. 
-It really does not fit with the flow} %This helps better utilization
+It does not fit with the flow} %This helps better utilization
 %of the resources as well as make the simulations run faster. 
-Following the
-results from the initial timing studies,the y and the z-axes were not divided
-in more than 2 compartments for 128 and 256 core simulation as well. This
-meant that the x-axis was divided into 32 and 64 compartments respectively. 
+%Following the results from the initial timing studies,the y and the z-axes were not divided
+%in more than 2 compartments for 128 and 256 core simulation as well. This
+%meant that the x-axis was divided into 32 and 64 compartments respectively. 
 \jhanote{1 paragraph, 1 idea. Is the following part of the above 'load balancing' or is 
 now about 'communication'?} \csnote{tried to clear the air by removing the general statements}
 In order to avoid the expensive communication
 between the processes, LIGGGHTS tries to insert the particles towards the
 center of the compartment such that the number of ghost atoms are minimized.
-But, slicing in the x-axis reduced the space available for the insertion of
-the particles thus, many of the particles were inserted incorrectly.
-\jhanote{please elaborate} Another abnormal behavior observed during these
-simulation was the particles halted \jhanote{in a?} at certain compartment and
-no particle traveled beyond this compartment in the x-direction. \jhanote{I'm
+For simulations with higher number of cores the extra slicing in the x direction 
+reduced the space available for the insertion of the particles.
+This made LIGGGHTS carry out larger number of Monte-Carlo simulations to insert 
+the partilces in the desired area. In some cases, the Monte-Carlo iterations performed 
+were not enought leading to many of the particles being inserted incorrectly.
+\jhanote{please elaborate} Another abnormal behavior observed due to this over slicing 
+was that the particles halted \jhanote{in a?} in a certain compartment and
+no particle traveled beyond this compartment in the x-direction. Thus, the number of partitions 
+in the x-direction were reduced and a new set of experiments with different 3-d partition 
+configuration were carried out. 
+\jhanote{I'm
 confused: the previous sentences imply a functional problem. The next sentence
-suggests a performance solution. Doesn't make sense to me.} Thus, another set
-of timing studies were performed for the 128 and 256 core simulations. The
-comparison of simulation times have been shown in
+suggests a performance solution. Doesn't make sense to me.}  The
+comparison of the simulation times of experiments with the new configurations are shown in
 Table~\ref{table:rslts_dem_128_256_decomp}.
 
 \begin{table}
@@ -980,7 +998,8 @@ The simulation times illustrated in Table~\ref{table:rslts_dem_128_256_decomp}
 show that incorrectly slicing the geometry also affects the performance of the
 system. It can be noted that slicing along y-axis is more favorable than
 slicing along the z-direction. \jhanote{Without further
-discussion/explaination, it is difficult to discern how/why?.} The
+discussion/explaination, it is difficult to discern how/why?.} \csnote{Proceeding lines 
+have this discussion} The
 insertion of particles is hindered when the geometry is cut along the z-axis
 as the inlet is perpendicular to it. LIGGGHTS thus provisions less space for
 the insertion of these particles, thus increasing the time of the simulation.

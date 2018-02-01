@@ -173,7 +173,7 @@ behavior~\citep{Goldschmidt2003}~\citep{Reinhold2012}~\citep{Barrasso2013}.
 This PBM-DEM method is more accurate than a PBM simulation alone but runs much
 faster than a complete DEM simulation. Despite the performance benefits of
 these coupled PBM-DEM models they still take unacceptably long to solve. In
-the past high-oerformance computing (HPC) has been used to speed up computationally
+the past High-Performance Computing (HPC) has been used to speed up computationally
 intensive problems such as Molecular Dynamics (MD), Computational Fluid
 Dynamics (CFD) and in recent years  this technique has been applied to DEM and
 PBM
@@ -186,13 +186,15 @@ usage; see next paragraph.} \csnote{have changed the occurence parallel computin
 
 Parallel Computing is the standard procedure to solve large computational
 problems in many sciences. \jhanote{What is this a reference to?} This method
-uses High Performance Computing (HPC) systems \jhanote{HPC = High-peformance
-computing, not computers} \csnote{Have addressed the name} to solve over a large number of cores. A HPC
-consists of thousands of compute nodes connected via a high speed network. A
-typical compute node has multiple cores and several GBs or memory. The network
-that connects them, usually Infiniband, reaches speeds of 56 Gbps. In
-addition, a high performance parallel filesystem accompanies the compute
-nodes, allowing users to read and write GBs of data efficiently. One of the
+uses High Performance Computing (HPC) resources \jhanote{HPC = High-peformance
+computing, not computers} \csnote{Have addressed the name} utilizing a large number 
+of cores to solve a problem.\gpnote{I agree with Shantenu. This is a description of an HPC.
+    I am not sure it is needed here. I propose that it is removed} A HPC
+consists of hundreds or thousands of compute nodes each with multiple cores 
+and several GBs of memory. The network
+that connects them, usually Infiniband, has bandwidth of 56 Gbps. In
+addition, a high performance parallel filesystem accompanies allows users 
+to read and write GBs of data efficiently. One of the
 challenges when implementing parallel applications is to make sure that data
 is written in a similar manner to serial programs. To ensure correctness of
 the results, an appropriate data communication implementation is required.
@@ -361,7 +363,8 @@ motivation and need for running the simulations on HPCs and parallelization tech
 \subsubsection{Computer Architecture}
 
 \jhanote{HPC has been defined. Please use it} \csnote{Changed}
-
+\gpnote{A conventional PC is not the correct term. I suggest the analogy to be removed and write:
+An HPC node usually has two processors and at least 64GBs of RAM. Each processor has at least 16 cores. Main memory or RAM is divided between processors. As a result, each processor has direct access to the part of the memory it considers local. However accessing the rest of the memory introduces delays~\cite{Jin2011}. Therefore, managing data locality is very important.}
 Analogous to a conventional PC a HPC cluster node has
 one or more CPUs and RAM. Commonly nodes are manufactured with two CPUs, each
 CPU is a multi-core meaning it has multiple compute cores such that each can
@@ -371,38 +374,49 @@ to its own socket, however accessing memory on another socket is much
 slower~\citep{Jin2011}. For this reason. data that is needed for computation
 should be stored locally to the CPU that needs it.
 
+\gpnote{I am not sure if this is needed. "nodes exchange memory" is not the best
+way to say it. How about "Data movement between nodes"? I am not sure for the purpose
+of this paragraph. You introduce MPI and OMP in the next subsection.}
 There are two classes of computer architecture which can be classified by
 memory locality features such as distributed memory systems or shared memory
 systems. These two classes co-exist in a cluster, thus providing the benefits
 of each. All the nodes exchange memory using explicit message passing while
 each has its own independent memory. The cores on each node can access data
-from the shared memory without any explicit message passing statements from
-the user. While designing a parallel program all these aspects need to be
+from the shared memory without explicit message passing statements from
+the user.\gpnote{It may be better to say programmer.} While designing a parallel program all these aspects need to be
 considered for optimal performance of the code~\citep{Adhianto2007}.
 
 
-\subsubsection{Parallel application programming interfaces}
-Message Passing Interface (MPI) is a common parallel computing application 
-programming interface standard. MPI is used for distributed memory parallel computing and this is 
-because the application programming interface will operate 
-every MPI process as a discrete unit that does not share memory with the other processes unless explicit 
-message passing is used. Even on shared a single node where the hardware supports shared 
-memory computing, MPI will still operate it in a distributed memory fashion~\citep{Jin2011}. Operating all 
-cores as distinct units also means they each need their own copy of all variables used for computation 
-which results in a large overall memory foot print compared to a similar system if it was operated in 
-shared memory. 
+\subsubsection{Parallel Application Programming Interfaces (APIs)}
+\gpnote{MPI is the most common and is considered the best way to parallelize applications for distributed
+    computing.}
+Message Passing Interface (MPI) is the most common Parallel Computing Application 
+Programming Interface standard. MPI is used for distributed memory parallel computing. Parallelization
+is achieved via multiprocessing and data communication is done through well defined messages, regardless
+executing a program in a single or multiple nodes~\citep{Jin2011}. Each process has each own copy of variables
+and arrays, which can result to large memory consumption if not used carefully. 
 
-Open Multi-Processing (OMP) is another application program interface stand for parallel 
-computing. OMP is used for shared memory and can take advantage of shared memory systems which 
-can result in much faster computation. Although, it does not work well on distributed systems. This 
-prevents it from being used to efficiently carry out computations across multiple nodes of a cluster 
-simultaneously~\citep{Jin2011}. 
+
+
+%and this is 
+%because the application programming interface will operate 
+%every MPI process as a discrete unit that does not share memory with the other processes unless explicit 
+%message passing is used. Even on shared a single node where the hardware supports shared 
+%memory computing, MPI will still operate it in a distributed memory fashion~\citep{Jin2011}. Operating all 
+%cores as distinct units also means they each need their own copy of all variables used for computation 
+%which results in a large overall memory foot print compared to a similar system if it was operated in 
+%shared memory. 
+
+Open Multi-Processing (OMP) is another API standard for parallel computing. OMP takes advantage of shared 
+memory systems and uses threads instead of processes. Although, it does not work well on distributed systems. This 
+prevents it from being used to efficiently carry out computations across multiple nodes~\citep{Jin2011}. 
 
 Since MPI is preferred for distributed computing and OMP is better for shared computing many 
 researchers have studied the performance of MPI vs MPI+OMP methods. Many a times a trade off is made 
 between optimizing a program for performance and trying to make it flexible enough to run on many 
-different computer architectures. It was found that hybrid methods for PBMs allow the code 
-flexibility for different architectures while still maintaining good performance~\citep{Bettencourt2017}.  
+different computer architectures. \gpnote{How is relevant to this section? I think it would be better in the next}
+It was found that hybrid methods for PBMs allow the code 
+flexibility for different architectures while still maintaining good performance~\citep{Bettencourt2017}.
 It was also reported that only the external(spatial) coordinates of the PBM were parallelized. 
 In this current work external and internal(compositions) calculations are parallelized. 
 
@@ -1293,7 +1307,7 @@ found in Figure \ref{fig:rslts_PBM_2mm_d50}}
 
 \subsection{One-way coupled DEM+PBM using RADICAL-Pilot and its performance} 
 
-The RADICAL pilot (RP) being a pilot job system it can bypass the need of
+RADICAL-Pilot (RP) being a pilot job system it can bypass the need of
 waiting on the long scheduler queues on a cluster for each individual task. \jhanote{This is wrong! It
 avoids the individual tasks from waiting for different periods of time at the
 scheduler, not waiting itself at the scheduler!} \csnote{corrected, could you please check if it is clear now} 
@@ -1431,43 +1445,7 @@ threads.
      \EndProcedure
      \end{algorithmic}
  \end{algorithm}     
- 
 
- \gpnote{ Hello Chaitanya, this is the algorithm style that I have. I define a procedure and then I write the pseudocode of the algorithm. In your algorithm, for example, there is no need to say "each process is assigned on chunk of....". It can be a comment. An algorithm should be well defined steps, not continuous text. Think what each process is doing not the whole program. If you need to specify specific values per process then give them as input or add a comment.     
-%     \begin{algorithm}[H]
-%     \scriptsize
-%     \caption{Path Similarity Algorithm: Hausdorff Distance}
-%     \label{alg:hausdorff}
-%     \begin{algorithmic}[1]
-%         \Procedure{HausdorffDistance}{$T_1$,$T_2$}\Comment{$T_1$ and $T_2$ are a set of 
-%             3D points}
-%         \State \texttt{List $D_1$,$D_2$}
-%         \For{$\forall frame_1$ in $T_1$}
-%         \For{$\forall frame_2$ in $T_2$}
-%         \State \texttt{Append in $D_1$ $d_{RMS}$($frame_1$, $frame_2$)}
-%         \EndFor
-%         \State \texttt{$D_{t_1}$ append $min(D_1)$}
-%         \EndFor
-%         \For{$\forall frame_2$ in $T_2$}
-%         \For{$\forall frame_1$ in $T_1$}
-%         \State \texttt{Append in $D_2$ $d_{RMS}$($frame_2$, $frame_1$)}
-%         \EndFor
-%         \State\texttt{$D_{t_2}$ append $min(D_2)$}
-%         \EndFor
-%         \State \textbf{return} $max\Big(max(D_{t_1}),max(D_{t_2})\Big)$
-%         \EndProcedure
-%         \\        
-%         \Procedure{PSA}{$Traj$}\Comment{$Traj$ is a set of trajectories}
-%         \For{$\forall T_1$ in $Traj$}
-%         \For{$\forall T_2$ in $Traj$}
-%         \State \texttt{ $D_{( T_1,T_2 )}$=HausdorffDistance$\Big( T_1,T_2 \Big)$} 
-%         \EndFor
-%         \EndFor
-%         \State \Return $D$
-%         \EndProcedure
-%     \end{algorithmic}
-% \end{algorithm}
-}\csnote{Giannis please have a look}
  
 \begin{figure}[H]
 \centering

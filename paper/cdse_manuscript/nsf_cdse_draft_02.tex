@@ -134,113 +134,153 @@ predict their behavior~\citep{sen2013}.
 
 Particulate processes are defined by chaotic micro-scale phenomena that result
 from the many particle-particle interactions inside these systems. These small
-scale phenomenon develop into complex bulk behavior of these processes. To
+scale phenomenon develop into the complex bulk behavior of these processes. To
 successfully predict the bulk behavior of these systems, a model needs to
 capture the particle-particle interactions and emergent meso-scale phenomena.
-Recently, the Discrete Element Method (DEM)~\citep{Cundall1979} simulations
-have been employed in pharmaceutical process modeling to obtain particle-level
-data, which helps describe the bulk properties of the particulate system
-accurately~\citep{Hancock2011}. DEM uses Newton's equations of motion to model
-the forces on each particle in the system and it's interactions with the
-system geometry and other particles. This enables DEM to model the small scale
-phenomena that determines the bulk behavior of particulate system. Since DEM
-includes large amount of interactions and force computations, it usually takes
-a large amount of time to run. Thus, there is a need for a more efficient
-simulation technique for these particulate particles. One of the common
-methods used in the industry is the population balance model (PBM), which is
-more computationally efficient but, lacks the accuracy of the DEM.
 
-PBM takes into account the changes in internal or spatial particle
-properties.This model lacks sensitivity to design parameters such as equipment
-geometry. It is semi-mechanistic in nature, meaning they use population
-averages and probability to capture bulk behavior but still seek to capture
-some of the micro-phenomena of particle-particle interactions using
-correlations or empirically developed kernels to approximate those
-interactions. Even though PBM is much faster than DEM, a detailed PBM can
+Discrete Element Method (DEM)~\citep{Cundall1979} simulations model the many particle-particle 
+force interactions in these particulate systems using newtons equations. The 
+particle-level simulation data is then used to help predict the bulk properties
+of these system \citep{Hancock2011}. However because DEMs model all particle-particle 
+interactions they are very time consuming to solve especially for very large 
+particulate systems which prevents them from being practial to use in many situations. 
+
+%Recently, Discrete Element Method (DEM)~\citep{Cundall1979} simulations
+%have been employed in pharmaceutical process modeling to obtain particle-level
+%data, which helps describe the bulk properties of the particulate system
+%accurately~\citep{Hancock2011}. DEM uses Newton's equations of motion to model
+%the forces on each particle in the system and it's interactions with the
+%system geometry and other particles. This enables DEM to model the small scale
+%phenomena that determines the bulk behavior of particulate system. Since DEM
+%includes large amount of interactions and force computations, it usually takes
+%a large amount of time to run. Thus, there is a need for a more efficient
+%simulation technique for these particulate particles. One of the common
+%methods used in the industry is the population balance model (PBM), which is
+%more computationally efficient but, lacks the accuracy of the DEM.
+
+Population balance models (PBMs) are a faster but less accurate way of 
+modeling these particulate sytems. They are semi-mechanistic in nature, meaning 
+they use population averages and probability to model bulk behavior but still 
+seek to capture some of the micro-phenomena of particle-particle interactions 
+using correlations or empirically developed kernels to approximate those
+interactions. Even though PBMs are much faster than DEMs, a detailed PBM can
 still take a significant amount of time to solve which prevents them from
 being used as widely as they could be in academia and industries
-\citep{Barrasso2013}. Though highly detailed PBMs take into account
-populating, averaging and contain semi-mechanistic kernels, these PBMs still
-can have difficulties in capturing the micro-scale phenomena that are crucial
-to predicting accurate dynamics of particulate processes.
+\citep{Barrasso2013}. Also even very detailed PBMs can still have difficulties 
+capturing the micro-scale phenomena that are crucial to predicting accurate 
+dynamics of particulate processes.
 
-Thus, to complement the limitations of each of these modeling techniques they
-are coupled to provide a more accurate model.  The typical work flow of such a
-PBM-DEM coupled model involves using a short DEM simulation to capture the
-particle-particle level interactions of the system and then this physics is
+%PBM takes into account the changes in internal or spatial particle
+%properties.This model lacks sensitivity to design parameters such as equipment
+%geometry. It is semi-mechanistic in nature, meaning they use population
+%averages and probability to capture bulk behavior but still seek to capture
+%some of the micro-phenomena of particle-particle interactions using
+%correlations or empirically developed kernels to approximate those
+%interactions. Even though PBM is much faster than DEM, a detailed PBM can
+%still take a significant amount of time to solve which prevents them from
+%being used as widely as they could be in academia and industries
+%\citep{Barrasso2013}. Though highly detailed PBMs take into account
+%populating, averaging and contain semi-mechanistic kernels, these PBMs still
+%can have difficulties in capturing the micro-scale phenomena that are crucial
+%to predicting accurate dynamics of particulate processes.
+
+Thus, to complement the strengths of each of these modeling techniques they
+are coupled to produce a model which is more accurate than a PBM but much more 
+efficient than DEM. The typical work flow of such a
+DEM-PBM coupled model involves using a short DEM simulation to capture the
+particle-particle level interactions of the system then that data is
 fed into the PBM, so that the PBM can more accurately simulate bulk system
 behavior~\citep{Goldschmidt2003}~\citep{Reinhold2012}~\citep{Barrasso2013}.
-This PBM-DEM method is more accurate than a PBM simulation alone but runs much
+This DEM-PBM method is more accurate than a PBM simulation alone but runs much
 faster than a complete DEM simulation. Despite the performance benefits of
-these coupled PBM-DEM models they still take unacceptably long to solve. In
+these coupled DEM-PBM models they still take unacceptably long to solve. In
 the past High-Performance Computing (HPC) has been used to speed up computationally
 intensive problems such as Molecular Dynamics (MD), Computational Fluid
 Dynamics (CFD) and in recent years  this technique has been applied to DEM and
-PBM
-simulations~\citep{Bettencourt2017}~\citep{Prakash2013a}~\citep{Gunawan2008}.
+PBM simulations~\citep{Bettencourt2017}~\citep{Prakash2013a}~\citep{Gunawan2008}.
 
-\jhanote{Parallel computing is a type/subset of high-performance computing
-(HPC). Please use HPC rather than parallel computing. Also need consistency of
-usage; see next paragraph.} \csnote{have changed the occurence parallel computing to HPC}
-
-
-Parallel Computing is the standard procedure to solve large computational
-problems in many sciences. \jhanote{What is this a reference to?} This method
-uses High Performance Computing (HPC) resources \jhanote{HPC = High-peformance
-computing, not computers} \csnote{Have addressed the name} utilizing a large number 
-of cores to solve a problem.\gpnote{I agree with Shantenu. This is a description of an HPC.
-    I am not sure it is needed here. I propose that it is removed} A HPC
-consists of hundreds or thousands of compute nodes each with multiple cores 
-and several GBs of memory. The network
-that connects them, usually Infiniband, has bandwidth of 56 Gbps. In
-addition, a high performance parallel filesystem accompanies allows users 
-to read and write GBs of data efficiently. One of the
-challenges when implementing parallel applications is to make sure that data
-is written in a similar manner to serial programs. To ensure correctness of
-the results, an appropriate data communication implementation is required.
-\jhanote{the above should not be in the introduction. GET to the message
-of the contribution of this work, not background/related work.}
+%\jhanote{Parallel computing is a type/subset of high-performance computing
+%(HPC). Please use HPC rather than parallel computing. Also need consistency of
+%usage; see next paragraph.} \csnote{have changed the occurence parallel computing to HPC}
 
 
-Some of the benefits of using HPC in the pharmaceutical industry include high
-accuracy for parameter estimation as detailed particle-scale simulations can
-be performed quickly. Quick simulations can also help improve control of
-continuous pharmaceutical processes. This work showcases the speed
-improvements that can be achieved using HPCs and how they can help improve
-process design. \jhanote{All of this can come later. Get to the problem this paper
-is addressing, the solution/approach and specific contribution. You've alread
-irritated the reviwer and reader by now} 
-\csnote{Will be replacing the above paragraph with the one below.}
+%Parallel Computing is the standard procedure to solve large computational
+%problems in many sciences. \jhanote{What is this a reference to?} This method
+%uses High Performance Computing (HPC) resources \jhanote{HPC = High-peformance
+%computing, not computers} \csnote{Have addressed the name} utilizing a large number 
+%of cores to solve a problem.\gpnote{I agree with Shantenu. This is a description of an HPC.
+%    I am not sure it is needed here. I propose that it is removed} A HPC
+%consists of hundreds or thousands of compute nodes each with multiple cores 
+%and several GBs of memory. The network
+%that connects them, usually Infiniband, has bandwidth of 56 Gbps. In
+%addition, a high performance parallel filesystem accompanies allows users 
+%to read and write GBs of data efficiently. One of the
+%challenges when implementing parallel applications is to make sure that data
+%is written in a similar manner to serial programs. To ensure correctness of
+%the results, an appropriate data communication implementation is required.
+%\jhanote{the above should not be in the introduction. GET to the message
+%of the contribution of this work, not background/related work.}
 
-Product quality is of prime importance when it comes to the pharmaceutical 
-products. Thus, the model implemented to control the system should be fast 
-enough to predict the deviation and correct it before the product 
-quality is affected. DEM and PBM are used to model granulation which take 
-a large amount of time to simulate. This arises the need to increase speed 
-of the simulation such that this process can be controlled online. 
-To apply the corrective actions, parallel versions of these codes need to be run 
-on large number of cores. This infrastructure is usually found on a supercomputer 
-making HPC systems a major component for the online control of such system.
 
-\jhanote{What is the specific engineering problem you are interested in
-solving that cannot be solved without HPC? It is unclear to the reader.} The
-main objective of this work is to develop a unidirectional DEM-PBM model that
-runs efficiently in parallel so that it can take advantage of the
-computational capabilities of  modern computing clusters. In the course of
-development of the model, the DEM simulation were performed on LAMMPS Improved
+%Some of the benefits of using HPC in the pharmaceutical industry include high
+%accuracy for parameter estimation as detailed particle-scale simulations can
+%be performed quickly. Quick simulations can also help improve control of
+%continuous pharmaceutical processes. This work showcases the speed
+%improvements that can be achieved using HPCs and how they can help improve
+%process design. \jhanote{All of this can come later. Get to the problem this paper
+%is addressing, the solution/approach and specific contribution. You've alread
+%irritated the reviwer and reader by now} 
+%\csnote{Will be replacing the above paragraph with the one below.}
+
+%Product quality is of prime importance when it comes to the pharmaceutical 
+%products. Thus, the model implemented to control the system should be fast 
+%enough to predict the deviation and correct it before the product 
+%quality is affected. DEM and PBM are used to model granulation which take 
+%a large amount of time to simulate. This arises the need to increase speed 
+%of the simulation such that this process can be controlled online. 
+%To apply the corrective actions, parallel versions of these codes need to be run 
+%on large number of cores. This infrastructure is usually found on a supercomputer 
+%making HPC systems a major component for the online control of such system.
+
+In this work a unidirectional DEM-PBM coupled model was developed to efficiently 
+predict the behavor of a wet-granulation process. HPC methods were implemented to use modern
+computing clusters to solve the model as quickly as possible. 
+The goal of this work was to solve a model, which can accurately simulate the physics of
+these particuate processes, in a time frame that would make it feasable for wide 
+scale use in industry and acadamia. 
+
+The DEM simulations were performed using LAMMPS Improved
 for General Granular and Granular Heat Transfer simulations
 (LIGGGHTS)~\citep{Kloss2012} to model the micro-mechanics of the L\"{o}dige
 CoriMix CM5 high shear granulator. A 4-Dimensional, reduced order DEM informed
 PBM was developed that is parallelized using hybrid techniques (Message
-Parsing Interface (MPI) + Open Multi-Processing (OMP))to model the bulk
+Passing Interface (MPI) + Open Multi-Processing (OMP))to model the bulk
 processes occurring during the granulation process and is discussed in
 section~\ref{sec:pbm_model}. Section~\ref{sec:RPandCommunications} describes
 unidirectional coupling of DEM and PBM using Radical Pilot, which is a
 framework developed in Python. This provides task level parallelization, to
 help develop an accurate model which can be run quickly on high performance
-computing systems. The speed improvements obtained for the parallel code and
-further improvements that can be implemented are discussed in
-Section~\ref{sec:Results}
+computing systems.
+
+%\jhanote{What is the specific engineering problem you are interested in
+%solving that cannot be solved without HPC? It is unclear to the reader.} The
+%main objective of this work is to develop a unidirectional DEM-PBM model that
+%runs efficiently in parallel so that it can take advantage of the
+%computational capabilities of  modern computing clusters. In the course of
+%development of the model, the DEM simulation were performed on LAMMPS Improved
+%for General Granular and Granular Heat Transfer simulations
+%(LIGGGHTS)~\citep{Kloss2012} to model the micro-mechanics of the L\"{o}dige
+%CoriMix CM5 high shear granulator. A 4-Dimensional, reduced order DEM informed
+%PBM was developed that is parallelized using hybrid techniques (Message
+%Parsing Interface (MPI) + Open Multi-Processing (OMP))to model the bulk
+%processes occurring during the granulation process and is discussed in
+%section~\ref{sec:pbm_model}. Section~\ref{sec:RPandCommunications} describes
+%unidirectional coupling of DEM and PBM using Radical Pilot, which is a
+%framework developed in Python. This provides task level parallelization, to
+%help develop an accurate model which can be run quickly on high performance
+%computing systems. The speed improvements obtained for the parallel code and
+%further improvements that can be implemented are discussed in
+%Section~\ref{sec:Results}
 
 
 \section{Background \& Motivation}

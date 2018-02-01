@@ -460,23 +460,23 @@ to a situation where each simulation gets through the batch-queue systems
 independent of the other. So although the first-through-the-queue is ready to
 run, it stalls fairly soon waiting for the other simulation to make it through
 the queue.  On the other hand MPI capabilities can be used to  execute both
-simulations as part of a single multi-node job.  Thus whereas the former
+simulations as part of a single multi-node job.  Whereas the former
 method suffers from unpredictable queue time for each job, the latter is
 suitable to execute tasks that are homogeneous and have no dependencies.
 
 
-The Pilot abstraction~\citep{pstar12} solves these issues:  The Pilot abstraction 
+The Pilot abstraction~\citep{pstar12} solves these issues. The Pilot abstraction 
 (i) uses a container-job as a placeholder to acquire resources, and (ii) decouples 
 the initial resource acquisition from task-to-resource assignment. Once the 
 Pilot (container-job) has acquired the resources, it can be populated with 
 computational tasks. This functionality allows all tasks to be executed directly 
-on the resources, without being queued individually. Thus, this approach supports 
+on the resources, without being queued individually. Thus, this approach can support 
 the requirements of task-level parallelism and high-throughput as needed by 
 science drivers.
 
-
 RADICAL-Pilot is an implementation of the Pilot abstraction in Python, engineered to
 support scalable and efficient launching of heterogeneous tasks across different platforms.
+
 \section{Methods}
 
 \subsection{Discrete Element Method (DEM)}
@@ -818,7 +818,8 @@ An algorithm in the form of pseudo code is presented below illustrating how
 the calculations are distributed and carried out during the simulation. For
 each time step, the MPI processes are made responsible for a specific chunk of
 the spatial compartments. \jhanote{please use proper format to present an
-algorithm. giannis please use format of CCGrid paper, for example} \csnote{re-wrote the algorithm please have a look} Then each
+algorithm. giannis please use format of CCGrid paper, for example} \csnote{re-wrote the algorithm please have a look}
+\gpnote{Yes, it is in the same format as the CCGrid paper. Much better than before. I suggest that you reference the algorithm. Using "below" I expect the algorithm near this paragraph, but it is in the Appendix.} Then each
 OMP thread, inside of each MPI process, is allocated to one of the cores of
 multi-core CPU the MPI process is bound too. The OMP threads divide up and
 compute $\Re_{agg}$. After $\Re_{agg}$ is calculated the MPI processes
@@ -847,7 +848,9 @@ process calculates the same size for the new time step.
 Since the DEM informed PBM code required dynamic size increase for the data
 structure due to different number of particles being present in the DEM
 simulation, the PBM code developed used the Standard Template Library
-containers and their features available in \textit{C++} 11 and later. It
+containers and their features available in \textit{C++} 11 and later. \gpnote{I do not think you have to
+give a reason this specific for the selected resource. Stampede2 supports the requirements of the
+software, and as a result it is the selected resource for the experiments} It
 requires intel v17.0.2 (gcc 5.3+)  or later for compilation. Since this module
 was not present on the Stampede, the execution of the PBM was done on the
 newer Stampede2 supercomputer. Each of the compute node of the cluster
@@ -858,33 +861,34 @@ threads. The simulations were then run by varying the the number of MPI
 processes from 1 to 16 and the number of OMP threads from 1 to 8, thus, using
 a maximum of 128 cores.
 
-\subsection{Radical Pilot (RP) \& PBM+DEM communication}
+\subsection{RADICAL-Pilot (RP) \& PBM+DEM communication}
 \label{sec:RPandCommunications}
 RADICAL-Pilot defines a number of abstractions to describe resources, and
 computational tasks. The Pilot Description is the abstraction that describes
-resources by defining the number of cores that will be used, the used HPC
-resource and the total time that the resources are needed, and the queue that
-will be used. The abstraction that defines the execution of a computational
-task is the Compute Unit (CU). A CU defines the executable, the necessary
+resources by defining number of cores, HPC resource, and the total time that 
+the resources are needed. Computational tasks are defined via the Compute Unit 
+(CU) abstraction. A CU defines the executable, the necessary
 environment that is needed during execution, execution arguments, and any file
 dependencies the executable may have. RP also defines two managing components,
 the Pilot Manager, and Unit Manager. The Pilot Manager is responsible to
-submit a Pilot to the selected resources. The Unit Manager is responsible to
-place CUs to active Pilots. As soon as a unit is placed in a pilot it starts
-executing on the acquired resources.
+submit and monitor a Pilot. The Unit Manager is responsible to
+place CUs to active Pilots. As soon as a Unit is placed in a Pilot, it starts
+executing.
 
-RADICAL-Pilot was utilized to execute and monitor DEM and PBM simulations.
+RADICAL-Pilot is utilized to execute and monitor DEM and PBM simulations.
 Initially, a pilot description is created to use several cores of a resource
 and submitted to the pilot manager. A CU description is created for the DEM
-simulation and submitted to the Unit Manager. As soon as the pilot is active
-the DEM simulation start executing. When finished a CU that describes a PBM
+simulation and submitted to the Unit Manager. As soon as the pilot is active,
+the DEM simulation start executing. When finished, a CU describing a PBM
 simulation is submitted at the Unit Manager and start executing. Any data
 dependency is satisfied by doing the necessary file linking through the CU
 description.
 
+\gpnote{This paragraph tellsis very similar with the previous one. Can they become
+    one?}
 The DEM and PBM executables are pre-placed in the resource along with any
-initial information for the DEM simulation. The DEM unit first creates links
-for the data files that will be needed for the DEM simulation and call the
+initial information required by the DEM simulation. The DEM unit creates links
+for the data files that are be needed and calls the
 executable. When the execution finishes, new links with the output are created
 in a shared space. The PBM unit uses those links to read the necessary data to
 execute the simulation. When both have finished RP downloads the PBM results.
@@ -927,7 +931,10 @@ partitions in the y and the z-axes, the master process needs to wait for more
 processes, leading to delays before the next time step can be simulated which 
 in turn makes the simulation slower.\jhanote{this sentence does 
 not make sense. MPI is "not limited": it is the message passing interface. 
-please rewrite and make consistent with data in table 3, or clarify} 
+please rewrite and make consistent with data in table 3, or clarify} \gpnote{This means
+that you used blocking communication. If there is a reason for using those and not non-blocking
+communication, please include it. It gives the sense that MPI communication is blocking 
+no matter what, which is not true}
 \csnote{have explained the communications in a better manner} Following the 
 results from the initial timing studies,the y and the z-axes were not divided
 in more than 2 compartments for 128 and 256 core simulation as well. This
@@ -974,8 +981,8 @@ center of the compartment such that the number of ghost atoms are minimized.
 For simulations with higher number of cores the extra slicing in the x direction 
 reduced the space available for the insertion of the particles.
 This made LIGGGHTS carry out larger number of Monte-Carlo simulations to insert 
-the partilces in the desired area. In some cases, the Monte-Carlo iterations performed 
-were not enought leading to many of the particles being inserted incorrectly.
+the particles in the desired area. In some cases, the Monte-Carlo iterations performed 
+were not enough leading to many of the particles being inserted incorrectly.
 \jhanote{please elaborate} Another abnormal behavior observed due to this over slicing 
 was that the particles halted \jhanote{in a?} in a certain compartment and
 no particle traveled beyond this compartment in the x-direction. Thus, the number of partitions 
@@ -1013,7 +1020,8 @@ show that incorrectly slicing the geometry also affects the performance of the
 system. It can be noted that slicing along y-axis is more favorable than
 slicing along the z-direction. \jhanote{Without further
 discussion/explaination, it is difficult to discern how/why?.} \csnote{Proceeding lines 
-have this discussion} The
+have this discussion}\gpnote{I think there are too many "thus"s and "so"s. I think it
+would read better if this was before the previous sentences and remove all "thus"s} The
 insertion of particles is hindered when the geometry is cut along the z-axis
 as the inlet is perpendicular to it. LIGGGHTS thus provisions less space for
 the insertion of these particles, thus increasing the time of the simulation.
@@ -1033,7 +1041,7 @@ mono-sized population of particles of diameter 0.63, 1, 1.26, 1.59 and 2 mm
 simulations and one simulation consisted of particle size distribution.
 Figure~\ref{fig:rslts_DEM_timing_studies} shows that the amount of CPU time
 required for a 10 second simulation of the granulator. The post processing
-MATLAB script was run on the dump files obtained from the simulation and it
+MATLAB \gpnote{needs citation} script was run on the dump files obtained from the simulation and it
 was observed that the system reached a steady state about 3-5 seconds of the
 simulation time. Particles with larger diameter reached steady state at a
 faster rate with an average hold-up of particles of about 6500.
@@ -1044,27 +1052,31 @@ faster rate with an average hold-up of particles of about 6500.
 The improvements in the speed of the simulation was higher when the cores were increased from 1 
 16 when compared to speed improvements obtained with a core count greater than 16.}
 \label{fig:rslts_DEM_2mm_timing}
-\end{figure}	
+\end{figure}
 
+\gpnote{You are saying that a measure is not good to represent performance, but a function which has
+this measure as a free variable is?! Showing only time may not be the best representation of performance,
+but time is a good measure of performance. I do not see any data other than timing data for performance.}
 Pure timing studies are not really a good measure to represent the parallel performance of a program. 
 Speedup of a parallel program indicates the speed increase of the program when it is run on more 
 compute cores compared to the wall clock time when it is run in serial. It is the most common way to 
 represent the parallel performance. Speedup is the ratio of the time taken to run the program in serial 
 to the time taken by the program to run in parallel as shown in Equation~\ref{eqn:rslts_DEM_Speed_Up}. 
-For an ideally parallelized program, the speedup is 'n' times, where n is the number of cores used.
-
+For an ideally parallelized program, speedup is equal to $n$, where $n$ is the number of cores used.
+\gpnote{My general preference: Anything that has to do with mathematics or arithmetics, regardless if it
+    is inline with the text or not, should be in \$ signs. It makes it clearer than quotes}
 \begin{align}
 \textit{Speedup} = \frac{\textit{Serial Wall Clock Time}}{\textit{Parallel Wall Clock Time}}
 \label{eqn:rslts_DEM_Speed_Up}
 \end{align}
 
-Speedup does not take into account number of processors used in the simulation, thus another metric 
-that is used to determine the parallel performance is parallel efficiency. This metric is nothing by 
+Speedup does not take into account number of processors used in the simulation. Another metric 
+used to determine parallel performance is Parallel Efficiency. This metric is defined as 
 speedup divided by the number of cores used. Thus, parallel efficiency normalizes speedup and gives 
-a fractional value of the ideal speedup a program achieves with the increase in the number of cores.
+the fraction of the ideal speedup a program achieves increasing the number of cores.
 
 \begin{align}
-\textit{Parallel Efficiency} = \frac{\textit{Serial Wall Clock Time}}{\textit{Parallel Wall Clock Time $\times$ $n_{cores}$}}
+\textit{Parallel Efficiency} = \frac{\textit{Serial Wall Clock Time}}{\textit{Parallel Wall Clock Time $\times$ $n$}}
 \label{eqn:rslts_DEM_parallel_efficiency}
 \end{align}
 
@@ -1307,12 +1319,11 @@ found in Figure \ref{fig:rslts_PBM_2mm_d50}}
 
 \subsection{One-way coupled DEM+PBM using RADICAL-Pilot and its performance} 
 
-RADICAL-Pilot (RP) being a pilot job system it can bypass the need of
-waiting on the long scheduler queues on a cluster for each individual task. \jhanote{This is wrong! It
+\gpnote{This is said before. It can be removed:RADICAL-Pilot (RP) being a pilot job system it can bypass the need of
+waiting on the long scheduler queues on a cluster for each individual task.} \jhanote{This is wrong! It
 avoids the individual tasks from waiting for different periods of time at the
 scheduler, not waiting itself at the scheduler!} \csnote{corrected, could you please check if it is clear now} 
-With resources allocated to
-itself the pilot can execute multiple simulation runs at once. The pilot job
+With resources allocated, the pilot can execute multiple simulation runs at once. The pilot job
 initiates the DEM simulation using the LIGGGHTS executable compiled for the
 DEM studies and then creates a link between the collision data obtained, which
 is utilized by then utilized by the PBM executable. After the link is
@@ -1381,14 +1392,18 @@ total time taken to complete the multiple runs required.
 
 \section{Acknowledgments}
 The authors would like to acknowledge National Science Foundation (NSF) for 
-funding this project
-through the grant number: 1547171.
-\section*{Appendix}
+funding this project through the grant number: 1547171. Computational resources 
+were provided by NSF XRAC award TG-MCB090174.
+
+
+\appendix
+\section{PBM Parallelization}
 The parallelization technique used for the PBM used was dependent on the number of compartments present inside 
 granulator. Each of the compartments, had calculations independent from each other for each time step. So each of them were
 loaded onto different MPI processes. Since there is minimal communication between them, they could easily be parallelized using MPI. 
 To get further speed improvements, the time independent calculations of the PBM were parallelized using OMP. 
-This parallelization technique is decried as an algorithm in Algorithm 1. \\
+This parallelization technique is decried as an algorithm in Algorithm \ref{alg:parpbm}.
+
 OMP was used to parallelize the calculations inside each compartment. Since the PBM consisted of 2 solid bins, one of 
 the solid bins was parallelized. The number of solid bins of solid were equally divided by the number of OMP threads. 
 Figure~\ref{fig:app_OMP_distribution} depicts the equal distribution of 16 solid bins of the second solid using 4 OMP 
@@ -1444,6 +1459,7 @@ threads.
      \EndWhile
      \EndProcedure
      \end{algorithmic}
+ \label{alg:parpbm}
  \end{algorithm}     
 
  

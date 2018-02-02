@@ -53,6 +53,7 @@
 \definecolor{orange}{rgb}{1,.5,0}
 \definecolor{dandelion}{cmyk}{0,0.29,0.84,0}
 \newcommand{\gpnote}[1]{{\textcolor{green} {***giannis: #1}}}
+\newcommand{\fbnote}[1]{{\textcolor{cyan} { ***franklin: #1 }}}
 \newcommand{\note}[1]{ {\textcolor{magenta} { ***Note: #1 }}}
 \else
 \newcommand{\terminology}[1]{}
@@ -301,25 +302,38 @@ powder.To understand how a granulation processes will behave with different
 design and operating parameter settings and formulations, experimental studies
 are performed which is a method referred to as Quality-by-Testing (QbT). This
 methodology is time consuming and expensive. Thus, newer research is focused
-on the QbD concept i.e, developing a mathematical model to represent the rate
-process.
+on the more economical Quality-by-Design (QbD) concept i.e, using mathmatical 
+models to design these processes in silico. %developing a mathematical model 
+%to represent the rate process.
 
 \subsection{Modeling}
-The paradigm shift of the pharmaceutical industry for instance towards
-continuous manufacturing, emphasizes the need for a more accurate model. This
-further helps to develop better control strategies for the process. The
-modeling of particulate processes is more time consuming and computationally
-expensive when compared to fluid systems since particles are considered as
-individual entities rather than a continuum like fluid systems. The models
-discussed ahead represent the particle-particle interaction at meso and micro-
-scale.
+
+The paradigm shift of the pharmaceutical industry towards QbD emphasizes the need
+for a more accurate models. As the industry switches to continuous prodution methods
+over tradtional batch methods there will be a dire need for accurate 
+predictive controllers that can midigate any loss of API in processing which will
+require computationally efficient and highly precise models. The models
+discussed ahead represent the particle-particle interaction at meso and micro-scale.
+
+%The paradigm shift of the pharmaceutical industry for instance towards
+%continuous manufacturing, emphasizes the need for a more accurate model. This
+%further helps to develop better control strategies for the process. The
+%modeling of particulate processes is more time consuming and computationally
+%expensive when compared to fluid systems since particles are considered as
+%individual entities rather than a continuum like fluid systems. The models
+%discussed ahead represent the particle-particle interaction at meso and micro-
+%scale.
+
+This method tracks the movement of each particle and records all forces on the particle
+such as particle-geometry collisions, particle-particle-collisions, gravitational forces,
+and select force-fields that apply~\citep{Barrasso2015cerd}.
+
 \subsubsection{Discrete Element Modeling (DEM)}
- Discrete Element Method is a simulation technique used to monitor the
-behavior of each particle as a separate entity compared to other bulk
-continuum models. This method tracks the movement of each particle within the
-space, records the collisions of each particle with the geometry as well as
-with each other and it is also subject to other force fields like
-gravity~\citep{Barrasso2015cerd}. This model is based on the Newton's laws of
+ Discrete Element Method is a simulation technique used to model the
+behavior of systems of particles. This method tracks the movement of each particle
+ and records all forces on the particle such as particle-geometry collisions, 
+ particle-particle collisions, gravitational forces, and select force-fields that 
+ apply~\citep{Barrasso2015cerd}. This model is based on the Newton's laws of
 the motion as shown in Equations~\ref{eqn:bkgd_dem_n2law} \&
 \ref{eqn:bkgd_dem_forcebal} : \\
 \begin{align}
@@ -327,8 +341,8 @@ m_i\frac{dv_i}{dt} &= F_{i,net} \label{eqn:bkgd_dem_n2law} \\
 F_{i,net} &=  F_{i,coll} +  F_{i,ext} \label{eqn:bkgd_dem_forcebal}
 \end{align}
 Where, $m_i$ is the mass of the particle, $v_i$ represents the velocity of the
-particle, $F_{i,net}$  represents the net force on the particle, forces on the
-particle due to collisions and other external forces are represented in
+particle, and $F_{i,net}$ represents the net force on the particle. Forces on the
+particle due to collisions and other external forces are represented by
 $F_{i,coll}$ and $F_{i,ext}$ respectively.
 
 Using this method, the distance between each particle is calculated at every
@@ -354,7 +368,7 @@ model~\citep{gantt2006}~\citep{hassanpour2013} has been utilized in this work.
      Population balance models (PBM) predict how groups of discrete entities will behave on a 
     bulk scale due to certain effects acting on the population with respect to time~\citep{ramkrishna2014}. In the context of process engineering and granulation, population 
     balance models are used to describe how the number densities, of different types of particles, in 
-    the granulator change as rate processes such as aggregation and breakage reshape particles~\citep{Barrasso2013}. A general form of population balance model is shown in Equation~\ref{eqn:bkgd_pbm_general}.
+    a granulator change as rate processes such as aggregation and breakage reshape particles~\citep{Barrasso2013}. A general form of population balance model is shown in Equation~\ref{eqn:bkgd_pbm_general}.
     
     \begin{align}
     \frac{ \partial}{\partial t}F(\textbf{v},\textbf{x},t) +& \frac{\partial}{\partial 
@@ -393,72 +407,109 @@ development of kernels. A hybrid model for one-way coupling has been reported fo
 
 In this work, a coupled DEM and PBM model has been implemented. In general, the PBM provides meso-scale 
 information while the DEM gives particle scale information. The combination of these two methods helps 
-describe the process dynamics with more accuracy. However, calculations involved due to the number 
-of particles involved in the DEM process as well as PBM become computationally very heavy, hence the
-motivation and need for running the simulations on HPCs and parallelization techniques. 
+describe the process dynamics with more accuracy an a PBM but more efficently than DEM. However, the computation
+required to solved these coupled models when using a large number of particles becomes very intensive and time consuming, hence the need for HPC methods to help solve these models more quickly.
  
 
 \subsection{Parallel computing and computer architectures}
 
-\subsubsection{Computer Architecture}
+\subsubsection{Computer Architecture and Parallel Applicaitons}
+\fbnote{merged sections comp arch and paralle apps. made content significantly more concise
+does this suit your liking better prof. Jha? Giannis does this seem to explain things in a simple
+yet correct fashion?}
 
-\jhanote{HPC has been defined. Please use it} \csnote{Changed}
-\gpnote{A conventional PC is not the correct term. I suggest the analogy to be removed and write:
-An HPC node usually has two processors and at least 64GBs of RAM. Each processor has at least 16 cores. Main memory or RAM is divided between processors. As a result, each processor has direct access to the part of the memory it considers local. However accessing the rest of the memory introduces delays~\cite{Jin2011}. Therefore, managing data locality is very important.}
-Analogous to a conventional PC a HPC cluster node has
-one or more CPUs and RAM. Commonly nodes are manufactured with two CPUs, each
-CPU is a multi-core meaning it has multiple compute cores such that each can
-carry out calculations separately from one another. On a node, memory is
-divided by CPU sockets, so each CPU has direct access to memory that is local
-to its own socket, however accessing memory on another socket is much
-slower~\citep{Jin2011}. For this reason. data that is needed for computation
-should be stored locally to the CPU that needs it.
+A node on a HPC cluster has multiple CPUs (usually two) and commonly 32GBs or more of RAM. 
+Each CPU is a multi-core processor meaning it has multiple compute cores that can carry 
+out computation independently of one another. Main memory or RAM is divided between processors.
+As a result, each processor has direct access to the part of the memory it considers local,
+ while accessing the memory of other processors introduces delays~\cite{Jin2011}. 
+Therefore, managing data locality is very important.
+ 
+%\jhanote{HPC has been defined. Please use it} \csnote{Changed}
+%\gpnote{A conventional PC is not the correct term. I suggest the analogy to be removed and write:
+%An HPC node usually has two processors and at least 64GBs of RAM. Each processor has at least 16 cores. Main memory or RAM is %divided between processors. As a result, each processor has direct access to the part of the memory it considers local. However %accessing the rest of the memory introduces delays~\cite{Jin2011}. Therefore, managing data locality is very important.}
 
-\gpnote{I am not sure if this is needed. "nodes exchange memory" is not the best
-way to say it. How about "Data movement between nodes"? I am not sure for the purpose
-of this paragraph. You introduce MPI and OMP in the next subsection.}
-There are two classes of computer architecture which can be classified by
-memory locality features such as distributed memory systems or shared memory
-systems. These two classes co-exist in a cluster, thus providing the benefits
-of each. All the nodes exchange memory using explicit message passing while
-each has its own independent memory. The cores on each node can access data
-from the shared memory without explicit message passing statements from
-the user.\gpnote{It may be better to say programmer.} While designing a parallel program all these aspects need to be
-considered for optimal performance of the code~\citep{Adhianto2007}.
+Since the many cores of a CPU can communicate directly through memory they can communicate using shared 
+memory methods. This is commonly done using Open Multi-Processing (OMP) which uses threading to 
+parallelize the cores. The cores can then communicate implicitly in most cases, directly through memory. 
+This also allows processes to share common data automatically reducing communication overhead and reduces the overall 
+memory footprint required for computation.
+
+When many CPUs are being used in parallel they cannot communicate with each other directly through memory 
+which results in much slower communication and therefore shared memory methods like OMP should not be used. 
+This type of system where processes cannot communicate directly through memory is called a 
+distributed memory system. Message passing interface ( MPI) is commonly used to enable communciation of the processes 
+of a distrubted memroy system. MPI allows the processes to communciate using explicit  message passing methods. 
+MPI will operate each process as a discrete entity with its own private copy of each variable it needs 
+for computation which is how it avoids memory retrieval slowdowns when using many CPUs. For optimial parallel performance a 
+programmer needs to consider the architecture of the cluster they are using and the features of the applicatons they are using
+ such as MPI and OMP ~\citep{Adhianto2007}.  
+
+%Analogous to a conventional PC a HPC cluster node has
+%one or more CPUs and RAM. Commonly nodes are manufactured with two CPUs, each
+%CPU is a multi-core meaning it has multiple compute cores such that each can
+%carry out calculations separately from one another. On a node, memory is
+%divided by CPU sockets, so each CPU has direct access to memory that is local
+%to its own socket, however accessing memory on another socket is much
+%slower~\citep{Jin2011}. For this reason. data that is needed for computation
+%should be stored locally to the CPU that needs it.
+
+%There are two types of computer architectures which can be classified by
+%memory locality features, distributed memory systems and shared memory
+%systems. A distributed system as memory which cannot be accessed by all processes
+%except by explicit message passing. For example a process from one node cannot
+%collect information from a process on a seperate node without explicit message passing. 
+%A shared memory system however enables processes to collect information from one another
+%without having to explicitly share that information. For example the multple cores on a CPU
+%can operate in a shared memory fashion since they can communicate directly through memory. 
+%However it is important to note that a programmer can operate a shared memory system in a way
+%that does not allow cores on a CPU to operate using shared memory. Therefore while designing a parallel 
+%program these aspects need to be considered for optimal performance of the code~\citep{Adhianto2007} 
+
+%%\gpnote{I am not sure if this is needed. "nodes exchange memory" is not the best
+%%way to say it. How about "Data movement between nodes"? I am not sure for the purpose
+%%of this paragraph. You introduce MPI and OMP in the next subsection.}
+%%There are two classes of computer architecture which can be classified by
+%%memory locality features such as distributed memory systems or shared memory
+%%systems. These two classes co-exist in a cluster, thus providing the benefits
+%%of each. All the nodes exchange memory using explicit message passing while
+%%each has its own independent memory. The cores on each node can access data
+%%from the shared memory without explicit message passing statements from
+%%the user.\gpnote{It may be better to say programmer.} While designing a parallel program all these aspects need to be
+%%considered for optimal performance of the code~\citep{Adhianto2007}.
+
+%\subsubsection{Parallel Application Programming Interfaces (APIs)}
+%\gpnote{MPI is the most common and is considered the best way to parallelize applications for distributed
+%    computing.}
+%Message Passing Interface (MPI) is the most common Parallel Computing Application 
+%Programming Interface standard. MPI is used for distributed memory parallel computing. Parallelization
+%is achieved via multiprocessing and data communication is done through well defined messages, regardless
+%executing a program in a single or multiple nodes~\citep{Jin2011}. Each process has each own copy of variables
+%and arrays, which can result to large memory consumption if not used carefully. 
 
 
-\subsubsection{Parallel Application Programming Interfaces (APIs)}
-\gpnote{MPI is the most common and is considered the best way to parallelize applications for distributed
-    computing.}
-Message Passing Interface (MPI) is the most common Parallel Computing Application 
-Programming Interface standard. MPI is used for distributed memory parallel computing. Parallelization
-is achieved via multiprocessing and data communication is done through well defined messages, regardless
-executing a program in a single or multiple nodes~\citep{Jin2011}. Each process has each own copy of variables
-and arrays, which can result to large memory consumption if not used carefully. 
 
+%%and this is 
+%%because the application programming interface will operate 
+%%every MPI process as a discrete unit that does not share memory with the other processes unless explicit 
+%%message passing is used. Even on shared a single node where the hardware supports shared 
+%%memory computing, MPI will still operate it in a distributed memory fashion~\citep{Jin2011}. Operating all 
+%%cores as distinct units also means they each need their own copy of all variables used for computation 
+%%which results in a large overall memory foot print compared to a similar system if it was operated in 
+%%shared memory. 
 
+%Open Multi-Processing (OMP) is another API standard for parallel computing. OMP takes advantage of shared 
+%memory systems and uses threads instead of processes. Although, it does not work well on distributed systems. This 
+%prevents it from being used to efficiently carry out computations across multiple nodes~\citep{Jin2011}. 
 
-%and this is 
-%because the application programming interface will operate 
-%every MPI process as a discrete unit that does not share memory with the other processes unless explicit 
-%message passing is used. Even on shared a single node where the hardware supports shared 
-%memory computing, MPI will still operate it in a distributed memory fashion~\citep{Jin2011}. Operating all 
-%cores as distinct units also means they each need their own copy of all variables used for computation 
-%which results in a large overall memory foot print compared to a similar system if it was operated in 
-%shared memory. 
-
-Open Multi-Processing (OMP) is another API standard for parallel computing. OMP takes advantage of shared 
-memory systems and uses threads instead of processes. Although, it does not work well on distributed systems. This 
-prevents it from being used to efficiently carry out computations across multiple nodes~\citep{Jin2011}. 
-
-Since MPI is preferred for distributed computing and OMP is better for shared computing many 
-researchers have studied the performance of MPI vs MPI+OMP methods. Many a times a trade off is made 
-between optimizing a program for performance and trying to make it flexible enough to run on many 
-different computer architectures. \gpnote{How is relevant to this section? I think it would be better in the next}
-It was found that hybrid methods for PBMs allow the code 
-flexibility for different architectures while still maintaining good performance~\citep{Bettencourt2017}.
-It was also reported that only the external(spatial) coordinates of the PBM were parallelized. 
-In this current work external and internal(compositions) calculations are parallelized. 
+%Since MPI is preferred for distributed computing and OMP is better for shared computing many 
+%researchers have studied the performance of MPI vs MPI+OMP methods. Many a times a trade off is made 
+%between optimizing a program for performance and trying to make it flexible enough to run on many 
+%different computer architectures. \gpnote{How is relevant to this section? I think it would be better in the next}
+%It was found that hybrid methods for PBMs allow the code 
+%flexibility for different architectures while still maintaining good performance~\citep{Bettencourt2017}.
+%It was also reported that only the external(spatial) coordinates of the PBM were parallelized. 
+%In this current work external and internal(compositions) calculations are parallelized. 
 
 \subsubsection{Previous works on parallel development and solution of PBM and DEM}
 The idea of parallelization to reduce the computation time of the DEM and PBM simulations have 

@@ -665,11 +665,11 @@ nature. The Hertz-Mindlin model was used for non-adhesive elastic contact betwee
 The particles were inserted inside the granulator from the inlet at a constant mass flow rate of 15 
 kilograms per hour. The rotation speed of the impeller was kept throughout the study at 2000 rotations 
 per minute. Such a high rotation speed was chosen since this would lead to high shear between the 
-particles and the walls of the shell resulting in better size control of the granules. There were 2 sets of 
+particles and the walls of the shell resulting in better size control of the granules. There were two sets of 
 simulations that were performed, one with mono-sized particles and second consisting of a distribution 
-of sizes. The particle radii chosen for mono-sized simulation varied 0.59mm - 2mm, consecutive 
-particles radii had volume twice of one before them. The radii range of the distributed size simulation 
-was 1mm - 3mm. The difference in the mechanics of these two simulations is discussed in the Section~\ref{sec:Results}. 
+of sizes. The particle radii chosen for mono-sized simulation varied from 0.59mm to 2mm, consecutive 
+particles radii had twice the volumne of the size class before them. The radii range of the distributed size simulation 
+was 1mm to 3mm. The difference in the mechanics of these two simulations is discussed in the Section~\ref{sec:Results}. 
 The physical constants used for the simulations are given in Table~\ref{table:mthds_dem_input}.
 
 The simulation data was collected after every 50,000 time steps (5$\times 10^{-3}$ sec) 
@@ -762,7 +762,7 @@ aggregation and breakage. $g_{in}(s_1,s_2,x)$ and $g_{out}(s_1,s_2,x)$ are respe
 volume of the particles entering and leaving the spatial compartment. $\dot{g}_{cons}(s_1,s_2,x)$ is the 
 volume of gas coming out of each particle at every time-step due to consolidation of the particles. 
 The rate of aggregation, $\Re_{agg}(s_1,s_2,x)$ in Equation~\ref{eqn:mthds_pbm_overall} is 
-calculated as:~\citep{Chaturbedi2017}
+calculated as:~\citep{Chaturbedi2017} \fbnote{should this citation come before the :?} 
 
 \begin{align}
 \Re_{agg}(s_1,s_2,x)&= \frac{1}{2}\int _0^{s_1} \int_0^{s_2} 
@@ -772,8 +772,8 @@ calculated as:~\citep{Chaturbedi2017}
 \end{align}
 
 
-where, the aggregation kernel, $\beta(s_1,s_2, s_1',s_2',x)$ is expressed as a function of collision 
-rate coefficient ($C$) and probability that collision results in agglomeration($\psi$)~\citep{ingram2004}
+where, the aggregation kernel, $\beta(s_1,s_2, s_1',s_2',x)$ is expressed as a function of the collision 
+rate coefficient ($C$) and probability that a collision will result in agglomeration($\psi$)~\citep{ingram2004}
 and is shown below: 
 
 \begin{align}
@@ -785,16 +785,16 @@ and is shown below:
 
 where, $\beta_o$ is aggregation rate constant.\\
 Collision rate coefficient ($C$) is a function of particle sizes and is calculated by normalizing the 
-number of collisions between group of particles~\citep{gantt2006} and is obtained from LIGGGHTS 
-DEM simulation. A recent study shows that collision frequency depends on the Particle Size Distribution (PSD) as well~\citep{sen2014}. Collision rate coefficient for every time step can be expressed as:
+number of collisions between a group of particles~\citep{gantt2006} and is obtained from a LIGGGHTS 
+DEM simulation. A recent study shows that collision frequency depends on the Particle Size Distribution (PSD) as well~\citep{sen2014} \fbnote{this line seems shoehorned in here. Need to explicitly state why it relates to this equation right now in the paper. Might make more sense to bring this study up before you talk about using mono and distributed particle size systems. This study would give reason for why both might be informative. }. Collision rate coefficient for every time step can be expressed as:
 
 \begin{align}
 C(s_1,s_2,s_1',s_2')=\frac{N_{coll}(s_1,s_2,s_1',s_2')}{N_p(s_1,s_2)N_p(s_1',s_2')\Delta t}
 \label{eqn:collfreq}
 \end{align}
 
-In Equation~\ref{eqn:collfreq}, $N_{coll}$ is the number of collision between two particles in 
-time interval $\Delta t$ \& $N_p$ is number of particle of particular size. The agglomeration 
+In Equation~\ref{eqn:collfreq}, $N_{coll}$ is the number of collisions between two particles in 
+time interval $\Delta t$ and $N_p$ is the number of particles of a particular size. The agglomeration 
 ($\psi$) in Equation~\ref{eqn:mthds_pbm_beta_kernal} can be expressed as:
 
 \begin{align}
@@ -814,12 +814,12 @@ The rate of increase of liquid volume of a particle, $\dot{l}_{add}(s_1,s_2,x)$ 
 \dot{l}_{add}(s_1,s_2,x) = \frac{(s_1+s_2)(\dot{m}_{spray}(1-c_{binder})-\dot{m}_{evap})}{m_{solid}(x)}
 \end{align}
 
-where, $(s_1+s_2)$  is the total solid volume of the particle; $\dot{m}_spray$ is the rate of external 
+where, $(s_1+s_2)$  is the total solid volume of the particle; $\dot{m}_{spray}$ is the rate of external 
 liquid addition, $c_{binder}$ is the concentration of binder in the external liquid (which is assumed to 
 be zero in this case); $\dot{m}_{evap}$ is the rate of evaporation of liquid from 
 the system (which is also assumed to be zero in this case) and $m_{solid}$ is the total amount of solid 
 present in the compartment.
-The rate of decrease in gas volume per particle due to for a time step consolidation is calculated using the 
+The rate of decrease in gas volume per particle due to consolidation is calculated using the 
 following expression:~\citep{Verkoeijen2002} 
 
 \begin{align}
@@ -879,22 +879,23 @@ Number of second solid bins & $ss$ & $16$ & $-$\\
 
 The PBM was discretized by converting each of its coordinates in to discrete
 bins. For the spatial coordinates a linear bin spacing was used. For the
-internal coordinates, solid, liquid and gas a non-linear discretization was
+internal coordinates, solid, liquid, and gas a non-linear discretization was
 used~\citep{barrasso2012}. Once the PBM had been discretized, a finite
 differences method was used which created a system of ordinary differential
 equations (ODEs)~\citep{Barrasso2015cerd}. The numerical integration technique
 used to evaluate the system of ODEs was first order Euler integration as it is
-commonly used to solve these types of systems and author found an improvement
-in  speed while having minimal impact on accuracy~\citep{Barrasso2013}. In
+commonly used to solve these types of systems and ~\citep{Barrasso2013} 
+found it decreased computation time while having minimal impact on 
+accuracy as opposed to other integration techniques. In
 order to avoid numerical instability due to the explicit nature of the Euler
 integration, Courant-Friedrichs-Lewis (CFL) condition must be
-satisfied~\citep{courant1967}. For our PBM model, time-step was calculated at
+satisfied~\citep{courant1967}. For our PBM model, a time-step was calculated at
 each iteration such that, the number of particles leaving a particular bin at
-any time is less than the number of particles present at that
+any time was less than the number of particles present at that
 time~\citep{Ramachandran2010}. To obtain the most optimal parallel
 performance, when solving the PBM, work loads were distributed in a manner
 which took into account the shared and distributed memory aspects of the
-clusters, the PBM was being run on. To parallelize the model in a way which
+clusters being used. To parallelize the model in a way which
 could take advantage of shared memory but still effectively run across a
 distributed system both MPI and OMP were implemented. One MPI process was used
 per CPU core and one OMP thread was used per CPU core,
@@ -902,6 +903,9 @@ as~\cite{Bettencourt2017} found it resulted in the best performance. MPI was
 used for message passing from one node to another while OMP was used for
 calculations on each node that could be efficiently solved using a shared
 memory system.
+
+\fbnote{bec pseudo code changed this section needs to be rewritten since 
+$F_{t,c}$ does not refer to any part of the psuedo code anymore. We will haveto work on this} 
 
 An algorithm in the form of pseudo code is presented below illustrating how
 the calculations are distributed and carried out during the simulation. For
@@ -954,33 +958,34 @@ a maximum of 128 cores.
 \label{sec:RPandCommunications}
 RADICAL-Pilot defines a number of abstractions to describe resources, and
 computational tasks. The Pilot Description is the abstraction that describes
-resources by defining number of cores, HPC resource, and the total time that 
+resources by defining the number of cores, the HPC resource, and the total time that 
 the resources are needed. Computational tasks are defined via the Compute Unit 
 (CU) abstraction. A CU defines the executable, the necessary
 environment that is needed during execution, execution arguments, and any file
 dependencies the executable may have. RP also defines two managing components,
-the Pilot Manager, and Unit Manager. The Pilot Manager is responsible to
-submit and monitor a Pilot. The Unit Manager is responsible to
-place CUs to active Pilots. As soon as a Unit is placed in a Pilot, it starts
+the Pilot Manager, and Unit Manager. The Pilot Manager is responsible for
+submitting and monitoring a Pilot. The Unit Manager is responsible for
+placing CUs in active Pilots. As soon as a Unit is placed in a Pilot, it starts
 executing.
 
 RADICAL-Pilot is utilized to execute and monitor DEM and PBM simulations.
 Initially, a pilot description is created to use several cores of a resource
 and submitted to the pilot manager. A CU description is created for the DEM
 simulation and submitted to the Unit Manager. As soon as the pilot is active,
-the DEM simulation start executing. When finished, a CU describing a PBM
-simulation is submitted at the Unit Manager and start executing. Any data
+the DEM simulation starts executing. When it is finished the DEM output is linked to 
+the new CU describing the PBM
+simulation. The PBM is submitted by the Unit Manager and starts executing. Any data
 dependency is satisfied by doing the necessary file linking through the CU
 description.
 
-\gpnote{This paragraph tellsis very similar with the previous one. Can they become
-    one?}
-The DEM and PBM executables are pre-placed in the resource along with any
-initial information required by the DEM simulation. The DEM unit creates links
-for the data files that are be needed and calls the
-executable. When the execution finishes, new links with the output are created
-in a shared space. The PBM unit uses those links to read the necessary data to
-execute the simulation. When both have finished RP downloads the PBM results.
+%\gpnote{This paragraph is very similar to the previous one. Can they become
+%    one?}
+%The DEM and PBM executables are pre-placed in the resource along with any
+%initial information required by the DEM simulation. The DEM unit creates links
+%for the data files that are be needed and calls the
+%executable. When the execution finishes, new links with the output are created
+%in a shared space. The PBM unit uses those links to read the necessary data to
+%execute the simulation. When both have finished RP downloads the PBM results.
 
 
 

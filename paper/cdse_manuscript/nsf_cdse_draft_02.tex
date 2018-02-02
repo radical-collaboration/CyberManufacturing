@@ -510,10 +510,10 @@ programmer needs to consider the architecture of the cluster they are using and 
 %It was also reported that only the external(spatial) coordinates of the PBM were parallelized. 
 %In this current work external and internal(compositions) calculations are parallelized. 
 
-\subsection{Previous works on parallel development and solution of PBM and DEM}
-The idea of parallelization to reduce the computation time of the DEM and PBM simulations have 
-been employed by various researchers in the past. \cite{Gunawan2008} used high-resolution 
-finite volumes solution methods for the parallelization of their PBM. They performed load 
+\subsection{Previous Works Using HPC Methods to Solve PBMs and DEMs}
+Various researchers ahve employed parallel computing methods to solve DEM and PBM simulations. 
+\cite{Gunawan2008} used high-resolution finite volumes solution methods for the parallelization 
+of their PBM. They performed load 
 balancing effectively by decomposing the internal coordinates of their PBM. They achieved 
 speed improvements up to 100 cores on one system size, but was not tested for models 
 with more dimensions. Moreover, they mentioned that parallelization could be 
@@ -523,10 +523,9 @@ hybrid approach towards the parallelization of the PBM using both MPI and OMP.
 The hybrid parallelization helped achieve a speed improvement of about 98\% using 
 128 cores over the serial code. 
 \cite{Prakash2013a} \& \cite{Prakash2013b} used the inbuilt Parallel Computation 
-Toolbox (PCT) in MATLAB~\citep{pctMatlab} to parallelize their PBM on lower number 
-of cores, but this faced the shortcomings of MATLAB's internal processing and 
-could not achieve the speed improvements of parallelization of a program if 
-it were written in a native programming language like C/C++ or FORTRAN. 
+Toolbox (PCT) in MATLAB~\citep{pctMatlab} to parallelize their PBM using less than 16 cores, 
+but faced short comings due to the overhead of MATLAB software and therefore could not achieve
+the same level of performance as a program written in C/C++ or FORTRAN.  
 
 LIGGGHTS~\citep{Kloss2012}, an open-source software used to perform DEM simulations has native 
 support for MPI for parallelizing the simulation by static decomposition which partitions space such that 

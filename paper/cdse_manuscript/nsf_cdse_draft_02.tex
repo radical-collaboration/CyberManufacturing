@@ -148,18 +148,6 @@ simulation technique for these particulate particles. One of the common
 methods used in the industry is the population balance model (PBM), which is
 more computationally efficient but, lacks the accuracy of the DEM.
 
-%Population balance models (PBMs) are a faster but less accurate way of 
-%modeling these particulate sytems. They are semi-mechanistic in nature, meaning 
-%they use population averages and probability to model bulk behavior but still 
-%seek to capture some of the micro-phenomena of particle-particle interactions 
-%using correlations or empirically developed kernels to approximate those
-%interactions. Even though PBMs are much faster than DEMs, a detailed PBM can
-%still take a significant amount of time to solve which prevents them from
-%being used as widely as they could be in academia and industries
-%\citep{Barrasso2013}. Also even very detailed PBMs can still have difficulties 
-%capturing the micro-scale phenomena that are crucial to predicting accurate 
-%dynamics of particulate processes.
-
 PBM takes into account the changes in internal or spatial particle
 properties.This model lacks sensitivity to design parameters such as equipment
 geometry. It is semi-mechanistic in nature, meaning they use population
@@ -1486,46 +1474,19 @@ were provided by NSF XRAC award TG-MCB090174.
 \appendix
 \section{PBM Parallelization}
 \label{app:parallelPBM}
-The parallelization technique used for the PBM used was dependent on the number of compartments present inside 
-granulator. Each of the compartments, had calculations independent from each other for each time step. So each of them were
-loaded onto different MPI processes. Since there is minimal communication between them, they could easily be parallelized using MPI. 
-To get further speed improvements, the time independent calculations of the PBM were parallelized using OMP. 
-This parallelization technique is decried as an algorithm in Algorithm \ref{alg:parpbm}.
+The parallelization technique used for the PBM used was dependent on the number of 
+compartments present inside granulator. Each of the compartments, had calculations 
+independent from each other for each time step. So each of them were loaded 
+onto different MPI processes. Since there is minimal communication between them, 
+they could easily be parallelized using MPI. To get further speed improvements, 
+the time independent calculations of the PBM were parallelized using OMP. This 
+parallelization technique is decried as an algorithm in Algorithm \ref{alg:parpbm}.
 
-OMP was used to parallelize the calculations inside each compartment. Since the PBM consisted of 2 solid bins, one of 
-the solid bins was parallelized. The number of solid bins of solid were equally divided by the number of OMP threads. 
+OMP was used to parallelize the calculations inside each compartment. Since 
+the PBM consisted of 2 solid bins, one of the solid bins was parallelized. 
+The number of solid bins of solid were equally divided by the number of OMP threads. 
 %Figure~\ref{fig:app_OMP_distribution} depicts the equal distribution of 16 solid bins of the second solid using 4 OMP 
 %threads.
-%\begin{algorithm}[H]
-%    \caption*{\textbf{Algorithm 1}}
-%    \label{alg:MyAlgorithm}
-%    \begin{algorithmic}[1]
-%        
-%        \While{ $t<t_{final}$ }
-%        \State The spatial domain is divided into equal chunks
-%        \State Each MPI process is assigned on chunk of spatial domain shown as $c_{low}$ to $c_{up}$ 
-%        \State Sum all $c_{low_i}$ to $c_{up_i}$ is = to [0,number of Compartments]
-%        \For{each MPI processes} $c = c_{low_i}$ to $c_{up_i}$
-%        \State Each MPI process is further divided with OMP to take advantage of multi-core CPU
-%        \State Each OMP process is allocated to a single compute core
-%        \State $\Re$ integrates for each first solid bin as the second solid bins is 
-%        divided across the OMP\\ \hspace{1.05cm} threads, thus divided into smaller integrals 
-%        Figure~\ref{fig:app_OMP_distribution} depicts this distribution.
-%        \State Allocated to that MPI process (CPU)
-%        \For{each OMP process}
-%        \State Calculate the Aggregation Constant $\Re_{agg}(s_1,s_2,c)$
-%        \EndFor
-%        \State Calculate total number of particles using Euler's rule.
-%        \EndFor
-%            \State MPI Send $F_{t,c}$ to Master MPI process
-%            \State MPI Recv $F_{t,c}$ from MPI all slave processes
-%            \State Master consolidate all $F_{t,c}$ chunks into a complete $F_{t,all}$
-%            \State Master does inter-bin particle transfers (updates $F_{t,all}$)
-%            \State MPI Bcast $F_{t,all}$ to all slave processes
-%            \State $t_{new} = t + timestep$
-%        \EndWhile        
-%    \end{algorithmic}
-%\end{algorithm}  
 
      \begin{algorithm}[H]
      \scriptsize

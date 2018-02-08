@@ -732,26 +732,26 @@ liquid addition.
 Similarly, the rate of change of gas volume for a given time is calculated using the following equation: 
 
 \begin{align}
-\frac{d}{dt}F(s_1,s_2,x)g(s_1,s_2,x)&= 
-\Re_{gas,agg}(s_1,s_2,x)+\Re_{gas,break}(s_1,s_2,x)+\dot{F}_{in}(s_1,s_2,x)g_{in}(s_1,s_2,x)\notag\\
-&-\dot{F}_{out}(s_1,s_2,x)g_{out}(s_1,s_2,x)+F(s_1,s_2,x)\dot{g}_{cons}(s_1,s_2,x)
+\frac{d}{dt}F(s_1,s_2,x,t)g(s_1,s_2,x,t)&= 
+\Re_{gas,agg}(s_1,s_2,x,t)+\Re_{gas,break}(s_1,s_2,x,t)+\dot{F}_{in}(s_1,s_2,x,t)g_{in}(s_1,s_2,x,t)\notag\\
+&-\dot{F}_{out}(s_1,s_2,x,t)g_{out}(s_1,s_2,x,t)+F(s_1,s_2,x,t)\dot{g}_{cons}(s_1,s_2,x,t)
 \label{eqn:mthds_pbm_gas_agg} 
 \end{align}
 
-where, $g(s_1,s_2,x)$ is the gas volume of each particle with API volume of $s_1$ and excipient 
-volume of $s_2$ in the spatial compartment $x$. $\Re_{gas,agg}(s_1,s_2,x)$ and 
-$\Re_{gas,break}(s_1,s_2,x)$ are respectively the rates of gas transferred between size classes due to 
-aggregation and breakage. $g_{in}(s_1,s_2,x)$ and $g_{out}(s_1,s_2,x)$ are respectively the gas 
-volume of the particles entering and leaving the spatial compartment. $\dot{g}_{cons}(s_1,s_2,x)$ is the 
+where, $g(s_1,s_2,x,t)$ is the gas volume of each particle with API volume of $s_1$ and excipient 
+volume of $s_2$ in the spatial compartment $x$. $\Re_{gas,agg}(s_1,s_2,x,t)$ and 
+$\Re_{gas,break}(s_1,s_2,x,t)$ are respectively the rates of gas transferred between size classes due to 
+aggregation and breakage. $g_{in}(s_1,s_2,x,t)$ and $g_{out}(s_1,s_2,x,t)$ are respectively the gas 
+volume of the particles entering and leaving the spatial compartment. $\dot{g}_{cons}(s_1,s_2,x,t)$ is the 
 volume of gas coming out of each particle at every time-step due to consolidation of the particles. 
-The rate of aggregation, $\Re_{agg}(s_1,s_2,x)$ in Equation~\ref{eqn:mthds_pbm_overall} is 
-calculated as:~\citep{Chaturbedi2017} \fbnote{should this citation come before the :?} 
+The rate of aggregation, $\Re_{agg}(s_1,s_2,x,t)$ in Equation~\ref{eqn:mthds_pbm_overall} is 
+calculated as~\citep{Chaturbedi2017}:
 
 \begin{align}
-\Re_{agg}(s_1,s_2,x)&= \frac{1}{2}\int _0^{s_1} \int_0^{s_2} 
-\beta(s_1',s_2',s_1-s_1',s_2-s_2',x)F(s_1',s_2',x)F(s_1-s_1',s_2-s_2',x)ds_1'ds_2'\notag\\ 
-&- F(s_1,s_2,x)\int _0^{s_{max_1}-s_1} \int_0^{s_{max_2}-s_2} 
-\beta(s_1,s_2,s_1',s_2',x)F(s_1',s_2',x)ds_1'ds_2'
+\Re_{agg}(s_1,s_2,x,t)&= \frac{1}{2}\int _0^{s_1} \int_0^{s_2} 
+\beta(s_1',s_2',s_1-s_1',s_2-s_2',x,t)F(s_1',s_2',x,t)F(s_1-s_1',s_2-s_2',x,t)ds_1'ds_2'\notag\\ 
+&- F(s_1,s_2,x,t)\int _0^{s_{max_1}-s_1} \int_0^{s_{max_2}-s_2} 
+\beta(s_1,s_2,s_1',s_2',x,t)F(s_1',s_2',x,t)ds_1'ds_2'
 \end{align}
 
 
@@ -770,7 +770,7 @@ rate coefficient ($C$) and probability that a collision will result in agglomera
 where, $\beta_o$ is aggregation rate constant.\\
 Collision rate coefficient ($C$) is a function of particle sizes and is calculated by normalizing the 
 number of collisions between a group of particles~\citep{gantt2006} and is obtained from a LIGGGHTS 
-DEM simulation. A recent study shows that collision frequency depends on the Particle Size Distribution (PSD) as well~\citep{sen2014} \fbnote{this line seems shoehorned in here. Need to explicitly state why it relates to this equation right now in the paper. Might make more sense to bring this study up before you talk about using mono and distributed particle size systems. This study would give reason for why both might be informative. }. Collision rate coefficient for every time step can be expressed as:
+DEM simulation. Collision rate coefficient for every time step can be expressed as:
 
 \begin{align}
 C(s_1,s_2,s_1',s_2')=\frac{N_{coll}(s_1,s_2,s_1',s_2')}{N_p(s_1,s_2)N_p(s_1',s_2')\Delta t}
@@ -807,9 +807,9 @@ The rate of decrease in gas volume per particle due to consolidation is calculat
 following expression:~\citep{Verkoeijen2002} 
 
 \begin{align}
-\dot{g}_{cons}(s_1,s_2,x)=&c (\nu_{impeller})^{\omega}V(s_1,s_2,x)\frac{(1-\epsilon_{min})}{s} 
+\dot{g}_{cons}(s_1,s_2,x,t)=& c \nu_{impeller}^{\omega}V(s_1,s_2,x)\frac{(1-\epsilon_{min})}{s} 
 \notag \\ 
-& \left[g(s_1,s_2,x)+l(s_1,s_2,x) -(s_1+s_2)\frac{\epsilon_{min}}{1-\epsilon_{min}}\right]
+& \left[g(s_1,s_2,x,t)+l(s_1,s_2,x,t) -(s_1+s_2)\frac{\epsilon_{min}}{1-\epsilon_{min}}\right]
 \end{align}        
 
  where, $c$ and $\omega$ are the consolidation constants; $v_{impeller}$ is the impeller 
@@ -890,9 +890,6 @@ distributed system both MPI and OMP were implemented.
 %used for message passing from one node to another while OMP was used for
 %calculations on each node that could be efficiently solved using a shared
 %memory system.
-
-\fbnote{bec pseudo code changed this section needs to be rewritten since 
-$F_{t,c}$ does not refer to any part of the psuedo code anymore. We will haveto work on this} 
 
 An algorithm in the form of pseudo code is presented in \ref{app:parallelPBM} illustrating how
 the calculations are distributed and carried out during the simulation. For
@@ -979,38 +976,40 @@ description.
 \subsubsection{DEM Spatial Decomposition Studies}
 LIGGGHTS as discussed previously, statically decomposes the work space and
 each section is sent to a MPI process for calculations. Thus, the division of
-the space becomes an important criteria for the simulation for efficient load
+the space became an important criteria for the simulation for efficient load
 balancing. The initial timing studies for the decomposition were performed using 64
-cores. The time values indicate that dividing the
-x-direction in more number of compartments decreases the speed of the
-simulation. \jhanote{increasing the "speed of the simulation" is typically
-associated with improved performance. what you mean here is the converse,
-greater the number of compartments, slower the simulation? please clarify or
-fix.} \csnote{A good spot! I meant the converse. Have fixed the 2 following lines as well} 
-The extra slicing in the x-direction decreases the amount of computation carried out by 
-a single process but it increases the number of communiations between the MPI slave and master processes. 
-Thus, leading to slower simulations when the number of slices increase beyond 16 in the x-direction. 
+cores. The time values indicated that dividing the
+x-direction in more number of compartments decreased the speed of the simulation. 
+%\jhanote{increasing the "speed of the simulation" is typically
+%associated with improved performance. what you mean here is the converse,
+%greater the number of compartments, slower the simulation? please clarify or
+%fix.} \csnote{A good spot! I meant the converse. Have fixed the 2 following lines as well} 
+The extra slicing in the x-direction decreased the amount of computation carried out by 
+a single process but it increased the number of communiations in between the MPI slave 
+and master processes. This led to slower simulations when the number of slices 
+increased beyond 16 in the x-direction. 
 %This is easy to comprehend since the granulator has its length parallel to the x-axis. 
 The studies also indicated that if the geometry is divided into more than 2 compartments 
-in either the y-axis or the z-axis the simulation time increases. 
-\jhanote{this is inconsistent with results in table 3!} 
-This can be accounted to the increased communication required to transfer 
+in either the y-axis or the z-axis the simulation time increased. 
+%\jhanote{this is inconsistent with results in table 3!} 
+This can be accounted to increased communication required to transfer 
 the rotating impeller mesh from one compartment in the y-axis or the z-axis 
 to the another compartment for each time step. Since MPI has to pass explicit 
-messages in between the nodes for it to communicate data, there is a delay 
+messages in between the nodes for it to communicate data, there was a delay 
 associated with the master process to obtain all the data. The master process
-need to wait for all the other processes to complete their task before it receives 
-the data from all the processes. With the increased 
-partitions in the y and the z-axes, the master process needs to wait for more 
-processes, leading to delays before the next time step can be simulated which 
-in turn makes the simulation slower.\jhanote{this sentence does 
-not make sense. MPI is "not limited": it is the message passing interface. 
-please rewrite and make consistent with data in table 3, or clarify} \gpnote{This means
-that you used blocking communication. If there is a reason for using those and not non-blocking
-communication, please include it. It gives the sense that MPI communication is blocking 
-no matter what, which is not true}
-\csnote{have explained the communications in a better manner} Following the 
-results from the initial timing studies,the y and the z-axes were not divided
+needed to wait for all the other processes to complete their task before it received 
+the data from all other processes. With the increased 
+partitions in the y and the z-axes, the master process needed to wait for more 
+processes, leading to delays before the next time step could be simulated which 
+in turn made the simulation slower.
+%\jhanote{this sentence does 
+%not make sense. MPI is "not limited": it is the message passing interface. 
+%please rewrite and make consistent with data in table 3, or clarify} \gpnote{This means
+%that you used blocking communication. If there is a reason for using those and not non-blocking
+%communication, please include it. It gives the sense that MPI communication is blocking 
+%no matter what, which is not true}
+%\csnote{have explained the communications in a better manner} 
+Following the results from the initial timing studies,the y and the z-axes were not divided
 in more than 2 compartments for 128 and 256 core simulation as well. This
 meant that the x-axis was divided into 32 and 64 compartments respectively. 
 
@@ -1039,16 +1038,16 @@ meant that the x-axis was divided into 32 and 64 compartments respectively.
 %important parameter that needs to be considered. When the geometry is divided,
 %the amount of computation done by one core should be similar to other
 %processors. 
-\jhanote{What evidence/indication is there that load balancing is
-a problem, as opposed to communication limited?} \csnote{The first few lines 
-are  just general statments I could do away with this paragraph altogether. 
-It does not fit with the flow} %This helps better utilization
+%\jhanote{What evidence/indication is there that load balancing is
+%a problem, as opposed to communication limited?} \csnote{The first few lines 
+%are  just general statments I could do away with this paragraph altogether. 
+%It does not fit with the flow} %This helps better utilization
 %of the resources as well as make the simulations run faster. 
 %Following the results from the initial timing studies,the y and the z-axes were not divided
 %in more than 2 compartments for 128 and 256 core simulation as well. This
 %meant that the x-axis was divided into 32 and 64 compartments respectively. 
-\jhanote{1 paragraph, 1 idea. Is the following part of the above 'load balancing' or is 
-now about 'communication'?} \csnote{tried to clear the air by removing the general statements}
+%\jhanote{1 paragraph, 1 idea. Is the following part of the above 'load balancing' or is 
+%now about 'communication'?} \csnote{tried to clear the air by removing the general statements}
 In order to avoid the expensive communication
 between the processes, LIGGGHTS tries to insert the particles towards the
 center of the compartment such that the number of ghost atoms are minimized.
@@ -1059,15 +1058,16 @@ reduced the space available for the insertion of the particles.
 %were not enough leading to many of the particles being inserted incorrectly.
 This resulted in more re-attempts at inserting the particles in the desired space 
 therby increasing simulation time.
-\jhanote{please elaborate} Another abnormal behavior observed due to this over slicing 
-was that the particles halted \jhanote{in a?} in a certain compartment and
-no particle traveled beyond this compartment in the x-direction. Thus, the number of partitions 
-in the x-direction were reduced and a new set of experiments with different 3-d partition 
-configuration were carried out. 
-\jhanote{I'm
-confused: the previous sentences imply a functional problem. The next sentence
-suggests a performance solution. Doesn't make sense to me.} \csnote{edited structure of the paragraph} The
-comparison of the simulation times of experiments with the new configurations are shown in
+%\jhanote{please elaborate} 
+%Another abnormal behavior observed due to this over slicing 
+%was that the particles halted in a certain compartment and
+%no particle traveled beyond this compartment in the x-direction. 
+Thus, the number of partitions in the x-direction were reduced and a new set of 
+experiments with different 3-D partition configuration were carried out. 
+%\jhanote{I'm
+%confused: the previous sentences imply a functional problem. The next sentence
+%suggests a performance solution. Doesn't make sense to me.} \csnote{edited structure of the paragraph}
+The comparison of the simulation times of experiments with the new configurations are shown in
 Table~\ref{table:rslts_dem_128_256_decomp}.
 
 \begin{table}
@@ -1092,33 +1092,33 @@ $256$ & $16$ & $4$ & $4$ & $265.32$\\
       
 \end{table}
 The simulation times illustrated in Table~\ref{table:rslts_dem_128_256_decomp}
-show that incorrectly slicing the geometry also affects the performance of the
+show that incorrect slicing of the geometry also affected the performance of the
 system. It can be noted that slicing along y-axis is more favorable than
 slicing along the z-direction. \jhanote{Without further
 discussion/explaination, it is difficult to discern how/why?.} \csnote{Proceeding lines 
 have this discussion}\gpnote{I think there are too many "thus"s and "so"s. I think it
 would read better if this was before the previous sentences and remove all "thus"s} The
 insertion of particles is hindered when the geometry is cut along the z-axis
-as the inlet is perpendicular to it. LIGGGHTS thus provisions less space for
-the insertion of these particles, thus increasing the time of the simulation.
-Thus, just slicing the geometry into 2 sections along the z-axis is preferred.
-So, the chosen configurations for the final simulations consisted of the
-geometry having only 2 sections in the z-direction and more slices along the
-y-axis.
+as the inlet is perpendicular to it. This made LIGGGHTS provision less space for
+the insertion of these particles, which increased the time of the simulation.
+Thus, slicing the geometry into 2 sections along the z-axis is preferred.
+The chosen configurations for the final simulations consisted of the
+geometry having only 2 sections in the z-direction and more slices along the y-axis.
 
 \subsubsection{DEM Performance}
 A test case was run for mono-sized particle of 2mm diameter for timing
-comparison studies. The times are plotted in
-Figure~\ref{fig:rslts_DEM_2mm_timing} indicate that using lower number of
-cores is not feasible for long simulations since the time taken while using 1
-core is about $11$x times slower. Thus, the simulations were carried out in
-core configurations of 64, 128 and 256 cores. The studies undertaken had 5
-mono-sized population of particles of diameter 0.63, 1, 1.26, 1.59 and 2 mm
-simulations and one simulation consisted of particle size distribution.
+comparison studies. The times plotted in
+Figure~\ref{fig:rslts_DEM_2mm_timing} indicated that using lower number of
+cores is not feasible for long simulations. The time taken while using 1
+core is about $11$x times slower than a 128 core simulations. 
+Thus, the simulations were carried out in core configurations of 64, 
+128 and 256 cores. The studies undertaken had 5 mono-sized population 
+of particles of diameter 0.63, 1, 1.26, 1.59 and 2 mm simulations 
+and one simulation consisted of particle size distribution. 
 Figure~\ref{fig:rslts_DEM_timing_studies} shows that the amount of CPU time
 required for a 10 second simulation of the granulator. The post processing
-MATLAB \gpnote{needs citation} script was run on the dump files obtained from the simulation and it
-was observed that the system reached a steady state about 3-5 seconds of the
+MATLAB script was run on the dump files obtained from the simulation and it
+was observed that the system reached a steady state about 4-6 seconds of the
 simulation time. Particles with larger diameter reached steady state at a
 faster rate with an average hold-up of particles of about 6500.
 %\begin{figure}
@@ -1145,7 +1145,7 @@ faster rate with an average hold-up of particles of about 6500.
 \end{subfigure}
 \caption{(a) The variation in the amount of time taken for the DEM simulation of 2 mm particles as 
 a function of number of cores. The improvements in the speed of the simulation was higher when the 
-cores were increased from 1 16 when compared to speed improvements obtained with a core count greater 
+cores were increased from 1 to 16 when compared to speed improvements obtained with a core count greater 
 than 16.(b) The speedup achieved in the DEM simulations of 2 mm particles. There 
 was a linear increase up to 16 cores while the speedup seems to plateau when 
 more number of cores are used due to larger amount of communications.}
@@ -1155,7 +1155,8 @@ more number of cores are used due to larger amount of communications.}
 \gpnote{You are saying that a measure is not good to represent performance, but a function which has
 this measure as a free variable is?! Showing only time may not be the best representation of performance,
 but time is a good measure of performance. I do not see any data other than timing data for performance.}
-Pure timing studies are not really a good measure to represent the parallel performance of a program. 
+
+Pure timing studies are not the best representation for the parallel performance of a program. 
 Speedup of a parallel program indicates the speed increase of the program when it is run on more 
 compute cores compared to the wall clock time when it is run in serial. It is the most common way to 
 represent the parallel performance. Speedup is the ratio of the time taken to run the program in serial 
@@ -1163,9 +1164,9 @@ to the time taken by the program to run in parallel as shown in Equation~\ref{eq
 For an ideally parallelized program, speedup is equal to $n$, where $n$ is the number of cores used.
 \gpnote{My general preference: Anything that has to do with mathematics or arithmetics, regardless if it
     is inline with the text or not, should be in \$ signs. It makes it clearer than quotes}
+
 \begin{align}
-\textit{Speedup} = \frac{\textit{Serial Wall Clock Time}}{\textit{Parallel Wall Clock Time}}
-\label{eqn:rslts_DEM_Speed_Up}
+\textit{Speedup} = \frac{\textit{Serial Wall Clock Time}}{\textit{Parallel Wall Clock Time}}\label{eqn:rslts_DEM_Speed_Up}
 \end{align}
 
 Speedup does not take into account number of processors used in the simulation. Another metric 
@@ -1179,11 +1180,10 @@ the fraction of the ideal speedup a program achieves increasing the number of co
 \end{align}
 
 The speedup of the DEM simulations using only MPI cores is shown in Figure~\ref{fig:rslts_DEM_speedup}.
-There is a linear speed increase in the speedup up to 16 cores, after which the 
-performance plateaus.
-Figure~\ref{fig:rslts_DEM_speedup} indicates that there 
-is not a significant amount of speed improvement for the simulation when 256 cores are used for the 
-simulation over 128 cores. This speed decrease can be accounted to the communication time between 
+There was a linear speed increase in the speedup up to 16 cores, after which the 
+performance plateaued. Figure~\ref{fig:rslts_DEM_speedup} indicates that there 
+was not a significant amount of speed improvement for the simulation when 256 cores were used for the 
+simulation over 128 cores. This speed decrease could be due to the communication time between 
 the MPI processes. When the particles move from one section to another of the space, they are 
 transferred as ghost particles from one process to another process. Thus, there is large amount of 
 communication which is required. One of the issues of using a cluster with shared memory within 

@@ -565,7 +565,7 @@ and intel (intel v15.0.2) compilers with the -O3 optimization option as well as 
 process to the Xeon phi co-processors was added. The initial timing studies were performed on Stampede 
 supercomputer located at TACC, University of Texas, Austin. The hardware configuration of each node 
 consists of 2 8-core Intel Xeon E5-2680 processors based on the Sandy Bridge architecture, 32 GB of 
-memory with QPI interconnects at 8.0 GT/s PCI-e lanes.
+memory with QPI interconnects.
 
 
 \subsubsection{Geometry}    
@@ -629,39 +629,35 @@ inside the L\"{o}dige CoriMix CM5 continuous high shear granulator.}
 
 \subsubsection{Meshing}
  After the geometry was built in SolidWorks$^{TM}$ (Dassault Syst\`{e}mes) the shell and impeller 
-were exported as stereo lithography (STL) files. The coarsest output option was used to keep the STL files 
-small and simple for faster computation times. The origin of the geometry was not preserved while saving 
-the STL files since it needs to be aligned in LIGGGHTS as per the process conditions.This resulted in 
-the impeller having 2802 faces and 1281 points with approximately a file size of 775 kilobytes. 
-The shell had 1948 faces and 720 points and size was about 544 kilobytes. Meshlab was used to 
-align the STL files for importing into LIGGGHTS. No mesh treatments were used on the STLs. 
-The meshes were then imported into LIGGGHTS using the write command in serial. This resulted 
-in 50 elements of the impeller file having highly skewed elements, which have more than 5 
-neighbors per surface or have an angle less than 0.0181185 radians, that according to LIGGGHTS 
-would degrade parallel performance. The write exclusion list command in LIGGGHTS was used and 
-this exclusion list file is then used in the simulation to skip the highly skewed elements during 
-the simulation. 
+were exported as stereolithography (STL) files. The coarsest output option was used to keep the STL files 
+small for faster computation times. The origin of the geometry was not preserved while saving 
+the STL files since it needs to be aligned in LIGGGHTS as per the process conditions. 
+Meshlab was used to align the STL files for importing into LIGGGHTS. No mesh treatments were 
+used on the STLs. The meshes were then imported into LIGGGHTS using the write command in serial. 
+The write exclusion list command in LIGGGHTS was used and this exclusion list file is then used in the 
+simulation to skip the highly skewed elements during the simulation. 
 
 
 \subsubsection{DEM input file settings}
-The DEM simulation in LIGGGHTS are setup using an input script which defines the physical 
+The DEM simulation in LIGGGHTS are setup using an input script which defines physical 
 parameters of the particles, importing of the geometry, particle insertion commands, various physics 
 models to be used during the simulation as well as various compute and dump commands to help print 
-the data required for post-processing of the data. The particles were considered to be granular in 
+data required for post-processing. The particles were considered to be granular in 
 nature. The Hertz-Mindlin model was used for non-adhesive elastic contact between the granular particles. 
-The particles were inserted inside the granulator from the inlet at a constant mass flow rate of 15 
-kilograms per hour. The rotation speed of the impeller was kept throughout the study at 2000 rotations 
+Particles were inserted inside the granulator from the inlet at a constant mass flow rate of 15 
+kilograms per hour. Rotation speed of the impeller was kept throughout the study at 2000 rotations 
 per minute. Such a high rotation speed was chosen since this would lead to high shear between the 
-particles and the walls of the shell resulting in better size control of the granules. There were two sets of 
+particles and walls of the shell resulting in better size control of the granules. There were two sets of 
 simulations that were performed, one with mono-sized particles and second consisting of a distribution 
 of sizes. The particle radii chosen for mono-sized simulation varied from 0.59mm to 2mm, consecutive 
-particles radii had twice the volumne of the size class before them. The radii range of the distributed size simulation 
-was 1mm to 3mm. The difference in the mechanics of these two simulations is discussed in the Section~\ref{sec:Results}. 
-The physical constants used for the simulations are given in Table~\ref{table:mthds_dem_input}.
+particles radii had twice the volume of particles before them. The radii range of the distributed 
+size simulation was 1mm to 3mm. The difference in mechanics of these two simulations is discussed 
+in the Section~\ref{sec:Results}. Physical constants used for the simulations are given in 
+Table~\ref{table:mthds_dem_input}.
 
 The simulation data was collected after every 50,000 time steps (5$\times 10^{-3}$ sec) 
 for the visualization of the particles inside the shell, further post processing . The collisions 
-between each of the particles and the collisions between the particle and the geometry was 
+between each of the particles and collisions between particle and the geometry was 
 collected and used in the PBM. 
 
 \begin{table}
@@ -685,11 +681,11 @@ Density of the granules & $500$ & $kg.m^{-3}$\\
 \end{table}
 
 \subsubsection{DEM data post processing}
-The post processing of the data obtained from the DEM simulations was done using MATLAB. 
+Post processing of data obtained from the DEM simulations was done using MATLAB. 
 The first test run on the output data was to determine if the simulation had reached steady-state. The 
 mass inside the granulator was found out by averaging it over 5 time steps and then compared to 
 mass inside the granulator after every 10000 time steps (about 5$\times 10^{-4}$ sec) with a 
-tolerance of about 10\%. If the mass was found to be constant for most of the iterations, it was 
+tolerance of 10\%. If the mass was found to be constant for most of the iterations, it was 
 considered to be at steady state. Another test to determine steady state was to monitor the number of 
 collision inside the granulator. The visualization of the simulation data was done by running the 
 LIGGGHTS post processing (LPP) script over the dump files to convert them into STL files. These 
@@ -713,24 +709,24 @@ of the geometry with the particles as well as from particle particle overlap.
 where, $F(s_1,s_2,x)$ is the number of particles with an active pharmaceutical ingredients 
 (API) volume of $s_1$ and an excipient 
 volume of $s_2$ in the spatial compartment $x$. The rate of change of number of particles with time 
-in different size classes depend on the rate of aggregation $\Re_{agg}(s_1,s_2,x)$ and the rate of 
-breakage $\Re_{break}(s_1,s_2,x)$. Also, the rate of particles coming into, $\dot{F}_{in}(s_1,s_2,x)$ and 
-going out, $\dot{F}_{out}(s_1,s_2,x)$ of the spatial compartment due to particle transfer affect the number of 
-particles in different size classes. 
+in different size classes depend on the rate of aggregation $\Re_{agg}(s_1,s_2,x,t)$ and the rate of 
+breakage $\Re_{break}(s_1,s_2,x,t)$. Also, the rate of particles coming into, $\dot{F}_{in}(s_1,s_2,x,t)$ and 
+going out, $\dot{F}_{out}(s_1,s_2,x,t)$ of the spatial compartment due to particle transfer affect the 
+number of particles in different size classes. 
 The rate of change of liquid volume for a given time in each particle is calculated using the equation: 
 
 \begin{align}
-\frac{d}{dt}F(s_1,s_2,x)l(s_1,s_2,x,t)&= 
-\Re_{liq,agg}(s_1,s_2,x)+\Re_{liq,break}(s_1,s_2,x)+\dot{F}_{in}(s_1,s_2,x)l_{in}(s_1,s_2,x)\notag\\
-&-\dot{F}_{out}(s_1,s_2,x)l_{out}(s_1,s_2,x)+F(s_1,s_2,x)\dot{l}_{add}(s_1,s_2,x)
+\frac{d}{dt}F(s_1,s_2,x,t)l(s_1,s_2,x,t)&= 
+\Re_{liq,agg}(s_1,s_2,x,t)+\Re_{liq,break}(s_1,s_2,x,t)+\dot{F}_{in}(s_1,s_2,x,t)l_{in}(s_1,s_2,x,t)\notag\\
+&-\dot{F}_{out}(s_1,s_2,x,t)l_{out}(s_1,s_2,x,t)+F(s_1,s_2,x,t)\dot{l}_{add}(s_1,s_2,x,t)
 \label{eqn:mthds_pbm_rate} 
 \end{align}
 
-where, $l(s_1,s_2,x)$ is the amount of liquid volume in each particle with API volume of $s_1$ and 
-excipient volume of $s_2$ in the spatial compartment $x$. $\Re_{liq,agg}(s_1,s_2,x)$ and 
-$\Re_{liq,break}(s_1,s_2,x)$ are respectively the rates of liquid transferred between size classes due to 
-aggregation and breakage. $l_{in}(s_1,s_2,x)$ and $l_{out}(s_1,s_2,x)$ are respectively the liquid 
-volumes of the particles coming in and going out of the spatial compartment.~$\dot{l}_{add}(s_1,s_2,x)$ is 
+where, $l(s_1,s_2,x,t)$ is the amount of liquid volume in each particle with API volume of $s_1$ and 
+excipient volume of $s_2$ in the spatial compartment $x$. $\Re_{liq,agg}(s_1,s_2,x,t)$ and 
+$\Re_{liq,break}(s_1,s_2,x,t)$ are respectively the rates of liquid transferred between size classes due to 
+aggregation and breakage. $l_{in}(s_1,s_2,x,t)$ and $l_{out}(s_1,s_2,x,t)$ are respectively the liquid 
+volumes of the particles coming in and going out of the spatial compartment.~$\dot{l}_{add}(s_1,s_2,x,t)$ is 
 the volume of liquid acquired by each particle in the compartment at every time step due to external 
 liquid addition.
 Similarly, the rate of change of gas volume for a given time is calculated using the following equation: 
@@ -759,9 +755,10 @@ calculated as:~\citep{Chaturbedi2017} \fbnote{should this citation come before t
 \end{align}
 
 
-where, the aggregation kernel, $\beta(s_1,s_2, s_1',s_2',x)$ is expressed as a function of the collision 
-rate coefficient ($C$) and probability that a collision will result in agglomeration($\psi$)~\citep{ingram2004}
-and is shown below: 
+where, $s_1'$ \& $s_2'$ represent for 2 different partcles inside the powder granule. 
+The aggregation kernel $\beta(s_1,s_2, s_1',s_2',x)$ is expressed as a function of the collision 
+rate coefficient ($C$) and probability that a collision will result in agglomeration($\psi$)
+~\citep{ingram2004} and is shown below: 
 
 \begin{align}
 \beta(s_1,s_2,s_1',s_2',x) = \beta_oC(s_1,s_2,s_1',s_2',x)\psi(s_1,s_2,s_1',s_2',x)
@@ -879,33 +876,36 @@ integration, Courant-Friedrichs-Lewis (CFL) condition must be
 satisfied~\citep{courant1967}. For our PBM model, a time-step was calculated at
 each iteration such that, the number of particles leaving a particular bin at
 any time was less than the number of particles present at that
-time~\citep{Ramachandran2010}. To obtain the most optimal parallel
-performance, when solving the PBM, work loads were distributed in a manner
-which took into account the shared and distributed memory aspects of the
-clusters being used. To parallelize the model in a way which
+time~\citep{Ramachandran2010}.
+% To obtain the most optimal parallel
+%performance, when solving the PBM, work loads were distributed in a manner
+%which took into account the shared and distributed memory aspects of the
+%clusters being used. 
+To parallelize the model in a way which
 could take advantage of shared memory but still effectively run across a
-distributed system both MPI and OMP were implemented. One MPI process was used
-per CPU core and one OMP thread was used per CPU core,
-as~\cite{Bettencourt2017} found it resulted in the best performance. MPI was
-used for message passing from one node to another while OMP was used for
-calculations on each node that could be efficiently solved using a shared
-memory system.
+distributed system both MPI and OMP were implemented. 
+%One MPI process was used
+%per CPU core and one OMP thread was used per CPU core,
+%as~\cite{Bettencourt2017} found it resulted in the best performance. MPI was
+%used for message passing from one node to another while OMP was used for
+%calculations on each node that could be efficiently solved using a shared
+%memory system.
 
 \fbnote{bec pseudo code changed this section needs to be rewritten since 
 $F_{t,c}$ does not refer to any part of the psuedo code anymore. We will haveto work on this} 
 
-An algorithm in the form of pseudo code is presented below illustrating how
+An algorithm in the form of pseudo code is presented in \ref{app:parallelPBM} illustrating how
 the calculations are distributed and carried out during the simulation. For
 each time step, the MPI processes are made responsible for a specific chunk of
-the spatial compartments. \jhanote{please use proper format to present an
+the spatial compartments. 
+\jhanote{please use proper format to present an
 algorithm. giannis please use format of CCGrid paper, for example} \csnote{re-wrote the algorithm please have a look}
-\gpnote{Yes, it is in the same format as the CCGrid paper. Much better than before. I suggest that you reference the algorithm. Using "below" I expect the algorithm near this paragraph, but it is in the Appendix.} Then each
-OMP thread, inside of each MPI process, is allocated to one of the cores of
+\gpnote{Yes, it is in the same format as the CCGrid paper. Much better than before. I suggest that you reference the algorithm. Using "below" I expect the algorithm near this paragraph, but it is in the Appendix.} Then each OMP thread, inside of each MPI process, is allocated to one of the cores of
 multi-core CPU the MPI process is bound too. The OMP threads divide up and
 compute $\Re_{agg}$. After $\Re_{agg}$ is calculated the MPI processes
-calculate the new PSD value for their chunk at that specific time step,
-$F_{t,c}$. The slave processes send their $F_{t,c}$ to the master processes
-which collects them into the complete $F_{t,all}$. The master process then
+calculate the new PSD value ($F_{t,c}$) for their chunk at that specific time step
+. The slave processes send their $F_{t,c}$ to the master processes
+which collects them into the complete PSD ($F_{t,all}$). The master process then
 broadcasts the $F_{t,all}$ value to all slave processes. This decomposition of
 the data into different CPUs and further into various threads is illustrated
 in Figure~\ref{fig:mthds_PBM_decompostion}.
@@ -925,13 +925,10 @@ the completely updated $F_{t,all}$ value is shared before calculating a new
 time step each process will have the same $F_{t,all}$ value. As a result each
 process calculates the same size for the new time step.
 
-Since the DEM informed PBM code required dynamic size increase for the data
-structure due to different number of particles being present in the DEM
-simulation, the PBM code developed used the Standard Template Library
-containers and their features available in \textit{C++} 11 and later. \gpnote{I do not think you have to
+\gpnote{I do not think you have to
 give a reason this specific for the selected resource. Stampede2 supports the requirements of the
-software, and as a result it is the selected resource for the experiments} It
-requires intel v17.0.2 (gcc 5.3+)  or later for compilation. Since this module
+software, and as a result it is the selected resource for the experiments} The PBM code developed
+required intel v17.0.2 (gcc 5.3+)  or later for compilation. Since this module
 was not present on the Stampede, the execution of the PBM was done on the
 newer Stampede2 supercomputer. Each of the compute node of the cluster
 consists of Intel Xeon Phi 7250 (\textquotedblleft Knights
@@ -983,24 +980,20 @@ description.
 LIGGGHTS as discussed previously, statically decomposes the work space and
 each section is sent to a MPI process for calculations. Thus, the division of
 the space becomes an important criteria for the simulation for efficient load
-balancing. The initial studies were undertaken for a mono-sized particle of
-size 1 mm and the simulation was carried out for 0.5 second of granulation
-time. The initial timing studies for the decomposition were performed using 64
-cores. The effect of the decomposition on the simulation time can be seen in
-Table~\ref{table:rslts_dem_slicing_studies}. The time values indicate that dividing the
+balancing. The initial timing studies for the decomposition were performed using 64
+cores. The time values indicate that dividing the
 x-direction in more number of compartments decreases the speed of the
 simulation. \jhanote{increasing the "speed of the simulation" is typically
 associated with improved performance. what you mean here is the converse,
 greater the number of compartments, slower the simulation? please clarify or
 fix.} \csnote{A good spot! I meant the converse. Have fixed the 2 following lines as well} 
-The extra slicing in the x-direction leads to lesser amount of computation required 
-for a single process but it also leads to each particle being transferred to 
-a new process in lesser number of time steps. Thus, leading to slower simulations when
-the number of slices increase beyond 16 in the x-direction. 
+The extra slicing in the x-direction decreases the amount of computation carried out by 
+a single process but it increases the number of communiations between the MPI slave and master processes. 
+Thus, leading to slower simulations when the number of slices increase beyond 16 in the x-direction. 
 %This is easy to comprehend since the granulator has its length parallel to the x-axis. 
-Table \ref{table:rslts_dem_slicing_studies} also indicate that if the geometry is divided into
-more than 2 compartments in either the y-axis or the z-axis the simulation time
-increases. \jhanote{this is inconsistent with results in table 3!} 
+The studies also indicated that if the geometry is divided into more than 2 compartments 
+in either the y-axis or the z-axis the simulation time increases. 
+\jhanote{this is inconsistent with results in table 3!} 
 This can be accounted to the increased communication required to transfer 
 the rotating impeller mesh from one compartment in the y-axis or the z-axis 
 to the another compartment for each time step. Since MPI has to pass explicit 
@@ -1021,26 +1014,26 @@ results from the initial timing studies,the y and the z-axes were not divided
 in more than 2 compartments for 128 and 256 core simulation as well. This
 meant that the x-axis was divided into 32 and 64 compartments respectively. 
 
-\begin{table}
-\caption{The effect of spatial decomposition on the performance of the DEM simulations using 64 cores.}
-\label{table:rslts_dem_slicing_studies}
-\begin{center}
-\begin{tabulary}{\linewidth}{C|C|C|C}
-  
-\hline
-\bf{Slices in x-direction}&\bf{Slices in y-direction}&\bf{Slices in z-direction}& \bf{Time taken for a 0.5 
-second simulation (in minutes)}\\
-\hline
-$64$ & $1$ & $1$ & $10.27$\\
-$32$ & $2$ & $1$ & $8.70$\\
-$16$ & $2$ & $2$ & $6.83$\\
-$8$ & $4$ & $2$ & $7.20$\\		  
-$8$ & $2$ & $4$ & $7.96$\\
-\hline  		  
-\end{tabulary}
-\end{center}
-      
-\end{table}
+%\begin{table}
+%\caption{The effect of spatial decomposition on the performance of the DEM simulations using 64 cores.}
+%\label{table:rslts_dem_slicing_studies}
+%\begin{center}
+%\begin{tabulary}{\linewidth}{C|C|C|C}
+%  
+%\hline
+%\bf{Slices in x-direction}&\bf{Slices in y-direction}&\bf{Slices in z-direction}& \bf{Time taken for a 0.5 
+%second simulation (in minutes)}\\
+%\hline
+%$64$ & $1$ & $1$ & $10.27$\\
+%$32$ & $2$ & $1$ & $8.70$\\
+%$16$ & $2$ & $2$ & $6.83$\\
+%$8$ & $4$ & $2$ & $7.20$\\		  
+%$8$ & $2$ & $4$ & $7.96$\\
+%\hline  		  
+%\end{tabulary}
+%\end{center}
+%      
+%\end{table}
 
 %When MPI is used for parallelization of a task, load balancing becomes an
 %important parameter that needs to be considered. When the geometry is divided,
@@ -1061,9 +1054,11 @@ between the processes, LIGGGHTS tries to insert the particles towards the
 center of the compartment such that the number of ghost atoms are minimized.
 For simulations with higher number of cores the extra slicing in the x direction 
 reduced the space available for the insertion of the particles.
-This made LIGGGHTS carry out larger number of Monte-Carlo simulations to insert 
-the particles in the desired area. In some cases, the Monte-Carlo iterations performed 
-were not enough leading to many of the particles being inserted incorrectly.
+%This made LIGGGHTS carry out larger number of Monte-Carlo simulations to insert 
+%the particles in the desired area. In some cases, the Monte-Carlo iterations performed 
+%were not enough leading to many of the particles being inserted incorrectly.
+This resulted in more re-attempts at inserting the particles in the desired space 
+therby increasing simulation time.
 \jhanote{please elaborate} Another abnormal behavior observed due to this over slicing 
 was that the particles halted \jhanote{in a?} in a certain compartment and
 no particle traveled beyond this compartment in the x-direction. Thus, the number of partitions 
@@ -1126,14 +1121,36 @@ MATLAB \gpnote{needs citation} script was run on the dump files obtained from th
 was observed that the system reached a steady state about 3-5 seconds of the
 simulation time. Particles with larger diameter reached steady state at a
 faster rate with an average hold-up of particles of about 6500.
+%\begin{figure}
+%\centering
+%\includegraphics[scale=0.75]{rslsts_2mm_timing_mtlb.pdf}
+%\caption{The variation in the amount of time taken for the DEM simulation of 2 mm particles as a function of number of cores. 
+%The improvements in the speed of the simulation was higher when the cores were increased from 1 
+%16 when compared to speed improvements obtained with a core count greater than 16.}
+%\label{fig:rslts_DEM_2mm_timing}
+%\end{figure}
+
 \begin{figure}
+\begin{subfigure}{.45\textwidth}
 \centering
-\includegraphics[scale=0.75]{rslsts_2mm_timing_mtlb.pdf}
-\caption{The variation in the amount of time taken for the DEM simulation of 2 mm particles as a function of number of cores. 
-The improvements in the speed of the simulation was higher when the cores were increased from 1 
-16 when compared to speed improvements obtained with a core count greater than 16.}
+\includegraphics[scale=0.5]{rslsts_2mm_timing_mtlb.pdf}
+\caption{}
 \label{fig:rslts_DEM_2mm_timing}
-\end{figure}
+\end{subfigure}\hfill
+\begin{subfigure}{.45\textwidth}
+\centering
+\includegraphics[scale=0.5]{rslsts_2mm_DEM_speedup_mtlb.pdf}
+\caption{}
+\label{fig:rslts_DEM_speedup}
+\end{subfigure}
+\caption{(a) The variation in the amount of time taken for the DEM simulation of 2 mm particles as 
+a function of number of cores. The improvements in the speed of the simulation was higher when the 
+cores were increased from 1 16 when compared to speed improvements obtained with a core count greater 
+than 16.(b) The speedup achieved in the DEM simulations of 2 mm particles. There 
+was a linear increase up to 16 cores while the speedup seems to plateau when 
+more number of cores are used due to larger amount of communications.}
+\end{figure} 
+
 
 \gpnote{You are saying that a measure is not good to represent performance, but a function which has
 this measure as a free variable is?! Showing only time may not be the best representation of performance,
@@ -1182,14 +1199,14 @@ spent in calculating the particle-particle interaction forces was higher than th
 simulations. The different diameters make the interaction forces more tedious thus, making it 
 computationally more expensive. 
 
-\begin{figure}
-\centering
-\includegraphics[scale=0.75]{rslsts_2mm_DEM_speedup_mtlb.pdf}
-\caption{The speedup achieved in the DEM simulations of 2 mm particles. There 
-was a linear increase up to 16 cores while the speedup seems to plateau when 
-more number of cores are used due to larger amount of communications.}
-\label{fig:rslts_DEM_speedup}
-\end{figure}
+%\begin{figure}
+%\centering
+%\includegraphics[scale=0.75]{rslsts_2mm_DEM_speedup_mtlb.pdf}
+%\caption{The speedup achieved in the DEM simulations of 2 mm particles. There 
+%was a linear increase up to 16 cores while the speedup seems to plateau when 
+%more number of cores are used due to larger amount of communications.}
+%\label{fig:rslts_DEM_speedup}
+%\end{figure}
 
 \begin{figure}
 \centering
@@ -1317,14 +1334,25 @@ cores. One thread waits for another thread to complete processing the outer loop
 performance increase is achieved by using the OMP implementation. \\
 
 \begin{figure}
+\begin{subfigure}{.45\textwidth}
 \centering
-\includegraphics[scale=0.75]{rslsts_PBM_speedup_logx.pdf}
-\caption{The speedup achieved by the hybrid parallel implementation of the PBM program. It can be 
-seen the initial speedup up to 16 cores as expected as from an ideal parallel 
-program where as it 
-becomes almost constant from 32 cores to 128 cores}
+\includegraphics[scale=0.5]{rslsts_PBM_speedup_logx.pdf}
+\caption{}
 \label{fig:rslts_PBM_speed_up}
-\end{figure}
+\end{subfigure}\hfill
+\begin{subfigure}{.45\textwidth}
+\centering
+\includegraphics[scale=0.55]{rslsts_PBM_efficiency.pdf}
+\caption{}
+\label{fig:rslts_PBM_parallel_efficiency}
+\end{subfigure}
+\caption{(a) The speedup achieved by the hybrid parallel implementation of the PBM program. It can be 
+seen the initial speedup up to 16 cores as expected as from an ideal parallel 
+program where as it becomes almost constant from 32 cores to 128 cores(b) The parallel efficiency for 
+the hybrid parallelized PBM code. The efficiency of the code decreased as the 
+number of cores are increased. The higher number of cores have very low efficiency of about 11\% 
+which depicted that there is large time being spent in communication in between the cores.}
+\end{figure}     
 
 A similar behavior as in Figure~\ref{fig:rslts_PBM_parallel_efficiency} where the parallel 
 efficiency of the program has been plotted against the number of the cores used. This efficiency 
@@ -1336,15 +1364,6 @@ when compared to the increase in the number of cores used. The efficiency falls 
 when 128 cores are used. Thus, there is scope for improvement in the parallel implementation 
 of the program using OMP, especially in section of the code where nested loops are present.
 
-\begin{figure}
-\centering
-\includegraphics[scale=0.75]{rslsts_PBM_efficiency.pdf}
-\caption{The parallel efficiency for the hybrid (MPI + OMP) parallelized PBM code. The efficiency of the 
-code decreased as the number of cores are increased. The higher number of cores have very low 
-efficiency of about 11\% which depicted that there is large time being spent in communication in 
-between the cores.}
-\label{fig:rslts_PBM_parallel_efficiency}
-\end{figure}
 
 \subsection{DEM + PBM physics}
 The micro-scale simulations provide an insight about the physics of the system usually by tracking 
@@ -1381,21 +1400,21 @@ Since the physics of both the systems are not different, using the mono-sized si
 for the DEM help save time on the overall simulations. 
 
 \begin{figure}
+\begin{subfigure}{.45\textwidth}
 \centering
-\includegraphics[scale=0.5]{rslts_pbm_d50_128_200.pdf}
-\caption{D\textsubscript{50} of the particles obtained after 100s of granulation time (25s of mixing and 75s of 
-liquid addition) for the 2mm mono-sized particle DEM simulation.}
+\includegraphics[scale=0.49]{rslts_pbm_d50_128_200.pdf}
+\caption{}
 \label{fig:rslts_PBM_2mm_d50}
-\end{figure}
-
-\begin{figure}
-\centering
+\end{subfigure}\hfill
+\begin{subfigure}{.45\textwidth}
 \includegraphics[scale=0.5]{rslts_pbm_d50_128_555.pdf}
-\caption{D\textsubscript{50} of the particles obtained after 100s of granulation time (25s of mixing and 75s of 
-liquid addition) for the distributed particle size DEM simulation. The trend observed was similar to the trend 
-found in Figure \ref{fig:rslts_PBM_2mm_d50}}
+\caption{}
 \label{fig:rslts_PBM_psd_d50}
-\end{figure}
+\end{subfigure}
+\caption{(a) D\textsubscript{50} of the particles obtained after 100s of granulation time (25s of 
+mixing and 75s of liquid addition) for the 2mm mono-sized particle DEM simulation. (b) D\textsubscript{50} of the particles obtained after 100s of granulation time (25s of mixing and 75s of liquid addition) for the distributed particle size DEM simulation. The trend observed was similar to the trend 
+found in Figure \ref{fig:rslts_PBM_2mm_d50}}
+\end{figure}  
 
 
 \subsection{One-way coupled DEM+PBM using RADICAL-Pilot and its performance} 
@@ -1479,6 +1498,7 @@ were provided by NSF XRAC award TG-MCB090174.
 
 \appendix
 \section{PBM Parallelization}
+\label{app:parallelPBM}
 The parallelization technique used for the PBM used was dependent on the number of compartments present inside 
 granulator. Each of the compartments, had calculations independent from each other for each time step. So each of them were
 loaded onto different MPI processes. Since there is minimal communication between them, they could easily be parallelized using MPI. 

@@ -186,9 +186,9 @@ practical use. In recent years, High-Performance Computing (HPC) has
 been employed to speed up  these DEM and PBM simulations
 ~\citep{Gunawan2008}~\citep{Prakash2013a}~\citep{Bettencourt2017}.
 
-%\jhanote{Parallel computing is a type/subset of high-performance computing
-%(HPC). Please use HPC rather than parallel computing. Also need consistency of
-%usage; see next paragraph.} \csnote{have changed the occurence parallel computing to HPC}
+\jhanote{Parallel computing is a type/subset of high-performance computing
+HPC). Please use HPC rather than parallel computing. Also need consistency of
+usage; see next paragraph.} \csnote{have changed the occurence parallel computing to HPC}
 
 
 %Parallel Computing is the standard procedure to solve large computational
@@ -243,9 +243,9 @@ been employed to speed up  these DEM and PBM simulations
 %help develop an accurate model which can be run quickly on high performance
 %computing systems.
 
-%\jhanote{What is the specific engineering problem you are interested in
-%solving that cannot be solved without HPC? It is unclear to the reader.} The
-%main objective of this work is to develop a unidirectional DEM-PBM model that
+\jhanote{What is the specific engineering problem you are interested in
+solving that cannot be solved without HPC? It is unclear to the reader.} 
+%The main objective of this work is to develop a unidirectional DEM-PBM model that
 %runs efficiently in parallel so that it can take advantage of the
 %computational capabilities of  modern computing clusters. 
 The goal of this work was to solve the developed DEM-PBM coupled model on HPC 
@@ -980,10 +980,10 @@ the space became an important criteria for the simulation for efficient load
 balancing. The initial timing studies for the decomposition were performed using 64
 cores. The time values indicated that dividing the
 x-direction in more number of compartments decreased the speed of the simulation. 
-%\jhanote{increasing the "speed of the simulation" is typically
-%associated with improved performance. what you mean here is the converse,
-%greater the number of compartments, slower the simulation? please clarify or
-%fix.} \csnote{A good spot! I meant the converse. Have fixed the 2 following lines as well} 
+\jhanote{increasing the "speed of the simulation" is typically
+associated with improved performance. what you mean here is the converse,
+greater the number of compartments, slower the simulation? please clarify or
+fix.} \csnote{A good spot! I meant the converse. Have fixed the 2 following lines as well} 
 The extra slicing in the x-direction decreased the amount of computation carried out by 
 a single process but it increased the number of communiations in between the MPI slave 
 and master processes. This led to slower simulations when the number of slices 
@@ -991,7 +991,7 @@ increased beyond 16 in the x-direction.
 %This is easy to comprehend since the granulator has its length parallel to the x-axis. 
 The studies also indicated that if the geometry is divided into more than 2 compartments 
 in either the y-axis or the z-axis the simulation time increased. 
-%\jhanote{this is inconsistent with results in table 3!} 
+\jhanote{this is inconsistent with results in table 3!} 
 This can be accounted to increased communication required to transfer 
 the rotating impeller mesh from one compartment in the y-axis or the z-axis 
 to the another compartment for each time step. Since MPI has to pass explicit 
@@ -1038,16 +1038,16 @@ meant that the x-axis was divided into 32 and 64 compartments respectively.
 %important parameter that needs to be considered. When the geometry is divided,
 %the amount of computation done by one core should be similar to other
 %processors. 
-%\jhanote{What evidence/indication is there that load balancing is
-%a problem, as opposed to communication limited?} \csnote{The first few lines 
-%are  just general statments I could do away with this paragraph altogether. 
-%It does not fit with the flow} %This helps better utilization
+\jhanote{What evidence/indication is there that load balancing is
+a problem, as opposed to communication limited?} \csnote{The first few lines 
+are  just general statments I could do away with this paragraph altogether. 
+It does not fit with the flow} %This helps better utilization
 %of the resources as well as make the simulations run faster. 
 %Following the results from the initial timing studies,the y and the z-axes were not divided
 %in more than 2 compartments for 128 and 256 core simulation as well. This
 %meant that the x-axis was divided into 32 and 64 compartments respectively. 
-%\jhanote{1 paragraph, 1 idea. Is the following part of the above 'load balancing' or is 
-%now about 'communication'?} \csnote{tried to clear the air by removing the general statements}
+\jhanote{1 paragraph, 1 idea. Is the following part of the above 'load balancing' or is 
+now about 'communication'?} \csnote{tried to clear the air by removing the general statements}
 In order to avoid the expensive communication
 between the processes, LIGGGHTS tries to insert the particles towards the
 center of the compartment such that the number of ghost atoms are minimized.
@@ -1058,15 +1058,15 @@ reduced the space available for the insertion of the particles.
 %were not enough leading to many of the particles being inserted incorrectly.
 This resulted in more re-attempts at inserting the particles in the desired space 
 therby increasing simulation time.
-%\jhanote{please elaborate} 
+\jhanote{please elaborate} 
 %Another abnormal behavior observed due to this over slicing 
 %was that the particles halted in a certain compartment and
 %no particle traveled beyond this compartment in the x-direction. 
 Thus, the number of partitions in the x-direction were reduced and a new set of 
 experiments with different 3-D partition configuration were carried out. 
-%\jhanote{I'm
-%confused: the previous sentences imply a functional problem. The next sentence
-%suggests a performance solution. Doesn't make sense to me.} \csnote{edited structure of the paragraph}
+\jhanote{I'm
+confused: the previous sentences imply a functional problem. The next sentence
+suggests a performance solution. Doesn't make sense to me.} \csnote{edited structure of the paragraph}
 The comparison of the simulation times of experiments with the new configurations are shown in
 Table~\ref{table:rslts_dem_128_256_decomp}.
 
@@ -1106,8 +1106,7 @@ The chosen configurations for the final simulations consisted of the
 geometry having only 2 sections in the z-direction and more slices along the y-axis.
 
 \subsubsection{DEM Performance}
-A test case was run for mono-sized particle of 2mm diameter for timing
-comparison studies. The times plotted in
+DEM simulation times were compared using a mono-sized particles of 2mm. The times plotted in
 Figure~\ref{fig:rslts_DEM_2mm_timing} indicated that using lower number of
 cores is not feasible for long simulations. The time taken while using 1
 core is about $11$x times slower than a 128 core simulations. 
@@ -1115,31 +1114,23 @@ Thus, the simulations were carried out in core configurations of 64,
 128 and 256 cores. The studies undertaken had 5 mono-sized population 
 of particles of diameter 0.63, 1, 1.26, 1.59 and 2 mm simulations 
 and one simulation consisted of particle size distribution. 
-Figure~\ref{fig:rslts_DEM_timing_studies} shows that the amount of CPU time
+Figure~\ref{fig:rslts_DEM_timing_studies} shows that the amount of wall clock time
 required for a 10 second simulation of the granulator. The post processing
 MATLAB script was run on the dump files obtained from the simulation and it
 was observed that the system reached a steady state about 4-6 seconds of the
 simulation time. Particles with larger diameter reached steady state at a
 faster rate with an average hold-up of particles of about 6500.
-%\begin{figure}
-%\centering
-%\includegraphics[scale=0.75]{rslsts_2mm_timing_mtlb.pdf}
-%\caption{The variation in the amount of time taken for the DEM simulation of 2 mm particles as a function of number of cores. 
-%The improvements in the speed of the simulation was higher when the cores were increased from 1 
-%16 when compared to speed improvements obtained with a core count greater than 16.}
-%\label{fig:rslts_DEM_2mm_timing}
-%\end{figure}
 
 \begin{figure}
 \begin{subfigure}{.45\textwidth}
 \centering
-\includegraphics[scale=0.5]{rslsts_2mm_timing_mtlb.pdf}
+\includegraphics[scale=0.6]{rslsts_2mm_timing_mtlb.pdf}
 \caption{}
 \label{fig:rslts_DEM_2mm_timing}
 \end{subfigure}\hfill
 \begin{subfigure}{.45\textwidth}
 \centering
-\includegraphics[scale=0.5]{rslsts_2mm_DEM_speedup_mtlb.pdf}
+\includegraphics[scale=0.6]{rslsts_2mm_DEM_speedup_mtlb.pdf}
 \caption{}
 \label{fig:rslts_DEM_speedup}
 \end{subfigure}
@@ -1185,28 +1176,20 @@ performance plateaued. Figure~\ref{fig:rslts_DEM_speedup} indicates that there
 was not a significant amount of speed improvement for the simulation when 256 cores were used for the 
 simulation over 128 cores. This speed decrease could be due to the communication time between 
 the MPI processes. When the particles move from one section to another of the space, they are 
-transferred as ghost particles from one process to another process. Thus, there is large amount of 
-communication which is required. One of the issues of using a cluster with shared memory within 
-the nodes but none in between nodes is that it has to rely on the networking infrastructure 
-of the cluster which bottlenecks the communications thus leading to higher communication times. 
-There are more sections present when 256 cores are used for the simulation, thus there is more 
-communication in this system when compared to 128 core simulation. 
-This excess communication makes the simulation slower though there is more processing power and 
-it requires lesser time for other calculations. Another observation that can be made from Figure~\ref{fig:rslts_DEM_timing_studies} is that the particle size distribution simulation takes more time 
+transferred as ghost particles from one process to another process as well as transfer the geometry 
+for each time step. This led to large amounts of communications between the processes. 
+One of the issues of using a cluster with no shared memory in between nodes is that it has to 
+rely on the networking infrastructure of the cluster for communications leading to higher 
+communication times. There are more sections present when 256 cores are used for the 
+simulation, leading to more communication in this system when compared to the 128 core simulation. 
+These excess communication made the simulation slower though there is more processing power and 
+it required lesser time for other calculations. Another observation that made from Figure~\ref{fig:rslts_DEM_timing_studies} was that the particle size distribution simulation took more time 
 compared to the simulations with mono-sized particles of 1.59mm and 2mm, though the mean size of 
-particles in the distribution is 2mm. The default profile provided by LIGGGHTS indicates that the time 
+particles in the distribution was 2mm. The default profile provided by LIGGGHTS indicated that the time 
 spent in calculating the particle-particle interaction forces was higher than the mono-sized 
-simulations. The different diameters make the interaction forces more tedious thus, making it 
+simulations. The different diameters made the interaction forces more tedious thus, making it 
 computationally more expensive. 
 
-%\begin{figure}
-%\centering
-%\includegraphics[scale=0.75]{rslsts_2mm_DEM_speedup_mtlb.pdf}
-%\caption{The speedup achieved in the DEM simulations of 2 mm particles. There 
-%was a linear increase up to 16 cores while the speedup seems to plateau when 
-%more number of cores are used due to larger amount of communications.}
-%\label{fig:rslts_DEM_speedup}
-%\end{figure}
 
 \begin{figure}
 \centering
@@ -1221,13 +1204,13 @@ computationally more expensive.
 
 The communication time in LIGGGHTS is indicated by the Modify time, which is the sum of the 
 times required to transfer the rotating mesh from one process to the other. From Figure~\ref{fig:rslts_DEM_percent_plot}, it can be seen that the main portion of the simulation time is taken up by 
-the modify time. This is expected since the impeller is rotating at a very high speed of 2000 rpm. So, if 
+the modify time. This was expected since the impeller rotates at a very high speed of 2000 rpm. If 
 the number of processes are increased the amount of time spent in transferring the mesh also 
-increases. In the studies, the modify time as a percentage of the simulation increased from 82\% to 
-about 90\%, when the core count was increased from the 64 cores to 256 cores. But, the using the 
-higher number of cores reduces time taken to calculate particle-particle interaction as well as in 
-neighbor calculation. Thus, a better implementation for meshing as well as decomposition of the 
-geometry for faster simulations with higher core counts.
+increased. In the studies, the modify time as a percentage of the simulation increased from 82\% to 
+about 90\%, when the core count was increased from the 64 cores to 256 cores. But, using the 
+higher number of cores reduced the time taken to calculate particle-particle interaction as well as  
+neighbor calculation. Thus, 128 cores was a better implementation for meshing and decomposition of the 
+geometry for faster simulations.
 
 \begin{figure}
 \centering
@@ -1243,27 +1226,27 @@ at high speeds, was the highest.}
 
 \subsection{Population Balance Modeling (PBM)}
 \subsubsection{PBM model validation}
- The population balance model implemented was considered to have an inlet flow of particles in the 
+The population balance model implemented was considered to have an inlet flow of particles in the 
 first compartment at a constant mass flow rate of 15 kilograms per hour. The particles were assumed 
 to have a log normal distribution with minimum diameter of the particles being about 12 $\mu$m and the 
 maximum of 2.1 mm with a mean of 0.453 mm and a standard deviation of about 0.62 mm. \\
-The PBM used in this study employs an aggregation kernel that takes into account the formation of a 
+The PBM used in this study employed an aggregation kernel that takes into account the formation of a 
 larger particle from only two smaller particles. The ratio of the rate of formation and the rate of 
-depletion due to aggregation helps us monitor whether the PBM satisfies the conservation of mass. 
-Since this PBM takes into account the aggregation of only 2 particles at once, the ratio of the particles 
-is expected to have a value of 0.5 during the aggregation process. This ratio was reported by the PBM 
+depletion due to aggregation helped us monitor whether the PBM satisfied the conservation of mass. 
+Since this PBM took into account the aggregation of only 2 particles at once, the ratio of the particles 
+was expected to have a value of 0.5 during the aggregation process. This ratio was reported by the PBM 
 to be 0.5 throughout the simulation, validating the accuracy of the PBM used.
 
 Figure~\ref{fig:rslts_PBM_d50_plots} shows four different particle size distribution plots at four 
 different time instants. Figure~\ref{fig:rslts_PBM_d50_plots}(\subref{fig:30s}) shows the distribution of 
-the particles at 30 seconds, where we expect to have the highest number of the smaller particles. 
-Since the degree of aggregation that has occurred is very low, there is a jump in the number of 
+the particles at 30 seconds, where we expected to have the highest number of the smaller particles. 
+Since the degree of aggregation that has occurred was very low, there was a jump in the number of 
 particles of the smaller size. The particle size distributions at 2 intermediate times of 50 seconds and 
-75 seconds are plotted in Figures~\ref{fig:rslts_PBM_d50_plots}(\subref{fig:50s}) \& \ref{fig:rslts_PBM_d50_plots}(\subref{fig:75s}) respectively. These illustrate that there is an increase in 
+75 seconds are plotted in Figures~\ref{fig:rslts_PBM_d50_plots}(\subref{fig:50s}) \& \ref{fig:rslts_PBM_d50_plots}(\subref{fig:75s}) respectively. These illustrate that there was an increase in 
 the number of larger particles  and a subsequent decrease in the number of smaller particles. 
 Figure~\ref{fig:rslts_PBM_d50_plots}(\subref{fig:100s}) shows the distribution 
 of the particle size at the end of the granulation process. It can be seen that the number of particles in 
-the higher diameter bins have increased.
+the higher diameter bins had increased.
 
 \begin{figure}
 \begin{subfigure}{.5\textwidth}
@@ -1289,27 +1272,27 @@ the higher diameter bins have increased.
 \caption{}
 \label{fig:100s}
 \end{subfigure}
-\caption{ Representation of the total number of particles inside all compartments with diameters less than 0.2 mm 
-in mm after (\subref{fig:30s}) 30s (\subref{fig:50s}) 50s (\subref{fig:75s}) 75s and
+\caption{Representation of the total number of particles inside all compartments with diameters less than 
+0.2 mm in mm after (\subref{fig:30s}) 30s (\subref{fig:50s}) 50s (\subref{fig:75s}) 75s and
  (\subref{fig:100s}) 100s of PBM simulation (Mixing takes place for the first 25 seconds).}
 \label{fig:rslts_PBM_d50_plots}
 \end{figure}   
 
 \subsubsection{Parallel PBM performance studies}
- The PBM was run for the results obtained from each of the aforementioned DEM simulations. 
+The PBM was run for the results obtained from each of the aforementioned DEM simulations. 
 Since the PBM has been parallelized using hybrid techniques, a combination of MPI and OMP cores 
 were used to perform the simulations. Figure~\ref{fig:rslts_PBM_timing_studies} shows the average time 
-taken by a PBM simulation for a total of 100 seconds of the granulation process, which includes 25 
+taken by a PBM simulation for a total of 100 seconds of the granulation process, which included 25 
 seconds of the mixing time and 75 seconds of granulation time. The time taken for simulating all DEM 
 scenarios by a single set of core configuration of in less than 10\% of each other, thus, an  average 
 time for a single core configuration was used to illustrate the performance. 
 These simulations were run in a varied configuration of cores ranging from 1 to 128. The cores were 
 initially increased to 16 by increasing only the number of MPI processes. To increase the number of 
 cores used, 8 OMP threads were employed for a configuration of 32(4 MPI  and 8 OMP), 64(8 MPI  and 8 OMP) 
-and 128 cores (16 MPI  and 8 OMP). Figure~\ref{fig:rslts_PBM_timing_studies} shows that the program scales 
+and 128 cores (16 MPI  and 8 OMP). Figure~\ref{fig:rslts_PBM_timing_studies} shows that the program scaled 
 well to about 32 cores but then, the improvement in the performance is negligible. The scaling with the 
-only MPI cores shows substantial increase in performance. \\
-\begin{figure}[H]
+only MPI cores showed substantial increase in performance.
+\begin{figure}
 \centering
 \includegraphics[scale=0.75]{rslsts_PBM_timing.pdf}
 \caption{Average time taken to run the PBM simulation which consisted of 25 seconds of mixing time 
@@ -1321,17 +1304,18 @@ not that significant.}
 
 
 Figure~\ref{fig:rslts_PBM_speed_up} depicts the speed up achieved by the hybrid parallel PBM code. It 
-can be seen when the MPI cores used are increased from 1 to 16 cores the speed up achieved is 
-almost linear. This speed can be accounted to the way MPI has been implemented inside the code. 
-Each compartment of the granulator is  offloaded on one MPI process, thus making 16 MPI processes 
-the ideal since, the granulator has been divided into 16 compartments. When less than 16 cores are used, 
-more than 1 compartment is sent to a single MPI process, which leads to a 
-decrease in performance. The implementation of OMP on top of the MPI parallelization helps improve 
+can be seen when the MPI cores used were increased from 1 to 16 cores the speed up achieved was 
+almost linear. This speed increase was due to the way MPI has been implemented inside the code. 
+Each compartment of the granulator was  offloaded on one MPI process, thus making 16 MPI processes 
+the ideal since, the granulator had been divided into 16 compartments. When less than 16 cores were used, 
+more than 1 compartment was sent to a single MPI process, which led to a 
+decrease in performance. The implementation of OMP on top of the MPI parallelization helped improve 
 the performance by the about 10\%. The calculations inside the OMP parallel section of the code 
-consists of large number of nested loop which have been known to be difficult to parallelize~\citep{He2016} using the native \textit{C++}'s OMP libraries. The amount of communication time spent in 
-between these threads is much higher than the speed increase achieved by using higher number of 
-cores. One thread waits for another thread to complete processing the outer loops thus lower 
-performance increase is achieved by using the OMP implementation. \\
+consisted of large number of nested loop which have been known to be difficult to parallelize~\citep{He2016} 
+using the native \textit{C++}'s OMP libraries. The amount of communication time spent in 
+between these threads was much higher than the speed increase achieved by using higher number of 
+cores. One OMP thread had to wait for another thread to complete processing the outer loops thus lower 
+performance increase is achieved by using the OMP implementation. 
 
 \begin{figure}
 \begin{subfigure}{.45\textwidth}
@@ -1354,14 +1338,14 @@ number of cores are increased. The higher number of cores have very low efficien
 which depicted that there is large time being spent in communication in between the cores.}
 \end{figure}     
 
-A similar behavior as in Figure~\ref{fig:rslts_PBM_parallel_efficiency} where the parallel 
-efficiency of the program has been plotted against the number of the cores used. This efficiency 
-decreases as the number of cores used increase. The decrease in efficiency initially up till 8 cores is steep as 
-the communication time in between the MPI process decreases the efficiency, deviating its value from 
-the ideal of 1 to about 0.4. With the increase in the MPI processes to 16 and then the 
-implementation of OMP the efficiency decreases as there is no major increase in the performance 
-when compared to the increase in the number of cores used. The efficiency falls to as low as 11\% 
-when 128 cores are used. Thus, there is scope for improvement in the parallel implementation 
+A similar behavior as Figure~\ref{fig:rslts_PBM_parallel_efficiency} was observed where the parallel 
+efficiency of the program was plotted against the number of the cores used. This efficiency 
+decreased as the number of cores used increased. The decrease in efficiency initially up till 8 cores 
+was steep as the communication time in between the MPI process decreased the efficiency, deviating 
+its value from the ideal of 1 to about 0.4. The implementation of OMP decreased the efficiency further 
+as there was no major increase in the performance when compared to the increase in the number 
+of cores used. The efficiency fell to as low as 11\% when 128 cores are used. 
+Thus, there is scope for improvement in the parallel implementation 
 of the program using OMP, especially in section of the code where nested loops are present.
 
 
@@ -1370,15 +1354,14 @@ The micro-scale simulations provide an insight about the physics of the system u
 each particle. This micro-scale simulation data is useful for the development of macro-scale 
 mechanistic models which take into account the dynamics of bulk of the particles and not individual 
 particles. A similar approach has been implemented in this work, where a mechanistic aggregation 
-kernel was developed from the DEM particle-particle collisions. Thus, the aim of this section is to 
+kernel was developed from the DEM particle-particle collisions. Thus, the aim of this section was to 
 illustrate that the physics of the system does not change to a great extent with the change in the size 
 of the particles or the distribution of the particles.
 
-Two simulations from the current scenario will be compared, the DEM + PBM simulation of the 2mm 
+Two simulations from the study were compared, the DEM + PBM simulation of the 2mm 
 mono-sized particle and the second being the simulation where the inserted particles were in a size 
 distribution. The ratio of rate of formation to the rate of depletion, both due to aggregation 
-observed during these simulations was 0.5 which indicated that the PBM is stable. This meant that the
-mono-sized and the PSD simulation were stable.
+observed during these simulations was 0.5 which indicated that the both PBMs were stable.
 
 One of the metrics to determine the physics of the system after a PBM simulation is to check the 
 median diameter (D\textsubscript{50}) plots of the system after the granulation process. 
@@ -1386,18 +1369,18 @@ D\textsubscript{50} indicates the maximum diameter of particles that constitute 
 These diameters vary along the length of the granulator since the granulated particles take time to 
 pass through the granulator and that there is not enough liquid content in the later sections of 
 the granulator to encourage the formation of granules. Thus, the D\textsubscript{50} for compartments 
-in the latter section of the granulator is low. Figures~\ref{fig:rslts_PBM_2mm_d50} \& \ref{fig:rslts_PBM_psd_d50} show the D\textsubscript{50} plots of the mono-sized and PSD respectively. 
+in the latter section of the granulator is usuallylow. Figures~\ref{fig:rslts_PBM_2mm_d50} \& 
+\ref{fig:rslts_PBM_psd_d50} show the D\textsubscript{50} plots of the mono-sized and PSD respectively. 
 It can be seen that both these plots have a similar behavior when it comes to the nature of the 
 increase of the D\textsubscript{50} during the granulation process. There is a difference of about 
 20\% in the final diameter of the particles predicted, which at the of micrometer scale does not affect 
-the final product quality. This slight deviation is observed due to the sudden jump in the 
-rate of the aggregation which increases when particles from one compartment with higher 
-D\textsubscript{50} get transferred to the next compartment with a lower D\textsubscript{50}. 
-The advantage of running the mono-sized simulation compared to the PSD simulation is the 
-time taken to simulate the DEM. It can be seen from Figure~\ref{fig:rslts_DEM_timing_studies} that 
-the 2mm mono-sized particle took about 1.6 times less than the PSD simulation time for the DEM. 
-Since the physics of both the systems are not different, using the mono-sized simulations 
-for the DEM help save time on the overall simulations. 
+the final product quality. This slight deviation was observed due to the sudden jump in the 
+rate of the aggregation which increased when particles from one compartment with higher 
+D\textsubscript{50} got transferred to the next compartment with a lower D\textsubscript{50}. 
+It can be seen from Figure~\ref{fig:rslts_DEM_timing_studies} that the 2mm mono-sized particle had a speed
+advantage over the PSD simulation as it took about 1.6 times less. Since the physics of both the 
+systems were not different, using the mono-sized simulations for the DEM could help save time on 
+the overall simulations. 
 
 \begin{figure}
 \begin{subfigure}{.45\textwidth}
@@ -1423,26 +1406,26 @@ found in Figure \ref{fig:rslts_PBM_2mm_d50}}
 waiting on the long scheduler queues on a cluster for each individual task.} \jhanote{This is wrong! It
 avoids the individual tasks from waiting for different periods of time at the
 scheduler, not waiting itself at the scheduler!} \csnote{corrected, could you please check if it is clear now} 
+
 With resources allocated, the pilot can execute multiple simulation runs at once. The pilot job
-initiates the DEM simulation using the LIGGGHTS executable compiled for the
-DEM studies and then creates a link between the collision data obtained, which
-is utilized by then utilized by the PBM executable. After the link is
-established, it also initiates the PBM. The timing profiles and results from
-both the simulations are then obtained. Since the executables and inputs files
-used in the simulations and the RP job are the similar, we do not expect to
+initiated the DEM simulation using the LIGGGHTS executable compiled for the
+DEM studies and then created a link between the collision data obtained, which
+was utilized by the PBM executable. After the link is
+established, it also initiated the PBM. The timing profiles and results from
+both the simulations were then obtained. Since the executables and inputs files
+used in the simulations and the RP job were similar, we did not expect to
 see any changes in the physics of the system. A value of 0.5 was obtained for
-the ratio of the rate of formation to the rate of depletion due to aggregation
-due to aggregation.
+the ratio of the rate of formation to the rate of depletion due to aggregation.
 
 Since the platforms used for initial development and testing of the DEM and
 PBM respectively were different, the DEM simulations were executed again on
 Stampede2 for a fair and accurate comparison. The need for re-running the
-simulations arises due to the clock speeds of the nodes and their
-configuration for the 2 platforms is different. The RADICAL-pilot was setup
+simulations arised due to the clock speeds of the nodes and their
+configuration for the 2 platforms were different. The RADICAL-pilot was setup
 for Stampede2 and aforementioned experiments were replicated. The DEM
 simulations were run for 64, 128 and 256 cores (MPI processes) and the PBM was
 run for 1, 2, 4, 8 and 16 MPI processes. No OMP threads were implemented for
-the PBM run, since the current version of RP does not support threading. The
+the PBM run, since the current version of RP did not support threading. The
 times for the individual DEM and PBM simulations were added to determine the
 total amount time taken to simulate the one-way coupling. This time did not
 include the time spent by each executable in the queue of the scheduler. This
@@ -1458,14 +1441,14 @@ taken by the pilot job are slightly higher than the summation of times of the
 individual simulations. The slight increase in the times of the simulation can
 be accounted for by the communication required for the pilot to realize that the
 DEM simulation has completed and link the data from the DEM to the PBM
-executable before it is executable. But, this communication is lower than the
-amount of time the executable the job would spend in the job scheduler queue.
-Thus, when a large number of these simulations need to be run, the could uploaded 
+executable before it was executable. But, this communication time was lower than the
+amount of time a executable job would spend in the job scheduler queue.
+Thus, when a large number of these simulations need to be run, they could uploaded 
 as a single pilot job using RADICAL pilot reducing scheduler wait times on individual 
 jobs. \jhanote{It is unclear what the
-benefit is!}\csnote{tried to address the benefit elaborately} An extension of this work would be to use RP to schedule multiple
-such coupled simulations as one job, thus decreasing the wait times even
-further.
+benefit is!}\csnote{tried to address the benefit elaborately} 
+An extension of this work would be to use RP to schedule multiple such coupled simulations 
+as one job, thus decreasing the wait times even further.
 \begin{figure}
 \centering
 \includegraphics[scale=0.7]{rslts_RP_timeComparison.pdf}
@@ -1477,18 +1460,22 @@ tool to perform simulations where a large number of job submissions are required
 \end{figure}
 	    
 \section{Conclusions}
- A simple uni-directional DEM+PBM coupled study for a high shear granulator has been presented. DEM simulations were 
-used to determine the movement of the particles inside the granulator and to obtain the collision data. This collision data 
-was then used in the multi-dimensional PBM which was developed with 2 solid bins. Both these executables were parallelized 
-to help them utilize the multi-core hardware of a cluster. The DEM was parallelized using MPI where as the developed PBM used 
-MPI as well as OMP for a faster execution. The speed-up achieved for the DEM simulation was about 12 times using 64 cores, 
-where as the PBM achieved a speed-up of 14 times when 16 cores were used. RP was utilized to execute the simulations for lower 
-wait times.
- A more accurate model for the high shear granulator would be to couple the DEM and PBM bidirectionally i.e. these 
-two methods are executed iteratively up till a steady state is reached. For the two-way coupling, the computation resources 
-required would be really large as it would involve multiple DEM and PBM simulations. The role RP in such a detailed simulation
-would be more crucial as it would need to handle more communications and various job submissions. This would also help reduce 
-total time taken to complete the multiple runs required. 
+A simple uni-directional DEM+PBM coupled study for a high shear granulator has been 
+presented. DEM simulations were used to determine the movement of the particles inside 
+the granulator and to obtain the collision data. This collision data was then used in 
+the multi-dimensional PBM which was developed with 2 solid bins. Both these executables 
+were parallelized to help them utilize the multi-core hardware of a cluster. The DEM 
+was parallelized using MPI where as the developed PBM used MPI as well as OMP for a 
+faster execution. The speed-up achieved for the DEM simulation was about 12 times using 
+64 cores, where as the PBM achieved a speed-up of 14 times when 16 cores were used. 
+RP was utilized to execute the simulations for lower wait times. A more accurate 
+model for the high shear granulator would be to couple the DEM and PBM bidirectionally 
+i.e. these two methods are executed iteratively up till a steady state is reached. 
+For the two-way coupling, the computation resources required would be really large 
+as it would involve multiple DEM and PBM simulations. The role RP in such a 
+detailed simulation would be more crucial as it would need to handle more 
+communications and various job submissions. This would also help reduce 
+total time taken to complete the required runs.
 
 \section{Acknowledgments}
 The authors would like to acknowledge National Science Foundation (NSF) for 
@@ -1507,8 +1494,8 @@ This parallelization technique is decried as an algorithm in Algorithm \ref{alg:
 
 OMP was used to parallelize the calculations inside each compartment. Since the PBM consisted of 2 solid bins, one of 
 the solid bins was parallelized. The number of solid bins of solid were equally divided by the number of OMP threads. 
-Figure~\ref{fig:app_OMP_distribution} depicts the equal distribution of 16 solid bins of the second solid using 4 OMP 
-threads.
+%Figure~\ref{fig:app_OMP_distribution} depicts the equal distribution of 16 solid bins of the second solid using 4 OMP 
+%threads.
 %\begin{algorithm}[H]
 %    \caption*{\textbf{Algorithm 1}}
 %    \label{alg:MyAlgorithm}
@@ -1564,13 +1551,13 @@ threads.
  \end{algorithm}     
 
  
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.5]{OMP_table.pdf}
-\caption{The integration of aggregation rate distributed among OMP processes. This figure indicates the use of 4 OMP processes, the 
-configuration that gave us the best performance. This technique has been implemented for each MPI process.}
-\label{fig:app_OMP_distribution}
-\end{figure}	
+%\begin{figure}[H]
+%\centering
+%\includegraphics[scale=0.5]{OMP_table.pdf}
+%\caption{The integration of aggregation rate distributed among OMP processes. This figure indicates the use of 4 OMP processes, the 
+%configuration that gave us the best performance. This technique has been implemented for each MPI process.}
+%\label{fig:app_OMP_distribution}
+%\end{figure}	
 
 \section*{References} 
 \bibliographystyle{elsarticle-harv}

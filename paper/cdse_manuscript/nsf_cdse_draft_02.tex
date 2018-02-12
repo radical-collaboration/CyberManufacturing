@@ -98,19 +98,20 @@ and more accurate way to model this system is to use a multi-scale model,
 i.e. use the particle-scale data into a bulk model. In this work, a
 unidirectional multi-scale model was used to model the high shear wet
 granulation process. A multi-dimensional population balance model (PBM) was
-developed which consisted of a mechanistic kernel, which in turn obtained 
+developed with a mechanistic kernel, which in turn obtained 
 collision data from the discrete element modeling (DEM) simulation. The PBM
-was run in parallel using MPI + OMP hybrid technique. The DEM simulations were
-performed on LIGGGHTS, which runs in parallel using MPI. Speedup of about 14
+was run in parallel using a hybrid technique. The DEM simulations were
+performed on LIGGGHTS, which ran in parallel using MPI. Speedup of about 14
 times was obtained for the PBM simulations and around 12 for the DEM
-simulations. This coupling was performed using the radical pilot for scaling
-studies from 1 to 128 cores for the PBM and up to 256 cores for the DEM. Using
-this developed framework, the granulation process was modeled 
-much faster than existing approaches in literature. \jhanote{Which figure
-speaks to the accuracy? Why does the accuracy arise?} \csnote{I have edited the line to remove this misunderstading}
+simulations. This coupling was performed using radical pilot for scaling
+studies from 1 to 128 cores for the PBM and up to 256 cores for the DEM. 
+Using this developed framework, the granulation process was modeled 
+faster than existing approaches in literature. 
+\jhanote{Which figure speaks to the accuracy? Why does the accuracy arise?} \csnote{I have edited 
+the line to remove this misunderstanding}
 \end{abstract}
 \begin{keyword}
-Population balance model \sep Granulation \sep Discrete element methods  \sep MPI and OpenMP 
+Population balance model \sep Granulation \sep Discrete element method  \sep MPI and OpenMP 
 \sep Pharmaceutical process design
 \end{keyword}
 \end{frontmatter}
@@ -118,7 +119,8 @@ Population balance model \sep Granulation \sep Discrete element methods  \sep MP
 
 \section{Introduction \& Objectives} 
 Half of all industrial chemical production is typically performed via the
-processing of particulate systems~\citep{seville1997}. These processes also account
+processing of particulate systems~\citep{seville1997}. These processes 
+also account
 for about 70\% of the products of industries like detergents, aerosols,
 fertilizers, and pharmaceuticals~\citep{Litster2016}. They are
 widely popular as particulate products have advantages over liquid
@@ -138,12 +140,13 @@ from the many particle-particle interactions inside these systems. These small
 scale phenomenon develop into the complex bulk behavior of these processes. To
 successfully predict the bulk behavior of these systems, a model needs to
 capture the particle-particle interactions and emergent meso-scale phenomena. 
-Discrete Element Method (DEM)~\citep{Cundall1979}simulations are employed 
+Discrete element method (DEM)~\citep{Cundall1979}simulations are employed 
 to obtain particle-level data, which helps describe the bulk properties 
 of the particulate system accurately~\citep{Hancock2011}. DEM uses Newton's 
-equations of motion to model the forces on each particle in the system and it's interactions with the system geometry and other particles. Since DEM
+equations of motion to model the forces on each particle in the system and 
+it's interactions with the system geometry and other particles. Since DEM
 includes large amount of interactions and force computations, it usually takes
-a large amount of time to run. Thus, there is a need for a more efficient
+a large amount of time to simulate. Thus, there is a need for a more efficient
 simulation technique for these particulate particles. One of the common
 methods used in the industry is the population balance model (PBM), which is
 more computationally efficient but, lacks the accuracy of the DEM.
@@ -155,9 +158,8 @@ averages and probability to capture bulk behavior but still seek to capture
 some of the micro-phenomena of particle-particle interactions using
 correlations or empirically developed kernels to approximate those
 interactions. Even though PBM is much faster than DEM, a detailed PBM can
-still take a significant amount of time to solve which prevents them from
-being used as widely as they could be in academia and industries
-\citep{Barrasso2013}. Though highly detailed PBMs take into account
+still take a significant amount of time to solve \citep{Barrasso2013}. 
+Though highly detailed PBMs take into account
 populating, averaging and contain semi-mechanistic kernels, these PBMs still
 can have difficulties in capturing the micro-scale phenomena that are crucial
 to predicting accurate dynamics of particulate processes.
@@ -236,8 +238,8 @@ solving that cannot be solved without HPC? It is unclear to the reader.}
 %The main objective of this work is to develop a unidirectional DEM-PBM model that
 %runs efficiently in parallel so that it can take advantage of the
 %computational capabilities of  modern computing clusters. 
-The goal of this work was to solve the developed DEM-PBM coupled model on HPC 
-systems such that it can be used to predict behaviour of the wet granulation 
+The goal of this work is to employ HPC systems to solve the developed DEM-PBM coupled 
+model such that it can be used to predict behavior of the wet granulation 
 process accurately. This model could be used to design a control system 
 around the granulation process to help control the product quality, which is of 
 prime importance to the pharmaceutical industry. In the course of
@@ -260,13 +262,13 @@ Section~\ref{sec:Results}
 \section{Background \& Motivation}
 
 \subsection{Particulate processes}
-Particulate processes are ones in which a system of discrete species exist,
-such as granules or catalyst pellets, that undergo changes in average
+A system of discrete species exist in these particulate processes, 
+that undergo changes in average
 composition, size, or other pertinent properties. Granulation is one such
 particulate process which is commonly found in the pharmaceutical industry. In
 this process, fine powders are converted to larger granules using a liquid
 binder. The three rate processes governing granulation are wetting and
-nucleation, consolidation and aggregation and attrition and
+nucleation, consolidation and aggregation, and attrition and
 breakage~\citep{Iveson2001}~\citep{Cameron2005}. As liquid is added to the
 fine powder, it forms a porous nuclei that can coalesce, deform and
 break~\citep{Barrasso2015ces}. As there is an alteration in the properties of
@@ -280,12 +282,12 @@ models to design these processes in silico.
 
 \subsection{Modeling}
 The paradigm shift of the pharmaceutical industry towards continuous 
-manufacturing, emphasizes the need for a more accurate model. This
-further helps to develop better control strategies for the process. 
-Thus, a need for accurate predictive controllers that can 
-mitigate any loss of API in processing arsises. These controllers will
-require computationally efficient and highly precise models. The models
-discussed ahead represent the particle-particle interaction at meso and micro-scale.
+manufacturing, emphasizes the need for a more accurate model. These models
+further help develop better control strategies for the process. 
+They also help develop model predictive control, which help increase mitigate the 
+loss of API during manufacturing. Such controllers require computationally 
+efficient and precise models. The models discussed ahead represent the particle-
+particle interactions at meso and micro-scales.
 
 \subsubsection{Discrete Element Modeling (DEM)}
 Discrete Element Method is a simulation technique used to monitor the
@@ -327,7 +329,7 @@ model~\citep{gantt2006}~\citep{hassanpour2013} has been utilized in this work.
 Population balance models (PBM) predict how groups of discrete entities will 
 behave on a bulk scale due to certain effects acting on the population with 
 respect to time~\citep{ramkrishna2014}. In the context of process engineering 
-and granulation, population balance models are used to describe how the number 
+and granulation, PBMs are used to describe how the number 
 densities, of different types of particles, in a granulator change as rate 
 processes such as aggregation and breakage reshape particles~\citep{Barrasso2013}. A 
 general form of population balance model is shown in Equation

@@ -622,7 +622,7 @@ inside the L\"{o}dige CoriMix CM5 continuous high shear granulator.}
 
 \subsubsection{Meshing}
  After the geometry was built in SolidWorks$^{TM}$ (Dassault Syst\`{e}mes) the shell and impeller 
-were exported as stereolithography (STL) files. The coarsest output option was used to keep the STL files 
+were exported as stereo-lithography (STL) files. The coarsest output option was used to keep the STL files 
 small for faster computation times. The origin of the geometry was not preserved while saving 
 the STL files since it needs to be aligned in LIGGGHTS as per the process conditions. 
 Meshlab was used to align the STL files for importing into LIGGGHTS. No mesh treatments were 
@@ -748,7 +748,7 @@ calculated as~\citep{Chaturbedi2017}:
 \end{align}
 
 
-where, $s_1'$ \& $s_2'$ represent for 2 different partcles inside the powder granule. 
+where, $s_1'$ \& $s_2'$ represent for 2 different particles inside the powder granule. 
 The aggregation kernel $\beta(s_1,s_2, s_1',s_2',x)$ is expressed as a function of the collision 
 rate coefficient ($C$) and probability that a collision will result in agglomeration($\psi$)
 ~\citep{ingram2004} and is shown below: 
@@ -978,7 +978,7 @@ associated with improved performance. what you mean here is the converse,
 greater the number of compartments, slower the simulation? please clarify or
 fix.} \csnote{A good spot! I meant the converse. Have fixed the 2 following lines as well} 
 The extra slicing in the x-direction decreased the amount of computation carried out by 
-a single process but it increased the number of communiations in between the MPI slave 
+a single process but it increased the number of communications in between the MPI slave 
 and master processes. This led to slower simulations when the number of slices 
 increased beyond 16 in the x-direction. 
 %This is easy to comprehend since the granulator has its length parallel to the x-axis. 
@@ -1033,7 +1033,7 @@ meant that the x-axis was divided into 32 and 64 compartments respectively.
 %processors. 
 \jhanote{What evidence/indication is there that load balancing is
 a problem, as opposed to communication limited?} \csnote{The first few lines 
-are  just general statments I could do away with this paragraph altogether. 
+are  just general statements I could do away with this paragraph altogether. 
 It does not fit with the flow} %This helps better utilization
 %of the resources as well as make the simulations run faster. 
 %Following the results from the initial timing studies,the y and the z-axes were not divided
@@ -1050,7 +1050,7 @@ reduced the space available for the insertion of the particles.
 %the particles in the desired area. In some cases, the Monte-Carlo iterations performed 
 %were not enough leading to many of the particles being inserted incorrectly.
 This resulted in more re-attempts at inserting the particles in the desired space 
-therby increasing simulation time.
+thereby increasing simulation time.
 \jhanote{please elaborate} 
 %Another abnormal behavior observed due to this over slicing 
 %was that the particles halted in a certain compartment and
@@ -1088,7 +1088,7 @@ The simulation times illustrated in Table~\ref{table:rslts_dem_128_256_decomp}
 show that incorrect slicing of the geometry also affected the performance of the
 system. It can be noted that slicing along y-axis is more favorable than
 slicing along the z-direction. \jhanote{Without further
-discussion/explaination, it is difficult to discern how/why?.} \csnote{Proceeding lines 
+discussion/explanation, it is difficult to discern how/why?.} \csnote{Proceeding lines 
 have this discussion}\gpnote{I think there are too many "thus"s and "so"s. I think it
 would read better if this was before the previous sentences and remove all "thus"s} The
 insertion of particles is hindered when the geometry is cut along the z-axis
@@ -1146,7 +1146,7 @@ compute cores compared to the wall clock time when it is run in serial. It is th
 represent the parallel performance. Speedup is the ratio of the time taken to run the program in serial 
 to the time taken by the program to run in parallel as shown in Equation~\ref{eqn:rslts_DEM_Speed_Up}. 
 For an ideally parallelized program, speedup is equal to $n$, where $n$ is the number of cores used.
-\gpnote{My general preference: Anything that has to do with mathematics or arithmetics, regardless if it
+\gpnote{My general preference: Anything that has to do with mathematics or arithmetic, regardless if it
     is inline with the text or not, should be in \$ signs. It makes it clearer than quotes}
 
 \begin{align}
@@ -1362,7 +1362,7 @@ D\textsubscript{50} indicates the maximum diameter of particles that constitute 
 These diameters vary along the length of the granulator since the granulated particles take time to 
 pass through the granulator and that there is not enough liquid content in the later sections of 
 the granulator to encourage the formation of granules. Thus, the D\textsubscript{50} for compartments 
-in the latter section of the granulator is usuallylow. Figures~\ref{fig:rslts_PBM_2mm_d50} \& 
+in the latter section of the granulator is usually low. Figures~\ref{fig:rslts_PBM_2mm_d50} \& 
 \ref{fig:rslts_PBM_psd_d50} show the D\textsubscript{50} plots of the mono-sized and PSD respectively. 
 It can be seen that both these plots have a similar behavior when it comes to the nature of the 
 increase of the D\textsubscript{50} during the granulation process. There is a difference of about 
@@ -1413,7 +1413,7 @@ the ratio of the rate of formation to the rate of depletion due to aggregation.
 Since the platforms used for initial development and testing of the DEM and
 PBM respectively were different, the DEM simulations were executed again on
 Stampede2 for a fair and accurate comparison. The need for re-running the
-simulations arised due to the clock speeds of the nodes and their
+simulations arises due to the clock speeds of the nodes and their
 configuration for the 2 platforms were different. The RADICAL-pilot was setup
 for Stampede2 and aforementioned experiments were replicated. The DEM
 simulations were run for 64, 128 and 256 cores (MPI processes) and the PBM was

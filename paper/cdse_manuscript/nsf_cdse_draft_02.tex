@@ -388,13 +388,14 @@ consuming, hence the need for HPC methods to help solve these models quciker.
 
 \fbnote{merged sections comp arch and paralle apps. made content significantly more concise
 does this suit your liking better prof. Jha? Giannis does this seem to explain things in a simple
-yet correct fashion?}
+yet correct fashion?}\gpnote{Yes, it is better. I did some fixing though. That being said, it am
+not sure whether it is needed or not.}
 
 A node on a HPC cluster has multiple CPUs (usually two) and commonly 32GBs or more of RAM. 
 Each CPU is a multi-core processor meaning it has multiple compute cores that can carry 
 out computation independently of one another. Main memory or RAM is divided between processors.
-As a result, each processor has direct access to the part of the memory it considers local,
- while accessing the memory of other processors introduces delays~\cite{Jin2011}. 
+As a result, each processor has direct access to the part of the memory it considers local.
+Accessing the memory of other processors introduces delays~\cite{Jin2011}. 
 Therefore, managing data locality is very important.
  
 %\jhanote{HPC has been defined. Please use it} \csnote{Changed}
@@ -402,25 +403,27 @@ Therefore, managing data locality is very important.
 %An HPC node usually has two processors and at least 64GBs of RAM. Each processor has at least 16 cores. Main memory or RAM is %divided between processors. As a result, each processor has direct access to the part of the memory it considers local. However %accessing the rest of the memory introduces delays~\cite{Jin2011}. Therefore, managing data locality is very important.}
 
 Since the many cores of a CPU can communicate directly through memory they can 
-communicate using shared memory methods. This is commonly done using OMP 
-which uses threading to parallelize the cores. 
-The cores can then communicate implicitly in most cases, directly through memory. 
+do so by using shared memory methods. This is commonly done using OMP 
+which uses threads to parallelize execution. 
+The cores then communicate implicitly, through memory. 
 This also allows processes to share common data automatically reducing 
-communication overhead and reduces the overall memory footprint required 
+communication overhead and the overall memory footprint required 
 for computation.
 
 When many CPUs are being used in parallel they cannot communicate with each 
 other directly through memory which results in much slower communication and 
-therefore shared memory methods like OMP should not be used. This type of 
+therefore shared memory methods like OMP should not be used. \gpnote{I am not sure
+    how the next sentence is a result from the previous? Processes do not communicate
+through memory.}This type of 
 system where processes cannot communicate directly through memory is called a 
-distributed memory system. MPI is commonly used to enable communciation 
-of the processes of a distrubted memroy system. MPI allows the processes 
-to communciate using explicit  message passing methods. MPI will operate 
+distributed memory system. MPI is commonly used to enable communication 
+of the processes in a distributed memory system. MPI allows the processes 
+to communicate using explicit  message passing methods. MPI will operate 
 each process as a discrete entity with its own private copy of 
-each variable it needs for computation which is how it avoids memory retrieval 
-slowdowns when using many CPUs. For optimial parallel performance a programmer 
+each variable it needs for computation \gpnote{I am not sure if this is correct}which is how it avoids memory retrieval 
+slowdowns when using many CPUs. For optimal parallel performance a programmer 
 needs to consider the architecture of the cluster they are using and the 
-features of the applicatons they are using such as MPI and OMP ~\citep{Adhianto2007}.  
+features of the applications they are using such as MPI and OMP ~\citep{Adhianto2007}.  
 
 %Analogous to a conventional PC a HPC cluster node has
 %one or more CPUs and RAM. Commonly nodes are manufactured with two CPUs, each
@@ -1431,7 +1434,9 @@ taken by the pilot job are slightly higher than the summation of times of the
 individual simulations. The slight increase in the times of the simulation can
 be accounted for by the communication required for the pilot to realize that the
 DEM simulation has completed and link the data from the DEM to the PBM
-executable before it was executable. But, this communication time was lower than the
+executable before it was executed. \gpnote{Do you agree with the following statement:
+In addition, we had to partition DEM execution to smaller parts, because RP coordination
+layer was timing out after 6 hours of a single simulation.} But, this communication time was lower than the
 amount of time a executable job would spend in the job scheduler queue.
 Thus, when a large number of these simulations need to be run, they could uploaded 
 as a single pilot job using RADICAL pilot reducing scheduler wait times on individual 

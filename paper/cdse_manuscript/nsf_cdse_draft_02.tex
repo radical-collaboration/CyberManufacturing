@@ -94,7 +94,7 @@ Particulate processes are prevalent in the pharmaceutical industry but, the
 physics underlying these processes is complicated and requires large amounts
 of computation to solve a particle-level model. This approach makes the
 simulation slower than a less accurate bulk model. A quicker
-and more accurate way to model this system is to use a multi-scale model, 
+and more accurate way to model such a system is to use a multi-scale model, 
 i.e. use the particle-scale data into a bulk model. In this work, a
 unidirectional multi-scale model was used to model the high shear wet
 granulation process. A multi-dimensional population balance model (PBM) was
@@ -145,8 +145,8 @@ to obtain particle-level data, which helps describe the bulk properties
 of the particulate system accurately~\citep{Hancock2011}. DEM uses Newton's 
 equations of motion to model the forces on each particle in the system and 
 it's interactions with the system geometry and other particles. Since DEM
-includes large amount of interactions and force computations, it usually takes
-a large amount of time to simulate. Thus, there is a need for a more efficient
+involves large amounts of interactions and force computation, it usually takes
+long time to simulate. Thus, there is a need for a more efficient
 simulation technique for these particulate particles. One of the common
 methods used in the industry is the population balance model (PBM), which is
 more computationally efficient but, lacks the accuracy of the DEM.
@@ -240,7 +240,8 @@ solving that cannot be solved without HPC? It is unclear to the reader.}
 %computational capabilities of  modern computing clusters. 
 The goal of this work is to employ HPC systems to solve the developed DEM-PBM coupled 
 model such that it can be used to predict behavior of the wet granulation 
-process accurately. This model could be used to design a control system 
+process accurately and in a reasonable time frame. 
+This model could be used to design a control system 
 around the granulation process to help control the product quality, which is of 
 prime importance to the pharmaceutical industry. In the course of
 development of the model, the DEM simulation were performed on LAMMPS Improved
@@ -550,24 +551,27 @@ support scalable and efficient launching of heterogeneous tasks across different
 \section{Methods}
 
 \subsection{Discrete Element Method (DEM)}
-\subsubsection{LIGGGHTS}
-LIGGGHTS v3.60 developed by DCS computing was used for all the simulation performed in this study. 
-Source code files were modified to obtain particle-particle 
+%\subsubsection{LIGGGHTS}
+LIGGGHTS v3.60 developed by DCS computing was used for all the DEM simulations 
+performed in this study. Source code files were modified to obtain particle-particle 
 collisions. This version of LIGGGHTS was compiled using the mvapich (mvapich2 v2.1) 
-and intel (intel v15.0.2) compilers with the -O3 optimization option as well as an option to side load the 
-process to the Xeon phi co-processors was added. The initial timing studies were performed on Stampede 
-supercomputer located at TACC, University of Texas, Austin. The hardware configuration of each node 
-consists of 2 8-core Intel Xeon E5-2680 processors based on the Sandy Bridge architecture, 32 GB of 
-memory with QPI interconnects.
+and intel (intel v15.0.2) compilers with the -O3 optimization option as well as an 
+option to side load the process to the Xeon phi co-processors was added. The 
+initial timing studies were performed on Stampede supercomputer located at TACC, 
+University of Texas, Austin. The hardware configuration of each node consists 
+of 2 8-core Intel Xeon E5-2680 processors based on the Sandy Bridge architecture, 
+32 GB of memory with QPI interconnects.
 
 
 \subsubsection{Geometry}    
-In this work, the L\"{o}dige CoriMix CM5 continuous high shear granulator has been studied. Its 
-geometry was developed using the SolidWorks$^{TM}$ (Dassault Syst\`{e}mes). This granulator 
-consisted of a high speed rotating element enclosed within a horizontal cylindrical casing. The casing 
-(shown in Figure~\ref{fig:mthdsDemCharlesGranShell}) consists of a cylinder with diameter of 120 mm 
-at inlet and 130 mm at outlet and having a total length of 440 mm. A vertical inlet port is 
-provided at one end of the casing and an angled outlet port is provided at the larger end of the case. 
+In this work, the L\"{o}dige CoriMix CM5 continuous high shear granulator has 
+been studied. Its geometry was developed using the SolidWorks$^{TM}$ (Dassault Syst\`{e}mes). 
+This granulator consisted of a high speed rotating element enclosed within a 
+horizontal cylindrical casing. The casing 
+(shown in Figure~\ref{fig:mthdsDemCharlesGranShell}) consists of a cylinder with 
+diameter of 120 mm at inlet and 130 mm at outlet and having a total length of 440 mm. 
+A vertical inlet port is provided at one end of the casing and an angled outlet port 
+is provided at the larger end of the case. 
 
 \begin{figure}
 \centering
@@ -617,17 +621,14 @@ inside the L\"{o}dige CoriMix CM5 continuous high shear granulator.}
 \label{fig:mthds_dem_charles_fig5pt3and4_blades_n_isometric}
 \end{figure}     
 
-
-
-
 \subsubsection{Meshing}
  After the geometry was built in SolidWorks$^{TM}$ (Dassault Syst\`{e}mes) the shell and impeller 
-were exported as stereo-lithography (STL) files. The coarsest output option was used to keep the STL files 
-small for faster computation times. The origin of the geometry was not preserved while saving 
-the STL files since it needs to be aligned in LIGGGHTS as per the process conditions. 
-Meshlab was used to align the STL files for importing into LIGGGHTS. No mesh treatments were 
-used on the STLs. The meshes were then imported into LIGGGHTS using the write command in serial. 
-The write exclusion list command in LIGGGHTS was used and this exclusion list file is then used in the 
+were exported as stereo-lithography (STL) files. The coarsest output option was used to keep the 
+STL files small for faster computation times. The origin of the geometry was not preserved 
+while saving the STL files since it needs to be aligned in LIGGGHTS as per the process conditions. 
+Meshlab was used to align the STL files for importing. No mesh treatments were used on the STLs. 
+The meshes were then imported into LIGGGHTS using the write command in serial. 
+The write exclusion list command was used and this exclusion list file is then used in the 
 simulation to skip the highly skewed elements during the simulation. 
 
 
@@ -636,12 +637,15 @@ The DEM simulation in LIGGGHTS are setup using an input script which defines phy
 parameters of the particles, importing of the geometry, particle insertion commands, various physics 
 models to be used during the simulation as well as various compute and dump commands to help print 
 data required for post-processing. The particles were considered to be granular in 
-nature. The Hertz-Mindlin model was used for non-adhesive elastic contact between the granular particles. 
+nature. The Hertz-Mindlin model was used for non-adhesive elastic contact between 
+the granular particles. 
 Particles were inserted inside the granulator from the inlet at a constant mass flow rate of 15 
 kilograms per hour. Rotation speed of the impeller was kept throughout the study at 2000 rotations 
 per minute. Such a high rotation speed was chosen since this would lead to high shear between the 
-particles and walls of the shell resulting in better size control of the granules. There were two sets of 
-simulations that were performed, one with mono-sized particles and second consisting of a distribution 
+particles and walls of the shell resulting in better size control of the granules. 
+There were two sets of 
+simulations that were performed, one with mono-sized particles and second consisting 
+of a distribution 
 of sizes. The particle radii chosen for mono-sized simulation varied from 0.59mm to 2mm, consecutive 
 particles radii had twice the volume of particles before them. The radii range of the distributed 
 size simulation was 1mm to 3mm. The difference in mechanics of these two simulations is discussed 
@@ -687,7 +691,7 @@ representation of the
 simulation. It can be seen that the number of collision start to oscillate around a mean value. The 
 number of collisions were then plotted and steady state time was determined.
 A precautionary script was also run so as to determine that no particles were lost due to overlap 
-of the geometry with the particles as well as from particle particle overlap.
+of the geometry with the particles as well as from particle-particle overlap.
 
 
 \subsection{Population Balance Modeling (PBM)}
@@ -866,7 +870,7 @@ found it decreased computation time while having minimal impact on
 accuracy as opposed to other integration techniques. In
 order to avoid numerical instability due to the explicit nature of the Euler
 integration, Courant-Friedrichs-Lewis (CFL) condition must be
-satisfied~\citep{courant1967}. For our PBM model, a time-step was calculated at
+satisfied~\citep{courant1967}. For the PBM model, a time-step was calculated at
 each iteration such that, the number of particles leaving a particular bin at
 any time was less than the number of particles present at that
 time~\citep{Ramachandran2010}.
@@ -874,9 +878,9 @@ time~\citep{Ramachandran2010}.
 %performance, when solving the PBM, work loads were distributed in a manner
 %which took into account the shared and distributed memory aspects of the
 %clusters being used. 
-To parallelize the model in a way which
+The model was parallelized such that it
 could take advantage of shared memory but still effectively run across a
-distributed system both MPI and OMP were implemented. 
+distributed system, thus employing a combination of both, MPI and OMP.
 %One MPI process was used
 %per CPU core and one OMP thread was used per CPU core,
 %as~\cite{Bettencourt2017} found it resulted in the best performance. MPI was
@@ -907,13 +911,13 @@ in Figure~\ref{fig:mthds_PBM_decompostion}.
 \label{fig:mthds_PBM_decompostion}
 \end{figure}
 
-A crucial feature of the PBM is that the current PSD ($F_{t,all}$) value is
-used to compute a new time step size for the next iteration. This means all of
-the MPI processes need to have the same dynamic time step size at each
-iteration for the calculations to be properly carried out in parallel. Since
-the completely updated $F_{t,all}$ value is shared before calculating a new
-time step each process will have the same $F_{t,all}$ value. As a result each
-process calculates the same size for the new time step.
+%A crucial feature of the PBM is that the current PSD ($F_{t,all}$) value is
+%used to compute a new time step size for the next iteration. This means all of
+%the MPI processes need to have the same dynamic time step size at each
+%iteration for the calculations to be properly carried out in parallel. Since
+%the completely updated $F_{t,all}$ value is shared before calculating a new
+%time step each process will have the same $F_{t,all}$ value. As a result each
+%process calculates the same size for the new time step.
 
 \gpnote{I do not think you have to
 give a reason this specific for the selected resource. Stampede2 supports the requirements of the

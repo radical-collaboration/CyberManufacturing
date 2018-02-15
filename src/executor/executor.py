@@ -222,7 +222,7 @@ class Executor(object):
             self._session.close()
             warnings.warn('exit requested\n',UserWarning)
 
-    def _start_dem_units(self,timestep=0,types=0,restart=False):
+    def _start_dem_units(self,timestep=0,types=0,restart=False,steprestart=False):
         """
         This method creates DEM units, their monitors and submits them for execution. 
         It also returns the unit objects so that they can be monitored. This method takes
@@ -258,6 +258,29 @@ class Executor(object):
                                 ]
             cud.cores          = self._DEMcores
             cud.mpi            = True
+        elif steprestart:
+            cud.input_staging  = [{'source': 'pilot:///granulator.%d.restart'%timestep,
+                                   'target': 'unit:///restart/granulator.%d.restart'%timestep,
+                                   'action': rp.LINK},
+                                  {'source': 'pilot:///in.restart_from_%d'%timestep,
+                                   'target': 'unit:///restart/in.restart_from_%d'%timestep,
+                                   'action': rp.LINK},
+                                  {'source': self._pathtoLIGGHTSinputs+'shell_closed.stl',
+                                   'target': 'unit:///shell_closed.stl',
+                                   'action': rp.LINK},
+                                  {'source': self._pathtoLIGGHTSinputs+'shell',
+                                   'target': 'unit:///shell',
+                                   'action': rp.LINK},
+                                  {'source': self._pathtoLIGGHTSinputs+'impeller',
+                                   'target': 'unit:///impeller',
+                                   'action': rp.LINK},
+                                  {'source': self._pathtoLIGGHTSinputs+'impeller_coarse.stl',
+                                   'target': 'unit:///impeller_coarse.stl',
+                                   'action': rp.LINK},
+                                    ]
+            cud.cores          = self._DEMcores
+            cud.mpi            = True
+
         else:
             cud.input_staging  = [{'source': self._pathtoLIGGHTSinputs+'/in.2_sim_new',
                                    'target':'unit:///in.2_sim_new',
@@ -277,6 +300,12 @@ class Executor(object):
                                 ]
             cud.cores          = self._DEMcores
             cud.mpi            = True
+
+
+        cud.output_staging = [{'source': 'unit:///restart/granulator.%d.restart'%timestep,
+                               'target': 'pilot:///granulator.%d.restart'%timestep,
+                               'action'  : rp.LINK}]
+
         self._logger.debug('DEM unit description: %s'%cud.as_dict())
         # Submit the first unit and wait until it staged its input files. Waiting is
         # needed so that we can get the path of the unit and pass it to the DEM monitor.
@@ -333,7 +362,16 @@ class Executor(object):
         status_fid.close()
         self._logger.debug('DEM Status Dict: %s'%status_dict)
 
+        if int(status_dict['status'][0]) == 0:
+            restartDEM = True
+            dem_timestep      = int(status_dict['DEM_time_step'][0])
+            pbm_init_timestep = float(status_dict['PBM_init_time_step'][0])
+            pbm_mixing_time   = int(status_dict['mixing_times'][0])
+
+            self._logger.debug('check DEM return values: Cont %d, DEM Timestep %d '%(cont,dem_timestep)+
+                               'PBM init timestep %f, PBM Mixing Time %d'%(pbm_init_timestep,pbm_mixing_time))
         if int(status_dict['status'][0]) == 1:
+            restartDEM = False
             cont = True
             dem_timestep      = int(status_dict['DEM_time_step'][0])
             pbm_init_timestep = float(status_dict['PBM_init_time_step'][0])
@@ -342,6 +380,7 @@ class Executor(object):
             self._logger.debug('check DEM return values: Cont %d, DEM Timestep %d '%(cont,dem_timestep)+
                                'PBM init timestep %f, PBM Mixing Time %d'%(pbm_init_timestep,pbm_mixing_time))
         else:
+            restartDEM = False
             cont = False
             dem_timestep      = None
             pbm_init_timestep = None
@@ -351,7 +390,7 @@ class Executor(object):
                                'PBM init timestep %s, PBM Mixing Time %s'%(pbm_init_timestep,pbm_mixing_time))
 
 
-        return cont,dem_timestep,pbm_init_timestep,pbm_mixing_time
+        return restartDEM,cont,dem_timestep,pbm_init_timestep,pbm_mixing_time
 
     def _check_PBM_status(self,status_file):
         """
@@ -534,21 +573,22 @@ class Executor(object):
             cont = True
             #Does DEM restart or not
             restart = False
+            restartDEM = False
             #Timestep input for DEM.
             pbm_timestep=0
             dem_timestep = 0
 
-            while cont:
+            while cont or restartDEM:
 
                 if not restart:
                     self._reporter.header('Starting DEM simulation')
-                self._start_dem_units(timestep=dem_timestep,restart=restart)
+                self._start_dem_units(timestep=dem_timestep,restart=restart,steprestart=restartDEM)
 
                 self._umgr.wait_units(uids=self._dem_monitor_unit.uid)
 
                 # Check DEM status returns whether the execution should continue
                 # or not. It also returns the timestep PBM should start.
-                cont, dem_timestep, pbm_init_timestep, pbm_mixing_time = self._check_DEM_status('DEM_status.json')
+                restartDEM, cont, dem_timestep, pbm_init_timestep, pbm_mixing_time = self._check_DEM_status('DEM_status.json')
                 
                 if self._dem_unit.state != rp.FINAL:
                     self._reporter.header('Canceling DEM simulation')

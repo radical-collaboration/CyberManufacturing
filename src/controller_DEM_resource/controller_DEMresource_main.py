@@ -87,6 +87,7 @@ class controller_DEMresource_main(object):
                 dump_collisions.write("%d %d \n"%(timestep, sum(sum(obj_inter.collision_matrix))))
                 dump_impacts.write("%d %d \n"%(timestep, int(obj_inter.avg_impacts)))
                 timestep = timestep + self.dump_difference
+                count = 0
             else :
                 continue
         

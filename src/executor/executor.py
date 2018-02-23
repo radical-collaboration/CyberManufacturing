@@ -236,10 +236,10 @@ class Executor(object):
         # TODO: Create a for loop for multiple DEM pipelines
         cud = rp.ComputeUnitDescription()
         cud.environment    = ['PATH='+self._pathtoLIGGHTS+':$PATH']
-        cud.pre_exec       = ['mkdir CSVs','mkdir post','mkdir restart']
         cud.executable     = 'lmp_micstam'
         cud.arguments      = ['-in','in.*' ]
         if restart:
+            cud.pre_exec       = ['mkdir CSVs','mkdir post']
             cud.input_staging  = [{'source': 'pilot:///in.restart_from_%d'%timestep,
                                    'target':'unit:///in.restart_from_%d'%timestep,
                                    'action'  :rp.LINK},
@@ -255,10 +255,14 @@ class Executor(object):
                                   {'source': self._pathtoLIGGHTSinputs+'/impeller_coarse.stl',
                                    'target':'unit:///impeller_coarse.stl',
                                    'action'  :rp.LINK},
-                                ]
+                                   {'source': ru.Url(self._dem_unit.sandbox).path+'restart/granulator.%d.restart'%timestep,
+                                    'target':'unit:///restart/granulator.%d.restart'%timestep,
+                                    'action'  :rp.LINK},
+                                    ]
             cud.cores          = self._DEMcores
             cud.mpi            = True
         elif steprestart:
+            cud.pre_exec       = ['mkdir CSVs','mkdir post']
             cud.input_staging  = [{'source': 'pilot:///granulator.%d.restart'%timestep,
                                    'target': 'unit:///restart/granulator.%d.restart'%timestep,
                                    'action': rp.LINK},
@@ -277,11 +281,15 @@ class Executor(object):
                                   {'source': self._pathtoLIGGHTSinputs+'impeller_coarse.stl',
                                    'target': 'unit:///impeller_coarse.stl',
                                    'action': rp.LINK},
+                                   {'source': ru.Url(self._dem_unit.sandbox).path+'restart/granulator.%d.restart'%timestep,
+                                    'target':'unit:///restart/granulator.%d.restart'%timestep,
+                                    'action'  :rp.LINK}
                                     ]
             cud.cores          = self._DEMcores
             cud.mpi            = True
 
         else:
+        	cud.pre_exec       = ['mkdir CSVs','mkdir post','mkdir restart']
             cud.input_staging  = [{'source': self._pathtoLIGGHTSinputs+'/in.2_sim_new',
                                    'target':'unit:///in.2_sim_new',
                                    'action'  :rp.LINK},

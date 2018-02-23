@@ -45,7 +45,7 @@ class controller_DEM_resource_interpretor(object):
             self.tot_part_each_type[x] = int(len(obj_data_reader.collision_data_acc_types[str(x+1)]))
             temp1 = self.tot_part_each_type[x]
             if (temp1 == 0):
-                temp1 = 0
+                self.tot_part_each_type[x] = 1
                 print("Collision for %d type is 0")
             temp2 = obj_data_reader.collision_data_acc_types[str(x+1)]
             vx = 0.0
@@ -107,9 +107,9 @@ class controller_DEM_resource_interpretor(object):
             vel_comp = (avg_vel - vai) / vai
             collision_comp = (avg_coll - cai) / cai
             impact_comp = (avg_imp - iai) / iai
-            if(vel_comp > 0.1 or collision_comp > 0.05 or impact_comp > 0.05):
+            if(vel_comp > 0.1 or collision_comp > 0.15 or impact_comp > 0.15):
                 flag = 1
-            elif((int(ts) - self.init_timestep) > (0.5 / dem_timestep)):
+            elif((int(ts) - self.init_timestep) > (0.4 / dem_timestep)):
                 flag = 2
             else:
                 flag = 0

@@ -24,7 +24,7 @@ import controllerPBMDataReader as PBM_reader
 
 class controllerPBMDataInterpretor(object):
 
-    def __init__(self, init_ts, compartment, bins1, bins2, PBM_out_path):
+    def __init__(self, init_ts, compartment, bins1, bins2, PBM_out_path, mixing_time):
         self.initial_ts = np.float(init_ts)
         self.bins1 = bins1
         self.bins2 = bins2
@@ -37,6 +37,7 @@ class controllerPBMDataInterpretor(object):
         self.d50_store = np.zeros_like(self.initial_d50)
         self.num_particles = np.zeros((1,2))
         self.new_data_storage(self.initial_ts)
+        self.mixing_time = mixing_time
         self.time_index = 0
 
 
@@ -64,21 +65,21 @@ class controllerPBMDataInterpretor(object):
         temp1 = self.obj_PBM_reader.data_d50_extractor(ts)
         temp2 = self.num_particles[-1]
         particles_check = abs(self.initial_num_particles - temp2) / self.initial_num_particles
-        ss_check_time = 5
+        ss_check_time = 10
         print(ts)
         # print("Now checking %f with initial time %f"%(ts, self.initial_ts))
         # This checks if the current timestep is greater than the older timestep and whether the properties have changed by 25% so that we kill PBM and start DEM.
-        if (ts > self.initial_ts and particles_check < 0.15):
+        if (ts > self.initial_ts and particles_check < 0.10):
             for i in range(0,self.compartments):
-                d50_check = (abs(self.initial_d50[0][i] - temp1[0][i]) / self.initial_d50[0][i])
-                if (int(d50_check) > 0.15):
+                d50_check = (abs(self.initial_d50[0][i] - temp1[0][i])) / self.initial_d50[0][i]
+                if (float(d50_check) > 0.10):
                     flag = 1
                     break
                 else:
                     continue
-        elif ((ts - self.initial_ts) > ss_check_time):
+        elif ((ts - self.initial_ts) > ss_check_time and ts > self.mixing_time):
             flag = 2
-        elif ((ts - self.initial_ts) < ss_check_time and particles_check > 0.15):
+        elif ((ts - self.initial_ts) < ss_check_time and particles_check > 0.10 and ts > self.mixing_time):
             flag = 1
         else:
             flag = 0

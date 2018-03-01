@@ -42,7 +42,7 @@
 \makeatother
 
 \newif\ifdraft
-\drafttrue
+%\drafttrue
 \ifdraft
 \usepackage{xcolor}
 \definecolor{ocolor}{rgb}{1,0,0.4}
@@ -387,10 +387,11 @@ mixing~\citep{sen2013}~\citep{sen2013b} and is discussed in Section \ref{sec:pbm
 
 \subsection{Computer Architecture and Parallel Applicaitons}
 
-\fbnote{merged sections comp arch and paralle apps. made content significantly more concise
-does this suit your liking better prof. Jha? Giannis does this seem to explain things in a simple
-yet correct fashion?}\gpnote{Yes, it is better. I did some fixing though. That being said, it am
-not sure whether it is needed or not.}
+%\fbnote{merged sections comp arch and paralle apps. made content significantly more concise
+%does this suit your liking better prof. Jha? Giannis does this seem to explain things in a simple
+%yet correct fashion?}
+%\gpnote{Yes, it is better. I did some fixing though. That being said, it am
+%not sure whether it is needed or not.}
 
 A node on a HPC cluster has multiple CPUs (usually two) and commonly 32GBs or more of RAM. 
 Each CPU is a multi-core processor meaning it has multiple compute cores that can carry 
@@ -1428,19 +1429,23 @@ total amount time taken to simulate the one-way coupling. This time did not
 include the time spent by each executable in the queue of the scheduler. This
 time could vary from a few hours to a few days depending upon the load of the
 cluster. The total time taken for the simulation using the RADICAL-pilot was
-determined from the time the DEM was first executed until the PBM execution
+determined from the time the first DEM unit was executed until the PBM execution
 completed. The time of the individual DEM and PBM simulation was added to get
 the total amount of time it required for a single one-way coupling simulation.
 Figure~\ref{fig:rslts_RP_time_plot} shows a comparison of the total times of
 simulation in seconds for the sum of DEM and PBM individual simulations to the
-times taken to run the simulation using RP. It can be observed that the times
-taken by the pilot job are slightly higher than the summation of times of the
-individual simulations. The slight increase in the times of the simulation can
-be accounted for by the communication required for the pilot to realize that the
-DEM simulation has completed and link the data from the DEM to the PBM
-executable before it was executed. \gpnote{Do you agree with the following statement:
+times taken to run the simulations using RP. RP's coordination layer tends to 
+lose connection with the database when the simulation time exceeds 6 hours. In order to 
+address this issue, the DEM simulations had to be restarted after $1~second$ 
+of simulation, which led to an increase in the simulation times of the DEM. 
+This can be observed in Figure~\ref{fig:rslts_RP_time_plot}. 
+There is also a small time penalty that is paid for the communication 
+in between the client and resource as RP needs to link the required 
+files for the next simulation and also determine the state of the simulation.
+ \gpnote{Do you agree with the following statement:
 In addition, we had to partition DEM execution to smaller parts, because RP coordination
-layer was timing out after 6 hours of a single simulation.} But, this communication time was lower than the
+layer was timing out after 6 hours of a single simulation.} \csnote{added the restart DEM part.}
+ But, this communication time was significantly lower than the total
 amount of time a executable job would spend in the job scheduler queue.
 Thus, when a large number of these simulations need to be run, they could uploaded 
 as a single pilot job using RADICAL pilot reducing scheduler wait times on individual 
@@ -1450,11 +1455,11 @@ An extension of this work would be to use RP to schedule multiple such coupled s
 as one job, thus decreasing the wait times even further.
 \begin{figure}
 \centering
-\includegraphics[scale=0.7]{rslts_RP_timeComparison.pdf}
+\includegraphics[scale=0.7]{rp_final.pdf}
 \caption{A comparison of times taken by 2 individual simulations (DEM + PBM) (without 
-including queue time) to the  time taken by Radical-Pilot to complete the same set of simulation. 
-A slight increase in the time of the simulations was observed making RP a more convenient 
-tool to perform simulations where a large number of job submissions are required.}
+including queue time) to the  time taken by each simulation in the pilot job of the 
+Radical-Pilot. A small communication time overhead can be seen which is a very small 
+when compared to the time of the complete simulation.}
 \label{fig:rslts_RP_time_plot}
 \end{figure}
 	    

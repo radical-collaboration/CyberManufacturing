@@ -24,6 +24,7 @@
 \usepackage[english]{babel} 
 \usepackage{multirow}
 \usepackage{nomencl}
+\usepackage{hyperref}
 \makenomenclature
 \definecolor{listinggray}{gray}{0.95}
 \definecolor{darkgray}{gray}{0.7}
@@ -260,7 +261,7 @@ further improvements that can be implemented are discussed in
 Section~\ref{sec:Results}
 
 
-\section{Background \& Motivation}
+\section{Background \& Related Work}
 
 \subsection{Particulate processes}
 A system of discrete species exist in these particulate processes, 
@@ -550,21 +551,8 @@ RADICAL-Pilot is an implementation of the Pilot abstraction in Python, engineere
 support scalable and efficient launching of heterogeneous tasks across different platforms.
 
 \section{Methods}
-
-\subsection{Discrete Element Method (DEM)}
-%\subsubsection{LIGGGHTS}
-LIGGGHTS v3.60 developed by DCS computing was used for all the DEM simulations 
-performed in this study. Source code files were modified to obtain particle-particle 
-collisions. This version of LIGGGHTS was compiled using the mvapich (mvapich2 v2.1) 
-and intel (intel v15.0.2) compilers with the -O3 optimization option as well as an 
-option to side load the process to the Xeon phi co-processors was added. The 
-initial timing studies were performed on Stampede supercomputer located at TACC, 
-University of Texas, Austin. The hardware configuration of each node consists 
-of 2 8-core Intel Xeon E5-2680 processors based on the Sandy Bridge architecture, 
-32 GB of memory with QPI interconnects.
-
-
-\subsubsection{Geometry}    
+\subsection{Simulation Setup}
+\subsubsection{Geometry and Meshing for DEM}
 In this work, the L\"{o}dige CoriMix CM5 continuous high shear granulator has 
 been studied. Its geometry was developed using the SolidWorks$^{TM}$ (Dassault Syst\`{e}mes). 
 This granulator consisted of a high speed rotating element enclosed within a 
@@ -622,8 +610,7 @@ inside the L\"{o}dige CoriMix CM5 continuous high shear granulator.}
 \label{fig:mthds_dem_charles_fig5pt3and4_blades_n_isometric}
 \end{figure}     
 
-\subsubsection{Meshing}
- After the geometry was built in SolidWorks$^{TM}$ (Dassault Syst\`{e}mes) the shell and impeller 
+After the geometry was built in SolidWorks$^{TM}$ (Dassault Syst\`{e}mes) the shell and impeller 
 were exported as stereo-lithography (STL) files. The coarsest output option was used to keep the 
 STL files small for faster computation times. The origin of the geometry was not preserved 
 while saving the STL files since it needs to be aligned in LIGGGHTS as per the process conditions. 
@@ -633,7 +620,17 @@ The write exclusion list command was used and this exclusion list file is then u
 simulation to skip the highly skewed elements during the simulation. 
 
 
-\subsubsection{DEM input file settings}
+\subsubsection{DEM Software and Input Setup}
+LIGGGHTS v3.60 developed by DCS computing was used for all the DEM simulations 
+performed in this study. Source code files were modified to obtain particle-particle 
+collisions. This version of LIGGGHTS was compiled using the mvapich (mvapich2 v2.1) 
+and intel (intel v15.0.2) compilers with the -O3 optimization option as well as an 
+option to side load the process to the Xeon phi co-processors was added. The 
+initial timing studies were performed on Stampede supercomputer located at TACC, 
+University of Texas, Austin. The hardware configuration of each node consists 
+of 2 8-core Intel Xeon E5-2680 processors based on the Sandy Bridge architecture, 
+32 GB of memory with QPI interconnects.
+
 The DEM simulation in LIGGGHTS are setup using an input script which defines physical 
 parameters of the particles, importing of the geometry, particle insertion commands, various physics 
 models to be used during the simulation as well as various compute and dump commands to help print 
@@ -678,26 +675,8 @@ Density of the granules & $500$ & $kg.m^{-3}$\\
 \end{center}
 \end{table}
 
-\subsubsection{DEM data post processing}
-Post processing of data obtained from the DEM simulations was done using MATLAB. 
-The first test run on the output data was to determine if the simulation had reached steady-state. The 
-mass inside the granulator was found out by averaging it over 5 time steps and then compared to 
-mass inside the granulator after every 10000 time steps (about 5$\times 10^{-4}$ sec) with a 
-tolerance of 10\%. If the mass was found to be constant for most of the iterations, it was 
-considered to be at steady state. Another test to determine steady state was to monitor the number of 
-collision inside the granulator. The visualization of the simulation data was done by running the 
-LIGGGHTS post processing (LPP) script over the dump files to convert them into STL files. These 
-files were then loaded in to Paraview~\citep{paraview2017} for a graphical 
-representation of the 
-simulation. It can be seen that the number of collision start to oscillate around a mean value. The 
-number of collisions were then plotted and steady state time was determined.
-A precautionary script was also run so as to determine that no particles were lost due to overlap 
-of the geometry with the particles as well as from particle-particle overlap.
-
-
-\subsection{Population Balance Modeling (PBM)}
+\subsubsection{Population Balance Modeling (PBM) development}
 \label{sec:pbm_model}
-\subsubsection{Model development}
  The population balance equation used in this work is expressed below:
 \begin{align}
 \frac{d}{dt}F(s_1,s_2,x,t)=\Re_{agg}(s_1,s_2,x,t)+\Re_{break}(s_1,s_2,x,t)+
@@ -856,9 +835,25 @@ Number of second solid bins & $ss$ & $16$ & $-$\\
 \end{center}
 \end{table}
 
+\subsection{Development and Experiment Analysis}
+\subsubsection{DEM post processing}
+Post processing of data obtained from the DEM simulations was done using MATLAB. 
+The first test run on the output data was to determine if the simulation had reached steady-state. The 
+mass inside the granulator was found out by averaging it over 5 time steps and then compared to 
+mass inside the granulator after every 10000 time steps (about 5$\times 10^{-4}$ sec) with a 
+tolerance of 10\%. If the mass was found to be constant for most of the iterations, it was 
+considered to be at steady state. Another test to determine steady state was to monitor the number of 
+collision inside the granulator. The visualization of the simulation data was done by running the 
+LIGGGHTS post processing (LPP) script over the dump files to convert them into STL files. These 
+files were then loaded in to Paraview~\citep{paraview2017} for a graphical 
+representation of the 
+simulation. It can be seen that the number of collision start to oscillate around a mean value. The 
+number of collisions were then plotted and steady state time was determined.
+A precautionary script was also run so as to determine that no particles were lost due to overlap 
+of the geometry with the particles as well as from particle-particle overlap.
 
-\subsection{Discretization \& parallelizing PBM}
 
+\subsubsection{Parallel PBM approach}
 The PBM was discretized by converting each of its coordinates in to discrete
 bins. For the spatial coordinates a linear bin spacing was used. For the
 internal coordinates, solid, liquid, and gas a non-linear discretization was
@@ -875,19 +870,10 @@ satisfied~\citep{courant1967}. For the PBM model, a time-step was calculated at
 each iteration such that, the number of particles leaving a particular bin at
 any time was less than the number of particles present at that
 time~\citep{Ramachandran2010}.
-% To obtain the most optimal parallel
-%performance, when solving the PBM, work loads were distributed in a manner
-%which took into account the shared and distributed memory aspects of the
-%clusters being used. 
+
 The model was parallelized such that it
 could take advantage of shared memory but still effectively run across a
 distributed system, thus employing a combination of both, MPI and OMP.
-%One MPI process was used
-%per CPU core and one OMP thread was used per CPU core,
-%as~\cite{Bettencourt2017} found it resulted in the best performance. MPI was
-%used for message passing from one node to another while OMP was used for
-%calculations on each node that could be efficiently solved using a shared
-%memory system.
 
 An algorithm in the form of pseudo code is presented in \ref{app:parallelPBM} illustrating how
 the calculations are distributed and carried out during the simulation. For
@@ -912,13 +898,6 @@ in Figure~\ref{fig:mthds_PBM_decompostion}.
 \label{fig:mthds_PBM_decompostion}
 \end{figure}
 
-%A crucial feature of the PBM is that the current PSD ($F_{t,all}$) value is
-%used to compute a new time step size for the next iteration. This means all of
-%the MPI processes need to have the same dynamic time step size at each
-%iteration for the calculations to be properly carried out in parallel. Since
-%the completely updated $F_{t,all}$ value is shared before calculating a new
-%time step each process will have the same $F_{t,all}$ value. As a result each
-%process calculates the same size for the new time step.
 
 \gpnote{I do not think you have to
 give a reason this specific for the selected resource. Stampede2 supports the requirements of the
@@ -933,7 +912,7 @@ threads. The simulations were then run by varying the the number of MPI
 processes from 1 to 16 and the number of OMP threads from 1 to 8, thus, using
 a maximum of 128 cores.
 
-\subsection{RADICAL-Pilot (RP) \& PBM+DEM communication}
+\subsection{CyberInfrastructre: RADICAL-Pilot (RP) \& Coupled DEM and PBM communication}
 \label{sec:RPandCommunications}
 RADICAL-Pilot defines a number of abstractions to describe resources, and
 computational tasks. The Pilot Description is the abstraction that describes
@@ -1347,7 +1326,7 @@ Thus, there is scope for improvement in the parallel implementation
 of the program using OMP, especially in section of the code where nested loops are present.
 
 
-\subsection{DEM + PBM physics}
+\subsection{Coupled DEM and PBM physics}
 The micro-scale simulations provide an insight about the physics of the system usually by tracking 
 each particle. This micro-scale simulation data is useful for the development of macro-scale 
 mechanistic models which take into account the dynamics of bulk of the particles and not individual 
@@ -1356,7 +1335,7 @@ kernel was developed from the DEM particle-particle collisions. Thus, the aim of
 illustrate that the physics of the system does not change to a great extent with the change in the size 
 of the particles or the distribution of the particles.
 
-Two simulations from the study were compared, the DEM + PBM simulation of the 2mm 
+Two simulations from the study were compared, the Coupled DEM and PBM simulation of the 2mm 
 mono-sized particle and the second being the simulation where the inserted particles were in a size 
 distribution. The ratio of rate of formation to the rate of depletion, both due to aggregation 
 observed during these simulations was 0.5 which indicated that the both PBMs were stable.
@@ -1456,7 +1435,7 @@ as one job, thus decreasing the wait times even further.
 \begin{figure}
 \centering
 \includegraphics[scale=0.7]{rp_final.pdf}
-\caption{A comparison of times taken by 2 individual simulations (DEM + PBM) (without 
+\caption{A comparison of times taken by 2 individual simulations (DEM and PBM) (without 
 including queue time) to the  time taken by each simulation in the pilot job of the 
 Radical-Pilot. A small communication time overhead can be seen which is a very small 
 when compared to the time of the complete simulation.}
@@ -1481,8 +1460,14 @@ detailed simulation would be more crucial as it would need to handle more
 communications and various job submissions. This would also help reduce 
 total time taken to complete the required runs.
 
-\section{Acknowledgments}
-The authors would like to acknowledge National Science Foundation (NSF) for 
+\section*{Software and Data}
+\noindent Source code, input scripts and analysis scripts for reproduction of the experiments can be 
+found at:\\
+Cybermanufacturing: \url{https://github.com/radical-collaboration/CyberManufacturing} \\
+RADICAL-Pilot: \url{https://github.com/radical-cybertools/radical.pilot}
+
+\section*{Acknowledgments}
+\noindent The authors would like to acknowledge National Science Foundation (NSF) for 
 funding this project through the grant number: 1547171. Computational resources 
 were provided by NSF XRAC award TG-MCB090174.
 

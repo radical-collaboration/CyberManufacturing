@@ -59,7 +59,7 @@
 \else
 \newcommand{\terminology}[1]{}
 \newcommand{\jwave}[1]{#1}
-\newcommand{\jhanote}[1]{}
+\newcommand{\jhanote}[1]{ {\textcolor{red} { ***shantenu: #1 }}}
 \newcommand{\csnote}[1]{}
 \newcommand{\gpnote}[1]{}
 \newcommand{\note}[1]{}
@@ -114,25 +114,25 @@ Piscataway, NJ, USA-08854}
 
 
 \begin{abstract}
-Particulate processes are prevalent in the pharmaceutical industry but, 
-
 The accurate modeling of the physics underlying particulate processes is
-complicated and requires significant computational capabilities
-...
-solve a particle-level model. This approach makes the
-simulation slower than a less accurate bulk model. A quicker and more accurate
-way to model such a system is to use a multi-scale model, i.e. use the
-particle-scale data into a bulk model. In this work, a unidirectional multi-
-scale model was used to model the high shear wet granulation process. A multi-
-dimensional population balance model (PBM) was developed with a mechanistic
-kernel, which in turn obtained collision data from the discrete element
-modeling (DEM) simulation. The PBM was run in parallel using a hybrid
-technique. The DEM simulations were performed on LIGGGHTS, which ran in
-parallel using MPI. Speedup of about 14 times was obtained for the PBM
-simulations and around 12 for the DEM simulations. This coupling was performed
-using radical pilot for scaling studies from 1 to 128 cores for the PBM and up
-to 256 cores for the DEM. Using this developed framework, the granulation
-process was modeled faster than existing approaches in literature.
+complicated and requires significant computational capabilities to solve
+using particle-based models. Multi-scale, hybrid approaches represent a balancing
+trade-off between the speed of bulk models and the high accuracy of
+particulate models. In this work, a unidirectional multi-scale approach was
+used to model the high shear wet granulation process. A multi-dimensional
+population balance model (PBM) was developed with a mechanistic kernel, which
+in turn obtained collision data from the discrete element modeling (DEM)
+simulation. The PBM was parallelized using a hybrid OpenMP+MPI approach. The DEM
+simulations were performed using LIGGGHTS, which was parallelized using MPI.
+Speedups of approximately 14 were obtained for the PBM simulations and
+approximately 12 for the DEM simulations. The uni-directional coupling of DEM
+to PBM was performed using middleware components (RADICAL-Pilot) that did not
+require modifications of the DEM or PBM codes, yet supported flexible
+execution on high-performance platforms. Experimental results demonstrate
+scaling from 1 to 128 cores for the PBM and up to 256 cores for the DEM. Our
+method, implementations and middleware enable the modeling of high shear wet
+granulation process faster than existing approaches in literature. 
+
 \end{abstract}
 
 \begin{keyword}
@@ -141,6 +141,14 @@ Population balance model \sep Granulation \sep Discrete element method  \sep MPI
 \end{keyword}
 \end{frontmatter}
 \linenumbers
+
+
+\jhanote{For introduction: what does "faster" mean? does it mean, time to
+completion? or scale? strong or weak scaling? Also, I see references but I
+don't see an apples-to- apples comparision of existing or alternate approaches
+in literature.}
+
+
 
 \section{Introduction \& Objectives} 
 Half of all industrial chemical production is typically performed via the
@@ -938,6 +946,8 @@ a maximum of 128 cores.
 
 \subsection{CyberInfrastructre: RADICAL-Pilot (RP) \& Coupled DEM and PBM communication}
 \label{sec:RPandCommunications}
+
+\jhanote{Giannis: I believe a diagram here would be helfpul. It can go next to Figure 4. That would help distinguish the different levels/types of parallelism.}\jhanote{references missing}
 RADICAL-Pilot defines a number of abstractions to describe resources, and
 computational tasks. The Pilot Description is the abstraction that describes
 resources by defining the number of cores, the HPC resource, and the total time that 
@@ -981,10 +991,10 @@ the space became an important criteria for the simulation for efficient load
 balancing. The initial timing studies for the decomposition were performed using 64
 cores. The time values indicated that dividing the
 x-direction in more number of compartments decreased the speed of the simulation. 
-\jhanote{increasing the "speed of the simulation" is typically
-associated with improved performance. what you mean here is the converse,
-greater the number of compartments, slower the simulation? please clarify or
-fix.} \csnote{A good spot! I meant the converse. Have fixed the 2 following lines as well} 
+% \jhanote{increasing the "speed of the simulation" is typically
+% associated with improved performance. what you mean here is the converse,
+% greater the number of compartments, slower the simulation? please clarify or
+% fix.} \csnote{A good spot! I meant the converse. Have fixed the 2 following lines as well} 
 The extra slicing in the x-direction decreased the amount of computation carried out by 
 a single process but it increased the number of communications in between the MPI slave 
 and master processes. This led to slower simulations when the number of slices 
@@ -992,7 +1002,7 @@ increased beyond 16 in the x-direction.
 %This is easy to comprehend since the granulator has its length parallel to the x-axis. 
 The studies also indicated that if the geometry is divided into more than 2 compartments 
 in either the y-axis or the z-axis the simulation time increased. 
-\jhanote{this is inconsistent with results in table 3!} 
+\jhanote{this is still not easy to see from table 3}
 This can be accounted to increased communication required to transfer 
 the rotating impeller mesh from one compartment in the y-axis or the z-axis 
 to the another compartment for each time step. Since MPI has to pass explicit 
@@ -1140,7 +1150,8 @@ a function of number of cores. The improvements in the speed of the simulation w
 cores were increased from 1 to 16 when compared to speed improvements obtained with a core count greater 
 than 16.(b) The speedup achieved in the DEM simulations of 2 mm particles. There 
 was a linear increase up to 16 cores while the speedup seems to plateau when 
-more number of cores are used due to larger amount of communications.}
+more number of cores are used due to larger amount of communications.
+\jhanote{consistency in the x-axis labeling and major/minor tics please. please refrain from inconsistency across figures.}}
 \end{figure} 
 
 
@@ -1195,7 +1206,8 @@ computationally more expensive.
 \begin{figure}
 \centering
 \includegraphics[scale=0.7]{rslsts_DEM_alldia_timing_mtlb.pdf}
-\caption{ Time taken for a 10 second DEM simulation for radii ranging from
+\caption{ \jhanote{consistency in the x-axis labeling and major/minor tics please. please refrain from inconsistency across figures.}
+Time taken for a 10 second DEM simulation for radii ranging from
  0.63mm to 2mm and a particle size distribution ranging from 1mm - 3mm. The speed improvements 
  for the smaller particles was higher as the core count increased when compared to the larger particles. 
  The larger number of smaller particles require more computational power thus benefit more as the number 
@@ -1227,27 +1239,41 @@ at high speeds, was the highest.}
 
 \subsection{Population Balance Modeling (PBM)}
 \subsubsection{PBM model validation}
-The population balance model implemented was considered to have an inlet flow of particles in the 
-first compartment at a constant mass flow rate of 15 kilograms per hour. The particles were assumed 
-to have a log normal distribution with minimum diameter of the particles being about 12 $\mu$m and the 
-maximum of 2.1 mm with a mean of 0.453 mm and a standard deviation of about 0.62 mm. \\
-The PBM used in this study employed an aggregation kernel that takes into account the formation of a 
-larger particle from only two smaller particles. The ratio of the rate of formation and the rate of 
-depletion due to aggregation helped us monitor whether the PBM satisfied the conservation of mass. 
-Since this PBM took into account the aggregation of only 2 particles at once, the ratio of the particles 
-was expected to have a value of 0.5 during the aggregation process. This ratio was reported by the PBM 
-to be 0.5 throughout the simulation, validating the accuracy of the PBM used.
 
-Figure~\ref{fig:rslts_PBM_d50_plots} shows four different particle size distribution plots at four 
-different time instants. Figure~\ref{fig:rslts_PBM_d50_plots}(\subref{fig:30s}) shows the distribution of 
-the particles at 30 seconds, where we expected to have the highest number of the smaller particles. 
-Since the degree of aggregation that has occurred was very low, there was a jump in the number of 
-particles of the smaller size. The particle size distributions at 2 intermediate times of 50 seconds and 
-75 seconds are plotted in Figures~\ref{fig:rslts_PBM_d50_plots}(\subref{fig:50s}) \& \ref{fig:rslts_PBM_d50_plots}(\subref{fig:75s}) respectively. These illustrate that there was an increase in 
-the number of larger particles  and a subsequent decrease in the number of smaller particles. 
-Figure~\ref{fig:rslts_PBM_d50_plots}(\subref{fig:100s}) shows the distribution 
-of the particle size at the end of the granulation process. It can be seen that the number of particles in 
-the higher diameter bins had increased.
+The population balance model implemented was considered to have an inlet flow
+of particles in the first compartment at a constant mass flow rate of 15
+kilograms per hour. The particles were assumed to have a log normal
+distribution with minimum diameter of the particles being about 12 $\mu$m and
+the maximum of 2.1 mm with a mean of 0.453 mm and a standard deviation of
+about 0.62 mm.
+
+The PBM used in this study employed an aggregation kernel that takes into
+account the formation of a larger particle from only two smaller particles.
+The ratio of the rate of formation and the rate of depletion due to
+aggregation helped us monitor whether the PBM satisfied the conservation of
+mass. Since this PBM took into account the aggregation of only 2 particles at
+once, the ratio of the particles was expected to have a value of 0.5 during
+the aggregation process. This ratio was reported by the PBM to be 0.5
+throughout the simulation, validating the accuracy of the PBM used.
+
+Figure~\ref{fig:rslts_PBM_d50_plots} shows four different particle size
+distribution plots at four different time instants.
+Figure~\ref{fig:rslts_PBM_d50_plots}(\subref{fig:30s}) shows the distribution
+of the particles at 30 seconds, where we expected to have the highest number
+of the smaller particles. Since the degree of aggregation that has occurred
+was very low, there was a jump in the number of particles of the smaller size.
+The particle size distributions at 2 intermediate times of 50 seconds and 75
+seconds are plotted in Figures~\ref{fig:rslts_PBM_d50_plots}(\subref{fig:50s})
+\& \ref{fig:rslts_PBM_d50_plots}(\subref{fig:75s}) respectively. These
+illustrate that there was an increase in the number of larger particles  and a
+subsequent decrease in the number of smaller particles.
+Figure~\ref{fig:rslts_PBM_d50_plots}(\subref{fig:100s}) shows the distribution
+of the particle size at the end of the granulation process. It can be seen
+that the number of particles in the higher diameter bins had increased.
+
+\jhanote{I struggle to see how this is validation. What are you validating
+against? What is the measure / metric of validation?}
+
 
 \begin{figure}
 \begin{subfigure}{.5\textwidth}
@@ -1331,12 +1357,15 @@ performance increase is achieved by using the OMP implementation.
 \caption{}
 \label{fig:rslts_PBM_parallel_efficiency}
 \end{subfigure}
-\caption{(a) The speedup achieved by the hybrid parallel implementation of the PBM program. It can be 
-seen the initial speedup up to 16 cores as expected as from an ideal parallel 
-program where as it becomes almost constant from 32 cores to 128 cores(b) The parallel efficiency for 
-the hybrid parallelized PBM code. The efficiency of the code decreased as the 
-number of cores are increased. The higher number of cores have very low efficiency of about 11\% 
-which depicted that there is large time being spent in communication in between the cores.}
+
+\caption{\jhanote{please use consistent style in presenting the figures. The range of x-axis is the same but why use different major/minor points. this includes figure 9. Also shouldn't the y-axis of figure 10a also use multipliers of 2 for ease of readability?}(a) 
+The speedup achieved by the hybrid parallel implementation of the PBM program.
+It can be seen the initial speedup up to 16 cores as expected as from an ideal
+parallel program where as it becomes almost constant from 32 cores to 128
+cores(b) The parallel efficiency for the hybrid parallelized PBM code. The
+efficiency of the code decreased as the number of cores are increased. The
+higher number of cores have very low efficiency of about 11\% which depicted
+that there is large time being spent in communication in between the cores.}
 \end{figure}     
 
 A similar behavior as Figure~\ref{fig:rslts_PBM_parallel_efficiency} was observed where the parallel 
@@ -1397,7 +1426,7 @@ the overall simulations.
 \end{subfigure}
 \caption{(a) D\textsubscript{50} of the particles obtained after 100s of granulation time (25s of 
 mixing and 75s of liquid addition) for the 2mm mono-sized particle DEM simulation. (b) D\textsubscript{50} of the particles obtained after 100s of granulation time (25s of mixing and 75s of liquid addition) for the distributed particle size DEM simulation. The trend observed was similar to the trend 
-found in Figure \ref{fig:rslts_PBM_2mm_d50}}
+found in Figure \ref{fig:rslts_PBM_2mm_d50}. \jhanote{If you are putting two figures side by side and trying to compare, generally good to set the y-axis scale the same.} \jhanote{Figure description/caption should be self-contained to the extent possible.}}
 \end{figure}  
 
 
@@ -1408,21 +1437,27 @@ waiting on the long scheduler queues on a cluster for each individual task.} \jh
 avoids the individual tasks from waiting for different periods of time at the
 scheduler, not waiting itself at the scheduler!} \csnote{corrected, could you please check if it is clear now} 
 
-With resources allocated, the pilot can execute multiple simulation runs at once. The pilot job
-initiated the DEM simulation using the LIGGGHTS executable compiled for the
-DEM studies and then created a link between the collision data obtained, which
-was utilized by the PBM executable. After the link is
-established, it also initiated the PBM. The timing profiles and results from
-both the simulations were then obtained. Since the executables and inputs files
-used in the simulations and the RP job were similar, we did not expect to
-see any changes in the physics of the system. A value of 0.5 was obtained for
-the ratio of the rate of formation to the rate of depletion due to aggregation.
+\jhanote{consistency between
+"the pilot", "pilot-job" and "RADICAL-pilot". "pilot" is a specific component; pilot-job is a  concept and concept, and "RADICAL-Pilot" is the software system. should not be used inter-changably. Also consistency between RP and other terms.} 
 
+With resources allocated, the pilot can execute multiple simulation runs
+\jhanote{what is a "simulation run" ? (as opposed to "simulations"?)} at once.
+The pilot job initiated the DEM simulation using the LIGGGHTS executable
+compiled for the DEM studies and then created a link between the collision
+data obtained, which was utilized by the PBM executable. After the link is
+established, it also initiated the PBM. The timing profiles and results from
+both the simulations were then obtained. Since the executables and inputs
+files used in the simulations and the RP job \jhanote{now using RP job? what
+is that?} were similar, we did not expect to see any changes in the physics of
+the system. A value of 0.5 was obtained for the ratio of the rate of formation
+to the rate of depletion due to aggregation.
+
+\jhanote{Giannis: this paragraph is too long and unweildy. needs to be broken and rewritten.}
 Since the platforms used for initial development and testing of the DEM and
 PBM respectively were different, the DEM simulations were executed again on
 Stampede2 for a fair and accurate comparison. The need for re-running the
 simulations arises due to the clock speeds of the nodes and their
-configuration for the 2 platforms were different. The RADICAL-pilot was setup
+configuration for the 2 platforms were different. RADICAL-pilot was setup
 for Stampede2 and aforementioned experiments were replicated. The DEM
 simulations were run for 64, 128 and 256 cores (MPI processes) and the PBM was
 run for 1, 2, 4, 8 and 16 MPI processes. No OMP threads were implemented for
@@ -1432,25 +1467,26 @@ total amount time taken to simulate the one-way coupling. This time did not
 include the time spent by each executable in the queue of the scheduler. This
 time could vary from a few hours to a few days depending upon the load of the
 cluster. The total time taken for the simulation using the RADICAL-pilot was
-determined from the time the first DEM unit was executed until the PBM execution
-completed. The time of the individual DEM and PBM simulation was added to get
-the total amount of time it required for a single one-way coupling simulation.
-Figure~\ref{fig:rslts_RP_time_plot} shows a comparison of the total times of
-simulation in seconds for the sum of DEM and PBM individual simulations to the
-times taken to run the simulations using RP. RP's coordination layer tends to 
-lose connection with the database when the simulation time exceeds 6 hours. In order to 
-address this issue, the DEM simulations had to be restarted after $1~second$ 
-of simulation, which led to an increase in the simulation times of the DEM. 
-This can be observed in Figure~\ref{fig:rslts_RP_time_plot}. 
-There is also a small time penalty that is paid for the communication 
-in between the client and resource as RP needs to link the required 
-files for the next simulation and also determine the state of the simulation.
+determined from the time the first DEM unit was executed until the PBM
+execution completed. The time of the individual DEM and PBM simulation was
+added to get the total amount of time it required for a single one-way
+coupling simulation. Figure~\ref{fig:rslts_RP_time_plot} shows a comparison of
+the total times of simulation in seconds for the sum of DEM and PBM individual
+simulations to the times taken to run the simulations using RP. RP's
+coordination layer tends to lose connection with the database when the
+simulation time exceeds 6 hours. In order to address this issue, the DEM
+simulations had to be restarted after $1~second$ of simulation, which led to
+an increase in the simulation times of the DEM. This can be observed in
+Figure~\ref{fig:rslts_RP_time_plot}. There is also a small time penalty that
+is paid for the communication in between the client and resource as RP needs
+to link the required files for the next simulation and also determine the
+state of the simulation.
  \gpnote{Do you agree with the following statement:
 In addition, we had to partition DEM execution to smaller parts, because RP coordination
 layer was timing out after 6 hours of a single simulation.} \csnote{added the restart DEM part.}
  But, this communication time was significantly lower than the total
 amount of time a executable job would spend in the job scheduler queue.
-Thus, when a large number of these simulations need to be run, they could uploaded 
+Thus, when a large number of these simulations need to be run, they could \jhanote{??} uploaded 
 as a single pilot job using RADICAL pilot reducing scheduler wait times on individual 
 jobs. \jhanote{It is unclear what the
 benefit is!}\csnote{tried to address the benefit elaborately} 
@@ -1459,10 +1495,13 @@ as one job, thus decreasing the wait times even further.
 \begin{figure}
 \centering
 \includegraphics[scale=0.7]{rp_final.pdf}
-\caption{A comparison of times taken by 2 individual simulations (DEM and PBM) (without 
-including queue time) to the  time taken by each simulation in the pilot job of the 
-Radical-Pilot. A small communication time overhead can be seen which is a very small 
-when compared to the time of the complete simulation.}
+\caption{\jhanote{y-axis unit is missing} \jhanote{"overheard" --> "overhead"} A comparison of times taken by 2 individual simulations (DEM and PBM) (without 
+including queue time) to the  time taken by each simulation in the pilot job
+of the Radical-Pilot. \jhanote{Giannis: Radical-Pilot --> RADICAL-Pilot. But
+more importantly, "pilot job" of the RADICAL-Pilot does not make sense.}
+\jhanote{Giannis: (i)Overheads do not show up any where? (ii) "64-1", "62-2"
+is not obvious to reader.}A small communication time overhead can be seen
+which is a very small when compared to the time of the complete simulation.}
 \label{fig:rslts_RP_time_plot}
 \end{figure}
 	    
@@ -1485,10 +1524,12 @@ communications and various job submissions. This would also help reduce
 total time taken to complete the required runs.
 
 \section*{Software and Data}
-\noindent Source code, input scripts and analysis scripts for reproduction of the experiments can be 
-found at:\\
-Cybermanufacturing: \url{https://github.com/radical-collaboration/CyberManufacturing} \\
-RADICAL-Pilot: \url{https://github.com/radical-cybertools/radical.pilot}
+\noindent Source code, input scripts \jhanote{what is the difference between input and analysis scripts?} and analysis scripts for reproduction of the experiments can be found at:\\
+Cybermanufacturing: \url{https://github.com/radical-collaboration/CyberManufacturing}
+\jhanote{I was not able to find "input scripts" to reproduce experiments. I
+would create a README at the github with links to the source code (for what?)
+etc}
+
 
 \section*{Acknowledgments}
 \noindent The authors would like to acknowledge National Science Foundation (NSF) for 

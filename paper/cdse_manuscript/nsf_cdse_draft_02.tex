@@ -969,10 +969,10 @@ in Figure~\ref{fig:mthds_PBM_decompostion}.
 
 \gpnote{I do not think you have to
 give a reason this specific for the selected resource. Stampede2 supports the requirements of the
-software, and as a result it is the selected resource for the experiments} The PBM code developed
-required intel v17.0.2 (gcc 5.3+)  or later for compilation. Since this module
-was not present on the Stampede, the execution of the PBM was done on the
-newer Stampede2 supercomputer. Each of the compute node of the cluster
+software, and as a result it is the selected resource for the experiments}
+The execution of the PBM was done on the
+newer Stampede2 supercomputer as it supported the developed PBM C++ code. 
+Each of the compute node of the cluster
 consists of Intel Xeon Phi 7250 (\textquotedblleft Knights
 Landing\textquotedblright) which has 68 cores on a single socket clocked at
 1.4 GHz, with 96 GB of DDR4 RAM. Each of the cores consists of 4 hardware
@@ -1095,7 +1095,7 @@ It does not fit with the flow} %This helps better utilization
 %in more than 2 compartments for 128 and 256 core simulation as well. This
 %meant that the x-axis was divided into 32 and 64 compartments respectively. 
 \jhanote{1 paragraph, 1 idea. Is the following part of the above 'load balancing' or is 
-now about 'communication'?} \csnote{tried to clear the air by removing the general statements}\\
+now about 'communication'?} \csnote{tried to clear the air by removing the general statements} 
 In order to avoid the expensive communication
 between the processes, LIGGGHTS tries to insert the particles towards the
 center of the compartment such that the number of ghost atoms are minimized.
@@ -1115,7 +1115,7 @@ experiments with different 3-D partition configuration were carried out.
 \jhanote{I'm
 confused: the previous sentences imply a functional problem. The next sentence
 suggests a performance solution. Doesn't make sense to me.} 
-\csnote{edited structure of the paragraph}\\
+\csnote{edited structure of the paragraph}
 The comparison of the simulation times of experiments with the new configurations are shown in
 Table~\ref{table:rslts_dem_128_256_decomp}.
 
@@ -1195,7 +1195,9 @@ more number of cores are used due to larger amount of communications.
 
 \gpnote{You are saying that a measure is not good to represent performance, but a function which has
 this measure as a free variable is?! Showing only time may not be the best representation of performance,
-but time is a good measure of performance. I do not see any data other than timing data for performance.} \\csnote{changed}
+but time is a good measure of performance. I do not see any data other than timing data for performance.} 
+
+\csnote{changed}
 
 Pure timing studies are not the best representation for the parallel performance of a program. 
 Speedup of a parallel program indicates the speed increase of the program when it is run on more 

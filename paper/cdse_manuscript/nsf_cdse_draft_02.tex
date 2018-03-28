@@ -43,7 +43,7 @@
 \makeatother
 
 \newif\ifdraft
-%\drafttrue
+\drafttrue
 \ifdraft
 \usepackage{xcolor}
 \definecolor{ocolor}{rgb}{1,0,0.4}
@@ -147,6 +147,9 @@ Population balance model \sep Granulation \sep Discrete element method  \sep MPI
 completion? or scale? strong or weak scaling? Also, I see references but I
 don't see an apples-to- apples comparision of existing or alternate approaches
 in literature.}
+\csnote{The simulations before this in literature have not ever been performed 
+with such large number of cores and the ones present using commercial software
+usually take days to run}
 
 
 
@@ -270,10 +273,12 @@ usage; see next paragraph.} \csnote{have changed the occurence parallel computin
 solving that cannot be solved without HPC? It is unclear to the reader.} 
 %The main objective of this work is to develop a unidirectional DEM-PBM model that
 %runs efficiently in parallel so that it can take advantage of the
-%computational capabilities of  modern computing clusters. 
+%computational capabilities of  modern computing clusters. \\
+
 The goal of this work is to employ HPC systems to solve the developed DEM-PBM coupled 
 model such that it can be used to predict behavior of the wet granulation 
-process accurately and in a reasonable time frame. 
+process accurately and in a reasonable time frame. Usually such simulations with 
+current techniques take upto several days to complete. 
 This model could be used to design a control system 
 around the granulation process to help control the product quality, which is of 
 prime importance to the pharmaceutical industry. In the course of
@@ -301,7 +306,7 @@ that undergo changes in average
 composition, size, or other pertinent properties. Granulation is one such
 particulate process which is commonly found in the pharmaceutical industry. In
 this process, fine powders are converted to larger granules using a liquid
-binder. The three rate processes governing granulation are wetting and
+binder. The rate processes governing granulation are wetting and
 nucleation, consolidation and aggregation, and attrition and
 breakage~\citep{Iveson2001}~\citep{Cameron2005}. As liquid is added to the
 fine powder, it forms a porous nuclei that can coalesce, deform and
@@ -426,16 +431,19 @@ mixing~\citep{sen2013}~\citep{sen2013b} and is discussed in Section \ref{sec:pbm
 %\gpnote{Yes, it is better. I did some fixing though. That being said, it am
 %not sure whether it is needed or not.}
 
-A node on a HPC cluster has multiple CPUs (usually two) and commonly 32GBs or more of RAM. 
-Each CPU is a multi-core processor meaning it has multiple compute cores that can carry 
-out computation independently of one another. Main memory or RAM is divided between processors.
-As a result, each processor has direct access to the part of the memory it considers local.
-Accessing the memory of other processors introduces delays~\cite{Jin2011}. 
-Therefore, managing data locality is very important.
+%A node on a HPC cluster has multiple CPUs (usually two) and commonly 32GBs or more of RAM. 
+%Each CPU is a multi-core processor meaning it has multiple compute cores that can carry 
+%out computation independently of one another. Main memory or RAM is divided between processors.
+%As a result, each processor has direct access to the part of the memory it considers local.
+%Accessing the memory of other processors introduces delays~\cite{Jin2011}. 
+%Therefore, managing data locality is very important.
  
-%\jhanote{HPC has been defined. Please use it} \csnote{Changed}
-%\gpnote{A conventional PC is not the correct term. I suggest the analogy to be removed and write:
-%An HPC node usually has two processors and at least 64GBs of RAM. Each processor has at least 16 cores. Main memory or RAM is %divided between processors. As a result, each processor has direct access to the part of the memory it considers local. However %accessing the rest of the memory introduces delays~\cite{Jin2011}. Therefore, managing data locality is very important.}
+\jhanote{HPC has been defined. Please use it} \csnote{Changed}
+\gpnote{A conventional PC is not the correct term. I suggest the analogy to be removed and write:}
+An HPC node usually has two processors and at least 64GBs of RAM. Each processor has at least 16 cores. 
+Main memory or RAM is divided between processors. As a result, each processor has direct access 
+to the part of the memory it considers local. However accessing the rest of the memory introduces 
+delays~\cite{Jin2011}. Therefore, managing data locality is very important.
 
 Since the many cores of a CPU can communicate directly through memory they can 
 do so by using shared memory methods. This is commonly done using OMP 
@@ -446,16 +454,17 @@ communication overhead and the overall memory footprint required
 for computation.
 
 When many CPUs are being used in parallel they cannot communicate with each 
-other directly through memory which results in much slower communication and 
-therefore shared memory methods like OMP should not be used. \gpnote{I am not sure
-    how the next sentence is a result from the previous? Processes do not communicate
+other directly through memory which results in much slower communications.
+ \gpnote{I am not sure  how the next sentence is a result from the previous? Processes do not communicate
 through memory.}This type of 
 system where processes cannot communicate directly through memory is called a 
 distributed memory system. MPI is commonly used to enable communication 
 of the processes in a distributed memory system. MPI allows the processes 
 to communicate using explicit  message passing methods. MPI will operate 
 each process as a discrete entity with its own private copy of 
-each variable it needs for computation \gpnote{I am not sure if this is correct}which is how it avoids memory retrieval 
+each variable it needs for computation 
+\gpnote{I am not sure if this is correct} \csnote{it does create its own variables}
+which is how it avoids memory retrieval 
 slowdowns when using many CPUs. For optimal parallel performance a programmer 
 needs to consider the architecture of the cluster they are using and the 
 features of the applications they are using such as MPI and OMP ~\citep{Adhianto2007}.  
@@ -907,13 +916,17 @@ The model was parallelized such that it
 could take advantage of shared memory but still effectively run across a
 distributed system, thus employing a combination of both, MPI and OMP.
 
-An algorithm in the form of pseudo code is presented in \ref{app:parallelPBM} illustrating how
+An algorithm in the form of pseudo code is presented in Algorithm \ref{alg:parallelPBM} illustrating how
 the calculations are distributed and carried out during the simulation. For
 each time step, the MPI processes are made responsible for a specific chunk of
-the spatial compartments. 
+the spatial compartments. \\
 \jhanote{please use proper format to present an
-algorithm. giannis please use format of CCGrid paper, for example} \csnote{re-wrote the algorithm please have a look}
-\gpnote{Yes, it is in the same format as the CCGrid paper. Much better than before. I suggest that you reference the algorithm. Using "below" I expect the algorithm near this paragraph, but it is in the Appendix.} Then each OMP thread, inside of each MPI process, is allocated to one of the cores of
+algorithm. giannis please use format of CCGrid paper, for example} \csnote{re-wrote the algorithm please 
+have a look}
+\gpnote{Yes, it is in the same format as the CCGrid paper. Much better than before. I suggest that you 
+reference the algorithm. Using "below" I expect the algorithm near this paragraph, but it is in the Appendix.}
+\csnote{Have added it back to this section}\\
+ Then each OMP thread, inside of each MPI process, is allocated to one of the cores of
 multi-core CPU the MPI process is bound too. The OMP threads divide up and
 compute $\Re_{agg}$. After $\Re_{agg}$ is calculated the MPI processes
 calculate the new PSD value ($F_{t,c}$) for their chunk at that specific time step
@@ -929,6 +942,29 @@ in Figure~\ref{fig:mthds_PBM_decompostion}.
 \caption{The distribution of the PBM calculations to utilize the MPI + OMP parallelization technique on the CPUs of each node}
 \label{fig:mthds_PBM_decompostion}
 \end{figure}
+
+\begin{algorithm}
+     \scriptsize
+     \caption{Parallel Population Balance Model}
+     \label{alg:parallelPBM}
+     \begin{algorithmic}[1]
+     \Procedure{Population Balance Model}{$N_{Comp}$,$N_{MPI}$,$N_{OMP}$}\Comment{$N_{Comp}$ is the number of compartments}
+     \State \texttt{Divide $N_{Comp}$ in $N_{MPI}$}
+     \While{$t < t_{final}$}
+     \For{$\forall n_{Comp}$ in 1 MPI process}
+     \For{$\forall n$ in $N_{OMP}$}
+     \State \texttt{Calculate $\Re_{agg}$ for solid bins $s_1$,$s_2$}
+     \EndFor 
+     \State \texttt{Calculate $n_{particles}$ using Euler's method}
+     \EndFor
+     \State \texttt{Collect $n_{particles}$ from $N_{MPI}$}\Comment{Master process collects all data}
+     \State \texttt{Calculate $timestep$ using \textit{CFL} condition}
+     \State \texttt{$t_{new} = t + timestep$ }
+     \EndWhile
+     \EndProcedure
+     \end{algorithmic}
+ \label{alg:parpbm}
+ \end{algorithm}     
 
 
 \gpnote{I do not think you have to
@@ -1002,7 +1038,7 @@ increased beyond 16 in the x-direction.
 %This is easy to comprehend since the granulator has its length parallel to the x-axis. 
 The studies also indicated that if the geometry is divided into more than 2 compartments 
 in either the y-axis or the z-axis the simulation time increased. 
-\jhanote{this is still not easy to see from table 3}
+\jhanote{this is still not easy to see from table 3} \csnote{the old table does not exist anymore thus no reference}
 This can be accounted to increased communication required to transfer 
 the rotating impeller mesh from one compartment in the y-axis or the z-axis 
 to the another compartment for each time step. Since MPI has to pass explicit 
@@ -1050,7 +1086,8 @@ meant that the x-axis was divided into 32 and 64 compartments respectively.
 %the amount of computation done by one core should be similar to other
 %processors. 
 \jhanote{What evidence/indication is there that load balancing is
-a problem, as opposed to communication limited?} \csnote{The first few lines 
+a problem, as opposed to communication limited?} 
+\csnote{The first few lines 
 are  just general statements I could do away with this paragraph altogether. 
 It does not fit with the flow} %This helps better utilization
 %of the resources as well as make the simulations run faster. 
@@ -1058,7 +1095,7 @@ It does not fit with the flow} %This helps better utilization
 %in more than 2 compartments for 128 and 256 core simulation as well. This
 %meant that the x-axis was divided into 32 and 64 compartments respectively. 
 \jhanote{1 paragraph, 1 idea. Is the following part of the above 'load balancing' or is 
-now about 'communication'?} \csnote{tried to clear the air by removing the general statements}
+now about 'communication'?} \csnote{tried to clear the air by removing the general statements}\\
 In order to avoid the expensive communication
 between the processes, LIGGGHTS tries to insert the particles towards the
 center of the compartment such that the number of ghost atoms are minimized.
@@ -1067,7 +1104,7 @@ reduced the space available for the insertion of the particles.
 %This made LIGGGHTS carry out larger number of Monte-Carlo simulations to insert 
 %the particles in the desired area. In some cases, the Monte-Carlo iterations performed 
 %were not enough leading to many of the particles being inserted incorrectly.
-This resulted in more re-attempts at inserting the particles in the desired space 
+This resulted in more Monte-Carlo insertion re-attempts of the particles at the desired space 
 thereby increasing simulation time.
 \jhanote{please elaborate} 
 %Another abnormal behavior observed due to this over slicing 
@@ -1077,7 +1114,8 @@ Thus, the number of partitions in the x-direction were reduced and a new set of
 experiments with different 3-D partition configuration were carried out. 
 \jhanote{I'm
 confused: the previous sentences imply a functional problem. The next sentence
-suggests a performance solution. Doesn't make sense to me.} \csnote{edited structure of the paragraph}
+suggests a performance solution. Doesn't make sense to me.} 
+\csnote{edited structure of the paragraph}\\
 The comparison of the simulation times of experiments with the new configurations are shown in
 Table~\ref{table:rslts_dem_128_256_decomp}.
 
@@ -1108,8 +1146,8 @@ system. It can be noted that slicing along y-axis is more favorable than
 slicing along the z-direction. \jhanote{Without further
 discussion/explanation, it is difficult to discern how/why?.} \csnote{Proceeding lines 
 have this discussion}\gpnote{I think there are too many "thus"s and "so"s. I think it
-would read better if this was before the previous sentences and remove all "thus"s} The
-insertion of particles is hindered when the geometry is cut along the z-axis
+would read better if this was before the previous sentences and remove all "thus"s} \csnote {edited} \\
+The insertion of particles is hindered when the geometry is cut along the z-axis
 as the inlet is perpendicular to it. This made LIGGGHTS provision less space for
 the insertion of these particles, which increased the time of the simulation.
 Thus, slicing the geometry into 2 sections along the z-axis is preferred.
@@ -1157,7 +1195,7 @@ more number of cores are used due to larger amount of communications.
 
 \gpnote{You are saying that a measure is not good to represent performance, but a function which has
 this measure as a free variable is?! Showing only time may not be the best representation of performance,
-but time is a good measure of performance. I do not see any data other than timing data for performance.}
+but time is a good measure of performance. I do not see any data other than timing data for performance.} \\csnote{changed}
 
 Pure timing studies are not the best representation for the parallel performance of a program. 
 Speedup of a parallel program indicates the speed increase of the program when it is run on more 
@@ -1273,6 +1311,9 @@ that the number of particles in the higher diameter bins had increased.
 
 \jhanote{I struggle to see how this is validation. What are you validating
 against? What is the measure / metric of validation?}
+\csnote{The simulation is validated with the assumption that 2 particles combine 
+to form 1 particle. Thus the ratio 0.5 come into the picture and this value if consistent
+throughout the simulation, this validates the simulation}
 
 
 \begin{figure}
@@ -1440,8 +1481,9 @@ scheduler, not waiting itself at the scheduler!} \csnote{corrected, could you pl
 \jhanote{consistency between
 "the pilot", "pilot-job" and "RADICAL-pilot". "pilot" is a specific component; pilot-job is a  concept and concept, and "RADICAL-Pilot" is the software system. should not be used inter-changably. Also consistency between RP and other terms.} 
 
-With resources allocated, the pilot can execute multiple simulation runs
-\jhanote{what is a "simulation run" ? (as opposed to "simulations"?)} at once.
+With resources allocated, the pilot can execute multiple simulations
+\jhanote{what is a "simulation run" ? (as opposed to "simulations"?)} \\csnote(changed) 
+at once.
 The pilot job initiated the DEM simulation using the LIGGGHTS executable
 compiled for the DEM studies and then created a link between the collision
 data obtained, which was utilized by the PBM executable. After the link is
@@ -1524,11 +1566,12 @@ communications and various job submissions. This would also help reduce
 total time taken to complete the required runs.
 
 \section*{Software and Data}
-\noindent Source code, input scripts \jhanote{what is the difference between input and analysis scripts?} and analysis scripts for reproduction of the experiments can be found at:\\
+\noindent Source code and input scripts \jhanote{what is the difference between input and analysis scripts?} for reproduction of the experiments can be found at:\\
 Cybermanufacturing: \url{https://github.com/radical-collaboration/CyberManufacturing}
 \jhanote{I was not able to find "input scripts" to reproduce experiments. I
 would create a README at the github with links to the source code (for what?)
-etc}
+etc} 
+\csnote{input files for ligghts are in dir src\/liggghts\_input\_files and the execution details are already on Wiki}
 
 
 \section*{Acknowledgments}
@@ -1538,44 +1581,23 @@ were provided by NSF XRAC award TG-MCB090174.
 
 
 \appendix
-\section{PBM Parallelization}
-\label{app:parallelPBM}
-The parallelization technique used for the PBM used was dependent on the number of 
-compartments present inside granulator. Each of the compartments, had calculations 
-independent from each other for each time step. So each of them were loaded 
-onto different MPI processes. Since there is minimal communication between them, 
-they could easily be parallelized using MPI. To get further speed improvements, 
-the time independent calculations of the PBM were parallelized using OMP. This 
-parallelization technique is decried as an algorithm in Algorithm \ref{alg:parpbm}.
+%\section{PBM Parallelization}
+%\label{app:parallelPBM}
+%The parallelization technique used for the PBM used was dependent on the number of 
+%compartments present inside granulator. Each of the compartments, had calculations 
+%independent from each other for each time step. So each of them were loaded 
+%onto different MPI processes. Since there is minimal communication between them, 
+%they could easily be parallelized using MPI. To get further speed improvements, 
+%the time independent calculations of the PBM were parallelized using OMP. This 
+%parallelization technique is decried as an algorithm in Algorithm \ref{alg:parpbm}.
+%
+%OMP was used to parallelize the calculations inside each compartment. Since 
+%the PBM consisted of 2 solid bins, one of the solid bins was parallelized. 
+%The number of solid bins of solid were equally divided by the number of OMP threads. 
+%%Figure~\ref{fig:app_OMP_distribution} depicts the equal distribution of 16 solid bins of the second solid using 4 OMP 
+%%threads.
 
-OMP was used to parallelize the calculations inside each compartment. Since 
-the PBM consisted of 2 solid bins, one of the solid bins was parallelized. 
-The number of solid bins of solid were equally divided by the number of OMP threads. 
-%Figure~\ref{fig:app_OMP_distribution} depicts the equal distribution of 16 solid bins of the second solid using 4 OMP 
-%threads.
-
-     \begin{algorithm}[H]
-     \scriptsize
-     \caption{Parallel Population Balance Model}
-     \label{alg:parallelPBM}
-     \begin{algorithmic}[1]
-     \Procedure{Population Balance Model}{$N_{Comp}$,$N_{MPI}$,$N_{OMP}$}\Comment{$N_{Comp}$ is the number of compartments}
-     \State \texttt{Divide $N_{Comp}$ in $N_{MPI}$}
-     \While{$t < t_{final}$}
-     \For{$\forall n_{Comp}$ in 1 MPI process}
-     \For{$\forall n$ in $N_{OMP}$}
-     \State \texttt{Calculate $\Re_{agg}$ for solid bins $s_1$,$s_2$}
-     \EndFor 
-     \State \texttt{Calculate $n_{particles}$ using Euler's method}
-     \EndFor
-     \State \texttt{Collect $n_{particles}$ from $N_{MPI}$}\Comment{Master process collects all data}
-     \State \texttt{Calculate $timestep$ using \textit{CFL} condition}
-     \State \texttt{$t_{new} = t + timestep$ }
-     \EndWhile
-     \EndProcedure
-     \end{algorithmic}
- \label{alg:parpbm}
- \end{algorithm}     
+     
 
  
 %\begin{figure}[H]

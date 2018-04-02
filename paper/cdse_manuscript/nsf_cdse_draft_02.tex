@@ -181,27 +181,29 @@ of the particulate system accurately~\citep{Hancock2011}. DEM uses Newton's
 equations of motion to model the forces on each particle in the system and 
 it's interactions with the system geometry and other particles. Since DEM
 involves large amounts of interactions and force computation, it usually takes
-long time to simulate. Thus, there is a need for a more efficient
+a significant amount of time to simulate. Thus, there is a need for a more efficient
 simulation technique for these particulate particles. One of the common
 methods used in the industry is the population balance model (PBM), which is
-more computationally efficient but, lacks the accuracy of the DEM.
+more computationally efficient but, lacks the microscopic detail of the DEM.
 
 PBM takes into account the changes in internal or spatial particle
-properties.This model lacks sensitivity to design parameters such as equipment
-geometry. It is semi-mechanistic in nature, meaning they use population
-averages and probability to capture bulk behavior but still seek to capture
+properties.This model is also unable to incorporate design parameters such 
+as equipment geometry. As a result, it is semi-mechanistic in nature, 
+that it uses population averages and collisional probability to capture 
+bulk behavior but still seeks to capture
 some of the micro-phenomena of particle-particle interactions using
 correlations or empirically developed kernels to approximate those
-interactions. Even though PBM is much faster than DEM, a detailed PBM can
+interactions. Although PBM is computationally much faster than DEM, a detailed PBM can
 still take a significant amount of time to solve \citep{Barrasso2013}. 
-Though highly detailed PBMs take into account
+Though highly detailed PBMs do take into account
 populating, averaging and contain semi-mechanistic kernels, these PBMs still
 can have difficulties in capturing the micro-scale phenomena that are crucial
 to predicting accurate dynamics of particulate processes.
 
-Thus, to complement each other strengths these two modeling techniques are 
-coupled to produce a model which is more accurate than a PBM and also speed  
-efficient compared to DEM. The typical work flow of such a
+Thus, to complement the computational and mechanistic advantages of the PBM and DEM
+technique respectively, they can be coupled to produce a model which is 
+more accurate than a PBM and also computationally more efficient compared to DEM. 
+The typical work flow of such a
 DEM-PBM coupled model involves using a short DEM simulation to capture the
 inter-particle interaction of the system, which is fed into the PBM. This helps 
 PBM accurately simulate the bulk system behavior~\citep{Goldschmidt2003}
@@ -216,67 +218,15 @@ HPC). Please use HPC rather than parallel computing. Also need consistency of
 usage; see next paragraph.} \csnote{have changed the occurence parallel computing to HPC}
 
 
-%Parallel Computing is the standard procedure to solve large computational
-%problems in many sciences. \jhanote{What is this a reference to?} This method
-%uses High Performance Computing (HPC) resources \jhanote{HPC = High-peformance
-%computing, not computers} \csnote{Have addressed the name} utilizing a large number 
-%of cores to solve a problem.\gpnote{I agree with Shantenu. This is a description of an HPC.
-%    I am not sure it is needed here. I propose that it is removed} A HPC
-%consists of hundreds or thousands of compute nodes each with multiple cores 
-%and several GBs of memory. The network
-%that connects them, usually Infiniband, has bandwidth of 56 Gbps. In
-%addition, a high performance parallel filesystem accompanies allows users 
-%to read and write GBs of data efficiently. One of the
-%challenges when implementing parallel applications is to make sure that data
-%is written in a similar manner to serial programs. To ensure correctness of
-%the results, an appropriate data communication implementation is required.
-%\jhanote{the above should not be in the introduction. GET to the message
-%of the contribution of this work, not background/related work.}
-
-
-%Some of the benefits of using HPC in the pharmaceutical industry include high
-%accuracy for parameter estimation as detailed particle-scale simulations can
-%be performed quickly. Quick simulations can also help improve control of
-%continuous pharmaceutical processes. This work showcases the speed
-%improvements that can be achieved using HPCs and how they can help improve
-%process design. \jhanote{All of this can come later. Get to the problem this paper
-%is addressing, the solution/approach and specific contribution. You've alread
-%irritated the reviwer and reader by now} 
-%\csnote{Will be replacing the above paragraph with the one below.}
-
-%Product quality is of prime importance when it comes to the pharmaceutical 
-%products. Thus, the model implemented to control the system should be fast 
-%enough to predict the deviation and correct it before the product 
-%quality is affected. DEM and PBM are used to model granulation which take 
-%a large amount of time to simulate. This arises the need to increase speed 
-%of the simulation such that this process can be controlled online. 
-%To apply the corrective actions, parallel versions of these codes need to be run 
-%on large number of cores. This infrastructure is usually found on a supercomputer 
-%making HPC systems a major component for the online control of such system.
-
-
-%The DEM simulations were performed using LAMMPS Improved
-%for General Granular and Granular Heat Transfer simulations
-%(LIGGGHTS)~\citep{Kloss2012} to model the micro-mechanics of the L\"{o}dige
-%CoriMix CM5 high shear granulator. A 4-Dimensional, reduced order DEM informed
-%PBM was developed that is parallelized using hybrid techniques (Message
-%Passing Interface (MPI) + Open Multi-Processing (OMP))to model the bulk
-%processes occurring during the granulation process and is discussed in
-%section~\ref{sec:pbm_model}. Section~\ref{sec:RPandCommunications} describes
-%unidirectional coupling of DEM and PBM using Radical Pilot, which is a
-%framework developed in Python. This provides task level parallelization, to
-%help develop an accurate model which can be run quickly on high performance
-%computing systems.
-
 \jhanote{What is the specific engineering problem you are interested in
 solving that cannot be solved without HPC? It is unclear to the reader.} 
 %The main objective of this work is to develop a unidirectional DEM-PBM model that
 %runs efficiently in parallel so that it can take advantage of the
 %computational capabilities of  modern computing clusters. \\
 
-The goal of this work is to employ HPC systems to solve the developed DEM-PBM coupled 
+The objective of this work is to employ HPC systems to solve the developed DEM-PBM coupled 
 model such that it can be used to predict behavior of the wet granulation 
-process accurately and in a reasonable time frame. Usually such simulations with 
+process accurately and in a computationally efficient manner. Usually such simulations with 
 current techniques take upto several days to complete. 
 This model could be used to design a control system 
 around the granulation process to help control the product quality, which is of 
@@ -284,8 +234,8 @@ prime importance to the pharmaceutical industry. In the course of
 development of the model, the DEM simulation were performed on LAMMPS Improved
 for General Granular and Granular Heat Transfer simulations
 (LIGGGHTS)~\citep{Kloss2012} to model the micro-mechanics of the L\"{o}dige
-CoriMix CM5 high shear granulator. A 4-Dimensional, reduced order DEM informed
-PBM was developed that is parallelized using hybrid techniques (Message
+CoriMix CM5 high shear granulator. A 4-Dimensional, PBM coupled with DEM 
+was developed that is parallelized using hybrid techniques (Message
 Parsing Interface (MPI) + Open Multi-Processing (OMP))to model the bulk
 processes occurring during the granulation process and is discussed in
 section~\ref{sec:pbm_model}. Section~\ref{sec:RPandCommunications} describes
@@ -315,17 +265,14 @@ powder.To understand how a granulation processes will behave with different
 design and operating parameter settings and formulations, experimental studies
 are performed which is a method referred to as Quality-by-Testing (QbT). This
 methodology is time consuming and expensive. Thus, newer research is focused
-on the more economical Quality-by-Design (QbD) concept i.e, using mathmatical 
+on the more economical Quality-by-Design (QbD) concept i.e, using mathematical 
 models to design these processes in silico.
 
 \subsection{Modeling}
 The paradigm shift of the pharmaceutical industry towards continuous 
 manufacturing, emphasizes the need for a more accurate model. These models
 further help develop better control strategies for the process. 
-They also help develop model predictive control, which help increase mitigate the 
-loss of API during manufacturing. Such controllers require computationally 
-efficient and precise models. The models discussed ahead represent the particle-
-particle interactions at meso and micro-scales.
+Such controllers require computationally efficient and precise models. 
 
 \subsubsection{Discrete Element Modeling (DEM)}
 Discrete Element Method is a simulation technique used to monitor the
@@ -344,7 +291,7 @@ particle, and $F_{i,net}$ represents net force on the particle. Forces on the
 particle due to collisions and other external forces are represented by
 $F_{i,coll}$ and $F_{i,ext}$ respectively.
 
-Using this method, distance between each particle is calculated at every
+Using this method, the distance between each particle is calculated at every
 time step and if this distance between two particles is less than the sum of
 the radii (for spherical particles)  a collision between the two particles is
 recorded. The tolerance for overlap is low in the normal as well as the
@@ -352,7 +299,7 @@ tangential direction. Micro-scale DEM simulations are computationally
 demanding and simulations may take up to several days to replicate a few
 seconds of real time experiments. Many methods have been implemented to
 increase the speed of these simulations, such as scaling by increasing the
-size of the particles. These approximations are good in understanding the
+size of the particles. These approximations are useful in understanding the
 physics of the system but are not directly applicable to process-level
 simulations.
 
@@ -442,9 +389,9 @@ mixing~\citep{sen2013}~\citep{sen2013b} and is discussed in Section \ref{sec:pbm
 An HPC node usually has two processors and at least 64GBs of RAM. Each processor has at least 16 cores. 
 Main memory or RAM is divided between processors. As a result, each processor has direct access 
 to the part of the memory it considers local. However accessing the rest of the memory introduces 
-delays~\cite{Jin2011}. Therefore, managing data locality is very important.
+delays~\citep{Jin2011}. Therefore, managing data locality is very important.
 
-Since the many cores of a CPU can communicate directly through memory they can 
+Since the numerous cores of a CPU can communicate directly through memory they can 
 do so by using shared memory methods. This is commonly done using OMP 
 which uses threads to parallelize execution. 
 The cores then communicate implicitly, through memory. 
@@ -468,72 +415,6 @@ slowdowns when using many CPUs. For optimal parallel performance a programmer
 needs to consider the architecture of the cluster they are using and the 
 features of the applications they are using such as MPI and OMP ~\citep{Adhianto2007}.  
 
-%Analogous to a conventional PC a HPC cluster node has
-%one or more CPUs and RAM. Commonly nodes are manufactured with two CPUs, each
-%CPU is a multi-core meaning it has multiple compute cores such that each can
-%carry out calculations separately from one another. On a node, memory is
-%divided by CPU sockets, so each CPU has direct access to memory that is local
-%to its own socket, however accessing memory on another socket is much
-%slower~\citep{Jin2011}. For this reason. data that is needed for computation
-%should be stored locally to the CPU that needs it.
-
-%There are two types of computer architectures which can be classified by
-%memory locality features, distributed memory systems and shared memory
-%systems. A distributed system as memory which cannot be accessed by all processes
-%except by explicit message passing. For example a process from one node cannot
-%collect information from a process on a seperate node without explicit message passing. 
-%A shared memory system however enables processes to collect information from one another
-%without having to explicitly share that information. For example the multple cores on a CPU
-%can operate in a shared memory fashion since they can communicate directly through memory. 
-%However it is important to note that a programmer can operate a shared memory system in a way
-%that does not allow cores on a CPU to operate using shared memory. Therefore while designing a parallel 
-%program these aspects need to be considered for optimal performance of the code~\citep{Adhianto2007} 
-
-%%\gpnote{I am not sure if this is needed. "nodes exchange memory" is not the best
-%%way to say it. How about "Data movement between nodes"? I am not sure for the purpose
-%%of this paragraph. You introduce MPI and OMP in the next subsection.}
-%%There are two classes of computer architecture which can be classified by
-%%memory locality features such as distributed memory systems or shared memory
-%%systems. These two classes co-exist in a cluster, thus providing the benefits
-%%of each. All the nodes exchange memory using explicit message passing while
-%%each has its own independent memory. The cores on each node can access data
-%%from the shared memory without explicit message passing statements from
-%%the user.\gpnote{It may be better to say programmer.} While designing a parallel program all these aspects need to be
-%%considered for optimal performance of the code~\citep{Adhianto2007}.
-
-%\subsubsection{Parallel Application Programming Interfaces (APIs)}
-%\gpnote{MPI is the most common and is considered the best way to parallelize applications for distributed
-%    computing.}
-%Message Passing Interface (MPI) is the most common Parallel Computing Application 
-%Programming Interface standard. MPI is used for distributed memory parallel computing. Parallelization
-%is achieved via multiprocessing and data communication is done through well defined messages, regardless
-%executing a program in a single or multiple nodes~\citep{Jin2011}. Each process has each own copy of variables
-%and arrays, which can result to large memory consumption if not used carefully. 
-
-
-
-%%and this is 
-%%because the application programming interface will operate 
-%%every MPI process as a discrete unit that does not share memory with the other processes unless explicit 
-%%message passing is used. Even on shared a single node where the hardware supports shared 
-%%memory computing, MPI will still operate it in a distributed memory fashion~\citep{Jin2011}. Operating all 
-%%cores as distinct units also means they each need their own copy of all variables used for computation 
-%%which results in a large overall memory foot print compared to a similar system if it was operated in 
-%%shared memory. 
-
-%Open Multi-Processing (OMP) is another API standard for parallel computing. OMP takes advantage of shared 
-%memory systems and uses threads instead of processes. Although, it does not work well on distributed systems. This 
-%prevents it from being used to efficiently carry out computations across multiple nodes~\citep{Jin2011}. 
-
-%Since MPI is preferred for distributed computing and OMP is better for shared computing many 
-%researchers have studied the performance of MPI vs MPI+OMP methods. Many a times a trade off is made 
-%between optimizing a program for performance and trying to make it flexible enough to run on many 
-%different computer architectures. \gpnote{How is relevant to this section? I think it would be better in the next}
-%It was found that hybrid methods for PBMs allow the code 
-%flexibility for different architectures while still maintaining good performance~\citep{Bettencourt2017}.
-%It was also reported that only the external(spatial) coordinates of the PBM were parallelized. 
-%In this current work external and internal(compositions) calculations are parallelized. 
-
 \subsection{Previous works using HPC methods to solve PBMs and DEMs}
 Various researchers have employed parallel computing methods to solve DEM and PBM simulations. 
 \cite{Gunawan2008} used high-resolution finite volumes solution methods for the parallelization 
@@ -542,7 +423,7 @@ balancing effectively by decomposing the internal coordinates of their PBM. They
 speed improvements up to 100 cores on one system size, but was not tested for models 
 with more dimensions. Moreover, they mentioned that parallelization could be 
 improved using shared memory processing. 
-In our previous work, \cite{Bettencourt2017} took a 
+In previous work, \cite{Bettencourt2017} adopted a 
 hybrid approach towards the parallelization of the PBM using both MPI and OMP. 
 This hybrid parallelization helped achieve a speed improvement of about 98\% using 
 128 cores over the serial code. \cite{Prakash2013a} \& \cite{Prakash2013b} used 
@@ -594,8 +475,8 @@ support scalable and efficient launching of heterogeneous tasks across different
 \subsection{Simulation Setup}
 \subsubsection{Geometry and Meshing for DEM}
 In this work, the L\"{o}dige CoriMix CM5 continuous high shear granulator has 
-been studied. Its geometry was developed using the SolidWorks$^{TM}$ (Dassault Syst\`{e}mes). 
-This granulator consisted of a high speed rotating element enclosed within a 
+been studied. Its geometry was developed using the SolidWorks$^{TM}$ (Dassault Syst\`{e}mes) software. 
+The granulator consists of a high speed rotating element enclosed within a 
 horizontal cylindrical casing. The casing 
 (shown in Figure~\ref{fig:mthdsDemCharlesGranShell}) consists of a cylinder with 
 diameter of 120 mm at inlet and 130 mm at outlet and having a total length of 440 mm. 
@@ -613,8 +494,8 @@ The impeller consists of a cylindrical shaft of length 370 mm and diameter 68 mm
 flattened sides 15 mm wide running along the axis. The blades are placed on these flattened sides as 
 shown in Figure~\ref{fig:mthds_dem_charles_impeller}. There are three different blade elements on the 
 shaft (Figure~\ref{fig:mthds_dem_charles_fig5pt3and4_blades_n_isometric}). At the granulator inlet, 
-there are 4 paddle shaped feed elements following which there are 20 tear drop shaped shearing 
-elements  and finally 4 trapezoidal blades near the exit. All these elements are placed in 
+there are four paddle shaped feed elements following which there are twenty tear drop shaped shearing 
+elements  and finally four trapezoidal blades near the exit. All these elements are placed in 
 a spiral configuration. 
 
 \begin{figure}
@@ -671,7 +552,7 @@ University of Texas, Austin. The hardware configuration of each node consists
 of 2 8-core Intel Xeon E5-2680 processors based on the Sandy Bridge architecture, 
 32 GB of memory with QPI interconnects.
 
-The DEM simulation in LIGGGHTS are setup using an input script which defines physical 
+The DEM simulation in LIGGGHTS were setup using an input script which defines physical 
 parameters of the particles, importing of the geometry, particle insertion commands, various physics 
 models to be used during the simulation as well as various compute and dump commands to help print 
 data required for post-processing. The particles were considered to be granular in 
@@ -914,18 +795,11 @@ time~\citep{Ramachandran2010}.
 The model was parallelized such that it
 could take advantage of shared memory but still effectively run across a
 distributed system, thus employing a combination of both, MPI and OMP.
-
 An algorithm in the form of pseudo code is presented in Algorithm \ref{alg:parallelPBM} illustrating how
 the calculations are distributed and carried out during the simulation. For
 each time step, the MPI processes are made responsible for a specific chunk of
-the spatial compartments. \\
-\jhanote{please use proper format to present an
-algorithm. giannis please use format of CCGrid paper, for example} \csnote{re-wrote the algorithm please 
-have a look}
-\gpnote{Yes, it is in the same format as the CCGrid paper. Much better than before. I suggest that you 
-reference the algorithm. Using "below" I expect the algorithm near this paragraph, but it is in the Appendix.}
-\csnote{Have added it back to this section}\\
- Then each OMP thread, inside of each MPI process, is allocated to one of the cores of
+the spatial compartments. Subsequently, each OMP thread, inside of each MPI 
+process, is allocated to one of the cores of
 multi-core CPU the MPI process is bound too. The OMP threads divide up and
 compute $\Re_{agg}$. After $\Re_{agg}$ is calculated the MPI processes
 calculate the new PSD value ($F_{t,c}$) for their chunk at that specific time step
@@ -1002,17 +876,8 @@ simulation and submitted to the Unit Manager. As soon as the pilot is active,
 the DEM simulation starts executing. When it is finished the DEM output is linked to 
 the new CU describing the PBM
 simulation. The PBM is submitted by the Unit Manager and starts executing. Any data
-dependency is satisfied by doing the necessary file linking through the CU
+dependency is satisfied by performing the necessary file linking through the CU
 description.
-
-%\gpnote{This paragraph is very similar to the previous one. Can they become
-%    one?}
-%The DEM and PBM executables are pre-placed in the resource along with any
-%initial information required by the DEM simulation. The DEM unit creates links
-%for the data files that are be needed and calls the
-%executable. When the execution finishes, new links with the output are created
-%in a shared space. The PBM unit uses those links to read the necessary data to
-%execute the simulation. When both have finished RP downloads the PBM results.
 
 
 
@@ -1056,7 +921,7 @@ in turn made the simulation slower.
 %no matter what, which is not true}
 %\csnote{have explained the communications in a better manner} 
 Following the results from the initial timing studies,the y and the z-axes were not divided
-in more than 2 compartments for 128 and 256 core simulation as well. This
+in more than two compartments for 128 and 256 core simulation as well. This
 meant that the x-axis was divided into 32 and 64 compartments respectively. 
 
 %\begin{table}
@@ -1096,7 +961,7 @@ It does not fit with the flow} %This helps better utilization
 \jhanote{1 paragraph, 1 idea. Is the following part of the above 'load balancing' or is 
 now about 'communication'?} \csnote{tried to clear the air by removing the general statements} 
 In order to avoid the expensive communication
-between the processes, LIGGGHTS tries to insert the particles towards the
+between the processes, LIGGGHTS attempts to insert the particles towards the
 center of the compartment such that the number of ghost atoms are minimized.
 For simulations with higher number of cores the extra slicing in the x direction 
 reduced the space available for the insertion of the particles.
@@ -1234,11 +1099,11 @@ rely on the networking infrastructure of the cluster for communications leading 
 communication times. There are more sections present when 256 cores are used for the 
 simulation, leading to more communication in this system when compared to the 128 core simulation. 
 These excess communication made the simulation slower though there is more processing power and 
-it required lesser time for other calculations. Another observation that made from Figure~\ref{fig:rslts_DEM_timing_studies} was that the particle size distribution simulation took more time 
+it required lesser time for other calculations. Another observation that was made from Figure~\ref{fig:rslts_DEM_timing_studies} was that the particle size distribution simulation took more time 
 compared to the simulations with mono-sized particles of 1.59mm and 2mm, though the mean size of 
 particles in the distribution was 2mm. The default profile provided by LIGGGHTS indicated that the time 
 spent in calculating the particle-particle interaction forces was higher than the mono-sized 
-simulations. The different diameters made the interaction forces more tedious thus, making it 
+simulations. The different diameters made the interaction forces more tedious thus making it 
 computationally more expensive. 
 
 
@@ -1259,7 +1124,7 @@ times required to transfer the rotating mesh from one process to the other. From
 the modify time. This was expected since the impeller rotates at a very high speed of 2000 rpm. If 
 the number of processes are increased the amount of time spent in transferring the mesh also 
 increased. In the studies, the modify time as a percentage of the simulation increased from 82\% to 
-about 90\%, when the core count was increased from the 64 cores to 256 cores. But, using the 
+about 90\%, when the core count was increased from the 64 cores to 256 cores. However, using the 
 higher number of cores reduced the time taken to calculate particle-particle interaction as well as  
 neighbor calculation. Thus, 128 cores was a better implementation for meshing and decomposition of the 
 geometry for faster simulations.
@@ -1422,7 +1287,7 @@ of the program using OMP, especially in section of the code where nested loops a
 
 
 \subsection{Coupled DEM and PBM physics}
-The micro-scale simulations provide an insight about the physics of the system usually by tracking 
+The micro-scale simulations provide an insight into the physics of the system usually by tracking 
 each particle. This micro-scale simulation data is useful for the development of macro-scale 
 mechanistic models which take into account the dynamics of bulk of the particles and not individual 
 particles. A similar approach has been implemented in this work, where a mechanistic aggregation 
@@ -1561,7 +1426,7 @@ RP was utilized to execute the simulations for lower wait times. A more accurate
 model for the high shear granulator would be to couple the DEM and PBM bidirectionally 
 i.e. these two methods are executed iteratively up till a steady state is reached. 
 For the two-way coupling, the computation resources required would be really large 
-as it would involve multiple DEM and PBM simulations. The role RP in such a 
+as it would involve multiple DEM and PBM simulations. The role of RP in such a 
 detailed simulation would be more crucial as it would need to handle more 
 communications and various job submissions. This would also help reduce 
 total time taken to complete the required runs.

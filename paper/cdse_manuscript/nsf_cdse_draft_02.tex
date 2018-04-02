@@ -60,6 +60,7 @@
 \newcommand{\terminology}[1]{}
 \newcommand{\jwave}[1]{#1}
 \newcommand{\jhanote}[1]{ {\textcolor{red} { ***shantenu: #1 }}}
+%\newcommand{\jhanote}[1]{}
 \newcommand{\csnote}[1]{}
 \newcommand{\gpnote}[1]{}
 \newcommand{\note}[1]{}
@@ -116,9 +117,7 @@ Piscataway, NJ, USA-08854}
 \begin{abstract}
 The accurate modeling of the physics underlying particulate processes is
 complicated and requires significant computational capabilities to solve
-using particle-based models. Multi-scale, hybrid approaches represent a balancing
-trade-off between the speed of bulk models and the high accuracy of
-particulate models. In this work, a unidirectional multi-scale approach was
+using particle-based models. In this work, a unidirectional multi-scale approach was
 used to model the high shear wet granulation process. A multi-dimensional
 population balance model (PBM) was developed with a mechanistic kernel, which
 in turn obtained collision data from the discrete element modeling (DEM)
@@ -128,8 +127,8 @@ Speedups of approximately 14 were obtained for the PBM simulations and
 approximately 12 for the DEM simulations. The uni-directional coupling of DEM
 to PBM was performed using middleware components (RADICAL-Pilot) that did not
 require modifications of the DEM or PBM codes, yet supported flexible
-execution on high-performance platforms. Experimental results demonstrate
-scaling from 1 to 128 cores for the PBM and up to 256 cores for the DEM. Our
+execution on high-performance platforms. Results demonstrate
+scaling from 1 to 128 cores for the PBM and up to 256 cores for the DEM. The proposed 
 method, implementations and middleware enable the modeling of high shear wet
 granulation process faster than existing approaches in literature. 
 
@@ -157,7 +156,7 @@ usually take days to run}
 Half of all industrial chemical production is typically performed via the
 processing of particulate systems~\citep{seville1997}. These processes 
 also account
-for about 70\% of the products of industries like detergents, aerosols,
+for approximate 70\% of the industrially manufactured products like detergents, aerosols,
 fertilizers, and pharmaceuticals~\citep{Litster2016}. They are
 widely popular as particulate products have advantages over liquid
 formulations such as better chemical and physical stability and reduced
@@ -166,8 +165,8 @@ the underlying physics of these processes is poorly
 understood~\citep{Rogers2013}. As a result industries that rely on these
 processes, especially pharmaceuticals, have to use expensive heuristic studies
 and inefficient operational protocols with high recycle ratios to meet strict
-regulatory standards~\citep{Ramachandran2009}. This can drive up the costs and
-delay the release of new products. What makes these processes so challenging
+regulatory standards~\citep{Ramachandran2009}. This can increase costs and
+delay the release of new products. Furthermore these processes so challenging
 to design is that there are none or few governing equations to accurately
 predict their behavior~\citep{sen2013}.
 

@@ -857,7 +857,7 @@ a maximum of 128 cores.
 \label{sec:RPandCommunications}
 
 \jhanote{Giannis: I believe a diagram here would be helfpul. It can go next to Figure 4. That would help distinguish the different levels/types of parallelism.}\jhanote{references missing}
-RADICAL-Pilot defines a number of abstractions to describe resources, and
+RADICAL-Pilot~\cite{rp-jsspp18} defines a number of abstractions to describe resources, and
 computational tasks. The Pilot Description is the abstraction that describes
 resources by defining the number of cores, the HPC resource, and the total time that 
 the resources are needed. Computational tasks are defined via the Compute Unit 
@@ -869,7 +869,7 @@ submitting and monitoring a Pilot. The Unit Manager is responsible for
 placing CUs in active Pilots. As soon as a Unit is placed in a Pilot, it starts
 executing.
 
-RADICAL-Pilot is utilized to execute and monitor DEM and PBM simulations.
+RADICAL-Pilot~\cite{rp-jsspp18} is utilized to execute and monitor DEM and PBM simulations.
 Initially, a pilot description is created to use several cores of a resource
 and submitted to the pilot manager. A CU description is created for the DEM
 simulation and submitted to the Unit Manager. As soon as the pilot is active,
@@ -878,8 +878,6 @@ the new CU describing the PBM
 simulation. The PBM is submitted by the Unit Manager and starts executing. Any data
 dependency is satisfied by performing the necessary file linking through the CU
 description.
-
-
 
 \section{Results \& Discussion}
 \label{sec:Results}

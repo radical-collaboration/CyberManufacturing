@@ -42,33 +42,9 @@
 \font\sixly=lasy6 % does not re-load if already loaded, so no memory problem.
 \makeatother
 
-\newif\ifdraft
-%\drafttrue
-\ifdraft
-\usepackage{xcolor}
-\definecolor{ocolor}{rgb}{1,0,0.4}
-\newcommand{\terminology}[1]{ {\textcolor{red} {(Terminology used: \textbf{#1}) }}}
-\newcommand{\jwave}[1]{ {\reduwave{#1}}}
-\newcommand{\jhanote}[1]{ {\textcolor{red} { ***shantenu: #1 }}}
-\newcommand{\csnote}[1]{ {\textcolor{blue} { ***chaitanya: #1 }}}
-\definecolor{orange}{rgb}{1,.5,0}
-\definecolor{dandelion}{cmyk}{0,0.29,0.84,0}
-\newcommand{\gpnote}[1]{{\textcolor{green} {***giannis: #1}}}
-\newcommand{\fbnote}[1]{{\textcolor{cyan} { ***franklin: #1 }}}
-\newcommand{\note}[1]{ {\textcolor{magenta} { ***Note: #1 }}}
-\else
-\newcommand{\terminology}[1]{}
-\newcommand{\jwave}[1]{#1}
-%newcommand{\jhanote}[1]{ {\textcolor{red} { ***shantenu: #1 }}}
-\newcommand{\jhanote}[1]{}
-\newcommand{\csnote}[1]{}
-\newcommand{\gpnote}[1]{}
-\newcommand{\note}[1]{}
-\fi
 
 
-
-\journal{Chemical Engineering Research and Design}
+\journal{Computer and Chemical Engineering}
 \begin{document}
 \begin{frontmatter}
 
@@ -179,14 +155,6 @@ these coupled DEM-PBM models, the simulations times are not short enough for
 practical use. In recent years, High-Performance Computing (HPC) has 
 been employed to speed up  these DEM and PBM simulations
 ~\citep{Gunawan2008}~\citep{Prakash2013a}~\citep{Bettencourt2017}.
-
-\jhanote{Parallel computing is a type/subset of high-performance computing
-HPC). Please use HPC rather than parallel computing. Also need consistency of
-usage; see next paragraph.} \csnote{have changed the occurence parallel computing to HPC}
-
-
-\jhanote{What is the specific engineering problem you are interested in
-solving that cannot be solved without HPC? It is unclear to the reader.} 
 
 
 The objective of this work is to employ HPC systems to solve the developed DEM-PBM coupled 
@@ -714,6 +682,13 @@ of the geometry with the particles as well as from particle-particle overlap.
 
 
 \subsubsection{Parallel PBM approach}
+\begin{figure}
+\centering
+\includegraphics[scale=0.45]{PBM_decomposition.pdf}
+\caption{The distribution of the PBM calculations to utilize the MPI + OMP parallelization technique on the CPUs of each node}
+\label{fig:mthds_PBM_decompostion}
+\end{figure}
+
 The PBM was discretized by converting each of its coordinates in to discrete
 bins. For the spatial coordinates a linear bin spacing was used. For the
 internal coordinates, solid, liquid, and gas a non-linear discretization was
@@ -741,19 +716,14 @@ the spatial compartments. Subsequently, each OMP thread, inside of each MPI
 process, is allocated to one of the cores of
 multi-core CPU the MPI process is bound too. The OMP threads divide up and
 compute $\Re_{agg}$. After $\Re_{agg}$ is calculated the MPI processes
-calculate the new PSD value ($F_{t,c}$) for their chunk at that specific time step
-. The slave processes send their $F_{t,c}$ to the master processes
+calculate the new PSD value ($F_{t,c}$) for their chunk at that specific time step. 
+The slave processes send their $F_{t,c}$ to the master processes
 which collects them into the complete PSD ($F_{t,all}$). The master process then
 broadcasts the $F_{t,all}$ value to all slave processes. This decomposition of
 the data into different CPUs and further into various threads is illustrated
 in Figure~\ref{fig:mthds_PBM_decompostion}.
 
-\begin{figure}
-\centering
-\includegraphics[scale=0.45]{PBM_decomposition.pdf}
-\caption{The distribution of the PBM calculations to utilize the MPI + OMP parallelization technique on the CPUs of each node}
-\label{fig:mthds_PBM_decompostion}
-\end{figure}
+
 
 \begin{algorithm}
      \scriptsize
@@ -924,16 +894,9 @@ a function of number of cores. The improvements in the speed of the simulation w
 cores were increased from 1 to 16 when compared to speed improvements obtained with a core count greater 
 than 16.(b) The speedup achieved in the DEM simulations of 2 mm particles. There 
 was a linear increase up to 16 cores while the speedup seems to plateau when 
-more number of cores are used due to larger amount of communications.
-\jhanote{consistency in the x-axis labeling and major/minor tics please. please refrain from inconsistency across figures.}}
+more number of cores are used due to larger amount of communications.}
 \end{figure} 
 
-
-\gpnote{You are saying that a measure is not good to represent performance, but a function which has
-this measure as a free variable is?! Showing only time may not be the best representation of performance,
-but time is a good measure of performance. I do not see any data other than timing data for performance.} 
-
-\csnote{changed}
 
 Pure timing studies are not the best representation for the parallel performance of a program. 
 Speedup of a parallel program indicates the speed increase of the program when it is run on more 
@@ -941,22 +904,21 @@ compute cores compared to the wall clock time when it is run in serial. It is th
 represent the parallel performance. Speedup is the ratio of the time taken to run the program in serial 
 to the time taken by the program to run in parallel as shown in Equation~\ref{eqn:rslts_DEM_Speed_Up}. 
 For an ideally parallelized program, speedup is equal to $n$, where $n$ is the number of cores used.
-\gpnote{My general preference: Anything that has to do with mathematics or arithmetic, regardless if it
-    is inline with the text or not, should be in \$ signs. It makes it clearer than quotes}
 
-\begin{align}
-\textit{Speedup} = \frac{\textit{Serial Wall Clock Time}}{\textit{Parallel Wall Clock Time}}\label{eqn:rslts_DEM_Speed_Up}
-\end{align}
+\begin{equation}
+Speedup = \frac{Wall \ Clock \ Time}{Parallel \ Wall \ Clock \ Time}\label{eqn:rslts_DEM_Speed_Up}
+\end{equation}
+
 
 Speedup does not take into account number of processors used in the simulation. Another metric 
 used to determine parallel performance is Parallel Efficiency. This metric is defined as 
 speedup divided by the number of cores used. Thus, parallel efficiency normalizes speedup and gives 
 the fraction of the ideal speedup a program achieves increasing the number of cores.
 
-\begin{align}
-\textit{Parallel Efficiency} = \frac{\textit{Serial Wall Clock Time}}{\textit{Parallel Wall Clock Time $\times$ $n$}}
+\begin{equation}
+\textit{Parallel Efficiency} = \frac{Serial \ Wall \ Clock \ Time}{Parallel \ Wall \ Clock \ Time \times n}
 \label{eqn:rslts_DEM_parallel_efficiency}
-\end{align}
+\end{equation}
 
 The speedup of the DEM simulations using only MPI cores is shown in Figure~\ref{fig:rslts_DEM_speedup}.
 There was a linear speed increase in the speedup up to 16 cores, after which the 
@@ -982,12 +944,11 @@ computationally more expensive.
 \begin{figure}
 \centering
 \includegraphics[scale=0.7]{rslsts_DEM_alldia_timing_mtlb.pdf}
-\caption{ \jhanote{consistency in the x-axis labeling and major/minor tics please. please refrain from inconsistency across figures.}
-Time taken for a 10 second DEM simulation for radii ranging from
+\caption{Time taken for a 10 second DEM simulation for radii ranging from
  0.63mm to 2mm and a particle size distribution ranging from 1mm - 3mm. The speed improvements 
  for the smaller particles was higher as the core count increased when compared to the larger particles. 
  The larger number of smaller particles require more computational power thus benefit more as the number 
- of cores are increased. }
+ of cores are increased.}
 \label{fig:rslts_DEM_timing_studies}
 \end{figure}
 
@@ -1046,12 +1007,6 @@ subsequent decrease in the number of smaller particles.
 Figure~\ref{fig:rslts_PBM_d50_plots}(\subref{fig:100s}) shows the distribution
 of the particle size at the end of the granulation process. It can be seen
 that the number of particles in the higher diameter bins had increased.
-
-\jhanote{I struggle to see how this is validation. What are you validating
-against? What is the measure / metric of validation?}
-\csnote{The simulation is validated with the assumption that 2 particles combine 
-to form 1 particle. Thus the ratio 0.5 come into the picture and this value if consistent
-throughout the simulation, this validates the simulation}
 
 
 \begin{figure}
@@ -1137,8 +1092,7 @@ performance increase is achieved by using the OMP implementation.
 \label{fig:rslts_PBM_parallel_efficiency}
 \end{subfigure}
 
-\caption{\jhanote{please use consistent style in presenting the figures. The range of x-axis is the same but why use different major/minor points. this includes figure 9. Also shouldn't the y-axis of figure 10a also use multipliers of 2 for ease of readability?}(a) 
-The speedup achieved by the hybrid parallel implementation of the PBM program.
+\caption{(a) The speedup achieved by the hybrid parallel implementation of the PBM program.
 It can be seen the initial speedup up to 16 cores as expected as from an ideal
 parallel program where as it becomes almost constant from 32 cores to 128
 cores(b) The parallel efficiency for the hybrid parallelized PBM code. The
@@ -1205,34 +1159,24 @@ the overall simulations.
 \end{subfigure}
 \caption{(a) D\textsubscript{50} of the particles obtained after 100s of granulation time (25s of 
 mixing and 75s of liquid addition) for the 2mm mono-sized particle DEM simulation. (b) D\textsubscript{50} of the particles obtained after 100s of granulation time (25s of mixing and 75s of liquid addition) for the distributed particle size DEM simulation. The trend observed was similar to the trend 
-found in Figure \ref{fig:rslts_PBM_2mm_d50}. \jhanote{If you are putting two figures side by side and trying to compare, generally good to set the y-axis scale the same.} \jhanote{Figure description/caption should be self-contained to the extent possible.}}
+found in Figure \ref{fig:rslts_PBM_2mm_d50}.}
 \end{figure}  
 
 
 \subsection{One-way coupled DEM+PBM using RADICAL-Pilot and its performance} 
 
-\gpnote{This is said before. It can be removed:RADICAL-Pilot (RP) being a pilot job system it can bypass the need of
-waiting on the long scheduler queues on a cluster for each individual task.} \jhanote{This is wrong! It
-avoids the individual tasks from waiting for different periods of time at the
-scheduler, not waiting itself at the scheduler!} \csnote{corrected, could you please check if it is clear now} 
 
-\jhanote{consistency between
-"the pilot", "pilot-job" and "RADICAL-pilot". "pilot" is a specific component; pilot-job is a  concept and concept, and "RADICAL-Pilot" is the software system. should not be used inter-changably. Also consistency between RP and other terms.} 
 
-With resources allocated, the pilot can execute multiple simulations
-\jhanote{what is a "simulation run" ? (as opposed to "simulations"?)} \\csnote(changed) 
-at once.
-The pilot job initiated the DEM simulation using the LIGGGHTS executable
+With resources allocated, the pilot can execute multiple simulations at once.
+The RP job initiated the DEM simulation using the LIGGGHTS executable
 compiled for the DEM studies and then created a link between the collision
 data obtained, which was utilized by the PBM executable. After the link is
 established, it also initiated the PBM. The timing profiles and results from
 both the simulations were then obtained. Since the executables and inputs
-files used in the simulations and the RP job \jhanote{now using RP job? what
-is that?} were similar, we did not expect to see any changes in the physics of
+files used in the simulations and the RP job were similar, we did not expect to see any changes in the physics of
 the system. A value of 0.5 was obtained for the ratio of the rate of formation
 to the rate of depletion due to aggregation.
 
-\jhanote{Giannis: this paragraph is too long and unweildy. needs to be broken and rewritten.}
 Since the platforms used for initial development and testing of the DEM and
 PBM respectively were different, the DEM simulations were executed again on
 Stampede2 for a fair and accurate comparison. The need for re-running the
@@ -1261,26 +1205,19 @@ Figure~\ref{fig:rslts_RP_time_plot}. There is also a small time penalty that
 is paid for the communication in between the client and resource as RP needs
 to link the required files for the next simulation and also determine the
 state of the simulation.
- \gpnote{Do you agree with the following statement:
-In addition, we had to partition DEM execution to smaller parts, because RP coordination
-layer was timing out after 6 hours of a single simulation.} \csnote{added the restart DEM part.}
- But, this communication time was significantly lower than the total
+ 
+But, this communication time was significantly lower than the total
 amount of time a executable job would spend in the job scheduler queue.
-Thus, when a large number of these simulations need to be run, they could \jhanote{??} uploaded 
-as a single pilot job using RADICAL pilot reducing scheduler wait times on individual 
-jobs. \jhanote{It is unclear what the
-benefit is!}\csnote{tried to address the benefit elaborately} 
-An extension of this work would be to use RP to schedule multiple such coupled simulations 
+Thus, when a large number of these simulations need to be run, they could uploaded 
+as a single RP job using RADICAL pilot reducing scheduler wait times on individual 
+jobs. An extension of this work would be to use RP to schedule multiple such coupled simulations 
 as one job, thus decreasing the wait times even further.
 \begin{figure}
 \centering
 \includegraphics[scale=0.65]{rp_final.pdf}
-\caption{\jhanote{y-axis unit is missing} \jhanote{"overheard" --> "overhead"} A comparison of times taken by 2 individual simulations (DEM and PBM) (without 
+\caption{A comparison of times taken by 2 individual simulations (DEM and PBM) (without 
 including queue time) to the  time taken by each simulation in the RP job
-of the RADICAL-Pilot. \jhanote{Giannis: RADICAL-Pilot --> RADICAL-Pilot. But
-more importantly, "pilot job" of the RADICAL-Pilot does not make sense.}
-\jhanote{Giannis: (i)Overheads do not show up any where? (ii) "64-1", "62-2"
-is not obvious to reader.}A small communication time overhead can be seen
+of the RADICAL-Pilot. A small communication time overhead can be seen
 which is a very small when compared to the time of the complete simulation.}
 \label{fig:rslts_RP_time_plot}
 \end{figure}
@@ -1304,12 +1241,8 @@ communications and various job submissions. This would also help reduce
 total time taken to complete the required runs.
 
 \section*{Software and Data}
-\noindent Source code and input scripts \jhanote{what is the difference between input and analysis scripts?} for reproduction of the experiments can be found at:\\
+\noindent Source code and input scripts for reproduction of the experiments can be found at:\\
 Cybermanufacturing: \url{https://github.com/radical-collaboration/CyberManufacturing}
-\jhanote{I was not able to find "input scripts" to reproduce experiments. I
-would create a README at the github with links to the source code (for what?)
-etc} 
-\csnote{input files for ligghts are in dir src\/liggghts\_input\_files and the execution details are already on Wiki}
 
 
 \section*{Acknowledgments}
@@ -1318,33 +1251,6 @@ funding this project through the grant number: 1547171. Computational resources
 were provided by NSF XRAC award TG-MCB090174.
 
 
-\appendix
-%\section{PBM Parallelization}
-%\label{app:parallelPBM}
-%The parallelization technique used for the PBM used was dependent on the number of 
-%compartments present inside granulator. Each of the compartments, had calculations 
-%independent from each other for each time step. So each of them were loaded 
-%onto different MPI processes. Since there is minimal communication between them, 
-%they could easily be parallelized using MPI. To get further speed improvements, 
-%the time independent calculations of the PBM were parallelized using OMP. This 
-%parallelization technique is decried as an algorithm in Algorithm \ref{alg:parpbm}.
-%
-%OMP was used to parallelize the calculations inside each compartment. Since 
-%the PBM consisted of 2 solid bins, one of the solid bins was parallelized. 
-%The number of solid bins of solid were equally divided by the number of OMP threads. 
-%%Figure~\ref{fig:app_OMP_distribution} depicts the equal distribution of 16 solid bins of the second solid using 4 OMP 
-%%threads.
-
-     
-
- 
-%\begin{figure}[H]
-%\centering
-%\includegraphics[scale=0.5]{OMP_table.pdf}
-%\caption{The integration of aggregation rate distributed among OMP processes. This figure indicates the use of 4 OMP processes, the 
-%configuration that gave us the best performance. This technique has been implemented for each MPI process.}
-%\label{fig:app_OMP_distribution}
-%\end{figure}	
 
 \section*{References} 
 \bibliographystyle{elsarticle-harv}

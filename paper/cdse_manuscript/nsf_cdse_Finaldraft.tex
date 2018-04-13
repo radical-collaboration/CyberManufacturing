@@ -761,7 +761,7 @@ a maximum of 128 cores.
 \subsection{CyberInfrastructre: RADICAL-Pilot (RP) \& Coupled DEM and PBM communication}
 \label{sec:RPandCommunications}
 
-RADICAL-Pilot defines a number of abstractions to describe resources, and
+RADICAL-Pilot~\cite{rp-jsspp18} defines a number of abstractions to describe resources, and
 computational tasks. The Pilot Description is the abstraction that describes
 resources by defining the number of cores, the HPC resource, and the total time that 
 the resources are needed. Computational tasks are defined via the Compute Unit 
@@ -773,7 +773,7 @@ submitting and monitoring a Pilot. The Unit Manager is responsible for
 placing CUs in active Pilots. As soon as a Unit is placed in a Pilot, it starts
 executing.
 
-RADICAL-Pilot is utilized to execute and monitor DEM and PBM simulations.
+RADICAL-Pilot~\cite{rp-jsspp18} is utilized to execute and monitor DEM and PBM simulations.
 Initially, a pilot description is created to use several cores of a resource
 and submitted to the pilot manager. A CU description is created for the DEM
 simulation and submitted to the Unit Manager. As soon as the pilot is active,
@@ -1168,50 +1168,34 @@ found in Figure \ref{fig:rslts_PBM_2mm_d50}.}
 
 
 With resources allocated, the pilot can execute multiple simulations at once.
-The RP job initiated the DEM simulation using the LIGGGHTS executable
-compiled for the DEM studies and then created a link between the collision
-data obtained, which was utilized by the PBM executable. After the link is
-established, it also initiated the PBM. The timing profiles and results from
-both the simulations were then obtained. Since the executables and inputs
-files used in the simulations and the RP job were similar, we did not expect to see any changes in the physics of
-the system. A value of 0.5 was obtained for the ratio of the rate of formation
-to the rate of depletion due to aggregation.
+RADICAL-Pilot initiated the DEM simulation using the LIGGGHTS executable. As soon
+as DEM is complete, links are created to the outputed collision data and a PBM
+is started. Due to the similarity between the simulations -- same executables and
+input files -- we did not expect any changes in the physical system. 
 
-Since the platforms used for initial development and testing of the DEM and
-PBM respectively were different, the DEM simulations were executed again on
-Stampede2 for a fair and accurate comparison. The need for re-running the
-simulations arises due to the clock speeds of the nodes and their
-configuration for the 2 platforms were different. RADICAL-pilot was setup
-for Stampede2 and aforementioned experiments were replicated. The DEM
-simulations were run for 64, 128 and 256 cores (MPI processes) and the PBM was
-run for 1, 2, 4, 8 and 16 MPI processes. No OMP threads were implemented for
-the PBM run, since the current version of RP did not support threading. The
-times for the individual DEM and PBM simulations were added to determine the
-total amount time taken to simulate the one-way coupling. This time did not
-include the time spent by each executable in the queue of the scheduler. This
-time could vary from a few hours to a few days depending upon the load of the
-cluster. The total time taken for the simulation using the RADICAL-pilot was
-determined from the time the first DEM unit was executed until the PBM
-execution completed. The time of the individual DEM and PBM simulation was
-added to get the total amount of time it required for a single one-way
-coupling simulation. Figure~\ref{fig:rslts_RP_time_plot} shows a comparison of
-the total times of simulation in seconds for the sum of DEM and PBM individual
-simulations to the times taken to run the simulations using RP. RP's
-coordination layer tends to lose connection with the database when the
-simulation time exceeds 6 hours. In order to address this issue, the DEM
-simulations had to be restarted after $1~second$ of simulation, which led to
-an increase in the simulation times of the DEM. This can be observed in
-Figure~\ref{fig:rslts_RP_time_plot}. There is also a small time penalty that
-is paid for the communication in between the client and resource as RP needs
-to link the required files for the next simulation and also determine the
-state of the simulation.
- 
-But, this communication time was significantly lower than the total
-amount of time a executable job would spend in the job scheduler queue.
-Thus, when a large number of these simulations need to be run, they could uploaded 
-as a single RP job using RADICAL pilot reducing scheduler wait times on individual 
-jobs. An extension of this work would be to use RP to schedule multiple such coupled simulations 
-as one job, thus decreasing the wait times even further.
+The DEM simulations were run for 64, 128 and 256 cores (MPI processes) and the PBM was
+run from 1, up to 16 MPI processes. We did not utilize the OpenMP capabilities of PBM,
+because the used version 0.47 of RADICAL-Pilot~\cite{rp-jsspp18} did not distinguish between 
+processes and threads. Initially, DEM and PBM were submitted using custom batch scripts
+to provide with execution profiles that could be used as the basis of the analysis. 
+Execution via RADICAL-Pilot required to break the DEM simulation to smaller
+simulations. This was due to some limitations RADICAL-Pilot presented when running
+Compute Units (CUs) for more than $\sim6$ hours. Thus, the execution included $10$ CUs
+for DEM and a single CU for PBM. The same core configurations were used.
+
+Figure~\ref{fig:rslts_RP_time_plot} shows the comparison between the uncoupled execution
+of DEM and PBM and the one with RADICAL-Pilot. Both DEM and PBM provide profiling data in 
+seconds. For RADICAL-Pilot, we aggregated the timings of the first $10$ units, since it
+concerns only the DEM step of the simulation. DEM's simulation is significantly larger
+when using RADICAL-Pilot compared to the single script execution. Restarting the DEM
+simulation add significant overheads to the overall execution. In addition, we verified
+that the difference cannot be attributed to RADICAL-Pilot. Figure~\ref{fig:rslts_RP_time_plot}
+includes the overheads presented by RADICAL-Pilot, but they are so small compared to
+the overall execution that are barely visible. Despite the significant performance,
+we were able to multiple such simulation running concurrently via RADICAL-Pilot
+without the need to submit every simulation to the batch queue, thus reducing
+the wait time when executing multiple configurations.
+
 \begin{figure}
 \centering
 \includegraphics[scale=0.65]{rp_final.pdf}
@@ -1254,5 +1238,5 @@ were provided by NSF XRAC award TG-MCB090174.
 
 \section*{References} 
 \bibliographystyle{elsarticle-harv}
-\bibliography{Bibli}
+\bibliography{Bibli,radical_publications}
 \end{document}
